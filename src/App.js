@@ -11,6 +11,7 @@ import Utils from './utils/tronUtils'
 import TronWeb from "tronweb";
 import TronLinkInfo from "./components/TronLinkInfo";
 import TronLinkGuide from "./components/TronLinkGuide";
+import { Provider } from 'react-redux'
 
 import MainPage from "./views/MainPage"
 
@@ -112,7 +113,7 @@ class App extends React.Component {
     if (!this.state.tronWeb.loggedIn) return <TronLinkGuide installed />;
 
     return (
-      <MainPage />
+        <MainPage />
     );
   }
 }

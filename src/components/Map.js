@@ -8,7 +8,10 @@ import {
 } from "react-simple-maps"
 
 import geoData from "./world-50m.json"
-import store from "../flux/store"
+import { connect } from "react-redux";
+
+import {selectedNations} from '../redux/selector'
+import {selectNation} from '../redux/actions'
 
 const wrapperStyles = {
   width: "100%",
@@ -20,10 +23,12 @@ class BasicMap extends React.Component{
   
   handleClick = (event) => {
     console.log("clicked on ", event.properties.name)
-    store.selectState(event.properties.name)
+    this.props.selectNation(event.properties.name)
+    this.forceUpdate()
   }
 
   render(){
+    let isSelected
     return (
       <div style={wrapperStyles}>
         <ComposableMap
@@ -40,34 +45,41 @@ class BasicMap extends React.Component{
           >
           <ZoomableGroup center={[0,20]} disablePanning>
             <Geographies geography={geoData}>
-              {(geographies, projection) => geographies.map((geography, i) => geography.id !== "ATA" && (
-                <Geography
-                  key={i}
-                  geography={geography}
-                  projection={projection}
-                  onClick={(event) => this.handleClick(event)}
-                  style={{
-                    default: {
-                      fill: "#ECEFF1",
-                      stroke: "#607D8B",
-                      strokeWidth: 0.75,
-                      outline: "none",
-                    },
-                    hover: {
-                      fill: "#607D8B",
-                      stroke: "#607D8B",
-                      strokeWidth: 0.75,
-                      outline: "none",
-                    },
-                    pressed: {
-                      fill: "#FF5722",
-                      stroke: "#607D8B",
-                      strokeWidth: 0.75,
-                      outline: "none",
-                    },
-                  }}
-                />
-              ))}
+              {(geographies, projection) => geographies.map((geography, i) => 
+                {
+                  console.log(geography)
+                  isSelected = this.props.nations.includes(geography.properties.name)
+                  
+                  return geography.id !== "ATA" && 
+                  (
+                    <Geography
+                      key={i}
+                      geography={geography}
+                      projection={projection}
+                      onClick={(event) => this.handleClick(event)}
+                      style={{
+                        default: {
+                          fill: isSelected ? "#FF5722" : "#ECEFF1",
+                          stroke: "#607D8B",
+                          strokeWidth: 0.75,
+                          outline: "none",
+                        },
+                        hover: {
+                          fill: isSelected ? "#FF5722" : "#ECEFF1",
+                          stroke: "#607D8B",
+                          strokeWidth: 0.75,
+                          outline: "none",
+                        },
+                        pressed: {
+                          fill: "#FF5722",
+                          stroke: "#607D8B",
+                          strokeWidth: 0.75,
+                          outline: "none",
+                        },
+                      }}
+                    />
+                )
+              })}
             </Geographies>
           </ZoomableGroup>
         </ComposableMap>
@@ -76,4 +88,12 @@ class BasicMap extends React.Component{
   }
 }
 
-export default BasicMap;
+const mapStateToProps = state => ({
+  nations: selectedNations(state)
+});
+
+const mapDispatchToProps = dispatch => ({
+  selectNation: (nation) => dispatch(selectNation(nation))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(BasicMap);

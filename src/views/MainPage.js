@@ -12,7 +12,8 @@ import TopReferrals from "./../components/common/TopReferrals";
 
 import BetBox from "./../components/BetBox"
 import Map from "./../components/Map"
-import store from "./../flux/store"
+
+import {connect} from 'react-redux'
 
 const MainPage = () => (
   <Container fluid className="main-content-container px-4">
@@ -46,4 +47,12 @@ const MainPage = () => (
   </Container>
 );
 
-export default MainPage;
+const mapStateToProps = state => ({
+  
+});
+
+const mapDispatchToProps = dispatch => ({
+  
+});
+
+export default connect(mapStateToProps,mapDispatchToProps)(MainPage);
