@@ -22,9 +22,10 @@ const wrapperStyles = {
 class BasicMap extends React.Component{ 
   
   handleClick = (event) => {
-    console.log("clicked on ", event.properties.name)
-    this.props.selectNation(event.properties.name)
-    this.forceUpdate()
+    const currentNation = event.properties.name
+    console.log("clicked on ", currentNation)
+    this.props.selectNation(currentNation)
+    console.log("nations: ", this.props.nations)
   }
 
   render(){
@@ -44,10 +45,9 @@ class BasicMap extends React.Component{
           }}
           >
           <ZoomableGroup center={[0,20]} disablePanning>
-            <Geographies geography={geoData}>
+            <Geographies geography={geoData} disableOptimization>
               {(geographies, projection) => geographies.map((geography, i) => 
                 {
-                  console.log(geography)
                   isSelected = this.props.nations.includes(geography.properties.name)
                   
                   return geography.id !== "ATA" && 
