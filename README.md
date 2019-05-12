@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <p align="center">
 <a href="https://designrevision.com/downloads/shards-dashboard-lite-react/">
 <img src="assets/preview.png" width="250" />
@@ -47,6 +46,11 @@ A free React admin dashboard template pack featuring a modern design system <br 
 * Install dependencies by running `yarn` or `npm install`.
 * Run `yarn start` or `npm run start` to start the local development server.
 * 😎 **That's it!** You're ready to start building awesome dashboards.
+
+#### Start the server and the db
+
+* run the server in the backend folder by running `node start`
+* run the mongodb server in the backend folder by running `mongod`
 
 <br />
 
