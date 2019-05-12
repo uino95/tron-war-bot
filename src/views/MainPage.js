@@ -12,6 +12,7 @@ import TopReferrals from "./../components/common/TopReferrals";
 
 import BetBox from "./../components/BetBox"
 import Map from "./../components/Map"
+import History from "./../components/History"
 
 import {connect} from 'react-redux'
 
@@ -30,7 +31,7 @@ const MainPage = () => (
 
       {/* history box */}
       <Col lg="4" md="6" sm="12" className="mb-4">
-        <UsersByDevice />
+        <History />
       </Col>
 
       {/* bet box */}
