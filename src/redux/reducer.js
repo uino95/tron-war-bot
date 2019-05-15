@@ -15,12 +15,12 @@ const initialState={
 const mapReducer = (state = initialState, action) => {
   switch (action.type) {
     case SELECT_NATION:
-    	if(state.selectedNations.includes(action.nation)) 
+    	if(state.selectedNations.includes(action.nation))
     		return {
     			selectedNations: state.selectedNations.filter(nation => action.nation != nation),
     			nations: state.nations
     		}
-    	else 
+    	else
     		return {
 	    		selectedNations: [...state.selectedNations, action.nation],
 	    		nations: state.nations
@@ -30,7 +30,7 @@ const mapReducer = (state = initialState, action) => {
 			selectedNations: [],
 			nations: action.nations
 		}
-		
+
     default:
       return state;
   }
