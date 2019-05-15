@@ -25,7 +25,7 @@ import {selectedNations} from '../redux/selector'
 import {selectNation} from '../redux/actions'
 
 class BetBox extends React.Component{
-  
+
   constructor(props) {
     super(props);
 
@@ -110,7 +110,7 @@ class BetBox extends React.Component{
   //   console.log("clicked on ", currentNation)
   //   this.props.selectNation(currentNation)
   //   console.log("nations: ", this.props.nations)
-  } 
+  }
 
   handleChange = (event) => {
     this.setState(
@@ -127,7 +127,7 @@ class BetBox extends React.Component{
     }
 
     if(bet.address !== undefined && bet.amount && bet.state.length > 0){
-      // actually do the transaction and verify that is ok 
+      // actually do the transaction and verify that is ok
       axios.post('http://localhost:4000/bets/add', bet)
         .then(res => {
             console.log(res.data)
@@ -141,7 +141,7 @@ class BetBox extends React.Component{
     } else if (bet.state.length === 0){
       this.showAlert(false, "you have to select at list one state")
     }
-    
+
   }
 
   render(){
@@ -204,7 +204,7 @@ class BetBox extends React.Component{
                 </ListGroup>) : (
                   <ListGroupItem> no nation selected </ListGroupItem>
                 )}
-                
+
 
                 <Button  onClick={(bet) => this.handleSubmit(bet)}>Bet</Button>
                 <Alert className="mb-3" open={this.state.visible} theme={this.state.success ? "success" : "danger"}>
