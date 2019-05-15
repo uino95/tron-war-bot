@@ -2,7 +2,8 @@ import { combineReducers } from "redux";
 
 import {
   SELECT_NATION,
-  MAP_UPDATED
+  MAP_UPDATED,
+  NEW_BET,
 } from "./actions";
 
 const merge = (prev, next) => Object.assign({}, prev, next);
@@ -37,7 +38,7 @@ const mapReducer = (state = initialState, action) => {
 };
 
 const reducer = combineReducers({
-  map: mapReducer
+  map: mapReducer,
 });
 
 export default reducer;
