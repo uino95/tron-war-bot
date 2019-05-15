@@ -23,9 +23,11 @@
     "react-scripts": "2.1.1",
     "react-simple-maps": "^0.12.1",
     "redux": "^4.0.1",
+    "redux-saga": "^1.0.2",
     "reselect": "^4.0.0",
     "shards-react": "^1.0.3",
     "shortid": "^2.2.14",
+    "socket.io-client": "^2.2.0",
     "tronweb": "^2.5.3"
   },
   "scripts": {
