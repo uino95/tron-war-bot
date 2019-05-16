@@ -30,7 +30,7 @@ io.on('connection', function(socket) {
 
   socket.on('newBet', function(newBet) {
     let bet = new Bet(newBet);
-    bet.save().then(bet => {
+    bet.save().then((bet) => {
         socket.emit('sendSocketIdResp', 'ok')
         console.log('Accepted New Bet: ' + bet)
       })

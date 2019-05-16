@@ -49,7 +49,7 @@ class History extends React.Component{
                     </tr>
                   </thead>
                   <tbody>
-                {/* show just the last five*/}
+                {/* show just the last five
                     {this.state.bets.slice(this.state.bets.length - 5, this.state.bets.length).reverse().map((bet, i) =>
                      (
                         <tr>
@@ -58,7 +58,7 @@ class History extends React.Component{
                           <td>{bet.state}</td>
                         </tr>
                       )
-                    )}
+                    )}*/}
                   </tbody>
                 </table>
               </CardBody>

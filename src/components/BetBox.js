@@ -22,7 +22,7 @@ import axios from 'axios'
 
 import {connect} from 'react-redux'
 import {selectedNations} from '../redux/selector'
-import {selectNation} from '../redux/actions'
+import {selectNation,newBet} from '../redux/actions'
 
 class BetBox extends React.Component{
 
@@ -128,19 +128,23 @@ class BetBox extends React.Component{
 
     if(bet.address !== undefined && bet.amount && bet.state.length > 0){
       // actually do the transaction and verify that is ok
-      axios.post('http://localhost:4000/bets/add', bet)
-        .then(res => {
-            console.log(res.data)
-            res.status === 200 ? this.showAlert(true, "transaction executed succesfully") : this.showAlert(false, "transaction not executed")
-          }
-        );
 
+      this.props.newBet(bet)
     }
-    else if (bet.address === undefined){
-      this.showAlert(false, "address undefined")
-    } else if (bet.state.length === 0){
-      this.showAlert(false, "you have to select at list one state")
-    }
+
+      // axios.post('http://localhost:4000/bets/add', bet)
+      //   .then(res => {
+      //       console.log(res.data)
+      //       res.status === 200 ? this.showAlert(true, "transaction executed succesfully") : this.showAlert(false, "transaction not executed")
+      //     }
+      //   );
+
+    // }
+    // else if (bet.address === undefined){
+    //   this.showAlert(false, "address undefined")
+    // } else if (bet.state.length === 0){
+    //   this.showAlert(false, "you have to select at list one state")
+    // }
 
   }
 
@@ -224,6 +228,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   selectNation: (nation) => dispatch(selectNation(nation)),
+  newBet: (bet) => dispatch(newBet(bet))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BetBox);
