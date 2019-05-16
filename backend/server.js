@@ -5,7 +5,8 @@ const cors = require('cors');
 const PORT = 4000;
 const mongoose = require('mongoose');
 
-let Bet = require('./tron.model');
+let Bet = require('./tron.model').Bet;
+let RunTurn = require('./tron.model').RunTurn;
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -46,7 +47,15 @@ io.on('connection', function(socket) {
   })
 });
 
-
+//TODO check for new turn
+function newTurn(turn) {
+  let newTurn = RunTurn(turn)
+  RunTurn.save().then((newTurn) => {
+    io.emit('newTurn', newTurn)
+  }).catch(err => {
+    console.log(err)
+  })
+}
 
 betRoutes.route('/').get(function(req, res) {
   Bet.find(function(err, bets) {
