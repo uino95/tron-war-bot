@@ -20,7 +20,7 @@ class History extends React.Component{
       .catch(function (error){
           console.log(error);
       })
-  }
+  }z
 
   render(){
     return(
@@ -41,7 +41,7 @@ class History extends React.Component{
                         Address
                       </th>
                       <th scope="col" className="border-0">
-                        Bet 
+                        Bet
                       </th>
                       <th scope="col" className="border-0">
                         Nation
@@ -49,8 +49,8 @@ class History extends React.Component{
                     </tr>
                   </thead>
                   <tbody>
-                {/* show just the last five*/}
-                    {this.state.bets.slice(this.state.bets.length - 5, this.state.bets.length).reverse().map((bet, i) => 
+                {/* show just the last five
+                    {this.state.bets.slice(this.state.bets.length - 5, this.state.bets.length).reverse().map((bet, i) =>
                      (
                         <tr>
                           <td>{bet.address.length < maxStringLength ? bet.address : bet.address.substring(0,maxStringLength-3).concat('...')}</td>
@@ -58,7 +58,7 @@ class History extends React.Component{
                           <td>{bet.state}</td>
                         </tr>
                       )
-                    )}
+                    )}*/}
                   </tbody>
                 </table>
               </CardBody>
