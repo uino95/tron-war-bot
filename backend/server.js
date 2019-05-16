@@ -65,19 +65,6 @@ betRoutes.route('/:id').get(function(req, res) {
   });
 });
 
-betRoutes.route('/add').post(function(req, res) {
-  let bet = new Bet(req.body);
-  bet.save()
-    .then(bet => {
-      res.status(200).json({
-        'bet': 'bet added successfully'
-      });
-    })
-    .catch(err => {
-      res.status(400).send('adding new bet failed');
-    });
-});
-
 betRoutes.route('/update/:id').post(function(req, res) {
   Bet.findById(req.params.id, function(err, bet) {
     if (!bet)
