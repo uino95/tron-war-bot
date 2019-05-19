@@ -14,10 +14,12 @@ interface ITronWarBot {
   /* Returns the rate of dividends distribution to stakeholders over total house profits: */
   /* 1 TRX equals 100% of profits redistributed through dividends to stakeholders */
   function dividendsToProfitsRate() external view returns (uint256);
-  /* Returns hose edge, minimum and maximum bet set for specific game type */
+  /* Returns house edge, minimum and maximum bet set for specific game type */
   function gameParams(uint256 _gameType) external view returns (uint256, uint256, uint256);
-  /* Returns the current available jackpot for the specific game type */
-  function jackpot(uint256 _gameType) external view returns (uint256)
+  /* Returns the current available jackpot for the specific game type of current round */
+  function jackpot(uint256 _gameType) external view returns (uint256);
+  /* Returns the final archived net jackpot for specific round of gametype and the remaining available funds not yet payed out */
+  function gameFunds(uint256 _gameType, uint256 _round) external view returns (uint256, uint256);
 
   /* SETTERS */
   /* Set the payable address of the house */
@@ -33,9 +35,16 @@ interface ITronWarBot {
   /* LOGIC */
   /* It places the bet, it mines tokens for the user and for the house according to houseMiningRate and records it in an event */
   function bet(uint256 _gameType, uint256 _userChoice) external payable returns (bool);
-  /* It pays the user after deducting the house edge and send TRX to house and to winning user */
-  function payout(uint256 _gameType, address _recipient, uint256 _amount) external returns (bool);
+  /* It deducts and send the house edge, it mantains a _preservedJackpotRate for next round's jackpot and move off the jackpot needed for winning users.
+     It returns the closing round number */
+  function closeGame(uint256 _gameType, uint256 _preservedJackpotRate) external returns (bool);
+  /* It pays the winning users and set them into leaderboard */
+  function payout(uint256 _gameType, uint256 _round, address _recipient, uint256 _amount) external returns (bool);
 
+  event Bet(uint256 indexed gameType, uint256 indexed round, address indexed from, uint256 amount);
+  event Payout(uint256 indexed gameType, uint256 indexed round, address indexed to, uint256 amount);
+  event StartGame(uint256 gameType, uint256 round, uint256 startBlock, uint256 initialJackpot);
+  event EndGame(uint256 gameType, uint256 round, uint256 endBlock, uint256 finalJackpot);
 
   /*********/
   /* UTILS */
