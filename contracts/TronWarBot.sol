@@ -91,7 +91,7 @@ contract TronWarBot is ITronWarBot, Frontend, ReentrancyGuard, Destructible {
     onlyFrontendAdmin
     returns (bool)
   {
-    require(_houseEdge <= 1 tron, "Must be a valid decimal number");
+    require(_houseEdge <= 1 tron, "House edge must be a valid decimal number");
     require(_minimumBet != 0, "Minimum bet must be a valid positive number");
     require(_maximumBet != 0, "Maximum bet must be a valid positive number");
     gameParams[_gameType] = new GameParams(_houseEdge, _minimumBet, _maximumBet);
@@ -184,7 +184,8 @@ contract TronWarBot is ITronWarBot, Frontend, ReentrancyGuard, Destructible {
     require(roundFunds[_gameType][_round].availableFunds >= _amount, "Payout must not exceed available funds");
     roundFunds[_gameType][_round].availableFunds = roundFunds[_gameType][_round].availableFunds.sub(_amount);
     emit Payout(_gameType, _round, _recipient, _amount);
-    _recipient.transfer(_amount);
+    if (_recipient != address(this)) _recipient.transfer(_amount);
+    else jackpot[_gameType] = jackpot[_gameType].add(_amount);
     return true;
   }
 
