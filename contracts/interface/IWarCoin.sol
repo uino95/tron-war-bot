@@ -1,4 +1,4 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.4.25;
 
 interface IWarCoin {
 
@@ -33,9 +33,9 @@ interface IWarCoin {
   function removePauser(address account) external;
   function renouncePauser() external;
   //Ownable
-  function owner() external view returns (address payable);
+  function owner() external view returns (address);
   function isOwner() external view returns (bool);
-  function transferOwnership(address payable newOwner) external;
+  function transferOwnership(address newOwner) external;
   //Backend
   function isBackend() external pure returns (bool);
   function isFrontend(address account) external view returns (bool);

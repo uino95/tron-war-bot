@@ -1,4 +1,4 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.4.25;
 
 import "../interface/IAdmin.sol";
 
@@ -22,7 +22,7 @@ contract Destructible is IAdmin, Ownable, Pausable {
     selfdestruct(Ownable.owner());
   }
 
-  function destroyAndSend(address payable _recipient)
+  function destroyAndSend(address _recipient)
     public
     onlyOwner
     whenPaused

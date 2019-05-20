@@ -1,4 +1,4 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.4.25;
 
 import "../interface/IAdmin.sol";
 import "../roles/Roles.sol";

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.4.25;
 
 import '../interface/IWarCoin.sol';
 
@@ -27,9 +27,9 @@ interface ITronWarBot {
 
   /* SETTERS */
   /* Set the payable address of the house */
-  function setHouseAddress(address payable _houseAddress) external returns (bool);
+  function setHouseAddress(address _houseAddress) external returns (bool);
   /* Set the payable address of the dividend pool */
-  function setDivPoolAddress(address payable _divPoolAddress) external returns (bool);
+  function setDivPoolAddress(address _divPoolAddress) external returns (bool);
   /* Set the rate of house mined tokens over user mined tokens: 1 TRX equals an additional 1 WAR to the house for each user mined WAR */
   function setHouseMiningRate(uint256 _houseMiningRate) external returns (bool);
   /* Set the rate of dividends distributed to stakeholders over total house profits: */
@@ -59,7 +59,7 @@ interface ITronWarBot {
   /*********/
   /* Frontend */
   function isBackendConfigured() external view returns(bool);
-  function changeWarCoinContract(address payable newAddress) external returns(bool);
+  function changeWarCoinContract(address newAddress) external returns(bool);
   function WAR() external view returns(IWarCoin);
   /* FrontendAdmin */
   function isAdmin(address _account) external view returns (bool);

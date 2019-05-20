@@ -1,8 +1,8 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.4.25;
 
 import './interface/IWarCoin.sol';
 
-import './backend/Backend.sol';
+import './architecture/Backend.sol';
 import './utils/HasNoEther.sol';
 import './ERC20/ERC20Pausable.sol';
 import './ERC20/ERC20Metadata.sol';

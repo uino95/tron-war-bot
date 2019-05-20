@@ -1,4 +1,4 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.4.25;
 
 import "../roles/TimedRoles.sol";
 import "../roles/BackendAdmin.sol";
@@ -29,14 +29,14 @@ contract Backend is BackendAdmin {
      * This is a measure that mitigates the authority of the Backend Admin as a single
      * central point of failure.
      **/
-    /* uint256 public frontendActivationTime = 172800; */
-    uint256 public frontendActivationTime = 3;
+    uint256 public frontendActivationTime = 172800;
+    /* uint256 public frontendActivationTime = 3; */
 
     /**
      * @notice Make sure the caller is an allowed frontend.
      */
     modifier onlyFrontend() {
-        require(isFrontend(msg.sender));
+        require(isFrontend(msg.sender), "Not authorized. Must be a Frontend.");
         _;
     }
 
