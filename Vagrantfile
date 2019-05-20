@@ -22,9 +22,11 @@ Vagrant.configure("2") do |config|
   config.vm.provision :shell, path: "vagrant-start.sh", run: 'always', privileged: false
 
   # P2P Port
-  config.vm.network "forwarded_port", guest: 18888 , host: 18888
+  config.vm.network "forwarded_port", guest: 18891, host: 18891
+  # Full HTTP Port
+  config.vm.network "forwarded_port", guest: 8500, host: 8500, host_ip: "127.0.0.1"
   # RPC Port
-  config.vm.network "forwarded_port", guest: 50051, host: 50051, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 58500, host: 58500, host_ip: "127.0.0.1"
   # Http Port
   config.vm.network "forwarded_port", guest: 3000, host: 3000
   # Http Production Port

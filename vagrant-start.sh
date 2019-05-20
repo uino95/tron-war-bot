@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+cd $HOME
+if [ -f running_nodes.json ]; then
+  rm running_nodes.json
+fi
+echo "Launching tron-cli in background..."
+tron-cli quick --reset True
+
 cd /vagrant
 
 # Migrate folders to home folder to avoid simlink errors
@@ -46,10 +53,7 @@ fi
 #   mkdir /home/vagrant/node_modules
 # fi
 
-# echo "Launching ganache-cli in background"
-# nohup ganache-cli -d --host=0.0.0.0 -b 1 -i 100 > /vagrant/ganache-cli.log &
 
-
-# tronbox migrate
+tronbox migrate
 
 echo "Server started. Log in under /vagrant directory and run"

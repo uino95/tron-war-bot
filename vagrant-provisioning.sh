@@ -44,6 +44,7 @@ echo "cd /vagrant" >> /home/vagrant/.profile
 cd /vagrant
 
 ## Install global packages
+pip3 install troncli
 npm install -g tronbox truffle-flattener
 npm i
 # npm install --only=production
