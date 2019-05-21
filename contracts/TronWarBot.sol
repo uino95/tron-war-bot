@@ -36,7 +36,7 @@ contract TronWarBot is ITronWarBot, Frontend, ReentrancyGuard, Destructible {
 
   mapping (uint256 => GameParams) public gameParams;
   mapping (uint256 => uint256) public currentRound;
-  mapping (uint256 => bool) public isGameActive;
+  mapping (uint256 => uint256) public roundStartedAt;
   mapping (uint256 => uint256) public jackpot;
   mapping (uint256 => mapping( uint256 => RoundFunds ) ) public roundFunds;
 
@@ -126,9 +126,9 @@ contract TronWarBot is ITronWarBot, Frontend, ReentrancyGuard, Destructible {
   {
     require(gameParams[_gameType].minimumBet != 0, "Game must be configured correctly");
     require(gameParams[_gameType].maximumBet != 0, "Game must be configured correctly");
-    require(!isGameActive[_gameType], "Game must have been stopped first");
+    require(roundStartedAt[_gameType]==0, "Game must have been stopped first");
     currentRound[_gameType]++;
-    isGameActive[_gameType] = true;
+    roundStartedAt[_gameType] = block.number;
     emit StartGame(_gameType, currentRound[_gameType], block.number, jackpot[_gameType]);
     return true;
   }
@@ -140,7 +140,7 @@ contract TronWarBot is ITronWarBot, Frontend, ReentrancyGuard, Destructible {
     whenNotPaused
     returns (bool)
   {
-    require(isGameActive[_gameType], "Game must have been started");
+    require(roundStartedAt[_gameType]!=0, "Game must have been started");
     uint256 _amount = msg.value;
     require(_amount >= gameParams[_gameType].minimumBet, "Bet amount must be equal or greater than minimum bet");
     require(_amount <= gameParams[_gameType].maximumBet, "Bet amount must be equal or lower than maximum bet");
@@ -160,8 +160,8 @@ contract TronWarBot is ITronWarBot, Frontend, ReentrancyGuard, Destructible {
     public
     returns (bool)
   {
-    require(isGameActive[_gameType], "Game must have been started");
-    isGameActive[_gameType] = false;
+    require(roundStartedAt[_gameType]!=0, "Game must have been started");
+    roundStartedAt[_gameType] = 0;
     emit EndGame(_gameType, currentRound[_gameType], block.number, jackpot[_gameType]);
     uint256 _jackpot = jackpot[_gameType];
     uint256 _houseEdge = _jackpot.mul(gameParams[_gameType].houseEdge).div(1 trx);

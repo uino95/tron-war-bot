@@ -1,19 +1,21 @@
-const port = process.env.HOST_PORT || 8500
+const port = process.env.HOST_PORT || 9090
 
 module.exports = {
   networks: {
     development: {
       // For trontools/quickstart docker image
+      from: 'TVGW7sdY6mR53NxYYFDRUyhsV7Kkp6TMTB',
       privateKey: 'da146374a75310b9666e834ee4ad0866d6f4035967bfc76217c5a495fff9f0d0',
-      userFeePercentage: 0,
-      feeLimit: 1e8,
+      consume_user_resource_percent: 0,
+      fee_limit: 100000000,
       fullHost: 'http://127.0.0.1:' + port,
       network_id: "9"
     },
     shasta: {
+      from: 'TB9EcbhwMzUq1nMcyAkdC3x5rSHB32S35i',
       privateKey: process.env.PRIVATE_KEY_SHASTA,
-      userFeePercentage: 50,
-      feeLimit: 1e8,
+      consume_user_resource_percent: 0,
+      fee_limit: 100000000,
       fullHost: "https://api.shasta.trongrid.io",
       network_id: "2"
     },
@@ -26,8 +28,8 @@ module.exports = {
         Then, run the migration with:
           source .env && tronbox migrate --network mainnet
         */
-      userFeePercentage: 100,
-      feeLimit: 1e8,
+      consume_user_resource_percent: 100,
+      fee_limit: 100000000,
       fullHost: "https://api.trongrid.io",
       network_id: "1"
     }

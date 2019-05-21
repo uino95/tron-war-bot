@@ -18,6 +18,8 @@ apt-get install build-essential -y
 echo "Installing openjdk-8..."
 apt-get install openjdk-8-jdk -y
 apt-get install openjfx -y
+apt-get install docker.io -y
+docker pull trontools/quickstart
 
 
 # apt-get install ethereum -y

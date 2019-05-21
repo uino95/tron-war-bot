@@ -16,6 +16,8 @@ interface ITronWarBot {
   /* Returns the rate of dividends distribution to stakeholders over total house profits: */
   /* 1 TRX equals 100% of profits redistributed through dividends to stakeholders */
   function dividendsToProfitsRate() external view returns (uint256);
+  /* Returns the block number of start of current round for specific game type, 0 if stopped */
+  function roundStartedAt(uint256 _gameType) external view returns (uint256);
   /* Returns house edge, minimum and maximum bet set for specific game type */
   function gameParams(uint256 _gameType) external view returns (uint256, uint256, uint256);
   /* Returns the current round of the specific game type */

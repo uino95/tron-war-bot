@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
-cd $HOME
-if [ -f running_nodes.json ]; then
-  rm running_nodes.json
-fi
-echo "Launching tron-cli in background..."
-tron-cli quick --reset True
-
 cd /vagrant
+
+echo "Launching tron quickstart..."
+
 
 # Migrate folders to home folder to avoid simlink errors
 declare -a folders=("node_modules")
@@ -54,6 +50,9 @@ fi
 # fi
 
 
-tronbox migrate
-
-echo "Server started. Log in under /vagrant directory and run"
+echo "###### SERVER STARTED #####"
+echo "- Log in and run, to launch Tron node:"
+echo "sudo docker run -it   -p 9090:9090 --rm --name tron -e \"mnemonic=wrong bit chicken kitchen rat\"  trontools/quickstart"
+echo "- then, to deploy contracts :"
+echo "tronbox migrate"
+echo "###########################"
