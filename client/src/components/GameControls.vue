@@ -1,50 +1,219 @@
 <template>
-<v-tabs centered color="grey lighten-1" dark icons-and-text>
-  <v-tabs-slider color="red lighten-4"></v-tabs-slider>
+    <v-tabs centered color="grey lighten-1" dark icons-and-text>
+        <v-tabs-slider color="red lighten-4"></v-tabs-slider>
 
-  <v-tab href="#tab-1">
-    Recents
-    <v-icon>phone</v-icon>
-  </v-tab>
+        <v-tab href="#tab-1">
+            Recents
+            <v-icon>phone</v-icon>
+        </v-tab>
 
-  <v-tab href="#tab-2">
-    Favorites
-    <v-icon>favorite</v-icon>
-  </v-tab>
+        <v-tab href="#tab-2">
+            Favorites
+            <v-icon>favorite</v-icon>
+        </v-tab>
 
-  <v-tab href="#tab-3">
-    Nearby
-    <v-icon>account_box</v-icon>
-  </v-tab>
+        <v-tab href="#tab-3">
+            Nearby
+            <v-icon>account_box</v-icon>
+        </v-tab>
 
-  <v-tab-item v-for="i in 3" :key="i" :value="'tab-' + i">
-    <v-card flat>
-      <v-card-text>{{ text }}</v-card-text>
-    </v-card>
-  </v-tab-item>
-  
-</v-tabs>
+        <v-tab-item id="tab-1">
+            <v-container grid-list-md text-xs-center>
+                <v-layout row wrap>
+                    <!-- Place a bet -->
+                    <v-flex xs4>
+                        <v-card>
+                            <v-toolbar color="indigo" dark>
+                                <v-toolbar-title>Place a bet</v-toolbar-title>
+                                <v-spacer></v-spacer>
+                                <v-btn icon>
+                                    <v-icon>search</v-icon>
+                                </v-btn>
+                                <v-btn icon>
+                                    <v-icon>sort</v-icon>
+                                </v-btn>
+                            </v-toolbar>
+                            <v-list>
+                                <v-list-tile
+                                        v-for="country in countriesTest"
+                                        :key="country.name"
+                                        avatar>
+                                    <v-list-tile-avatar>
+                                        <img :alt="country.name" :src="country.flag">
+                                    </v-list-tile-avatar>
+
+                                    <v-list-tile-content>
+                                        <v-list-tile-title v-text="country.name"></v-list-tile-title>
+                                    </v-list-tile-content>
+                                    <v-list-tile-action>
+                                        <v-list-tile-action-text class="title"
+                                                                 v-text="country.bet"></v-list-tile-action-text>
+                                    </v-list-tile-action>
+                                </v-list-tile>
+                            </v-list>
+                        </v-card>
+                    </v-flex>
+                    <!-- My latest bets -->
+                    <v-flex xs4>
+                        <v-card>
+                            <v-toolbar color="indigo" dark>
+                                <v-toolbar-title>{{ text2 }}</v-toolbar-title>
+                                <v-spacer></v-spacer>
+                                <v-btn icon>
+                                    <v-icon>sort</v-icon>
+                                </v-btn>
+                            </v-toolbar>
+                            <v-list>
+                                <v-list-tile
+                                        v-for="bet in myBets"
+                                        :key="bet" :style="getColor">
+                                    <v-list-tile-content>
+                                        <v-list-tile-title v-text="bet.country"></v-list-tile-title>
+                                    </v-list-tile-content>
+                                    <v-list-tile-action>
+                                        <v-list-tile-action-text class="title"
+                                                                 v-text="bet.bet"></v-list-tile-action-text>
+                                    </v-list-tile-action>
+                                </v-list-tile>
+                            </v-list>
+                        </v-card>
+                    </v-flex>
+                    <!-- Latest turn bets -->
+                    <v-flex xs4>
+                        <v-card dark color="success">
+                            <v-toolbar color="indigo" dark>
+                                <v-toolbar-title>{{ text3 }}</v-toolbar-title>
+                                <v-spacer></v-spacer>
+                                <v-btn icon>
+                                    <v-icon>sort</v-icon>
+                                </v-btn>
+                            </v-toolbar>
+                        </v-card>
+                    </v-flex>
+                </v-layout>
+            </v-container>
+        </v-tab-item>
+
+        <v-tab-item id="tab-2">
+            <v-card flat>
+                <v-card-text>{{ text }}</v-card-text>
+            </v-card>
+        </v-tab-item>
+
+        <v-tab-item id="tab-3">
+            <v-card flat>
+                <v-card-text>{{ text }}</v-card-text>
+            </v-card>
+        </v-tab-item>
+    </v-tabs>
 </template>
 
 <script>
-export default {
-  data: () => ({
-    text: "ciaooooooooooo nsakfdjed skndlej deandnlnd jdnew",
-    ecosystem: [{
-        text: 'vuetify-loader',
-        href: 'https://github.com/vuetifyjs/vuetify-loader'
-      },
-      {
-        text: 'github',
-        href: 'https://github.com/vuetifyjs/vuetify'
-      },
-      {
-        text: 'awesome-vuetify',
-        href: 'https://github.com/vuetifyjs/awesome-vuetify'
-      }
-    ]
-  })
-}
+    export default {
+        data: () => ({
+            text: "ciaooooooooooo nsakfdjed skndlej deandnlnd jdnew",
+            text1: "Place a bet",
+            text2: "My latest bets",
+            text3: "Latest turn bets",
+            search: '',
+            computed: {
+                filteredList() {
+                    return this.countriesTest.filter(country => {
+                        return country.name.toLowerCase().includes(this.search.toLowerCase())
+                    })
+                },
+                getColor(bet) {
+                    switch (bet.result) {
+                        case 'won':
+                            return {color: "rgb(23,255,0)"};
+                        case 'lost':
+                            return {color: "rgb(255,9,0)"};
+                        case 'pending':
+                            return {color: "rgb(255,228,0)"};
+                        default:
+                            return {color: "rgb(0,20,255)"};
+                    }
+                }
+            },
+            countriesTest: [
+                {
+                    name: "Malawii",
+                    bet: 1.5,
+                    flag: "https://upload.wikimedia.org/wikipedia/commons/d/d1/Flag_of_Malawi.svg"
+                },
+                {
+                    name: "Zimbawe",
+                    bet: 7.4,
+                    flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Flag_of_Zimbabwe.svg/1200px-Flag_of_Zimbabwe.svg.png"
+                },
+                {
+                    name: "Non",
+                    bet: 4.5,
+                    flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Flag_of_Zimbabwe.svg/1200px-Flag_of_Zimbabwe.svg.png"
+                },
+                {
+                    name: "Ho",
+                    bet: 4.4,
+                    flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Flag_of_Zimbabwe.svg/1200px-Flag_of_Zimbabwe.svg.png"
+                },
+                {
+                    name: "Voglia",
+                    bet: 6.0,
+                    flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Flag_of_Zimbabwe.svg/1200px-Flag_of_Zimbabwe.svg.png"
+                },
+                {
+                    name: "Di",
+                    bet: 9.9,
+                    flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Flag_of_Zimbabwe.svg/1200px-Flag_of_Zimbabwe.svg.png"
+                },
+                {
+                    name: "Mettere",
+                    bet: 6.6,
+                    flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Flag_of_Zimbabwe.svg/1200px-Flag_of_Zimbabwe.svg.png"
+                },
+                {
+                    name: "Le",
+                    bet: 2.8,
+                    flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Flag_of_Zimbabwe.svg/1200px-Flag_of_Zimbabwe.svg.png"
+                },
+                {
+                    name: "Bandiere",
+                    bet: 3.5,
+                    flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Flag_of_Zimbabwe.svg/1200px-Flag_of_Zimbabwe.svg.png"
+                }
+            ],
+            myBets: [
+                {
+                    country: "Zimbawe",
+                    bet: 7.5,
+                    result: "won"
+                },
+                {
+                    country: "Malawii",
+                    bet: 2.3,
+                    result: "pending"
+                },
+                {
+                    country: "Togo",
+                    bet: 5.0,
+                    result: "lost"
+                }
+            ],
+            ecosystem: [{
+                text: 'vuetify-loader',
+                href: 'https://github.com/vuetifyjs/vuetify-loader'
+            },
+                {
+                    text: 'github',
+                    href: 'https://github.com/vuetifyjs/vuetify'
+                },
+                {
+                    text: 'awesome-vuetify',
+                    href: 'https://github.com/vuetifyjs/awesome-vuetify'
+                }
+            ]
+        })
+    }
 </script>
 
 <style>
