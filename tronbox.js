@@ -28,7 +28,7 @@ module.exports = {
         Then, run the migration with:
           source .env && tronbox migrate --network mainnet
         */
-      consume_user_resource_percent: 100,
+      consume_user_resource_percent: 0,
       fee_limit: 100000000,
       fullHost: "https://api.trongrid.io",
       network_id: "1"

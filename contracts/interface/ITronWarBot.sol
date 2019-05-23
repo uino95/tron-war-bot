@@ -8,24 +8,24 @@ interface ITronWarBot {
   /**************/
   /* GETTERS */
   /* Returns currently set address of the house */
-  function houseAddress() external view returns (address);
+//  function houseAddress() external view returns (address);
   /* Returns currently set address of the dividend pool */
-  function divPoolAddress() external view returns (address);
+//  function divPoolAddress() external view returns (address);
   /* Returns the rate of house mined tokens over user mined tokens: x WAR to the house for every 1 WAR to the user   */
-  function houseMiningRate() external view returns (uint256);
+//  function houseMiningRate() external view returns (uint256);
   /* Returns the rate of dividends distribution to stakeholders over total house profits: */
   /* 1 TRX equals 100% of profits redistributed through dividends to stakeholders */
-  function dividendsToProfitsRate() external view returns (uint256);
+//  function dividendsToProfitsRate() external view returns (uint256);
   /* Returns the block number of start of current round for specific game type, 0 if stopped */
-  function roundStartedAt(uint256 _gameType) external view returns (uint256);
+//  function roundStartedAt(uint256 _gameType) external view returns (uint256);
   /* Returns house edge, minimum and maximum bet set for specific game type */
-  function gameParams(uint256 _gameType) external view returns (uint256, uint256, uint256);
+//  function gameParams(uint256 _gameType) external view returns (uint256, uint256, uint256);
   /* Returns the current round of the specific game type */
-  function currentRound(uint256 _gameType) external view returns (uint256);
+//  function currentRound(uint256 _gameType) external view returns (uint256);
   /* Returns the current available jackpot for the specific game type of current round */
-  function jackpot(uint256 _gameType) external view returns (uint256);
+//  function jackpot(uint256 _gameType) external view returns (uint256);
   /* Returns the final archived net jackpot for specific round of gametype, the remaining available funds not yet payed out and the edge paid to house */
-  function roundFunds(uint256 _gameType, uint256 _round) external view returns (uint256, uint256, uint256);
+//  function roundFunds(uint256 _gameType, uint256 _round) external view returns (uint256, uint256, uint256);
 
   /* SETTERS */
   /* Set the payable address of the house */
