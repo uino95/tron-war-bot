@@ -33,7 +33,45 @@
                                     <v-icon>sort</v-icon>
                                 </v-btn>
                             </v-toolbar>
-                            <v-list>
+
+                            <v-expansion-panel>
+                                <v-expansion-panel-content v-for="country in countriesTest"
+                                                           :key="country.name">
+                                    <div slot="header">
+                                        <v-layout row wrap>
+                                            <v-flex xs4>
+                                                <v-avatar>
+                                                    <img :alt="country.name" :src="country.flag">
+                                                </v-avatar>
+                                            </v-flex>
+                                            <v-flex xs4>
+                                                <div class="title font-weight-light">{{country.name}}</div>
+                                            </v-flex>
+                                            <v-flex xs4>
+                                                <div class="title font-weight-light text-xs-center">{{country.bet}}
+                                                </div>
+                                            </v-flex>
+                                        </v-layout>
+                                    </div>
+                                    <v-card>
+                                        <v-layout row wrap>
+                                            <v-flex xs4>
+                                                <v-text-field label="Bet" v-model="betting"></v-text-field>
+                                            </v-flex>
+                                            <v-flex xs4>
+                                                <div class="title font-weight-light">
+                                                    <span class="caption">Winning:</span>
+                                                    <p>{{betting*country.bet}}</p>
+                                                </div>
+                                            </v-flex>
+                                            <v-flex xs4>
+                                                <v-btn>Bet</v-btn>
+                                            </v-flex>
+                                        </v-layout>
+                                    </v-card>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                            <!--<v-list>
                                 <v-list-tile
                                         v-for="country in countriesTest"
                                         :key="country.name"
@@ -50,14 +88,14 @@
                                                                  v-text="country.bet"></v-list-tile-action-text>
                                     </v-list-tile-action>
                                 </v-list-tile>
-                            </v-list>
+                            </v-list>-->
                         </v-card>
                     </v-flex>
                     <!-- My latest bets -->
                     <v-flex xs4>
                         <v-card>
                             <v-toolbar color="indigo" dark>
-                                <v-toolbar-title>{{ text2 }}</v-toolbar-title>
+                                <v-toolbar-title>My Latest Bets</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
                                     <v-icon>sort</v-icon>
@@ -66,7 +104,7 @@
                             <v-list>
                                 <v-list-tile
                                         v-for="bet in myBets"
-                                        :key="bet" :style="getColor">
+                                        :key="bet">
                                     <v-list-tile-content>
                                         <v-list-tile-title v-text="bet.country"></v-list-tile-title>
                                     </v-list-tile-content>
@@ -82,7 +120,7 @@
                     <v-flex xs4>
                         <v-card dark color="success">
                             <v-toolbar color="indigo" dark>
-                                <v-toolbar-title>{{ text3 }}</v-toolbar-title>
+                                <v-toolbar-title>Latest turn bets</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
                                     <v-icon>sort</v-icon>
@@ -112,27 +150,13 @@
     export default {
         data: () => ({
             text: "ciaooooooooooo nsakfdjed skndlej deandnlnd jdnew",
-            text1: "Place a bet",
-            text2: "My latest bets",
-            text3: "Latest turn bets",
             search: '',
+            betting: 0,
             computed: {
                 filteredList() {
                     return this.countriesTest.filter(country => {
                         return country.name.toLowerCase().includes(this.search.toLowerCase())
                     })
-                },
-                getColor(bet) {
-                    switch (bet.result) {
-                        case 'won':
-                            return {color: "rgb(23,255,0)"};
-                        case 'lost':
-                            return {color: "rgb(255,9,0)"};
-                        case 'pending':
-                            return {color: "rgb(255,228,0)"};
-                        default:
-                            return {color: "rgb(0,20,255)"};
-                    }
                 }
             },
             countriesTest: [
