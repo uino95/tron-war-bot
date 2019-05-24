@@ -230,16 +230,6 @@
                 }
             ]
         }),
-        mounted() {
-            var link = "https://worldwarbot.com/api/v0.1/?request=countries&turn=last";
-            this.$http.get(link, function (data, status, request) {
-                alert(data);
-                if (status == 200) {
-                    console.log(data);
-                    this.countries = data;
-                }
-            });
-        },
         methods: {
             validate() {
                 alert("Bet placed");
@@ -254,7 +244,6 @@
                         return 1;
                     return 0;
                 }
-
                 return this.countriesTest.countries.sort(compare);
             }
         }
