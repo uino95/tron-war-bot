@@ -3,12 +3,12 @@
         <v-tabs-slider color="red lighten-4"></v-tabs-slider>
 
         <v-tab href="#tab-1">
-            Recents
+            Bet Panel
             <v-icon>phone</v-icon>
         </v-tab>
 
         <v-tab href="#tab-2">
-            Favorites
+            Current Run Stats
             <v-icon>favorite</v-icon>
         </v-tab>
 
@@ -33,7 +33,7 @@
                                     <v-icon>sort</v-icon>
                                 </v-btn>
                             </v-toolbar>
-                            <v-card-title primary-title>
+                            <v-card-title primary-title class="justify-center">
                                 <v-form ref="form"
                                         v-model="valid"
                                         lazy-validation>
@@ -112,9 +112,59 @@
         </v-tab-item>
 
         <v-tab-item id="tab-2">
-            <v-card flat>
-                <v-card-text>{{ text }}</v-card-text>
-            </v-card>
+            <v-container grid-list-md text-xs-center>
+                <v-layout row wrap>
+                    <!-- Place a bet -->
+                    <v-flex xs6>
+                        <v-card>
+                            <v-toolbar color="indigo" dark>
+                                <v-toolbar-title>Stats</v-toolbar-title>
+                                <v-spacer></v-spacer>
+                                <v-btn icon>
+                                    <v-icon>search</v-icon>
+                                </v-btn>
+                                <v-btn icon>
+                                    <v-icon>sort</v-icon>
+                                </v-btn>
+                            </v-toolbar>
+                                <v-list>
+                                    <v-list-tile v-for="bet in myBets" :key="bet">
+                                        <v-list-tile-content>
+                                            <v-list-tile-title v-text="bet.country"></v-list-tile-title>
+                                        </v-list-tile-content>
+                                        <v-list-tile-action>
+                                            <v-list-tile-action-text class="title"
+                                                                     v-text="bet.bet"></v-list-tile-action-text>
+                                        </v-list-tile-action>
+                                    </v-list-tile>
+                                </v-list>
+                        </v-card>
+                    </v-flex>
+                    <!-- My latest bets -->
+                    <v-flex xs6>
+                        <v-card>
+                            <v-toolbar color="indigo" dark>
+                                <v-toolbar-title>History</v-toolbar-title>
+                                <v-spacer></v-spacer>
+                                <v-btn icon>
+                                    <v-icon>sort</v-icon>
+                                </v-btn>
+                            </v-toolbar>
+                            <v-list>
+                                <v-list-tile v-for="bet in myBets" :key="bet">
+                                    <v-list-tile-content>
+                                        <v-list-tile-title v-text="bet.country"></v-list-tile-title>
+                                    </v-list-tile-content>
+                                    <v-list-tile-action>
+                                        <v-list-tile-action-text class="title"
+                                                                 v-text="bet.bet"></v-list-tile-action-text>
+                                    </v-list-tile-action>
+                                </v-list-tile>
+                            </v-list>
+                        </v-card>
+                    </v-flex>
+                </v-layout>
+            </v-container>
         </v-tab-item>
 
         <v-tab-item id="tab-3">
