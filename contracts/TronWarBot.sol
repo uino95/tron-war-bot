@@ -13,7 +13,7 @@ import './architecture/Frontend.sol';
  * @author Samuele Rodi (a.k.a. Sam Fisherman)
  * @notice This TronWarBot contract is the first release of the TronWarBot logic contract.
  */
-contract TronWarBot is ITronWarBot, Frontend, ReentrancyGuard, Destructible {
+contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
 
   using SafeMath for uint256;
 
