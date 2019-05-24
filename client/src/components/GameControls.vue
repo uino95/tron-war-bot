@@ -33,62 +33,32 @@
                                     <v-icon>sort</v-icon>
                                 </v-btn>
                             </v-toolbar>
+                            <v-card-title primary-title>
+                                <v-form ref="form"
+                                        v-model="valid"
+                                        lazy-validation>
+                                    <v-text-field v-model="country"
+                                                  label="Country"
+                                                  outline
+                                                  disabled></v-text-field>
 
-                            <v-expansion-panel>
-                                <v-expansion-panel-content v-for="country in countriesTest"
-                                                           :key="country.name">
-                                    <div slot="header">
-                                        <v-layout row wrap>
-                                            <v-flex xs4>
-                                                <v-avatar>
-                                                    <img :alt="country.name" :src="country.flag">
-                                                </v-avatar>
-                                            </v-flex>
-                                            <v-flex xs4>
-                                                <div class="title font-weight-light">{{country.name}}</div>
-                                            </v-flex>
-                                            <v-flex xs4>
-                                                <div class="title font-weight-light text-xs-center">{{country.bet}}
-                                                </div>
-                                            </v-flex>
-                                        </v-layout>
-                                    </div>
-                                    <v-card>
-                                        <v-layout row wrap>
-                                            <v-flex xs4>
-                                                <v-text-field label="Bet" v-model="betting"></v-text-field>
-                                            </v-flex>
-                                            <v-flex xs4>
-                                                <div class="title font-weight-light">
-                                                    <span class="caption">Winning:</span>
-                                                    <p>{{betting*country.bet}}</p>
-                                                </div>
-                                            </v-flex>
-                                            <v-flex xs4>
-                                                <v-btn>Bet</v-btn>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-card>
-                                </v-expansion-panel-content>
-                            </v-expansion-panel>
-                            <!--<v-list>
-                                <v-list-tile
-                                        v-for="country in countriesTest"
-                                        :key="country.name"
-                                        avatar>
-                                    <v-list-tile-avatar>
-                                        <img :alt="country.name" :src="country.flag">
-                                    </v-list-tile-avatar>
+                                    <v-text-field v-model="jackpot"
+                                                  label="Current Jackpot"
+                                                  outline
+                                                  disabled></v-text-field>
 
-                                    <v-list-tile-content>
-                                        <v-list-tile-title v-text="country.name"></v-list-tile-title>
-                                    </v-list-tile-content>
-                                    <v-list-tile-action>
-                                        <v-list-tile-action-text class="title"
-                                                                 v-text="country.bet"></v-list-tile-action-text>
-                                    </v-list-tile-action>
-                                </v-list-tile>
-                            </v-list>-->
+                                    <v-select
+                                            v-model="currency"
+                                            :items="currencies"
+                                            :rules="currencyRule"
+                                            label="Currency"
+                                            required
+                                            outline
+                                    ></v-select>
+
+                                    <v-btn color="success" @click="validate"> {{betText}}</v-btn>
+                                </v-form>
+                            </v-card-title>
                         </v-card>
                     </v-flex>
                     <!-- My latest bets -->
@@ -102,9 +72,7 @@
                                 </v-btn>
                             </v-toolbar>
                             <v-list>
-                                <v-list-tile
-                                        v-for="bet in myBets"
-                                        :key="bet">
+                                <v-list-tile v-for="bet in myBets" :key="bet">
                                     <v-list-tile-content>
                                         <v-list-tile-title v-text="bet.country"></v-list-tile-title>
                                     </v-list-tile-content>
@@ -118,7 +86,7 @@
                     </v-flex>
                     <!-- Latest turn bets -->
                     <v-flex xs4>
-                        <v-card dark color="success">
+                        <v-card color="success">
                             <v-toolbar color="indigo" dark>
                                 <v-toolbar-title>Latest turn bets</v-toolbar-title>
                                 <v-spacer></v-spacer>
@@ -126,6 +94,17 @@
                                     <v-icon>sort</v-icon>
                                 </v-btn>
                             </v-toolbar>
+                            <v-list>
+                                <v-list-tile v-for="bet in myBets" :key="bet">
+                                    <v-list-tile-content>
+                                        <v-list-tile-title v-text="bet.country"></v-list-tile-title>
+                                    </v-list-tile-content>
+                                    <v-list-tile-action>
+                                        <v-list-tile-action-text class="title"
+                                                                 v-text="bet.bet"></v-list-tile-action-text>
+                                    </v-list-tile-action>
+                                </v-list-tile>
+                            </v-list>
                         </v-card>
                     </v-flex>
                 </v-layout>
@@ -151,14 +130,15 @@
         data: () => ({
             text: "ciaooooooooooo nsakfdjed skndlej deandnlnd jdnew",
             search: '',
-            betting: 0,
-            computed: {
-                filteredList() {
-                    return this.countriesTest.filter(country => {
-                        return country.name.toLowerCase().includes(this.search.toLowerCase())
-                    })
-                }
-            },
+            country: "USA",
+            computed: {},
+            jackpot: 10938147,
+            betText: "Bet 50 TRX",
+            currencies: ["TRX", "WAR"],
+            currency: "TRX",
+            currencyRule: [v => !!v || 'Select a currency',
+                //v => v < 50 || 'You don\'t have enough money'
+            ],
             countriesTest: [
                 {
                     name: "Malawii",
@@ -206,6 +186,20 @@
                     flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Flag_of_Zimbabwe.svg/1200px-Flag_of_Zimbabwe.svg.png"
                 }
             ],
+            watch: {
+                currency: function (newVal) {
+                    if (newVal.equals("TRX")) {
+                        this.betText = "Bet 50 TRX";
+                    } else {
+                        this.betText = "Bet 1 WAR";
+                    }
+                }
+            },
+            methods: {
+                validate() {
+                    alert(this.$refs.form.$data);
+                },
+            },
             myBets: [
                 {
                     country: "Zimbawe",
