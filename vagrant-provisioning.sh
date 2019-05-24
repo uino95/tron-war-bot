@@ -46,7 +46,7 @@ cd /vagrant
 ## Install global packages
 pip3 install troncli
 npm install -g tronbox truffle-flattener
-npm i
+
 # npm install --only=production
 
 echo "Provisioning finished"

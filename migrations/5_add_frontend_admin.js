@@ -1,7 +1,11 @@
 var TronWarBot = artifacts.require("TronWarBot");
 
+
 module.exports = async function(deployer) {
   var accounts = await tronWrap._getAccounts();
+  var admin = process.env.ADMIN_ADDRESS;
+  if (!admin && accounts.length < 2) return;
+  if (!admin) admin = (accounts.length > 1) ? accounts[0]: accounts[1];
   var twb = await TronWarBot.deployed();
-  await twb.addFrontendAdmin(accounts[1], {from: accounts[0]});
+  await twb.addFrontendAdmin(admin);
 };

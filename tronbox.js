@@ -4,10 +4,10 @@ module.exports = {
   networks: {
     development: {
       // For trontools/quickstart docker image
-      from: 'TVGW7sdY6mR53NxYYFDRUyhsV7Kkp6TMTB',
       privateKey: 'da146374a75310b9666e834ee4ad0866d6f4035967bfc76217c5a495fff9f0d0',
       consume_user_resource_percent: 0,
-      fee_limit: 100000000,
+      feeLimit: 1e9,  // Set fee limit
+      originEnergyLimit: 1e7,
       fullHost: 'http://127.0.0.1:' + port,
       network_id: "9"
     },
@@ -15,7 +15,8 @@ module.exports = {
       from: 'TB9EcbhwMzUq1nMcyAkdC3x5rSHB32S35i',
       privateKey: process.env.PRIVATE_KEY_SHASTA,
       consume_user_resource_percent: 0,
-      fee_limit: 100000000,
+      feeLimit: 1e9,  // Set fee limit
+      originEnergyLimit: 1e7,
       fullHost: "https://api.shasta.trongrid.io",
       network_id: "2"
     },
@@ -29,7 +30,8 @@ module.exports = {
           source .env && tronbox migrate --network mainnet
         */
       consume_user_resource_percent: 0,
-      fee_limit: 100000000,
+      feeLimit: 1e9,  // Set fee limit
+      originEnergyLimit: 1e7,
       fullHost: "https://api.trongrid.io",
       network_id: "1"
     }
