@@ -10,6 +10,16 @@ var Bet = new Schema({
   },
   country: {
     type: String
+  },
+  time: {
+    type: Date,
+    default: Date.now
+  },
+  forTurn: {
+    type: Number
+  },
+  forRun: {
+    type: Number
   }
 });
 
@@ -22,6 +32,9 @@ var RunTurn = new Schema({
   },
   id: {
     type: Number
+  },
+  runID: {
+    type: Number
   }
 });
 
@@ -31,18 +44,13 @@ var Run = new Schema({
   currentState: {
     remainingCountries: [{
       name: String,
-      territoriesOwned: Number,
-      totalBetsPlaced: Number
-    }]
+      territoriesOwned: Number
+    }],
+    latestTurn: Number
   },
   turnsHistory: [RunTurn]
-});
-
-var TurnBettingGame = new Schema({
-
 });
 
 module.exports.Bet = mongoose.model('Bet', Bet);
 module.exports.RunTurn = mongoose.model('RunTurn', RunTurn);
 module.exports.Run = mongoose.model('Run', Run);
-// module.exports = mongoose.model('Bet', Bet);

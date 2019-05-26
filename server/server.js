@@ -5,10 +5,15 @@ const cors = require('cors');
 const PORT = 4000;
 const mongoose = require('mongoose');
 
+const cron = require("node-cron");
+const utils = require("./utils")
+
 let Bet = require('./tron.model').Bet;
 let RunTurn = require('./tron.model').RunTurn;
+let Run = require('./tron.model').Run;
 
 var http = require('http').Server(app);
+const https = require('https');
 var io = require('socket.io')(http);
 
 const betRoutes = express.Router();
@@ -47,7 +52,9 @@ io.on('connection', function(socket) {
   })
 });
 
-//TODO check for new turn
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// New Turn ///////////////////////////////////////
+
 function newTurn(turn) {
   let newTurn = RunTurn(turn)
   RunTurn.save().then((newTurn) => {
@@ -56,6 +63,51 @@ function newTurn(turn) {
     console.log(err)
   })
 }
+
+var latestTurn = 848
+
+function pollForNewTurn() {
+  https.get('https://worldwarbot.com/api/v0.1/?request=conquest&turn=last', (resp) => {
+    let data = '';
+    // A chunk of data has been recieved.
+    resp.on('data', (chunk) => {
+      data += chunk;
+    });
+    // The whole response has been received. Print out the result.
+    resp.on('end', () => {
+      console.log(`statusCode: ${resp.statusCode}`)
+      let turn = JSON.parse(data)
+      console.log(turn);
+      if (turn.turn == latestTurn + 1) {
+        //TODO insert into db
+        latestTurn++
+        utils.consoleLog("new Turn - " + latestTurn)
+      }
+    });
+  }).on("error", (err) => {
+    console.log("Error: " + err.message);
+  });
+}
+
+//start polling the api server at every :13 of each hour
+// cron.schedule("1 * * * * *", function() {
+utils.consoleLog("start polling WWB server for new turn")
+//fetch latest turn number
+// let latestTurn = Run.findOne().sort({id: -1}).exec(function(err, post) {
+//   console.log(post)
+// });
+let currentRun = 2
+let currentTurn = 848 //TODO fetch from db
+
+//start polling every 15 seconds. The function then quits as the turn changes
+while (currentTurn == latestTurn) {
+  setTimeout(function() {
+    console.log("ciao")
+    pollForNewTurn()
+  }, 2000);
+}
+// });
+
 
 betRoutes.route('/').get(function(req, res) {
   Bet.find(function(err, bets) {
@@ -90,6 +142,10 @@ betRoutes.route('/update/:id').post(function(req, res) {
       });
   });
 });
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// DB and Server StartUp /////////////////////////////
 
 mongoose.connect('mongodb://127.0.0.1:27017/tron', {
   useNewUrlParser: true
