@@ -42,6 +42,11 @@
                                                   outline
                                                   disabled></v-text-field>
 
+                                    <v-text-field v-model="balance"
+                                                  label="Your Balance"
+                                                  outline
+                                                  disabled></v-text-field>
+
                                     <v-text-field v-model="jackpot"
                                                   label="Current Jackpot"
                                                   outline
@@ -111,7 +116,7 @@
                                 </v-layout>
                                 <v-divider style="margin-bottom: 3%"></v-divider>
                                 <v-layout row wrap v-for="bet in latestBets" :key="bet">
-                                    <v-flex xs3 style="text-align: start" class="subheading">
+                                    <v-flex xs3 style="text-align: start" class="subheading" v-alt="bet.address">
                                         {{bet.address.substring(0,8)+"..."}}
                                     </v-flex>
                                     <v-flex xs3 class="subheading">
@@ -219,6 +224,7 @@
             search: '',
             country: "USA",
             computed: {},
+            balance: 21471828.99,
             countries: [],
             jackpot: 10938147,
             betText: "Bet 50 TRX",
@@ -268,7 +274,6 @@
                     time: "05:00"
                 },
             ],
-
             myBets: [
                 {
                     country: "Zimbawe",

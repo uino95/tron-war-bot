@@ -59,7 +59,7 @@
                         // 2. Previously activated countries should be de-activated.
                         lastSelected.isActive = false;
                     }
-                    console.log(ev.target)
+                    console.log(ev.target);
                     ev.target.series.chart.zoomToMapObject(ev.target.dataItem.dataContext);
                     if (lastSelected !== ev.target) {
                         lastSelected = ev.target;
