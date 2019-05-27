@@ -1,6 +1,6 @@
 <template>
-    <v-tabs centered color="grey lighten-1" dark icons-and-text>
-        <v-tabs-slider color="red lighten-4"></v-tabs-slider>
+    <v-tabs centered color="secondary lighten-1" dark icons-and-text>
+        <v-tabs-slider color="secondary lighten-4"></v-tabs-slider>
 
         <v-tab href="#tab-1">
             Bet Panel
@@ -21,9 +21,9 @@
             <v-container grid-list-md text-xs-center>
                 <v-layout row wrap>
                     <!-- Place a bet -->
-                    <v-flex xs4>
+                    <v-flex>
                         <v-card>
-                            <v-toolbar color="indigo" dark>
+                            <v-toolbar color="secondary lighten-4" dark>
                                 <v-toolbar-title>Place a bet</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
@@ -67,9 +67,9 @@
                         </v-card>
                     </v-flex>
                     <!-- My latest bets -->
-                    <v-flex xs4>
+                    <v-flex>
                         <v-card>
-                            <v-toolbar color="indigo" dark>
+                            <v-toolbar color="secondary lighten-4" dark>
                                 <v-toolbar-title>My Latest Bets</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
@@ -90,9 +90,9 @@
                         </v-card>
                     </v-flex>
                     <!-- Latest turn bets -->
-                    <v-flex xs4>
+                    <v-flex>
                         <v-card>
-                            <v-toolbar color="indigo" dark>
+                            <v-toolbar color="secondary lighten-4" dark>
                                 <v-toolbar-title>Latest turn bets</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
@@ -132,6 +132,7 @@
                             </v-container>
                         </v-card>
                     </v-flex>
+
                 </v-layout>
             </v-container>
         </v-tab-item>
@@ -141,9 +142,9 @@
             <v-container grid-list-md text-xs-center>
                 <v-layout row wrap>
                     <!-- Countries -->
-                    <v-flex xs6>
+                    <v-flex>
                         <v-card>
-                            <v-toolbar color="indigo" dark>
+                            <v-toolbar color="secondary lighten-4" dark>
                                 <v-toolbar-title>Stats</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
@@ -167,9 +168,9 @@
                         </v-card>
                     </v-flex>
                     <!-- History -->
-                    <v-flex xs6>
+                    <v-flex>
                         <v-card>
-                            <v-toolbar color="indigo" dark>
+                            <v-toolbar color="secondary lighten-4" dark>
                                 <v-toolbar-title>History</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
@@ -215,6 +216,7 @@
             </v-card>
         </v-tab-item>
     </v-tabs>
+
 </template>
 
 <script>
@@ -319,7 +321,8 @@
                         return 1;
                     return 0;
                 }
-                return this.countriesTest.countries.sort(compare);
+                let arr = this.countriesTest.countries
+                return arr.sort(compare);
             }
         }
     }

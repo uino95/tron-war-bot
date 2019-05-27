@@ -1,7 +1,7 @@
 <template>
     <v-app id="keep">
-        <v-navigation-drawer v-model="drawer" fixed clipped class="grey lighten-4" app>
-            <v-list dense class="grey lighten-4">
+        <v-navigation-drawer v-model="drawer" fixed clipped class="secondary lighten-2" app>
+            <v-list dense class="secondary lighten-2">
                 <template v-for="(item, i) in items">
                     <v-layout v-if="item.heading" :key="i" row align-center>
                         <v-flex xs6>
@@ -24,7 +24,7 @@
                 </template>
             </v-list>
         </v-navigation-drawer>
-        <v-toolbar color="blue-grey lighten-4" app fixed clipped-left>
+        <v-toolbar color="primary lighten-3" app fixed clipped-left>
             <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
             <v-avatar class="ml-3">
               <img src="/img/logo.jpg">
@@ -110,7 +110,7 @@
             source: String
         },
         mounted(){
-          console.log(window.tronWeb)
+          // console.log(window.tronWeb)
         }
     }
 </script>
