@@ -37,7 +37,7 @@
                                 <v-form ref="form"
                                         v-model="valid"
                                         lazy-validation>
-                                    <v-text-field v-model="country"
+                                    <v-text-field :value = "currentCountry"
                                                   label="Country"
                                                   outline
                                                   disabled></v-text-field>
@@ -178,6 +178,7 @@
 
 <script>
     export default {
+
         data: () => ({
             text: "ciaooooooooooo nsakfdjed skndlej deandnlnd jdnew",
             search: '',
@@ -235,6 +236,7 @@
                 alert("Bet placed");
             }
         },
+        props: ['currentCountry'],
         computed: {
             sortedArray: function () {
                 function compare(a, b) {

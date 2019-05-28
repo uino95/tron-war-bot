@@ -11,7 +11,7 @@
                         </v-flex>
                     </v-layout>
                     <v-divider v-else-if="item.divider" :key="i" dark class="my-3"></v-divider>
-                    <v-list-tile v-else :key="i" @click="">
+                    <v-list-tile v-else :key="i" @click="showModal(i)">
                         <v-list-tile-action>
                             <v-icon>{{ item.icon }}</v-icon>
                         </v-list-tile-action>
@@ -37,8 +37,14 @@
             <v-container fluid fill-height fill-width class="grey lighten-4 pa-0 ma-0">
                 <v-layout justify-center align-center>
                     <v-flex>
-                        <GameMap/>
-                        <GameControls/>
+                        
+                        <GameMap @select="selectedCountryChild"/>
+                        <GameControls v-bind:current-country = "selected_country"/>
+                        <modal 
+                            v-show="isModalVisible" 
+                            @close="closeModal" 
+                            v-bind:header-tile = "items[itemClicked].text"
+                            />
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -52,21 +58,27 @@
 <script>
     import GameMap from './components/GameMap'
     import GameControls from './components/GameControls'
+    import modal from './components/modal'
 
     export default {
         name: 'App',
         components: {
             GameControls,
-            GameMap
+            GameMap,
+            modal
         },
         data: () => ({
             drawer: null,
+            isModalVisible: false,
+            itemClicked: 4,
+            tronLinkStatus: null,
+            selected_country: null,
             items: [{
                 heading: 'Wallet Login'
             },
                 {
                     icon: 'lightbulb_outline',
-                    text: 'Login with Wallet'
+                    text: 'Login with Wallet',
                 },
                 {
                     divider: true
@@ -109,8 +121,21 @@
         props: {
             source: String
         },
+        methods:{
+            showModal(item){
+                this.isModalVisible = true;
+                this.itemClicked = item;
+            },
+            closeModal() {
+                this.isModalVisible = false;
+            },
+            selectedCountryChild(country){
+                
+                this.selected_country = country;
+            }
+        },
         mounted(){
-          console.log(window.tronWeb)
+            console.log(window.tronWeb);
         }
     }
 </script>
