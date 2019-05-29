@@ -40,9 +40,9 @@
                         
                         <GameMap @select="selectedCountryChild"/>
                         <GameControls v-bind:current-country = "selected_country"/>
-                        <modal 
-                            v-show="isModalVisible" 
-                            @close="closeModal" 
+                        <modal
+                            @close="closeModal"
+                            v-bind:isModalVisible = "isModalVisible"
                             v-bind:header-tile = "items[itemClicked].text"
                             />
                     </v-flex>
