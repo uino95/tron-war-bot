@@ -1,4 +1,4 @@
-<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
+<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-attr="http://www.w3.org/1999/xhtml">
     <v-tabs centered color="secondary lighten-1" dark icons-and-text>
         <v-tabs-slider color="secondary lighten-4"></v-tabs-slider>
 
@@ -32,7 +32,7 @@
                                 <v-form ref="form"
                                         v-model="valid"
                                         lazy-validation>
-                                    <v-text-field :value = "currentCountry"
+                                    <v-text-field :value="currentCountry"
                                                   label="Country"
                                                   outline
                                                   disabled></v-text-field>
@@ -117,16 +117,16 @@
                             <v-container grid-list-md text-xs-center>
                                 <v-layout row wrap>
                                     <v-flex xs3 style="text-align: start" class="title">
-                                        Address
+                                        <span>Address</span>
                                     </v-flex>
                                     <v-flex xs3 class="title">
-                                        Country
+                                        <span>Country</span>
                                     </v-flex>
                                     <v-flex xs3 class="title">
-                                        Bet
+                                        <span>Bet</span>
                                     </v-flex>
                                     <v-flex xs3 class="title">
-                                        Time
+                                        <span>Time</span>
                                     </v-flex>
                                 </v-layout>
                                 <v-divider style="margin-bottom: 3%"></v-divider>
@@ -140,13 +140,13 @@
                                         </v-tooltip>
                                     </v-flex>
                                     <v-flex xs3 class="subheading">
-                                        {{bet.country}}
+                                        <span>{{bet.country}}</span>
                                     </v-flex>
                                     <v-flex xs3 class="subheading">
-                                        {{bet.bet+"TRX"}}
+                                        <span>{{bet.bet+"TRX"}}</span>
                                     </v-flex>
                                     <v-flex xs3 class="subheading">
-                                        {{bet.time}}
+                                        <span>{{bet.time}}</span>
                                     </v-flex>
                                 </v-layout>
                             </v-container>
@@ -161,7 +161,7 @@
             <v-container grid-list-md text-xs-center>
                 <v-layout row wrap>
                     <!-- Countries -->
-                    <v-flex>
+                    <v-flex xs5>
                         <v-card>
                             <v-toolbar color="secondary lighten-4" dark>
                                 <v-toolbar-title>Stats</v-toolbar-title>
@@ -186,7 +186,10 @@
                                 <v-divider style="margin-bottom: 3%"></v-divider>
 
                                 <v-layout row wrap v-for="country in sortedArray" :key="country">
-                                    <v-flex xs6 style="text-align: start" class="subheading">
+                                    <v-flex xs1>
+                                        <img :src="getFlagString(country[0])" :alt="country[0]">
+                                    </v-flex>
+                                    <v-flex xs5 style="text-align: start" class="subheading">
                                         {{country[0]}}
                                     </v-flex>
                                     <v-flex xs6 class="title" style="text-align: end">
@@ -197,7 +200,7 @@
                         </v-card>
                     </v-flex>
                     <!-- History -->
-                    <v-flex>
+                    <v-flex xs7>
                         <v-card>
                             <v-toolbar color="secondary lighten-4" dark>
                                 <v-toolbar-title>History</v-toolbar-title>
@@ -222,16 +225,16 @@
                                 <v-divider style="margin-bottom: 3%"></v-divider>
 
                                 <v-layout row wrap v-for="conquest in historyTest" :key="conquest">
-                                    <v-flex xs2 style="text-align: start" class="subheading">
+                                    <v-flex xs1 style="text-align: start" class="subheading">
                                         {{conquest.turn}}
                                     </v-flex>
-                                    <v-flex xs2 class="subheading" style="color: green;">
+                                    <v-flex xs3 class="subheading" style="color: green;">
                                         {{conquest.conquest[0]}}
                                     </v-flex>
-                                    <v-flex xs2>
+                                    <v-flex xs1>
                                         <v-icon>arrow_forward</v-icon>
                                     </v-flex>
-                                    <v-flex xs2 class="subheading" style="color: red;">
+                                    <v-flex xs3 class="subheading" style="color: red;">
                                         {{conquest.conquest[1]}}
                                     </v-flex>
                                     <v-flex xs4 class="subheading" style="color: red;">
@@ -248,10 +251,18 @@
 </template>
 
 <script>
+    String.prototype.replaceAll = function(search, replace) {
+        if (replace === undefined) {
+            return this.toString();
+        }
+        return this.split(search).join(replace);
+    };
+
     export default {
 
         data: () => ({
             search: '',
+            spain: "/img/flags/spain.svg",
             country: "USA",
             balance: 21471828.99,
             countries: [],
@@ -340,6 +351,9 @@
         methods: {
             validate() {
                 alert("Bet placed");
+            },
+            getFlagString(str) {
+                return "/img/flags/"+str.toLowerCase().replaceAll(" ", "-") + ".svg";
             }
         },
         props: ['currentCountry'],
@@ -352,7 +366,8 @@
                         return 1;
                     return 0;
                 }
-                let arr = this.countriesTest.countries
+
+                let arr = this.countriesTest.countries;
                 return arr.sort(compare);
             }
         }
