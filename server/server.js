@@ -3,14 +3,9 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const PORT = 4000;
-const mongoose = require('mongoose');
-
 const cron = require("node-cron");
 const utils = require("./utils")
 
-let Bet = require('./tron.model').Bet;
-let RunTurn = require('./tron.model').RunTurn;
-let Run = require('./tron.model').Run;
 
 var http = require('http').Server(app);
 const https = require('https');
@@ -100,12 +95,12 @@ let currentRun = 2
 let currentTurn = 848 //TODO fetch from db
 
 //start polling every 15 seconds. The function then quits as the turn changes
-while (currentTurn == latestTurn) {
-  setTimeout(function() {
-    console.log("ciao")
-    pollForNewTurn()
-  }, 2000);
-}
+// while (currentTurn == latestTurn) {
+//   setTimeout(function() {
+//     console.log("ciao")
+//     pollForNewTurn()
+//   }, 2000);
+// }
 // });
 
 
@@ -146,16 +141,6 @@ betRoutes.route('/update/:id').post(function(req, res) {
 
 ///////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// DB and Server StartUp /////////////////////////////
-
-mongoose.connect('mongodb://127.0.0.1:27017/tron', {
-  useNewUrlParser: true
-});
-
-const connection = mongoose.connection;
-
-connection.once('open', function() {
-  console.log("MongoDB database connection established successfully");
-})
 
 http.listen(PORT, function() {
   console.log("Server is running on Port: " + PORT);
