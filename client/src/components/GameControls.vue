@@ -1,4 +1,4 @@
-<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-attr="http://www.w3.org/1999/xhtml">
+<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
     <v-tabs centered color="secondary lighten-1" dark icons-and-text>
         <v-tabs-slider color="secondary lighten-4"></v-tabs-slider>
 
@@ -21,12 +21,6 @@
                             <v-toolbar color="secondary lighten-4" dark>
                                 <v-toolbar-title>Place a bet</v-toolbar-title>
                                 <v-spacer></v-spacer>
-                                <v-btn icon>
-                                    <v-icon>search</v-icon>
-                                </v-btn>
-                                <v-btn icon>
-                                    <v-icon>sort</v-icon>
-                                </v-btn>
                             </v-toolbar>
                             <v-card-title primary-title class="justify-center">
                                 <v-form ref="form"
@@ -169,7 +163,7 @@
             <v-container grid-list-md text-xs-center>
                 <v-layout row wrap>
                     <!-- Countries -->
-                    <v-flex xs5>
+                    <v-flex>
                         <v-card>
                             <v-toolbar color="secondary lighten-4" dark>
                                 <v-toolbar-title>Stats</v-toolbar-title>
@@ -208,7 +202,7 @@
                         </v-card>
                     </v-flex>
                     <!-- History -->
-                    <v-flex xs7>
+                    <v-flex>
                         <v-card>
                             <v-toolbar color="secondary lighten-4" dark>
                                 <v-toolbar-title>History</v-toolbar-title>
@@ -219,10 +213,10 @@
                             </v-toolbar>
                             <v-container grid-list-md text-xs-center class="font-weight-light">
                                 <v-layout row wrap>
-                                    <v-flex xs2 style="text-align: start;" class="title">
+                                    <v-flex xs1 style="text-align: start;" class="title">
                                         Turn
                                     </v-flex>
-                                    <v-flex xs6 class="title">
+                                    <v-flex xs7 class="title">
                                         Conquest
                                     </v-flex>
                                     <v-flex xs4 class="title">
@@ -271,7 +265,6 @@
         data: () => ({
             search: '',
             spain: "/img/flags/spain.svg",
-            country: "USA",
             balance: 21471828.99,
             countries: [],
             jackpot: 10938147,

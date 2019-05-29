@@ -1,6 +1,6 @@
 <template>
     <v-app id="keep">
-        <v-navigation-drawer v-model="drawer" fixed clipped class="secondary lighten-2" app>
+        <v-navigation-drawer v-model="drawer" fixed clipped class="secondary lighten-2" app dark>
             <v-list dense class="secondary lighten-2" dark>
                 <template v-for="(item, i) in items">
                     <v-layout v-if="item.heading" :key="i" row align-center>
