@@ -1,7 +1,7 @@
 <template>
-    <v-container flex>
-        <div id="chartdiv"></div>
-    </v-container>
+
+    <div id="chartdiv"></div>
+
 </template>
 
 <script>
@@ -9,6 +9,7 @@
     import * as am4maps from "@amcharts/amcharts4/maps";
     import am4themes_spiritedaway from "@amcharts/amcharts4/themes/spiritedaway.js";
     import am4geodata_worldLow from "../assets/worldLow.js"
+    import countries from "../assets/countries.js"
 
     am4core.useTheme(am4themes_spiritedaway);
     export default {
@@ -19,7 +20,8 @@
         data: () => ({
             width: 0,
             height: 0,
-            lastSelected: null
+            lastSelected: null,
+            poligonSeries : null
         }),
         computed: {},
           mounted() {
@@ -30,10 +32,12 @@
 
                 /* Set map definition */
                 chart.geodata = am4geodata_worldLow;
-                //chart.geodataSource.url = "./geoData.json";
 
                 /* Set projection */
                 chart.projection = new am4maps.projections.Miller();
+
+                chart.background.fill = "#37474f";
+                chart.background.fillOpacity = 1;
 
                 /* Create map polygon series */
                 var polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
@@ -41,15 +45,23 @@
                 /* Make map load polygon (like country names) data from GeoJSON */
                 polygonSeries.useGeodata = true;
 
+                polygonSeries.data = countries;
+                this.polygonSeries = polygonSeries
+
                 /* Configure series */
                 var polygonTemplate = polygonSeries.mapPolygons.template;
+                
+                polygonSeries.tooltip.getFillFromObject = false;
+                polygonSeries.tooltip.background.fill = chart.colors.getIndex(4);
                 polygonTemplate.applyOnClones = true;
                 polygonTemplate.togglable = true;
-                polygonTemplate.tooltipText = "{name}";
+                polygonTemplate.tooltipText = "'{name}' controlled by '{controlledBy}'";
+                
                 polygonTemplate.nonScalingStroke = true;
                 polygonTemplate.strokeOpacity = 0.5;
 
-                polygonTemplate.fill = "{color}";
+                polygonTemplate.propertyFields.fill = "color";
+             
                 
                 polygonTemplate.events.on("hit", this.clicked)
 
@@ -57,11 +69,36 @@
                 var ss = polygonTemplate.states.create("active");
                 ss.properties.fill = chart.colors.getIndex(2);
 
-                var hs = polygonTemplate.states.create("hover");
+                var hs = polygonTemplate.states.create("highlight");
                 hs.properties.fill = chart.colors.getIndex(4);
 
+                polygonSeries.events.on("over", over);
+                polygonSeries.events.on("out", out);
+
+                function over(ev) {
+                  let hoveredState
+                  ev.target.mapPolygons.each(function(polygon) {
+                    if(polygon.isHover){
+                        hoveredState = polygon.dataItem.dataContext.controlledBy
+                        polygon.setState("highlight");
+                    } 
+                  });
+                  ev.target.mapPolygons.each(function(polygon) {
+                    if(polygon.dataItem.dataContext.controlledBy == hoveredState){
+                        polygon.setState("highlight");
+                    } 
+                  });
+                }
+
+                function out(ev) {
+                  ev.target.mapPolygons.each(function(polygon) {
+                    polygon.setState("default");
+                  });
+                }
+
                 // Hide Antarctica and all the states not present in the territories from michael API
-                polygonSeries.exclude = ["AQ"];
+                //polygonSeries.exclude = ["AQ"];
+
 
                 // Small map
                 chart.smallMap = new am4maps.SmallMap();
@@ -72,6 +109,7 @@
 
                 // Zoom control
                 chart.zoomControl = new am4maps.ZoomControl();
+                chart.chartContainer.wheelable = false;
 
                 var homeButton = new am4core.Button();
                 homeButton.events.on("hit", function () {
@@ -86,28 +124,16 @@
                 homeButton.parent = chart.zoomControl;
                 homeButton.insertBefore(chart.zoomControl.plusButton);
 
-
-
             this.chart = chart;
 
             
         },
         methods: {
             clicked(ev){
-                if (this.lastSelected) {
-                    // This line serves multiple purposes:
-                    // 1. Clicking a country twice actually de-activates, the line below
-                    //    de-activates it in advance, so the toggle then re-activates, making it
-                    //    appear as if it was never de-activated to begin with.
-                    // 2. Previously activated countries should be de-activated.
-                    this.lastSelected.isActive = false;
-                }
                 this.$emit('select',ev.target.dataItem.dataContext.name)
-                
-                ev.target.series.chart.zoomToMapObject(ev.target.dataItem.dataContext);
-                if (this.lastSelected !== ev.target) {
-                    this.lastSelected = ev.target;
-                }
+                // this is to update the data array and change color or stuff like that or you can just replace the data array with a brand new
+                // this.polygonSeries.data[4].color = "#000"
+                // this.polygonSeries.invalidateData();
             }
         },
 

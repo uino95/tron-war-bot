@@ -58,7 +58,7 @@
                                             outline
                                     ></v-select>
 
-                                    <v-btn color="success" @click="validate">Bet 50 {{currency}}</v-btn>
+                                    <v-btn color="success" @click="placeBet">Bet 50 {{currency}}</v-btn>
                                 </v-form>
                             </v-card-title>
                         </v-card>
@@ -351,8 +351,19 @@
             ]
         }),
         methods: {
-            validate() {
+            placeBet() {
                 alert("Bet placed");
+                
+                //let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
+                //window.tronWeb.contract().at(contract_address).then(contract => {
+                  //  contract.bet(0, 59).send({callValue:window.tronWeb.toSun(1)})
+                //});
+
+                let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
+                window.tronWeb.contract().at(contract_address).then(contract => {
+                    contract.jackpot(0).call().then(res => {console.log(res.toString())})
+                });
+
             },
             getFlagString(str) {
                 return "/img/flags/"+str.toLowerCase().replaceAll(" ", "-") + ".svg";
