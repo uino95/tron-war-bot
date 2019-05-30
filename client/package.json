@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "icons": "vsvg -s src/assets/flags -t src/components/flags"
   },
   "dependencies": {
     "@amcharts/amcharts4": "^4.4.8",
@@ -14,6 +15,7 @@
     "d3": "^5.9.2",
     "datamaps": "^0.5.9",
     "vue": "^2.6.10",
+    "vue-svgicon": "^3.2.6",
     "vuetify": "^1.5.5"
   },
   "devDependencies": {
