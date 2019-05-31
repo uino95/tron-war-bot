@@ -13,4 +13,4 @@ Vue.use(Vuetify, {
     info: '#F9F3C5',
     success: '#4caf50'
   }
-})
+});
