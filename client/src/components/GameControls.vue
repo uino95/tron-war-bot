@@ -596,6 +596,8 @@
                     "code": "ZM"
                 }, {"name": "Zimbabwe", "code": "ZW"}],
             },
+            latestBets: [],
+            myBets: [],
             // historyTest: [{"turn": 805, "conquest": ["Ciao", "Miao"], prev: "Isola di Pasqua"},
             //     {"turn": 804, "conquest": ["Bu", "Bi"], prev: "Isola di Pasqua"},
             //     {"turn": 803, "conquest": ["Pippo (tanto)", "Pluto"], prev: "Isola di Pasqua"},
@@ -607,52 +609,52 @@
             //     {"turn": 797, "conquest": ["Rohan", "Gondor"], prev: "Isola di Pasqua"},
             //     {"turn": 796, "conquest": ["Sith", "Naboo"], prev: "Isola di Pasqua"},
             //     {"turn": 795, "conquest": ["Daenerys", "King's Landing"], prev: "Isola di Pasqua"}],
-            latestBets: [
-                {
-                    address: "afuyagfiyuarfgfiuaryntfiua",
-                    country: "Mongolia",
-                    bet: "50",
-                    time: "10:01"
-                },
-                {
-                    address: "gaiuhguairheguahguraohguoa",
-                    country: "USA",
-                    bet: "50",
-                    time: "09:41"
-                },
-                {
-                    address: "fjewifaujihguraehguahgughs",
-                    country: "Russia",
-                    bet: "50",
-                    time: "08:01"
-                },
-                {
-                    address: "agui5hgauyngiamigaig782ygh",
-                    country: "Italia",
-                    bet: "50",
-                    time: "05:00"
-                },
-            ],
-            myBets: [
-                {
-                    country: "Zimbawe",
-                    bet: 7.5,
-                    time: "10:00",
-                    result: "won"
-                },
-                {
-                    country: "Malawii",
-                    bet: 2.3,
-                    time: "10:00",
-                    result: "pending"
-                },
-                {
-                    country: "Togo",
-                    bet: 5.0,
-                    time: "10:00",
-                    result: "lost"
-                }
-            ],
+            // latestBets: [
+            //     {
+            //         address: "afuyagfiyuarfgfiuaryntfiua",
+            //         country: "Mongolia",
+            //         bet: "50",
+            //         time: "10:01"
+            //     },
+            //     {
+            //         address: "gaiuhguairheguahguraohguoa",
+            //         country: "USA",
+            //         bet: "50",
+            //         time: "09:41"
+            //     },
+            //     {
+            //         address: "fjewifaujihguraehguahgughs",
+            //         country: "Russia",
+            //         bet: "50",
+            //         time: "08:01"
+            //     },
+            //     {
+            //         address: "agui5hgauyngiamigaig782ygh",
+            //         country: "Italia",
+            //         bet: "50",
+            //         time: "05:00"
+            //     },
+            // ],
+            // myBets: [
+            //     {
+            //         country: "Zimbawe",
+            //         bet: 7.5,
+            //         time: "10:00",
+            //         result: "won"
+            //     },
+            //     {
+            //         country: "Malawii",
+            //         bet: 2.3,
+            //         time: "10:00",
+            //         result: "pending"
+            //     },
+            //     {
+            //         country: "Togo",
+            //         bet: 5.0,
+            //         time: "10:00",
+            //         result: "lost"
+            //     }
+            // ],
             ecosystem: [{
                 text: 'vuetify-loader',
                 href: 'https://github.com/vuetifyjs/vuetify-loader'
@@ -669,7 +671,8 @@
         }),
         
         firebase: {
-            history: db.ref('history')
+            history: db.ref('history'),
+            latestBets: db.ref('bets')
         },
     
         methods: {

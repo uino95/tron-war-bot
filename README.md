@@ -13,9 +13,18 @@ npm run build
 ```
 
 To deploy (always from the client folder):
+
+install firebase cli:
+```
+npm install -g firebase-tools
+```
+run 
 ```
 firebase login
-firebase deploy
+```
+and follow the isntructions printed into the terminal. Then run 
+```
+firebase deploy --project tron-war-bot
 ```
 You need the tronwarbot@gmail.com account to deploy
 
