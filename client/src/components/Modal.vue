@@ -22,7 +22,7 @@
 
 <script>
     export default {
-        name: 'modal',
+        name: 'Modal',
 
         props: ['isModalVisible', 'headerTile', 'bodyTile', 'footerTile'],
 

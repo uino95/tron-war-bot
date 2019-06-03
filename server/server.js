@@ -67,6 +67,7 @@ function pollForNewTurn() {
     // A chunk of data has been recieved.
     resp.on('data', (chunk) => {
       data += chunk;
+      // fire STOP_GAME
     });
     // The whole response has been received. Print out the result.
     resp.on('end', () => {

@@ -63,7 +63,7 @@
 
     import GameMap from './components/GameMap'
     import GameControls from './components/GameControls'
-    import modal from './components/modal'
+    import Modal from './components/Modal'
 
     export default {
 
@@ -71,7 +71,7 @@
         components: {
             GameControls,
             GameMap,
-            modal
+            Modal
         },
         data: () => ({
             drawer: null,
