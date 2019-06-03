@@ -26,43 +26,60 @@
                                 <v-form ref="form"
                                         v-model="valid"
                                         lazy-validation>
-                                    <v-autocomplete
-                                            outline
-                                            v-model="currentCountry"
-                                            :items="countriesTest.countryList"
-                                            item-text="name"
-                                            :loading="isLoading"
-                                            :search-input.sync="search"
-                                            item-value="name"
-                                            hide-no-data
-                                            hide-selected
-                                            label="Select Country"
-                                            placeholder="Start typing or pick from map"
-                                    ></v-autocomplete>
+                                    <v-layout row wrap>
+                                        <v-flex xs4>
+                                            <v-autocomplete
+                                                    outline
+                                                    v-model="currentCountry"
+                                                    :items="countriesTest.countryList"
+                                                    item-text="name"
+                                                    :loading="isLoading"
+                                                    :search-input.sync="search"
+                                                    item-value="name"
+                                                    hide-no-data
+                                                    hide-selected
+                                                    label="Select Country"
+                                                    placeholder="Start typing or pick from map"
+                                            ></v-autocomplete>
+                                        </v-flex>
+                                        <v-flex xs4>
+                                            <v-text-field v-model="calculatePotentialWin"
+                                                          label="Potential win"
+                                                          outline
+                                                          disabled></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs4>
+                                            <v-text-field v-model="turnTimer"
+                                                          label="Next Turn"
+                                                          outline
+                                                          disabled></v-text-field>
+                                        </v-flex>
+                                    </v-layout>
+                                    <v-layout row wrap>
+                                        <v-flex xs4>
+                                            <v-text-field v-model="balance"
+                                                          label="Your Balance"
+                                                          outline
+                                                          disabled></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs4>
 
-                                    <v-text-field v-model="balance"
-                                                  label="Your Balance"
-                                                  outline
-                                                  disabled></v-text-field>
-
-                                    <v-text-field v-model="jackpot"
-                                                  label="Current Jackpot"
-                                                  outline
-                                                  disabled></v-text-field>
-
-                                    <v-text-field v-model="turnTimer"
-                                                  label="Next Turn"
-                                                  outline
-                                                  disabled></v-text-field>
-
-                                    <v-select
-                                            v-model="currency"
-                                            :items="currencies"
-                                            :rules="currencyRule"
-                                            label="Currency"
-                                            required
-                                            outline
-                                    ></v-select>
+                                            <v-text-field v-model="jackpot"
+                                                          label="Current Jackpot"
+                                                          outline
+                                                          disabled></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs4>
+                                            <v-select
+                                                    v-model="currency"
+                                                    :items="currencies"
+                                                    :rules="currencyRule"
+                                                    label="Currency"
+                                                    required
+                                                    outline
+                                            ></v-select>
+                                        </v-flex>
+                                    </v-layout>
 
                                     <v-btn color="success" @click="placeBet">Bet 50 {{currency}}</v-btn>
 
@@ -72,9 +89,9 @@
                             <v-snackbar
                                     v-model="snackbar"
                                     :color="snackbarColor"
-                                    timeout="6000"
-                                    vertical="true"
-                                    bottom="true">
+                                    :timeout="snackbarTimeout"
+                                    vertical
+                                    bottom>
                                 <span class="title">{{snackbarText}}</span>
                                 <v-btn dark flat @click="snackbar = false">
                                     Close
@@ -82,6 +99,8 @@
                             </v-snackbar>
                         </v-card>
                     </v-flex>
+                </v-layout>
+                <v-layout row wrap>
                     <!-- My latest bets -->
                     <v-flex>
                         <v-card>
@@ -152,10 +171,10 @@
                                 </v-layout>
                                 <v-divider style="margin-bottom: 3%"></v-divider>
                                 <v-layout row wrap v-for="bet in latestBets" :key="bet">
-                                    <v-flex xs3 style="text-align: start" class="subheading" v-alt="bet.address">
+                                    <v-flex xs3 style="text-align: start" class="subheading">
                                         <v-tooltip bottom>
                                             <template v-slot:activator="{ on }">
-                                                <span v-on="on" v-text="bet.address.substring(0,8)+'...'"></span>
+                                                <span v-on="on" v-text="bet.address.substring(0,12)+'...'"></span>
                                             </template>
                                             <span>{{bet.address}}</span>
                                         </v-tooltip>
@@ -206,7 +225,7 @@
 
                                 <v-divider style="margin-bottom: 3%"></v-divider>
 
-                                <v-layout row wrap v-for="country in sortedArray" :key="country">
+                                <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
                                     <v-flex xs1>
                                         <v-avatar size="90%">
                                             <img :src="getFlagString(country[0])" :alt="country[0]">
@@ -291,7 +310,8 @@
             snackbar: false,
             snackbarText: "",
             snackbarColor: "",
-            spain: "/img/flags/spain.svg",
+            snackbarTimeout: 6000,
+            potentialWin: 0,
             balance: 21471828.99,
             countries: [],
             turnTimer: "00:00",
@@ -669,12 +689,12 @@
                 }
             ]
         }),
-        
+
         firebase: {
             history: db.ref('history'),
             latestBets: db.ref('bets')
         },
-    
+
         methods: {
             placeBet() {
 
@@ -704,7 +724,7 @@
 
                 // subpath: $baseUrl/events/{contractAddress}
 
-                // parameters   
+                // parameters
                 // limit: each page size, default is 25
                 // sort: sort Field, default is sort by timeStamp descending order
                 // since: start time of event occurrence, timeStamp >= since will be shown
@@ -713,7 +733,7 @@
                 // start: start page, default is 1
                 // "https://api.tronex.io/events/TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e?limit=1&sort=-timeStamp&since=0&block=0&start=4"
 
-                
+
 
             },
             getFlagString(str) {
@@ -734,9 +754,9 @@
                 this.turnTimer = `${min}:${sec}`;
             },
             startTimer: function () {
-                setInterval(() => {
+                /*setInterval(() => {
                     this.setTimer();
-                }, 1000);
+                }, 1000);*/
             }
         },
         props: ['currentCountry'],
@@ -752,6 +772,11 @@
 
                 let arr = this.countriesTest.countries;
                 return arr.sort(compare);
+            },
+            calculatePotentialWin: function () {
+                //TODO replace
+                if (this.currentCountry == null) return 0;
+                return (this.jackpot + 50) * 0.7 / this.currentCountry.length;
             }
         },
         mounted() {
