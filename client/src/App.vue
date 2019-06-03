@@ -39,7 +39,9 @@
                     <v-flex>
                         
                         <GameMap @select="selectedCountryChild"/>
-                        <GameControls v-bind:current-country = "selected_country"/>
+                        <GameControls 
+                            v-bind:current-country = "selected_country"
+                            />
                         <modal
                             @close="closeModal"
                             v-bind:isModalVisible = "isModalVisible"
@@ -56,11 +58,15 @@
 </template>
 
 <script>
+
+    /////////////////////// import component //////////////////////////
+
     import GameMap from './components/GameMap'
     import GameControls from './components/GameControls'
     import modal from './components/modal'
 
     export default {
+
         name: 'App',
         components: {
             GameControls,
@@ -135,7 +141,7 @@
             }
         },
         mounted(){
-            //console.log(window.tronWeb);
+            console.log(window.tronWeb);
         }
     }
 </script>
