@@ -3,9 +3,12 @@ cd /vagrant
 
 echo "Launching tron quickstart..."
 
+if [ ! -d /home/vagrant/server ]; then
+  mkdir /home/vagrant/server
+fi
 
 # Migrate folders to home folder to avoid simlink errors
-declare -a folders=("node_modules")
+declare -a folders=("node_modules" "server/node_modules")
 
 ## now loop through the above array
 for i in "${folders[@]}"
