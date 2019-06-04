@@ -26,43 +26,60 @@
                                 <v-form ref="form"
                                         v-model="valid"
                                         lazy-validation>
-                                    <v-autocomplete
-                                            outline
-                                            v-model="currentCountry"
-                                            :items="countriesTest.countryList"
-                                            item-text="name"
-                                            :loading="isLoading"
-                                            :search-input.sync="search"
-                                            item-value="name"
-                                            hide-no-data
-                                            hide-selected
-                                            label="Select Country"
-                                            placeholder="Start typing or pick from map"
-                                    ></v-autocomplete>
+                                    <v-layout row wrap>
+                                        <v-flex xs4>
+                                            <v-autocomplete
+                                                    outline
+                                                    v-model="currentCountry"
+                                                    :items="countries"
+                                                    item-text="controlledBy"
+                                                    :loading="isLoading"
+                                                    :search-input.sync="search"
+                                                    item-value="controlledBy"
+                                                    hide-no-data
+                                                    hide-selected
+                                                    label="Select Country"
+                                                    placeholder="Start typing or pick from map"
+                                            ></v-autocomplete>
+                                        </v-flex>
+                                        <v-flex xs4>
+                                            <v-text-field v-model="calculatePotentialWin"
+                                                          label="Potential win"
+                                                          outline
+                                                          disabled></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs4>
+                                            <v-text-field v-model="turnTimer"
+                                                          label="Next Turn"
+                                                          outline
+                                                          disabled></v-text-field>
+                                        </v-flex>
+                                    </v-layout>
+                                    <v-layout row wrap>
+                                        <v-flex xs4>
+                                            <v-text-field v-model="balance"
+                                                          label="Your Balance"
+                                                          outline
+                                                          disabled></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs4>
 
-                                    <v-text-field v-model="balance"
-                                                  label="Your Balance"
-                                                  outline
-                                                  disabled></v-text-field>
-
-                                    <v-text-field v-model="jackpot"
-                                                  label="Current Jackpot"
-                                                  outline
-                                                  disabled></v-text-field>
-
-                                    <v-text-field v-model="turnTimer"
-                                                  label="Next Turn"
-                                                  outline
-                                                  disabled></v-text-field>
-
-                                    <v-select
-                                            v-model="currency"
-                                            :items="currencies"
-                                            :rules="currencyRule"
-                                            label="Currency"
-                                            required
-                                            outline
-                                    ></v-select>
+                                            <v-text-field v-model="jackpot"
+                                                          label="Current Jackpot"
+                                                          outline
+                                                          disabled></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs4>
+                                            <v-select
+                                                    v-model="currency"
+                                                    :items="currencies"
+                                                    :rules="currencyRule"
+                                                    label="Currency"
+                                                    required
+                                                    outline
+                                            ></v-select>
+                                        </v-flex>
+                                    </v-layout>
 
                                     <v-btn color="success" @click="placeBet">Bet 50 {{currency}}</v-btn>
 
@@ -72,9 +89,9 @@
                             <v-snackbar
                                     v-model="snackbar"
                                     :color="snackbarColor"
-                                    timeout="6000"
-                                    vertical="true"
-                                    bottom="true">
+                                    :timeout="snackbarTimeout"
+                                    vertical
+                                    bottom>
                                 <span class="title">{{snackbarText}}</span>
                                 <v-btn dark flat @click="snackbar = false">
                                     Close
@@ -82,6 +99,8 @@
                             </v-snackbar>
                         </v-card>
                     </v-flex>
+                </v-layout>
+                <v-layout row wrap>
                     <!-- My latest bets -->
                     <v-flex>
                         <v-card>
@@ -152,10 +171,10 @@
                                 </v-layout>
                                 <v-divider style="margin-bottom: 3%"></v-divider>
                                 <v-layout row wrap v-for="bet in latestBets" :key="bet">
-                                    <v-flex xs3 style="text-align: start" class="subheading" v-alt="bet.address">
+                                    <v-flex xs3 style="text-align: start" class="subheading">
                                         <v-tooltip bottom>
                                             <template v-slot:activator="{ on }">
-                                                <span v-on="on" v-text="bet.address.substring(0,8)+'...'"></span>
+                                                <span v-on="on" v-text="bet.address.substring(0,12)+'...'"></span>
                                             </template>
                                             <span>{{bet.address}}</span>
                                         </v-tooltip>
@@ -206,7 +225,7 @@
 
                                 <v-divider style="margin-bottom: 3%"></v-divider>
 
-                                <v-layout row wrap v-for="country in sortedArray" :key="country">
+                                <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
                                     <v-flex xs1>
                                         <v-avatar size="90%">
                                             <img :src="getFlagString(country[0])" :alt="country[0]">
@@ -247,7 +266,7 @@
 
                                 <v-divider style="margin-bottom: 3%"></v-divider>
 
-                                <v-layout row wrap v-for="conquest in historyTest" :key="conquest">
+                                <v-layout row wrap v-for="conquest in history" :key="conquest">
                                     <v-flex xs1 style="text-align: start" class="subheading">
                                         {{conquest.turn}}
                                     </v-flex>
@@ -274,6 +293,10 @@
 </template>
 
 <script>
+
+    import {db} from '../plugins/firebase'
+    import countries from "../assets/countries.js"
+
     String.prototype.replaceAll = function (search, replace) {
         if (replace === undefined) {
             return this.toString();
@@ -288,7 +311,8 @@
             snackbar: false,
             snackbarText: "",
             snackbarColor: "",
-            spain: "/img/flags/spain.svg",
+            snackbarTimeout: 6000,
+            potentialWin: 0,
             balance: 21471828.99,
             countries: [],
             turnTimer: "00:00",
@@ -299,6 +323,7 @@
             currencyRule: [v => !!v || 'Select a currency',
                 //v => v < 50 || 'You don\'t have enough money'
             ],
+            history: [],
             countriesTest: {
                 "turn": 804,
                 "countries": [["El Salvador", [0, 1, 2, 25, 28, 48, 51, 52, 54, 60, 62, 85, 91, 93, 105, 131, 151, 160, 161, 167, 187, 201, 220, 223, 228]], ["Spain", [3, 7, 8, 16, 19, 20, 21, 26, 40, 50, 61, 65, 66, 72, 77, 78, 79, 80, 81, 83, 92, 96, 99, 104, 117, 118, 119, 123, 126, 127, 134, 135, 137, 141, 148, 150, 153, 169, 180, 186, 188, 196, 202, 211, 222, 239]], ["Bahrain", [4, 9, 24, 58, 100, 114, 130, 158, 173, 178, 207, 233]], ["Zimbabwe", [5, 18, 36, 45, 46, 49, 68, 75, 90, 98, 109, 121, 129, 140, 142, 143, 145, 146, 177, 192, 198, 215, 216, 234, 235, 236]], ["France", [6, 57, 59, 67]], ["Chile", [10, 41, 219]], ["Georgia", [11, 17, 55, 76, 101, 116, 200, 212, 217, 230]], ["Pitcairn Islands", [12, 47, 112, 132, 147, 152, 157, 172, 206, 209, 213, 218, 225, 226, 227]], ["Paraguay", [13, 32, 71, 86, 88, 170, 194, 210]], ["Antarctica", [14, 35, 174, 182]], ["New Zealand", [15, 149, 208]], ["Cambodia", [22, 33, 39, 53, 95, 97, 111, 115, 136, 144, 155, 163, 164, 165, 181, 204, 224, 231, 232]], ["Serbia", [23, 128, 133, 175, 191, 229]], ["Belarus", [27, 56, 94, 122, 124, 166, 195, 197]], ["Bermuda", [29, 38, 84, 190]], ["Ecuador", [30, 31]], ["Sri Lanka", [34]], ["[REDACTED]", [37, 44, 64, 179]], ["Japan", [42, 108, 176]], ["Gambia", [43]], ["Libya", [63]], ["Norway", [69, 238]], ["Papua New Guinea", [70, 74, 87, 156]], ["Wales", [73, 102, 237, 240]], ["Republic of Congo", [82, 183, 193]], ["Thailand", [89]], ["Turkey", [103, 171]], ["Jordan", [106]], ["Philippines", [107, 139]], ["Kyrgyzstan", [110, 159, 205, 221]], ["Taiwan", [113, 125, 138, 168, 214]], ["Nepal", [120]], ["Netherlands", [154, 184]], ["ABC Islands", [162]], ["Vanuatu", [185]], ["Somalia", [189, 199]], ["Ghana", [203]]],
@@ -592,63 +617,65 @@
                     "code": "ZM"
                 }, {"name": "Zimbabwe", "code": "ZW"}],
             },
-            historyTest: [{"turn": 805, "conquest": ["Ciao", "Miao"], prev: "Isola di Pasqua"},
-                {"turn": 804, "conquest": ["Bu", "Bi"], prev: "Isola di Pasqua"},
-                {"turn": 803, "conquest": ["Pippo (tanto)", "Pluto"], prev: "Isola di Pasqua"},
-                {"turn": 802, "conquest": ["Ghana", "Zimbawe"], prev: "Isola di Pasqua"},
-                {"turn": 801, "conquest": ["Togo", "USA"], prev: "Isola di Pasqua"},
-                {"turn": 800, "conquest": ["USA", "Giappone"], prev: "Isola di Pasqua"},
-                {"turn": 799, "conquest": ["Mordor", "Gondor"], prev: "Isola di Pasqua"},
-                {"turn": 798, "conquest": ["Freezer", "Namek"], prev: "Isola di Pasqua"},
-                {"turn": 797, "conquest": ["Rohan", "Gondor"], prev: "Isola di Pasqua"},
-                {"turn": 796, "conquest": ["Sith", "Naboo"], prev: "Isola di Pasqua"},
-                {"turn": 795, "conquest": ["Daenerys", "King's Landing"], prev: "Isola di Pasqua"}],
-            latestBets: [
-                {
-                    address: "afuyagfiyuarfgfiuaryntfiua",
-                    country: "Mongolia",
-                    bet: "50",
-                    time: "10:01"
-                },
-                {
-                    address: "gaiuhguairheguahguraohguoa",
-                    country: "USA",
-                    bet: "50",
-                    time: "09:41"
-                },
-                {
-                    address: "fjewifaujihguraehguahgughs",
-                    country: "Russia",
-                    bet: "50",
-                    time: "08:01"
-                },
-                {
-                    address: "agui5hgauyngiamigaig782ygh",
-                    country: "Italia",
-                    bet: "50",
-                    time: "05:00"
-                },
-            ],
-            myBets: [
-                {
-                    country: "Zimbawe",
-                    bet: 7.5,
-                    time: "10:00",
-                    result: "won"
-                },
-                {
-                    country: "Malawii",
-                    bet: 2.3,
-                    time: "10:00",
-                    result: "pending"
-                },
-                {
-                    country: "Togo",
-                    bet: 5.0,
-                    time: "10:00",
-                    result: "lost"
-                }
-            ],
+            latestBets: [],
+            myBets: [],
+            // historyTest: [{"turn": 805, "conquest": ["Ciao", "Miao"], prev: "Isola di Pasqua"},
+            //     {"turn": 804, "conquest": ["Bu", "Bi"], prev: "Isola di Pasqua"},
+            //     {"turn": 803, "conquest": ["Pippo (tanto)", "Pluto"], prev: "Isola di Pasqua"},
+            //     {"turn": 802, "conquest": ["Ghana", "Zimbawe"], prev: "Isola di Pasqua"},
+            //     {"turn": 801, "conquest": ["Togo", "USA"], prev: "Isola di Pasqua"},
+            //     {"turn": 800, "conquest": ["USA", "Giappone"], prev: "Isola di Pasqua"},
+            //     {"turn": 799, "conquest": ["Mordor", "Gondor"], prev: "Isola di Pasqua"},
+            //     {"turn": 798, "conquest": ["Freezer", "Namek"], prev: "Isola di Pasqua"},
+            //     {"turn": 797, "conquest": ["Rohan", "Gondor"], prev: "Isola di Pasqua"},
+            //     {"turn": 796, "conquest": ["Sith", "Naboo"], prev: "Isola di Pasqua"},
+            //     {"turn": 795, "conquest": ["Daenerys", "King's Landing"], prev: "Isola di Pasqua"}],
+            // latestBets: [
+            //     {
+            //         address: "afuyagfiyuarfgfiuaryntfiua",
+            //         country: "Mongolia",
+            //         bet: "50",
+            //         time: "10:01"
+            //     },
+            //     {
+            //         address: "gaiuhguairheguahguraohguoa",
+            //         country: "USA",
+            //         bet: "50",
+            //         time: "09:41"
+            //     },
+            //     {
+            //         address: "fjewifaujihguraehguahgughs",
+            //         country: "Russia",
+            //         bet: "50",
+            //         time: "08:01"
+            //     },
+            //     {
+            //         address: "agui5hgauyngiamigaig782ygh",
+            //         country: "Italia",
+            //         bet: "50",
+            //         time: "05:00"
+            //     },
+            // ],
+            // myBets: [
+            //     {
+            //         country: "Zimbawe",
+            //         bet: 7.5,
+            //         time: "10:00",
+            //         result: "won"
+            //     },
+            //     {
+            //         country: "Malawii",
+            //         bet: 2.3,
+            //         time: "10:00",
+            //         result: "pending"
+            //     },
+            //     {
+            //         country: "Togo",
+            //         bet: 5.0,
+            //         time: "10:00",
+            //         result: "lost"
+            //     }
+            // ],
             ecosystem: [{
                 text: 'vuetify-loader',
                 href: 'https://github.com/vuetifyjs/vuetify-loader'
@@ -663,6 +690,12 @@
                 }
             ]
         }),
+
+        firebase: {
+            history: db.ref('history'),
+            latestBets: db.ref('bets')
+        },
+
         methods: {
             placeBet() {
 
@@ -687,20 +720,36 @@
                     })
                 });
 
+                // listen on this url
+//                 Function: get events by contract address
+
+                // subpath: $baseUrl/events/{contractAddress}
+
+                // parameters
+                // limit: each page size, default is 25
+                // sort: sort Field, default is sort by timeStamp descending order
+                // since: start time of event occurrence, timeStamp >= since will be shown
+                // block: block number, block number >= block will be shown
+                // contractAddress: contract address
+                // start: start page, default is 1
+                // "https://api.tronex.io/events/TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e?limit=1&sort=-timeStamp&since=0&block=0&start=4"
+
+
+
             },
             getFlagString(str) {
                 return "/img/flags/" + str.toLowerCase().replaceAll(" ", "-") + ".svg";
             },
             setTimer: function () {
-                const time = Date.now();
+                const time = new Date();
                 let min = time.getMinutes();
                 let sec = time.getSeconds();
                 if (min >= 15) {
-                    min += 15;
+                    min = 74 - min;
                 } else {
-                    min = 15 - min;
+                    min = 14 - min;
                 }
-                sec = 60 - sec;
+                sec = 59- sec;
                 sec = sec < 10 ? `0${sec}` : sec;
                 min = min < 10 ? `0${min}` : min;
                 this.turnTimer = `${min}:${sec}`;
@@ -724,10 +773,16 @@
 
                 let arr = this.countriesTest.countries;
                 return arr.sort(compare);
+            },
+            calculatePotentialWin: function () {
+                //TODO replace
+                if (this.currentCountry == null) return 0;
+                return (this.jackpot + 50) * 0.7 / this.currentCountry.length;
             }
         },
         mounted() {
             this.startTimer();
+            this.countries = countries;
         }
     }
 </script>

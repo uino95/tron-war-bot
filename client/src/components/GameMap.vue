@@ -131,6 +131,7 @@
         methods: {
             clicked(ev){
                 this.$emit('select',ev.target.dataItem.dataContext.name)
+                
                 // this is to update the data array and change color or stuff like that or you can just replace the data array with a brand new
                 // this.polygonSeries.data[4].color = "#000"
                 // this.polygonSeries.invalidateData();
