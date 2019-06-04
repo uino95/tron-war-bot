@@ -1,5 +1,8 @@
 import Vue from 'vue'
+
+import './plugins/firebase'
 import './plugins/vuetify'
+
 import App from './App.vue'
 
 Vue.config.productionTip = false;

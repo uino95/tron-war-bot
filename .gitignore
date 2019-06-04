@@ -8,6 +8,9 @@ logs
 *.log
 *.out
 
+# Firebase deploy
+./firebase
+
 # Runtime data
 pids
 *.pid
