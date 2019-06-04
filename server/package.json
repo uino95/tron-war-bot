@@ -18,6 +18,7 @@
     "mongoose": "^5.5.9",
     "node-cron": "^2.0.3",
     "socket.io": "^2.2.0",
+    "trongrid": "^1.2.1",
     "tronweb": "^2.5.6"
   }
 }
