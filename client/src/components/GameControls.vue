@@ -29,7 +29,7 @@
                                     <v-autocomplete
                                             outline
                                             v-model="currentCountry"
-                                            :items="countriesTest.countryList"
+                                            :items="countriesArr"
                                             item-text="name"
                                             :loading="isLoading"
                                             :search-input.sync="search"
@@ -45,12 +45,12 @@
                                                   outline
                                                   disabled></v-text-field>
 
-                                    <v-text-field v-model="jackpot"
+                                    <v-text-field v-model="info.jackpot"
                                                   label="Current Jackpot"
                                                   outline
                                                   disabled></v-text-field>
 
-                                    <v-text-field v-model="turnTimer"
+                                    <v-text-field v-model="info.nextTurn"
                                                   label="Next Turn"
                                                   outline
                                                   disabled></v-text-field>
@@ -108,7 +108,7 @@
                                     </v-flex>
                                 </v-layout>
                                 <v-divider style="margin-bottom: 3%"></v-divider>
-                                <v-layout row wrap v-for="bet in myBets" :key="bet">
+                                <v-layout row wrap v-for="bet in myBets" >
                                     <v-flex xs3 class="subheading">
                                         {{bet.country}}
                                     </v-flex>
@@ -151,7 +151,7 @@
                                     </v-flex>
                                 </v-layout>
                                 <v-divider style="margin-bottom: 3%"></v-divider>
-                                <v-layout row wrap v-for="bet in latestBets" :key="bet">
+                                <v-layout row wrap v-for="bet in latestBets" >
                                     <v-flex xs3 style="text-align: start" class="subheading" v-alt="bet.address">
                                         <v-tooltip bottom>
                                             <template v-slot:activator="{ on }">
@@ -206,7 +206,7 @@
 
                                 <v-divider style="margin-bottom: 3%"></v-divider>
 
-                                <v-layout row wrap v-for="country in sortedArray" :key="country">
+                                <v-layout row wrap v-for="country in sortedArray" >
                                     <v-flex xs1>
                                         <v-avatar size="90%">
                                             <img :src="getFlagString(country[0])" :alt="country[0]">
@@ -247,7 +247,7 @@
 
                                 <v-divider style="margin-bottom: 3%"></v-divider>
 
-                                <v-layout row wrap v-for="conquest in history" :key="conquest">
+                                <v-layout row wrap v-for="conquest in history" >
                                     <v-flex xs1 style="text-align: start" class="subheading">
                                         {{conquest.turn}}
                                     </v-flex>
@@ -276,6 +276,8 @@
 <script>
 
     import {db} from '../plugins/firebase'
+    import countryListObj from '../assets/countryListObj'
+    import countryListArr from '../assets/countryListArr' 
 
     String.prototype.replaceAll = function (search, replace) {
         if (replace === undefined) {
@@ -292,10 +294,7 @@
             snackbarText: "",
             snackbarColor: "",
             spain: "/img/flags/spain.svg",
-            balance: 21471828.99,
-            countries: [],
-            turnTimer: "00:00",
-            jackpot: 10938147,
+            info: {},
             betText: "Bet 50 TRX",
             currencies: ["TRX", "WAR"],
             currency: "TRX",
@@ -303,378 +302,20 @@
                 //v => v < 50 || 'You don\'t have enough money'
             ],
             history: [],
-            countriesTest: {
-                "turn": 804,
-                "countries": [["El Salvador", [0, 1, 2, 25, 28, 48, 51, 52, 54, 60, 62, 85, 91, 93, 105, 131, 151, 160, 161, 167, 187, 201, 220, 223, 228]], ["Spain", [3, 7, 8, 16, 19, 20, 21, 26, 40, 50, 61, 65, 66, 72, 77, 78, 79, 80, 81, 83, 92, 96, 99, 104, 117, 118, 119, 123, 126, 127, 134, 135, 137, 141, 148, 150, 153, 169, 180, 186, 188, 196, 202, 211, 222, 239]], ["Bahrain", [4, 9, 24, 58, 100, 114, 130, 158, 173, 178, 207, 233]], ["Zimbabwe", [5, 18, 36, 45, 46, 49, 68, 75, 90, 98, 109, 121, 129, 140, 142, 143, 145, 146, 177, 192, 198, 215, 216, 234, 235, 236]], ["France", [6, 57, 59, 67]], ["Chile", [10, 41, 219]], ["Georgia", [11, 17, 55, 76, 101, 116, 200, 212, 217, 230]], ["Pitcairn Islands", [12, 47, 112, 132, 147, 152, 157, 172, 206, 209, 213, 218, 225, 226, 227]], ["Paraguay", [13, 32, 71, 86, 88, 170, 194, 210]], ["Antarctica", [14, 35, 174, 182]], ["New Zealand", [15, 149, 208]], ["Cambodia", [22, 33, 39, 53, 95, 97, 111, 115, 136, 144, 155, 163, 164, 165, 181, 204, 224, 231, 232]], ["Serbia", [23, 128, 133, 175, 191, 229]], ["Belarus", [27, 56, 94, 122, 124, 166, 195, 197]], ["Bermuda", [29, 38, 84, 190]], ["Ecuador", [30, 31]], ["Sri Lanka", [34]], ["[REDACTED]", [37, 44, 64, 179]], ["Japan", [42, 108, 176]], ["Gambia", [43]], ["Libya", [63]], ["Norway", [69, 238]], ["Papua New Guinea", [70, 74, 87, 156]], ["Wales", [73, 102, 237, 240]], ["Republic of Congo", [82, 183, 193]], ["Thailand", [89]], ["Turkey", [103, 171]], ["Jordan", [106]], ["Philippines", [107, 139]], ["Kyrgyzstan", [110, 159, 205, 221]], ["Taiwan", [113, 125, 138, 168, 214]], ["Nepal", [120]], ["Netherlands", [154, 184]], ["ABC Islands", [162]], ["Vanuatu", [185]], ["Somalia", [189, 199]], ["Ghana", [203]]],
-                "countryList": [{"name": "Afghanistan", "code": "AF"}, {
-                    "name": "Åland Islands",
-                    "code": "AX"
-                }, {"name": "Albania", "code": "AL"}, {"name": "Algeria", "code": "DZ"}, {
-                    "name": "American Samoa",
-                    "code": "AS"
-                }, {"name": "AndorrA", "code": "AD"}, {"name": "Angola", "code": "AO"}, {
-                    "name": "Anguilla",
-                    "code": "AI"
-                }, {"name": "Antarctica", "code": "AQ"}, {
-                    "name": "Antigua and Barbuda",
-                    "code": "AG"
-                }, {"name": "Argentina", "code": "AR"}, {"name": "Armenia", "code": "AM"}, {
-                    "name": "Aruba",
-                    "code": "AW"
-                }, {"name": "Australia", "code": "AU"}, {"name": "Austria", "code": "AT"}, {
-                    "name": "Azerbaijan",
-                    "code": "AZ"
-                }, {"name": "Bahamas", "code": "BS"}, {"name": "Bahrain", "code": "BH"}, {
-                    "name": "Bangladesh",
-                    "code": "BD"
-                }, {"name": "Barbados", "code": "BB"}, {"name": "Belarus", "code": "BY"}, {
-                    "name": "Belgium",
-                    "code": "BE"
-                }, {"name": "Belize", "code": "BZ"}, {"name": "Benin", "code": "BJ"}, {
-                    "name": "Bermuda",
-                    "code": "BM"
-                }, {"name": "Bhutan", "code": "BT"}, {
-                    "name": "Bolivia",
-                    "code": "BO"
-                }, {"name": "Bosnia and Herzegovina", "code": "BA"}, {
-                    "name": "Botswana",
-                    "code": "BW"
-                }, {"name": "Bouvet Island", "code": "BV"}, {
-                    "name": "Brazil",
-                    "code": "BR"
-                }, {"name": "British Indian Ocean Territory", "code": "IO"}, {
-                    "name": "Brunei Darussalam",
-                    "code": "BN"
-                }, {"name": "Bulgaria", "code": "BG"}, {"name": "Burkina Faso", "code": "BF"}, {
-                    "name": "Burundi",
-                    "code": "BI"
-                }, {"name": "Cambodia", "code": "KH"}, {"name": "Cameroon", "code": "CM"}, {
-                    "name": "Canada",
-                    "code": "CA"
-                }, {"name": "Cape Verde", "code": "CV"}, {
-                    "name": "Cayman Islands",
-                    "code": "KY"
-                }, {"name": "Central African Republic", "code": "CF"}, {"name": "Chad", "code": "TD"}, {
-                    "name": "Chile",
-                    "code": "CL"
-                }, {"name": "China", "code": "CN"}, {
-                    "name": "Christmas Island",
-                    "code": "CX"
-                }, {"name": "Cocos (Keeling) Islands", "code": "CC"}, {
-                    "name": "Colombia",
-                    "code": "CO"
-                }, {"name": "Comoros", "code": "KM"}, {
-                    "name": "Congo",
-                    "code": "CG"
-                }, {"name": "Congo, The Democratic Republic of the", "code": "CD"}, {
-                    "name": "Cook Islands",
-                    "code": "CK"
-                }, {"name": "Costa Rica", "code": "CR"}, {"name": "Cote D'Ivoire", "code": "CI"}, {
-                    "name": "Croatia",
-                    "code": "HR"
-                }, {"name": "Cuba", "code": "CU"}, {"name": "Cyprus", "code": "CY"}, {
-                    "name": "Czech Republic",
-                    "code": "CZ"
-                }, {"name": "Denmark", "code": "DK"}, {"name": "Djibouti", "code": "DJ"}, {
-                    "name": "Dominica",
-                    "code": "DM"
-                }, {"name": "Dominican Republic", "code": "DO"}, {"name": "Ecuador", "code": "EC"}, {
-                    "name": "Egypt",
-                    "code": "EG"
-                }, {"name": "El Salvador", "code": "SV"}, {
-                    "name": "Equatorial Guinea",
-                    "code": "GQ"
-                }, {"name": "Eritrea", "code": "ER"}, {"name": "Estonia", "code": "EE"}, {
-                    "name": "Ethiopia",
-                    "code": "ET"
-                }, {"name": "Falkland Islands (Malvinas)", "code": "FK"}, {
-                    "name": "Faroe Islands",
-                    "code": "FO"
-                }, {"name": "Fiji", "code": "FJ"}, {"name": "Finland", "code": "FI"}, {
-                    "name": "France",
-                    "code": "FR"
-                }, {"name": "French Guiana", "code": "GF"}, {
-                    "name": "French Polynesia",
-                    "code": "PF"
-                }, {"name": "French Southern Territories", "code": "TF"}, {
-                    "name": "Gabon",
-                    "code": "GA"
-                }, {"name": "Gambia", "code": "GM"}, {"name": "Georgia", "code": "GE"}, {
-                    "name": "Germany",
-                    "code": "DE"
-                }, {"name": "Ghana", "code": "GH"}, {"name": "Gibraltar", "code": "GI"}, {
-                    "name": "Greece",
-                    "code": "GR"
-                }, {"name": "Greenland", "code": "GL"}, {"name": "Grenada", "code": "GD"}, {
-                    "name": "Guadeloupe",
-                    "code": "GP"
-                }, {"name": "Guam", "code": "GU"}, {"name": "Guatemala", "code": "GT"}, {
-                    "name": "Guernsey",
-                    "code": "GG"
-                }, {"name": "Guinea", "code": "GN"}, {"name": "Guinea-Bissau", "code": "GW"}, {
-                    "name": "Guyana",
-                    "code": "GY"
-                }, {"name": "Haiti", "code": "HT"}, {
-                    "name": "Heard Island and Mcdonald Islands",
-                    "code": "HM"
-                }, {"name": "Holy See (Vatican City State)", "code": "VA"}, {
-                    "name": "Honduras",
-                    "code": "HN"
-                }, {"name": "Hong Kong", "code": "HK"}, {"name": "Hungary", "code": "HU"}, {
-                    "name": "Iceland",
-                    "code": "IS"
-                }, {"name": "India", "code": "IN"}, {
-                    "name": "Indonesia",
-                    "code": "ID"
-                }, {"name": "Iran, Islamic Republic Of", "code": "IR"}, {
-                    "name": "Iraq",
-                    "code": "IQ"
-                }, {"name": "Ireland", "code": "IE"}, {"name": "Isle of Man", "code": "IM"}, {
-                    "name": "Israel",
-                    "code": "IL"
-                }, {"name": "Italy", "code": "IT"}, {"name": "Jamaica", "code": "JM"}, {
-                    "name": "Japan",
-                    "code": "JP"
-                }, {"name": "Jersey", "code": "JE"}, {"name": "Jordan", "code": "JO"}, {
-                    "name": "Kazakhstan",
-                    "code": "KZ"
-                }, {"name": "Kenya", "code": "KE"}, {
-                    "name": "Kiribati",
-                    "code": "KI"
-                }, {"name": "Korea, Democratic People'S Republic of", "code": "KP"}, {
-                    "name": "Korea, Republic of",
-                    "code": "KR"
-                }, {"name": "Kuwait", "code": "KW"}, {
-                    "name": "Kyrgyzstan",
-                    "code": "KG"
-                }, {"name": "Lao People'S Democratic Republic", "code": "LA"}, {
-                    "name": "Latvia",
-                    "code": "LV"
-                }, {"name": "Lebanon", "code": "LB"}, {"name": "Lesotho", "code": "LS"}, {
-                    "name": "Liberia",
-                    "code": "LR"
-                }, {"name": "Libyan Arab Jamahiriya", "code": "LY"}, {
-                    "name": "Liechtenstein",
-                    "code": "LI"
-                }, {"name": "Lithuania", "code": "LT"}, {"name": "Luxembourg", "code": "LU"}, {
-                    "name": "Macao",
-                    "code": "MO"
-                }, {"name": "Macedonia, The Former Yugoslav Republic of", "code": "MK"}, {
-                    "name": "Madagascar",
-                    "code": "MG"
-                }, {"name": "Malawi", "code": "MW"}, {"name": "Malaysia", "code": "MY"}, {
-                    "name": "Maldives",
-                    "code": "MV"
-                }, {"name": "Mali", "code": "ML"}, {"name": "Malta", "code": "MT"}, {
-                    "name": "Marshall Islands",
-                    "code": "MH"
-                }, {"name": "Martinique", "code": "MQ"}, {"name": "Mauritania", "code": "MR"}, {
-                    "name": "Mauritius",
-                    "code": "MU"
-                }, {"name": "Mayotte", "code": "YT"}, {
-                    "name": "Mexico",
-                    "code": "MX"
-                }, {"name": "Micronesia, Federated States of", "code": "FM"}, {
-                    "name": "Moldova, Republic of",
-                    "code": "MD"
-                }, {"name": "Monaco", "code": "MC"}, {"name": "Mongolia", "code": "MN"}, {
-                    "name": "Montserrat",
-                    "code": "MS"
-                }, {"name": "Morocco", "code": "MA"}, {"name": "Mozambique", "code": "MZ"}, {
-                    "name": "Myanmar",
-                    "code": "MM"
-                }, {"name": "Namibia", "code": "NA"}, {"name": "Nauru", "code": "NR"}, {
-                    "name": "Nepal",
-                    "code": "NP"
-                }, {"name": "Netherlands", "code": "NL"}, {
-                    "name": "Netherlands Antilles",
-                    "code": "AN"
-                }, {"name": "New Caledonia", "code": "NC"}, {"name": "New Zealand", "code": "NZ"}, {
-                    "name": "Nicaragua",
-                    "code": "NI"
-                }, {"name": "Niger", "code": "NE"}, {"name": "Nigeria", "code": "NG"}, {
-                    "name": "Niue",
-                    "code": "NU"
-                }, {"name": "Norfolk Island", "code": "NF"}, {
-                    "name": "Northern Mariana Islands",
-                    "code": "MP"
-                }, {"name": "Norway", "code": "NO"}, {"name": "Oman", "code": "OM"}, {
-                    "name": "Pakistan",
-                    "code": "PK"
-                }, {"name": "Palau", "code": "PW"}, {
-                    "name": "Palestinian Territory, Occupied",
-                    "code": "PS"
-                }, {"name": "Panama", "code": "PA"}, {"name": "Papua New Guinea", "code": "PG"}, {
-                    "name": "Paraguay",
-                    "code": "PY"
-                }, {"name": "Peru", "code": "PE"}, {"name": "Philippines", "code": "PH"}, {
-                    "name": "Pitcairn",
-                    "code": "PN"
-                }, {"name": "Poland", "code": "PL"}, {"name": "Portugal", "code": "PT"}, {
-                    "name": "Puerto Rico",
-                    "code": "PR"
-                }, {"name": "Qatar", "code": "QA"}, {"name": "Reunion", "code": "RE"}, {
-                    "name": "Romania",
-                    "code": "RO"
-                }, {"name": "Russian Federation", "code": "RU"}, {
-                    "name": "RWANDA",
-                    "code": "RW"
-                }, {"name": "Saint Helena", "code": "SH"}, {
-                    "name": "Saint Kitts and Nevis",
-                    "code": "KN"
-                }, {"name": "Saint Lucia", "code": "LC"}, {
-                    "name": "Saint Pierre and Miquelon",
-                    "code": "PM"
-                }, {"name": "Saint Vincent and the Grenadines", "code": "VC"}, {
-                    "name": "Samoa",
-                    "code": "WS"
-                }, {"name": "San Marino", "code": "SM"}, {
-                    "name": "Sao Tome and Principe",
-                    "code": "ST"
-                }, {"name": "Saudi Arabia", "code": "SA"}, {
-                    "name": "Senegal",
-                    "code": "SN"
-                }, {"name": "Serbia and Montenegro", "code": "CS"}, {
-                    "name": "Seychelles",
-                    "code": "SC"
-                }, {"name": "Sierra Leone", "code": "SL"}, {"name": "Singapore", "code": "SG"}, {
-                    "name": "Slovakia",
-                    "code": "SK"
-                }, {"name": "Slovenia", "code": "SI"}, {"name": "Solomon Islands", "code": "SB"}, {
-                    "name": "Somalia",
-                    "code": "SO"
-                }, {"name": "South Africa", "code": "ZA"}, {
-                    "name": "South Georgia and the South Sandwich Islands",
-                    "code": "GS"
-                }, {"name": "Spain", "code": "ES"}, {"name": "Sri Lanka", "code": "LK"}, {
-                    "name": "Sudan",
-                    "code": "SD"
-                }, {"name": "Suriname", "code": "SR"}, {
-                    "name": "Svalbard and Jan Mayen",
-                    "code": "SJ"
-                }, {"name": "Swaziland", "code": "SZ"}, {"name": "Sweden", "code": "SE"}, {
-                    "name": "Switzerland",
-                    "code": "CH"
-                }, {"name": "Syrian Arab Republic", "code": "SY"}, {
-                    "name": "Taiwan, Province of China",
-                    "code": "TW"
-                }, {"name": "Tajikistan", "code": "TJ"}, {
-                    "name": "Tanzania, United Republic of",
-                    "code": "TZ"
-                }, {"name": "Thailand", "code": "TH"}, {"name": "Timor-Leste", "code": "TL"}, {
-                    "name": "Togo",
-                    "code": "TG"
-                }, {"name": "Tokelau", "code": "TK"}, {"name": "Tonga", "code": "TO"}, {
-                    "name": "Trinidad and Tobago",
-                    "code": "TT"
-                }, {"name": "Tunisia", "code": "TN"}, {"name": "Turkey", "code": "TR"}, {
-                    "name": "Turkmenistan",
-                    "code": "TM"
-                }, {"name": "Turks and Caicos Islands", "code": "TC"}, {
-                    "name": "Tuvalu",
-                    "code": "TV"
-                }, {"name": "Uganda", "code": "UG"}, {"name": "Ukraine", "code": "UA"}, {
-                    "name": "United Arab Emirates",
-                    "code": "AE"
-                }, {"name": "United Kingdom", "code": "GB"}, {
-                    "name": "United States",
-                    "code": "US"
-                }, {"name": "United States Minor Outlying Islands", "code": "UM"}, {
-                    "name": "Uruguay",
-                    "code": "UY"
-                }, {"name": "Uzbekistan", "code": "UZ"}, {"name": "Vanuatu", "code": "VU"}, {
-                    "name": "Venezuela",
-                    "code": "VE"
-                }, {"name": "Viet Nam", "code": "VN"}, {
-                    "name": "Virgin Islands, British",
-                    "code": "VG"
-                }, {"name": "Virgin Islands, U.S.", "code": "VI"}, {
-                    "name": "Wallis and Futuna",
-                    "code": "WF"
-                }, {"name": "Western Sahara", "code": "EH"}, {"name": "Yemen", "code": "YE"}, {
-                    "name": "Zambia",
-                    "code": "ZM"
-                }, {"name": "Zimbabwe", "code": "ZW"}],
-            },
-            latestBets: [],
-            myBets: [],
-            // historyTest: [{"turn": 805, "conquest": ["Ciao", "Miao"], prev: "Isola di Pasqua"},
-            //     {"turn": 804, "conquest": ["Bu", "Bi"], prev: "Isola di Pasqua"},
-            //     {"turn": 803, "conquest": ["Pippo (tanto)", "Pluto"], prev: "Isola di Pasqua"},
-            //     {"turn": 802, "conquest": ["Ghana", "Zimbawe"], prev: "Isola di Pasqua"},
-            //     {"turn": 801, "conquest": ["Togo", "USA"], prev: "Isola di Pasqua"},
-            //     {"turn": 800, "conquest": ["USA", "Giappone"], prev: "Isola di Pasqua"},
-            //     {"turn": 799, "conquest": ["Mordor", "Gondor"], prev: "Isola di Pasqua"},
-            //     {"turn": 798, "conquest": ["Freezer", "Namek"], prev: "Isola di Pasqua"},
-            //     {"turn": 797, "conquest": ["Rohan", "Gondor"], prev: "Isola di Pasqua"},
-            //     {"turn": 796, "conquest": ["Sith", "Naboo"], prev: "Isola di Pasqua"},
-            //     {"turn": 795, "conquest": ["Daenerys", "King's Landing"], prev: "Isola di Pasqua"}],
-            // latestBets: [
-            //     {
-            //         address: "afuyagfiyuarfgfiuaryntfiua",
-            //         country: "Mongolia",
-            //         bet: "50",
-            //         time: "10:01"
-            //     },
-            //     {
-            //         address: "gaiuhguairheguahguraohguoa",
-            //         country: "USA",
-            //         bet: "50",
-            //         time: "09:41"
-            //     },
-            //     {
-            //         address: "fjewifaujihguraehguahgughs",
-            //         country: "Russia",
-            //         bet: "50",
-            //         time: "08:01"
-            //     },
-            //     {
-            //         address: "agui5hgauyngiamigaig782ygh",
-            //         country: "Italia",
-            //         bet: "50",
-            //         time: "05:00"
-            //     },
-            // ],
-            // myBets: [
-            //     {
-            //         country: "Zimbawe",
-            //         bet: 7.5,
-            //         time: "10:00",
-            //         result: "won"
-            //     },
-            //     {
-            //         country: "Malawii",
-            //         bet: 2.3,
-            //         time: "10:00",
-            //         result: "pending"
-            //     },
-            //     {
-            //         country: "Togo",
-            //         bet: 5.0,
-            //         time: "10:00",
-            //         result: "lost"
-            //     }
-            // ],
-            ecosystem: [{
-                text: 'vuetify-loader',
-                href: 'https://github.com/vuetifyjs/vuetify-loader'
-            },
-                {
-                    text: 'github',
-                    href: 'https://github.com/vuetifyjs/vuetify'
-                },
-                {
-                    text: 'awesome-vuetify',
-                    href: 'https://github.com/vuetifyjs/awesome-vuetify'
-                }
-            ]
+            bets: [],
+            mapStatus: [],
+            countriesObj: countryListObj,
+            countriesArr: countryListArr,
+
         }),
         
         firebase: {
             history: db.ref('history'),
-            latestBets: db.ref('bets')
+            bets: db.ref('bets'),
+            info: db.ref('data'),
+            mapStatus: db.ref('countries')
         },
-    
+
         methods: {
             placeBet() {
 
@@ -735,12 +376,28 @@
             },
             startTimer: function () {
                 setInterval(() => {
-                    this.setTimer();
+                    //this.setTimer();
                 }, 1000);
             }
         },
         props: ['currentCountry'],
         computed: {
+            countryStatus: function(){
+                let result = []
+                let arr = [] 
+                let tmp = []
+                for (var i = this.mapStatus.length - 1; i >= 0; i--) {
+                    arr.push(this.countriesObj[this.mapStatus[i]['id']]);
+                    for (var j = this.mapStatus.length - 1; j >= 0; j--) {
+                        if(this.mapStatus[j]['controlledBy'] === this.countriesObj[this.mapStatus[i]['id']]){tmp.push(j)}
+                    }
+                    arr.push(tmp)
+                    tmp = []
+                    result.push(arr)
+                    arr = []
+                }
+                return result
+            },
             sortedArray: function () {
                 function compare(a, b) {
                     if (a[1].length > b[1].length)
@@ -750,9 +407,33 @@
                     return 0;
                 }
 
-                let arr = this.countriesTest.countries;
+                let arr = this.countryStatus;
                 return arr.sort(compare);
-            }
+            },
+            myBets: function() {
+                return this.bets.filter(bet => bet.address === this.account)
+            },
+            latestBets: function() {
+                return this.bets.slice(-10, this.bets.lenght)
+            },
+
+        },
+        asyncComputed: {
+            async account() {
+                const account = await window.tronWeb.trx.getAccount();
+                const accountAddress = account.address; // HexString(Ascii)
+                const accountAddressInBase58 = window.tronWeb.address.fromHex(
+                  accountAddress
+                ); // Base58
+                return accountAddressInBase58
+            },
+            async balance() {
+                const balanceInSun = await window.tronWeb.trx.getBalance(); //number
+                const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
+                // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
+
+                return balanceInTRX
+            },
         },
         mounted() {
             this.startTimer();

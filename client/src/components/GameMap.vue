@@ -1,6 +1,6 @@
 <template>
 
-    <div id="chartdiv"></div>
+    <div  id="chartdiv"></div>
 
 </template>
 
@@ -9,9 +9,11 @@
     import * as am4maps from "@amcharts/amcharts4/maps";
     import am4themes_spiritedaway from "@amcharts/amcharts4/themes/spiritedaway.js";
     import am4geodata_worldLow from "../assets/worldLow.js"
-    import countries from "../assets/countries.js"
+    import {db} from "../plugins/firebase"
+    //import countries from "../assets/countries.js"
 
     am4core.useTheme(am4themes_spiritedaway);
+    let _this
     export default {
         props: {
             projects: Array,
@@ -21,13 +23,26 @@
             width: 0,
             height: 0,
             lastSelected: null,
-            poligonSeries : null
+            polygonSeries : null,
+            loaded: false,
+            countriesRef: [],
+            countries: []
         }),
-        computed: {},
-          mounted() {
 
+        firebase: {
+            countries: db.ref('countries').once('value').then((snapshot) => {
+                if(_this.polygonSeries ){
+                    _this.polygonSeries.data = snapshot.val()
+                    _this.polygonSeries.invalidateData()
+                } 
+            }),
+            cuntriesRef: db.ref('countries')
+        },
+        beforeMount(){
+            _this = this
+        },
+          mounted() {
             /* Create map instance */
-            
                 var chart = am4core.create("chartdiv", am4maps.MapChart);
 
                 /* Set map definition */
@@ -45,7 +60,7 @@
                 /* Make map load polygon (like country names) data from GeoJSON */
                 polygonSeries.useGeodata = true;
 
-                polygonSeries.data = countries;
+                //polygonSeries.data = this.countriesRef;
                 this.polygonSeries = polygonSeries
 
                 /* Configure series */
@@ -126,15 +141,12 @@
 
             this.chart = chart;
 
-            
         },
         methods: {
             clicked(ev){
                 this.$emit('select',ev.target.dataItem.dataContext.name)
                 
-                // this is to update the data array and change color or stuff like that or you can just replace the data array with a brand new
-                // this.polygonSeries.data[4].color = "#000"
-                // this.polygonSeries.invalidateData();
+                // this is to update the data array and change color or stuff like that or you can just replace the data array with a brand ne
             }
         },
 
@@ -143,6 +155,7 @@
                 this.chart.dispose();
             }
         }
+
 }
 </script>
 

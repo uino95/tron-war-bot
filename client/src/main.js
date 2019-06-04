@@ -2,6 +2,7 @@ import Vue from 'vue'
 
 import './plugins/firebase'
 import './plugins/vuetify'
+import './plugins/vueAsync'
 
 import App from './App.vue'
 

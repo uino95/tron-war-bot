@@ -141,7 +141,6 @@
             }
         },
         mounted(){
-            console.log(window.tronWeb);
         }
     }
 </script>
