@@ -35,7 +35,7 @@
                                                     item-text="name"
                                                     :loading="isLoading"
                                                     :search-input.sync="search"
-                                                    item-value="name"
+                                                    item-value="id"
                                                     hide-no-data
                                                     hide-selected
                                                     label="Select Country"
@@ -324,6 +324,7 @@
             currencyRule: [v => !!v || 'Select a currency',
                 //v => v < 50 || 'You don\'t have enough money'
             ],
+            balance: null,
             history: [],
             bets: [],
             mapStatus: [],
@@ -341,27 +342,50 @@
 
         methods: {
             placeBet() {
+                let _this = this
+                if (this.currentCountry === null) {
 
-                if (this.currentCountry == null) {
                     this.snackbarText = "Select a country from map or search it";
                     this.snackbarColor = "error";
+                    this.snackbar = true;
                 } else {
-                    this.snackbarColor = "success";
-                    this.snackbarText = `Successfully bet on ${this.currentCountry}!`;
+                    this.snackbarText = "We are processing your bet! Wait for the result";
+                    this.snackbarColor = "blue";
+                    this.snackbar = true;
+                    let _txId
+                    let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
+                    window.tronWeb.contract().at(contract_address).then(contract => {
+                     contract.bet(0, _this.countryToInt).send({callValue:window.tronWeb.toSun(1)}).then(
+                        txId => _txId = txId)
+                    });
 
+                    setTimeout(function(){
+                        console.log("checking status of the following transaction: ", _txId)
+                        window.tronWeb.trx.getTransaction(_txId).then(tx => {
+                            if (tx.ret[0].contractRet=="SUCCESS") {
+                                _this.snackbarColor = "success";
+                                _this.snackbarText = `Successfully bet on ${_this.countryToName}!`;
+                                setTimeout(function(){
+                                    _this.fetchBalance()
+                                }, 2000)
+                            }
+                            else {
+                                _this.snackbarText = tx.ret[0].contractRet
+                                _this.snackbarColor = "error";
+                            }
+                            _this.snackbar = true
+                        })
+                    }, 10000)
                 }
-                this.snackbar = true;
-                //let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
-                //window.tronWeb.contract().at(contract_address).then(contract => {
-                //  contract.bet(0, 59).send({callValue:window.tronWeb.toSun(1)})
-                //});
 
-                let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
-                window.tronWeb.contract().at(contract_address).then(contract => {
-                    contract.jackpot(0).call().then(res => {
-                        console.log(res.toString())
-                    })
-                });
+               
+
+                // let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
+                // window.tronWeb.contract().at(contract_address).then(contract => {
+                //     contract.jackpot(0).call().then(res => {
+                //         console.log(res.toString())
+                //     })
+                // });
 
                 // listen on this url
 //                 Function: get events by contract address
@@ -378,7 +402,14 @@
                 // "https://api.tronex.io/events/TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e?limit=1&sort=-timeStamp&since=0&block=0&start=4"
 
 
+            },
+            async fetchBalance(){
+                console.log("fetching new balance")
+                const balanceInSun = await window.tronWeb.trx.getBalance(); //number
+                const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
+                // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
 
+                this.balance = balanceInTRX
             },
             getFlagString(str) {
                 return "/img/flags/" + str.toLowerCase().replaceAll(" ", "-") + ".svg";
@@ -412,7 +443,7 @@
                 for (var i = this.mapStatus.length - 1; i >= 0; i--) {
                     arr.push(this.countriesObj[this.mapStatus[i]['id']]);
                     for (var j = this.mapStatus.length - 1; j >= 0; j--) {
-                        if(this.mapStatus[j]['controlledBy'] === this.countriesObj[this.mapStatus[i]['id']]){tmp.push(j)}
+                        if(this.mapStatus[j]['controlledBy'] === this.mapStatus[i]['id']){tmp.push(j)}
                     }
                     arr.push(tmp)
                     tmp = []
@@ -443,6 +474,18 @@
                 //TODO replace
                 if (this.currentCountry == null) return 0;
                 return (this.jackpot + 50) * 0.7 / this.currentCountry.length;
+            },
+            countryToName: function(){
+                return this.countriesObj[this.currentCountry]
+            },
+            countryToInt: function(){
+                let converted = 0
+                for (var i = 0; i <= this.currentCountry.length - 1; i++) {
+                    
+                    converted += this.currentCountry.charCodeAt(i) * (Math.pow(100, i))
+                    console.log(converted)
+                }
+                return converted
             }
 
         },
@@ -465,7 +508,6 @@
         },
         mounted() {
             this.startTimer();
-            this.countries = countries;
         }
     }
 </script>
