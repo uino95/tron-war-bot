@@ -31,11 +31,11 @@
                                             <v-autocomplete
                                                     outline
                                                     v-model="currentCountry"
-                                                    :items="countriesTest.countryList"
-                                                    item-text="name"
+                                                    :items="countries"
+                                                    item-text="controlledBy"
                                                     :loading="isLoading"
                                                     :search-input.sync="search"
-                                                    item-value="name"
+                                                    item-value="controlledBy"
                                                     hide-no-data
                                                     hide-selected
                                                     label="Select Country"
@@ -295,6 +295,7 @@
 <script>
 
     import {db} from '../plugins/firebase'
+    import countries from "../assets/countries.js"
 
     String.prototype.replaceAll = function (search, replace) {
         if (replace === undefined) {
@@ -740,23 +741,23 @@
                 return "/img/flags/" + str.toLowerCase().replaceAll(" ", "-") + ".svg";
             },
             setTimer: function () {
-                const time = Date.now();
+                const time = new Date();
                 let min = time.getMinutes();
                 let sec = time.getSeconds();
                 if (min >= 15) {
-                    min += 15;
+                    min = 74 - min;
                 } else {
-                    min = 15 - min;
+                    min = 14 - min;
                 }
-                sec = 60 - sec;
+                sec = 59- sec;
                 sec = sec < 10 ? `0${sec}` : sec;
                 min = min < 10 ? `0${min}` : min;
                 this.turnTimer = `${min}:${sec}`;
             },
             startTimer: function () {
-                /*setInterval(() => {
+                setInterval(() => {
                     this.setTimer();
-                }, 1000);*/
+                }, 1000);
             }
         },
         props: ['currentCountry'],
@@ -781,6 +782,7 @@
         },
         mounted() {
             this.startTimer();
+            this.countries = countries;
         }
     }
 </script>
