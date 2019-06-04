@@ -32,7 +32,7 @@
                                                     outline
                                                     v-model="currentCountry"
                                                     :items="countriesArr"
-                                                    item-text="controlledBy"
+                                                    item-text="name"
                                                     :loading="isLoading"
                                                     :search-input.sync="search"
                                                     item-value="name"
