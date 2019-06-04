@@ -68,6 +68,7 @@ module.exports.getCurrentRound = async function (gameType) {
       round
     }
   }).then(r=>r[0]);
+  if (!stopped && !endGame) throw "Sorry there is something wrong... probably TRON is a scam... Retry later!";
   if (endGame && endGame.result.round != startGame.result.round) throw "Something wrong with game rounds";
   return {
     round,
