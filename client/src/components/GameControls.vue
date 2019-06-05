@@ -127,7 +127,7 @@
                                     </v-flex>
                                 </v-layout>
                                 <v-divider style="margin-bottom: 3%"></v-divider>
-                                <v-layout row wrap v-for="bet in myBets" >
+                                <v-layout row wrap v-for="bet in myBets" :key="bet.time">
                                     <v-flex xs3 class="subheading">
                                         {{bet.country}}
                                     </v-flex>
@@ -226,7 +226,7 @@
 
                                 <v-divider style="margin-bottom: 3%"></v-divider>
 
-                                <v-layout row wrap v-for="country in sortedArray" >
+                                <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
                                     <v-flex xs1>
                                         <v-avatar size="90%">
                                             <img :src="getFlagString(country[0])" :alt="country[0]">
@@ -267,7 +267,7 @@
 
                                 <v-divider style="margin-bottom: 3%"></v-divider>
 
-                                <v-layout row wrap v-for="conquest in history" >
+                                <v-layout row wrap v-for="conquest in history" :key="conquest.turn">
                                     <v-flex xs1 style="text-align: start" class="subheading">
                                         {{conquest.turn}}
                                     </v-flex>
@@ -314,7 +314,6 @@
             snackbar: false,
             snackbarText: "",
             snackbarColor: "",
-            spain: "/img/flags/spain.svg",
             info: {},
             snackbarTimeout: 6000,
             potentialWin: 0,
@@ -343,8 +342,8 @@
 
         methods: {
             placeBet() {
-                let _this = this
-                if (this.currentCountry === null) {
+                let _this = this;
+                if (this.currentCountry == null) {
 
                     this.snackbarText = "Select a country from map or search it";
                     this.snackbarColor = "error";
@@ -353,7 +352,7 @@
                     this.snackbarText = "We are processing your bet! Wait for the result";
                     this.snackbarColor = "blue";
                     this.snackbar = true;
-                    let _txId
+                    let _txId;
                     let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
                     window.tronWeb.contract().at(contract_address).then(contract => {
                      contract.bet(0, _this.countryToInt).send({callValue:window.tronWeb.toSun(1)}).then(
@@ -370,7 +369,7 @@
                                 }, 2000)
                             }
                             else {
-                                _this.snackbarText = tx.ret[0].contractRet
+                                _this.snackbarText = tx.ret[0].contractRet;
                                 _this.snackbarColor = "error";
                             }
                             _this.snackbar = true
@@ -446,17 +445,17 @@
         props: ['currentCountry'],
         computed: {
             countryStatus: function(){
-                let result = []
-                let arr = [] 
-                let tmp = []
+                let result = [];
+                let arr = [];
+                let tmp = [];
                 for (var i = this.mapStatus.length - 1; i >= 0; i--) {
                     arr.push(this.countriesObj[this.mapStatus[i]['id']]);
                     for (var j = this.mapStatus.length - 1; j >= 0; j--) {
                         if(this.mapStatus[j]['controlledBy'] === this.mapStatus[i]['id']){tmp.push(j)}
                     }
-                    arr.push(tmp)
-                    tmp = []
-                    result.push(arr)
+                    arr.push(tmp);
+                    tmp = [];
+                    result.push(arr);
                     arr = []
                 }
                 return result
@@ -482,13 +481,13 @@
             calculatePotentialWin: function () {
                 //TODO replace
                 if (this.currentCountry == null) return 0;
-                return (this.jackpot + 50) * 0.7 / this.currentCountry.length;
+                return (this.info.jackpot + 50) * 0.7 / this.currentCountry.length;
             },
             countryToName: function(){
                 return this.countriesObj[this.currentCountry]
             },
             countryToInt: function(){
-                let converted = 0
+                let converted = 0;
                 for (var i = 0; i <= this.currentCountry.length - 1; i++) {
                     converted += this.currentCountry.charCodeAt(i) * (Math.pow(100, i))
                 }
@@ -521,7 +520,7 @@
                 this.fetchBalance();
                 this.fetchAccount();
               }
-            }
+            };
             this.fetchBalance();
             this.fetchAccount();
             this.startTimer();
