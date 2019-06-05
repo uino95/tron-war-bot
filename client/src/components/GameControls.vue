@@ -325,6 +325,7 @@
                 //v => v < 50 || 'You don\'t have enough money'
             ],
             balance: null,
+            account: null,
             history: [],
             bets: [],
             mapStatus: [],
@@ -360,7 +361,6 @@
                     });
 
                     setTimeout(function(){
-                        console.log("checking status of the following transaction: ", _txId)
                         window.tronWeb.trx.getTransaction(_txId).then(tx => {
                             if (tx.ret[0].contractRet=="SUCCESS") {
                                 _this.snackbarColor = "success";
@@ -403,8 +403,17 @@
 
 
             },
+            async fetchAccount(){
+                const account = await window.tronWeb.trx.getAccount();
+                const accountAddress = account.address; // HexString(Ascii)
+                const accountAddressInBase58 = window.tronWeb.address.fromHex(
+                  accountAddress
+                ); // Base58
+                
+                this.account = accountAddressInBase58
+
+            },
             async fetchBalance(){
-                console.log("fetching new balance")
                 const balanceInSun = await window.tronWeb.trx.getBalance(); //number
                 const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
                 // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
@@ -481,32 +490,40 @@
             countryToInt: function(){
                 let converted = 0
                 for (var i = 0; i <= this.currentCountry.length - 1; i++) {
-                    
                     converted += this.currentCountry.charCodeAt(i) * (Math.pow(100, i))
-                    console.log(converted)
                 }
                 return converted
             }
 
         },
-        asyncComputed: {
-            async account() {
-                const account = await window.tronWeb.trx.getAccount();
-                const accountAddress = account.address; // HexString(Ascii)
-                const accountAddressInBase58 = window.tronWeb.address.fromHex(
-                  accountAddress
-                ); // Base58
-                return accountAddressInBase58
-            },
-            async balance() {
-                const balanceInSun = await window.tronWeb.trx.getBalance(); //number
-                const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
-                // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
+        // asyncComputed: {
+        //     async account() {
+        //         const account = await window.tronWeb.trx.getAccount();
+        //         const accountAddress = account.address; // HexString(Ascii)
+        //         const accountAddressInBase58 = window.tronWeb.address.fromHex(
+        //           accountAddress
+        //         ); // Base58
+        //         return accountAddressInBase58
+        //     },
+        //     async balance() {
+        //         const balanceInSun = await window.tronWeb.trx.getBalance(); //number
+        //         const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
+        //         // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
 
-                return balanceInTRX
-            }
-        },
+        //         return balanceInTRX
+        //     }
+        // },
         mounted() {
+            window.onmessage = (event) => {
+              // Waiting for that message.
+              
+              if(event.data.message.action === 'setAccount'){
+                this.fetchBalance();
+                this.fetchAccount();
+              }
+            }
+            this.fetchBalance();
+            this.fetchAccount();
             this.startTimer();
         }
     }
