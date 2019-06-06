@@ -1,7 +1,7 @@
 <template>
     <v-app id="keep">
-        <v-navigation-drawer v-model="drawer" fixed clipped class="secondary lighten-2" app dark>
-            <v-list dense class="secondary lighten-2" dark>
+        <v-navigation-drawer v-model="drawer" fixed clipped class="secondary" app dark>
+            <v-list dense class="secondary" dark>
                 <template v-for="(item, i) in items">
                     <v-layout v-if="item.heading" :key="i" row align-center>
                         <v-flex xs6>
@@ -24,7 +24,7 @@
                 </template>
             </v-list>
         </v-navigation-drawer>
-        <v-toolbar color="primary lighten-3" app fixed clipped-left>
+        <v-toolbar color="primary" app fixed clipped-left>
             <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
             <v-avatar class="ml-3">
               <img src="/img/logo.jpg">
@@ -34,12 +34,12 @@
             <v-spacer></v-spacer>
         </v-toolbar>
         <v-content>
-            <v-container fluid fill-height fill-width class="grey lighten-4 pa-0 ma-0">
+            <v-container fluid fill-height fill-width class="grey pa-0 ma-0">
                 <v-layout justify-center align-center>
                     <v-flex>
-                        
+
                         <GameMap @select="selectedCountryChild"/>
-                        <GameControls 
+                        <GameControls
                             v-bind:current-country = "selected_country"
                             />
                         <modal
@@ -51,7 +51,7 @@
                 </v-layout>
             </v-container>
         </v-content>
-        <!-- <v-footer fixed class="grey lighten-4" app>
+        <!-- <v-footer fixed class="grey" app>
           <span>&copy; 2019</span>
         </v-footer> -->
     </v-app>
@@ -102,10 +102,6 @@
                 },
                 {
                     icon: 'add',
-                    text: 'How To Play'
-                },
-                {
-                    icon: 'add',
                     text: 'Whitepaper'
                 },
                 {
@@ -136,7 +132,7 @@
                 this.isModalVisible = false;
             },
             selectedCountryChild(country){
-                
+
                 this.selected_country = country;
             }
         },
