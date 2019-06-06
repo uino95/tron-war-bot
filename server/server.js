@@ -43,6 +43,12 @@ var jackpotRef = db.ref('data/jackpot')
 var nextTurnRef = db.ref('data/nextTurn')
 var payoutRef = db.ref('payout')
 
+
+module.exports.startup = async function (){
+  var l = await twb.getCurrentRound(0);
+  if (!l.stoppedAt) return;
+  var r = await twb.startGame(0);
+}
 // Append new data to an array
 // historyRef.push().set(
 //   {
