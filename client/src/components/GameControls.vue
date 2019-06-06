@@ -334,7 +334,7 @@
         }),
 
         firebase: {
-            history: db.ref('history'),
+            history: db.ref('history').orderByChild('turn'),
             bets: db.ref('bets'),
             info: db.ref('data'),
             mapStatus: db.ref('countries')

@@ -37,10 +37,13 @@ i = len(colorBlue) - 1
 # 	i = i-1
 # 	if i < 0 : i=len(colorBlue) - 1
 
+obj = {}
+
 for item in distros_dict:
-	del item['color'],
-	item['name'] = item['controlledBy']
-	del item['controlledBy']
+
+	obj[item['controlledBy']] = item['id'] 
+
+	
  
 # for item in features:
 #     featuresList.append(item['properties']['name'])
@@ -59,8 +62,8 @@ for item in distros_dict:
 print(len(territories))
 
 
-with open('./countryList.json', 'w') as f:
-    json.dump(distros_dict,f)
+with open('./country.json', 'w') as f:
+    json.dump(obj,f)
 
 # def anydup(thelist):
 #   seen = set()
