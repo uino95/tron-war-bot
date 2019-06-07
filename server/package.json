@@ -18,6 +18,8 @@
     "http": "0.0.0",
     "mongoose": "^5.5.9",
     "node-cron": "^2.0.3",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
     "socket.io": "^2.2.0",
     "trongrid": "^1.2.1",
     "tronweb": "^2.5.6"

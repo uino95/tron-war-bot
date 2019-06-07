@@ -1,4 +1,4 @@
-import mapping from './map-utilities/mapping'
+const mapping = require( './map-utilities/mapping')
 
 module.exports = {
     consoleLog:function(text) {
@@ -12,7 +12,7 @@ module.exports = {
 				return mapping[id]['charId'];
 			case 'numberId':
 				for (var i = mapping.length - 1; i >= 0; i--) {
-					if (mapping[i]['charId'] === id){
+					if (mapping[i]['name'] === id){
 						return i
 					}
 				}
