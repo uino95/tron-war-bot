@@ -45,6 +45,7 @@ module.exports.init = async function(){
 }
 
 
+
 module.exports.getCurrentRound = async function (gameType) {
   if (!twb || !war) await this.init();
   var stoppedAt, startedAt, startGame, endGame;
@@ -54,7 +55,7 @@ module.exports.getCurrentRound = async function (gameType) {
   var startedAt = await twb.roundStartedAt(gameType).call();
   var stopped = startedAt.eq("0");
   var startGame = await twb.getEvents({
-    onlyConfirmed:true,
+    onlyConfirmed:false,
     eventName: "StartGame",
     orderBy:"timestamp,desc",
     limit:200,
@@ -64,7 +65,7 @@ module.exports.getCurrentRound = async function (gameType) {
   }).then(r=>r[0]);
   if (!startGame) return {};
   if (stopped) endGame = await twb.getEvents({
-    onlyConfirmed:true,
+    onlyConfirmed:false,
     eventName: "EndGame",
     orderBy:"timestamp,desc",
     limit:200,
@@ -95,7 +96,7 @@ module.exports.startGame = async function (gameType) {
   var round = await this.getCurrentRound(gameType);
   if (!round.stoppedAt) throw "Game must be stopped before a new round can be started";
   let txId = await this.twb.startGame(gameType).send();
-  await sleep(10000);
+  await sleep(20000);
   let tx = await this.tronWeb.trx.getTransaction(txId)
   if (tx.ret[0].contractRet!="SUCCESS") throw tx;
   return round.round;
@@ -106,10 +107,19 @@ module.exports.endGame = async function (gameType) {
   var round = await this.getCurrentRound(gameType);
   if (!!round.stoppedAt) throw "Game must be started before it can be stopped";
   let txId = await this.twb.endGame(gameType,tronWeb.toSun(config.game.preservedJackpotRateForNextTurn)).send();
-  await sleep(10000);
+  await sleep(20000);
   let tx = await this.tronWeb.trx.getTransaction(txId)
   if (tx.ret[0].contractRet!="SUCCESS") throw tx;
   return round.round;
+}
+
+
+module.exports.watchEvents = async function (eventType, fn) {
+  if (!twb || !war) await this.init();
+  await this.twb[eventType]().watch(async function(e, r){
+    if (e) return console.error(e);
+    await fn(r);
+  })
 }
 
 module.exports.availableJackpot = async function (gameType, gameRound) {
