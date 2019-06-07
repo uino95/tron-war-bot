@@ -45,6 +45,7 @@ module.exports.init = async function(){
 }
 
 
+
 module.exports.getCurrentRound = async function (gameType) {
   if (!twb || !war) await this.init();
   var stoppedAt, startedAt, startGame, endGame;
@@ -110,6 +111,15 @@ module.exports.endGame = async function (gameType) {
   let tx = await this.tronWeb.trx.getTransaction(txId)
   if (tx.ret[0].contractRet!="SUCCESS") throw tx;
   return round.round;
+}
+
+
+module.export.watchEvents = async function (eventType, fn) {
+  if (!twb || !war) await this.init();
+  await this.twb[eventType]().watch((e, r)=>{
+    if (e) return console.error(e);
+    await fn(r);
+  })
 }
 
 module.exports.availableJackpot = async function (gameType, gameRound) {
