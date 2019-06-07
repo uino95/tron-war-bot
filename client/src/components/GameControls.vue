@@ -351,7 +351,7 @@
                     this.snackbar = true;
                 } else {
                     this.snackbarText = "We are processing your bet! Wait for the result";
-                    this.snackbarColor = "blue";
+                    this.snackbarColor = "info";
                     this.snackbar = true;
                     let _txId;
                     let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
@@ -396,7 +396,15 @@
                 this.balance = balanceInTRX
             },
             getFlagString(str) {
-                return "/img/flags/" + str.toLowerCase().replaceAll(" ", "-") + ".svg";
+                return "/img/flags/" + str.toLowerCase()
+                    .replaceAll(" ", "-")
+                    .replaceAll("ã", "a")
+                    .replaceAll("ì", "i")
+                    .replaceAll("è", "e")
+                    .replaceAll("ì", "i")
+                    .replaceAll("å", "a")
+                    .replaceAll("é", "e")
+                    .replaceAll("í", "i") + ".svg";
             },
             setTimer: function () {
                 const time = new Date();
