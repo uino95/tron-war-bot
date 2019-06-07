@@ -114,9 +114,9 @@ module.exports.endGame = async function (gameType) {
 }
 
 
-module.export.watchEvents = async function (eventType, fn) {
+module.exports.watchEvents = async function (eventType, fn) {
   if (!twb || !war) await this.init();
-  await this.twb[eventType]().watch((e, r)=>{
+  await this.twb[eventType]().watch(async function(e, r){
     if (e) return console.error(e);
     await fn(r);
   })

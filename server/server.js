@@ -112,9 +112,21 @@ startUp()
 ///////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// Start Working ///////////////////////////////////
 
+
 // TODO watch for new bets
-// TODO console.log(newBet)
-// TODO console.log(newJackpot)
+twb.watchEvents('Bet', async function(r){
+  let bet = r.result
+  betsRef.push().set({
+    address: twb.tronWeb.address.fromHex(bet.from),
+    bet: twb.tronWeb.fromSun(bet.amount),
+    country: bet.userChoice,
+    result: -1,
+    time: new Date().getTime()
+  })
+  // TODO console.log(newJackpot)
+})
+
+
 
 //watch for new turn
 
@@ -211,7 +223,7 @@ async function pollForNewTurn() {
 }
 
 //start polling the api server at every :13 of each hour (edit second star with 13)
-cron.schedule("15 * * * * *", async function() {
+cron.schedule("1 13 * * * *", async function() {
   utils.consoleLog("start polling WWB server for new turn")
 
   latestTurn = await fetchLatestTurnOnDb()
