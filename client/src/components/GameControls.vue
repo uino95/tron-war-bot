@@ -129,7 +129,7 @@
                                 <v-divider style="margin-bottom: 3%"></v-divider>
                                 <v-layout row wrap v-for="bet in myBets" :key="bet.time">
                                     <v-flex xs3 class="subheading">
-                                        {{bet.country}}
+                                        {{universalMap(bet.country)}}
                                     </v-flex>
                                     <v-flex xs3 class="subheading">
                                         {{bet.bet+"TRX"}}
@@ -184,7 +184,7 @@
                                         </v-tooltip>
                                     </v-flex>
                                     <v-flex xs2 class="subheading">
-                                        <span>{{bet.country}}</span>
+                                        <span>{{universalMap(bet.country)}}</span>
                                     </v-flex>
                                     <v-flex xs2 class="subheading">
                                         <span>{{bet.bet+"TRX"}}</span>
