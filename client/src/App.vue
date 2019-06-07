@@ -27,7 +27,7 @@
         <v-toolbar color="primary" app fixed clipped-left>
             <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
             <v-avatar class="ml-3">
-              <img src="/img/logo.jpg">
+              <img src="/img/logo.png">
             </v-avatar>
 
             <span class="headline ml-3 mr-5">Tron<span class="font-weight-light">WarBot</span></span>
