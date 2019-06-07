@@ -49,7 +49,7 @@
                                                           disabled></v-text-field>
                                         </v-flex>
                                         <v-flex xs4>
-                                            <v-text-field v-model="info.nextTurn"
+                                            <v-text-field v-model="turnTimer"
                                                           label="Next Turn"
                                                           outline
                                                           disabled></v-text-field>
@@ -232,7 +232,7 @@
                                 <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
                                     <v-flex xs1>
                                         <v-avatar size="90%">
-                                            <v-lazy-image src-placeholder="/img/placeholder.svg"
+                                            <v-lazy-image src-placeholder="/img/flags/placeholder.svg"
                                                           :src="getFlagString(country[0])" :alt="country[0]"/>
                                         </v-avatar>
                                     </v-flex>
@@ -319,6 +319,7 @@
         data: () => ({
             search: '',
             snackbar: false,
+            turnTimer: "00:00",
             snackbarText: "",
             snackbarColor: "",
             info: {},
@@ -410,22 +411,20 @@
                     .replaceAll("í", "i") + ".svg";
             },
             setTimer: function () {
-                const time = new Date();
-                let min = time.getMinutes();
-                let sec = time.getSeconds();
-                if (min >= 15) {
-                    min = 74 - min;
-                } else {
-                    min = 14 - min;
-                }
-                sec = 59 - sec;
+                let offset = new Date().getTimezoneOffset() * 60 * 1000;
+                let nextTurn = this.info.nextTurn - offset;
+                let now = new Date().getTime();
+                let timer = new Date(nextTurn - now);
+                let min = timer.getMinutes();
+                let sec = timer.getSeconds();
                 sec = sec < 10 ? `0${sec}` : sec;
                 min = min < 10 ? `0${min}` : min;
                 this.turnTimer = `${min}:${sec}`;
+                //this.turnTimer = timer;
             },
             startTimer: function () {
                 setInterval(() => {
-                    //this.setTimer();
+                    this.setTimer();
                 }, 1000);
             },
             convertResultBet: function (betResult) {
