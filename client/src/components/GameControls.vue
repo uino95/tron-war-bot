@@ -232,7 +232,7 @@
                                 <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
                                     <v-flex xs1>
                                         <v-avatar size="90%">
-                                            <img :src="getFlagString(country[0])" :alt="country[0]">
+                                            <vuetify-lazy-image :src="getFlagString(country[0])" :alt="country[0]"/>
                                         </v-avatar>
                                     </v-flex>
                                     <v-flex xs5 style="text-align: start" class="subheading">
@@ -298,8 +298,9 @@
 
 <script>
 
-    import {db} from '../plugins/firebase'
-    import mapping from '../assets/mapping'
+    import {db} from '../plugins/firebase';
+    import mapping from '../assets/mapping';
+    import VuetifyLazyImage from "vuetify-lazy-image";
 
 
     String.prototype.replaceAll = function (search, replace) {
@@ -310,7 +311,9 @@
     };
 
     export default {
-
+        components: {
+            VuetifyLazyImage
+        },
         data: () => ({
             search: '',
             snackbar: false,
