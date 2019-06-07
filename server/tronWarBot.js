@@ -97,8 +97,8 @@ module.exports.startGame = async function (gameType) {
   let txId = await this.twb.startGame(gameType).send();
   await sleep(10000);
   let tx = await this.tronWeb.trx.getTransaction(txId)
-  if (tx.ret[0].contractRet=="SUCCESS") return tx;
-  throw tx;
+  if (tx.ret[0].contractRet!="SUCCESS") throw tx;
+  return round.round;
 }
 
 module.exports.endGame = async function (gameType) {
@@ -108,8 +108,8 @@ module.exports.endGame = async function (gameType) {
   let txId = await this.twb.endGame(gameType,tronWeb.toSun(config.game.preservedJackpotRateForNextTurn)).send();
   await sleep(10000);
   let tx = await this.tronWeb.trx.getTransaction(txId)
-  if (tx.ret[0].contractRet=="SUCCESS") return tx;
-  throw tx;
+  if (tx.ret[0].contractRet!="SUCCESS") throw tx;
+  return round.round;
 }
 
 module.exports.availableJackpot = async function (gameType, gameRound) {

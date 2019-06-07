@@ -5,8 +5,8 @@ import 'vuetify/src/stylus/app.styl'
 Vue.use(Vuetify, {
   iconfont: 'md',
   theme: {
-    primary: '#001537',
-    secondary: '#4b636e',
+    primary: '#4b636e',
+    secondary: '#001537',
     accent: '#FFF15C',
     error: '#ff5252',
     warning: '#AAAAAA',

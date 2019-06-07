@@ -1,6 +1,6 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
-    <v-tabs centered color="secondary lighten-1" dark icons-and-text>
-        <v-tabs-slider color="secondary lighten-4"></v-tabs-slider>
+    <v-tabs centered color="secondary" dark icons-and-text>
+        <v-tabs-slider color="secondary"></v-tabs-slider>
 
         <v-tab href="#tab-1">
             Bet Panel
@@ -18,7 +18,7 @@
                     <!-- Place a bet -->
                     <v-flex>
                         <v-card>
-                            <v-toolbar color="secondary lighten-4" dark>
+                            <v-toolbar color="primary" dark>
                                 <v-toolbar-title>Place a bet</v-toolbar-title>
                                 <v-spacer></v-spacer>
                             </v-toolbar>
@@ -104,7 +104,7 @@
                     <!-- My latest bets -->
                     <v-flex>
                         <v-card>
-                            <v-toolbar color="secondary lighten-4" dark>
+                            <v-toolbar color="primary" dark>
                                 <v-toolbar-title>My Latest Bets</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
@@ -147,7 +147,7 @@
                     <!-- Latest turn bets -->
                     <v-flex>
                         <v-card>
-                            <v-toolbar color="secondary lighten-4" dark>
+                            <v-toolbar color="primary" dark>
                                 <v-toolbar-title>Latest turn bets</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
@@ -204,7 +204,7 @@
                     <!-- Countries -->
                     <v-flex>
                         <v-card>
-                            <v-toolbar color="secondary lighten-4" dark>
+                            <v-toolbar color="primary" dark>
                                 <v-toolbar-title>Stats</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
@@ -245,7 +245,7 @@
                     <!-- History -->
                     <v-flex>
                         <v-card>
-                            <v-toolbar color="secondary lighten-4" dark>
+                            <v-toolbar color="primary" dark>
                                 <v-toolbar-title>History</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
@@ -297,7 +297,7 @@
 
     import {db} from '../plugins/firebase'
     import countryListObj from '../assets/countryListObj'
-    import countryListArr from '../assets/countryListArr' 
+    import countryListArr from '../assets/countryListArr'
 
 
     String.prototype.replaceAll = function (search, replace) {
@@ -377,7 +377,7 @@
                     }, 10000)
                 }
 
-               
+
 
                 // let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
                 // window.tronWeb.contract().at(contract_address).then(contract => {
@@ -408,7 +408,7 @@
                 const accountAddressInBase58 = window.tronWeb.address.fromHex(
                   accountAddress
                 ); // Base58
-                
+
                 this.account = accountAddressInBase58
 
             },
@@ -515,7 +515,7 @@
         mounted() {
             window.onmessage = (event) => {
               // Waiting for that message.
-              
+
               if(event.data.message.action === 'setAccount'){
                 this.fetchBalance();
                 this.fetchAccount();
