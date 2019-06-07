@@ -10,7 +10,6 @@
     import am4themes_spiritedaway from "@amcharts/amcharts4/themes/spiritedaway.js";
     import am4geodata_worldLow from "../assets/worldLow.js"
     import {db} from "../plugins/firebase"
-    //import countries from "../assets/countries.js"
 
     am4core.useTheme(am4themes_spiritedaway);
     let _this
@@ -41,6 +40,8 @@
                 if(_this.polygonSeries ){
                     for (var i = snapshot.val().length - 1; i >= 0; i--) {
                         data[i]['color'] = _this.colorBlue[j];
+                        data[i]['id'] = _this.universalMap(i, 'charId')
+                        data[i]['controlledBy'] = _this.universalMap(data[i]['controlledBy'])
                         j --;
                         if (j < 0) { j=_this.colorBlue.length - 1}
                     }
@@ -155,7 +156,7 @@
         },
         methods: {
             clicked(ev){
-                this.$emit('select',ev.target.dataItem.dataContext.id)
+                this.$emit('select', this.universalMap(ev.target.dataItem.dataContext.id, 'numberId'))
                 
                 // this is to update the data array and change color or stuff like that or you can just replace the data array with a brand ne
             }

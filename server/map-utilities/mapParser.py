@@ -55,9 +55,9 @@ for item in territories:
     		charId = item2['id']
     		featuresList.append(
 	    		{
-	    			"numberId": numberId,
-	    			"charId": charId,
-	    			"name": name
+	    			"controlledBy": numberId,
+	    			# "charId": charId,
+	    			# "name": name
 	    		}
     		)
     		break
@@ -67,7 +67,7 @@ for item in territories:
 
 
 
-with open('./mapping.json', 'w') as f:
+with open('./mapStatus.json', 'w') as f:
     json.dump(featuresList,f)
 
 # def anydup(thelist):

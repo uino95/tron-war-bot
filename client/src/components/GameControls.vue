@@ -31,11 +31,11 @@
                                             <v-autocomplete
                                                     outline
                                                     v-model="currentCountry"
-                                                    :items="countriesArr"
+                                                    :items="mapping"
                                                     item-text="name"
                                                     :loading="isLoading"
                                                     :search-input.sync="search"
-                                                    item-value="id"
+                                                    item-value="numberId"
                                                     hide-no-data
                                                     hide-selected
                                                     label="Select Country"
@@ -138,7 +138,7 @@
                                         {{bet.time}}
                                     </v-flex>
                                     <v-flex xs3 class="subheading">
-                                        {{bet.result}}
+                                        {{convertResultBet(bet.result)}}
                                     </v-flex>
                                 </v-layout>
                             </v-container>
@@ -156,23 +156,26 @@
                             </v-toolbar>
                             <v-container grid-list-md text-xs-center>
                                 <v-layout row wrap>
-                                    <v-flex xs3 style="text-align: start" class="title">
+                                    <v-flex xs4 style="text-align: start" class="title">
                                         <span>Address</span>
                                     </v-flex>
-                                    <v-flex xs3 class="title">
+                                    <v-flex xs2 class="title">
                                         <span>Country</span>
                                     </v-flex>
-                                    <v-flex xs3 class="title">
+                                    <v-flex xs2 class="title">
                                         <span>Bet</span>
                                     </v-flex>
-                                    <v-flex xs3 class="title">
+                                    <v-flex xs2 class="title">
                                         <span>Time</span>
+                                    </v-flex>
+                                    <v-flex xs2 class="title">
+                                        Result
                                     </v-flex>
                                 </v-layout>
                                 <v-divider style="margin-bottom: 3%"></v-divider>
 
                                 <v-layout row wrap v-for="bet in latestBets" :key="bet">
-                                    <v-flex xs3 style="text-align: start" class="subheading">
+                                    <v-flex xs4 style="text-align: start" class="subheading">
                                         <v-tooltip bottom>
                                             <template v-slot:activator="{ on }">
                                                 <span v-on="on" v-text="bet.address.substring(0,12)+'...'"></span>
@@ -180,14 +183,17 @@
                                             <span>{{bet.address}}</span>
                                         </v-tooltip>
                                     </v-flex>
-                                    <v-flex xs3 class="subheading">
+                                    <v-flex xs2 class="subheading">
                                         <span>{{bet.country}}</span>
                                     </v-flex>
-                                    <v-flex xs3 class="subheading">
+                                    <v-flex xs2 class="subheading">
                                         <span>{{bet.bet+"TRX"}}</span>
                                     </v-flex>
-                                    <v-flex xs3 class="subheading">
+                                    <v-flex xs2 class="subheading">
                                         <span>{{bet.time}}</span>
+                                    </v-flex>
+                                    <v-flex xs2 class="subheading">
+                                        {{convertResultBet(bet.result)}}
                                     </v-flex>
                                 </v-layout>
                             </v-container>
@@ -272,16 +278,16 @@
                                         {{conquest.turn}}
                                     </v-flex>
                                     <v-flex xs3 class="subheading" style="color: green;">
-                                        {{conquest.conquest[0]}}
+                                        {{universalMap(conquest.conquest[0])}}
                                     </v-flex>
                                     <v-flex xs1>
                                         <v-icon>arrow_forward</v-icon>
                                     </v-flex>
                                     <v-flex xs3 class="subheading" style="color: red;">
-                                        {{conquest.conquest[1]}}
+                                        {{universalMap(conquest.conquest[1])}}
                                     </v-flex>
                                     <v-flex xs4 class="subheading" style="color: red;">
-                                        {{conquest.prev}}
+                                        {{universalMap(conquest.prev)}}
                                     </v-flex>
                                 </v-layout>
                             </v-container>
@@ -296,8 +302,7 @@
 <script>
 
     import {db} from '../plugins/firebase'
-    import countryListObj from '../assets/countryListObj'
-    import countryListArr from '../assets/countryListArr'
+    import mapping from '../assets/mapping'
 
 
     String.prototype.replaceAll = function (search, replace) {
@@ -328,8 +333,7 @@
             history: [],
             bets: [],
             mapStatus: [],
-            countriesObj: countryListObj,
-            countriesArr: countryListArr,
+            mapping: mapping
 
         }),
 
@@ -355,7 +359,7 @@
                     let _txId;
                     let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
                     window.tronWeb.contract().at(contract_address).then(contract => {
-                     contract.bet(0, _this.countryToInt).send({callValue:window.tronWeb.toSun(1)}).then(
+                     contract.bet(0, _this.currentCountry).send({callValue:window.tronWeb.toSun(1)}).then(
                         txId => _txId = txId)
                     });
 
@@ -363,7 +367,7 @@
                         window.tronWeb.trx.getTransaction(_txId).then(tx => {
                             if (tx.ret[0].contractRet=="SUCCESS") {
                                 _this.snackbarColor = "success";
-                                _this.snackbarText = `Successfully bet on ${_this.countryToName}!`;
+                                _this.snackbarText = `Successfully bet on ${_this.universalMap(_this.currentCountry)}!`;
                                 setTimeout(function(){
                                     _this.fetchBalance()
                                 }, 2000)
@@ -376,31 +380,6 @@
                         })
                     }, 10000)
                 }
-
-
-
-                // let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
-                // window.tronWeb.contract().at(contract_address).then(contract => {
-                //     contract.jackpot(0).call().then(res => {
-                //         console.log(res.toString())
-                //     })
-                // });
-
-                // listen on this url
-//                 Function: get events by contract address
-
-                // subpath: $baseUrl/events/{contractAddress}
-
-                // parameters
-                // limit: each page size, default is 25
-                // sort: sort Field, default is sort by timeStamp descending order
-                // since: start time of event occurrence, timeStamp >= since will be shown
-                // block: block number, block number >= block will be shown
-                // contractAddress: contract address
-                // start: start page, default is 1
-                // "https://api.tronex.io/events/TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e?limit=1&sort=-timeStamp&since=0&block=0&start=4"
-
-
             },
             async fetchAccount(){
                 const account = await window.tronWeb.trx.getAccount();
@@ -440,6 +419,13 @@
                 setInterval(() => {
                     //this.setTimer();
                 }, 1000);
+            },
+            convertResultBet: function(betResult){
+                if(betResult < 0){
+                    return '-'
+                } else {
+                    return betResult
+                }
             }
         },
         props: ['currentCountry'],
@@ -449,9 +435,9 @@
                 let arr = [];
                 let tmp = [];
                 for (var i = this.mapStatus.length - 1; i >= 0; i--) {
-                    arr.push(this.countriesObj[this.mapStatus[i]['id']]);
+                    arr.push(this.universalMap(i));
                     for (var j = this.mapStatus.length - 1; j >= 0; j--) {
-                        if(this.mapStatus[j]['controlledBy'] === this.mapStatus[i]['id']){tmp.push(j)}
+                        if(this.mapStatus[j]['controlledBy'] === i){tmp.push(j)}
                     }
                     arr.push(tmp);
                     tmp = [];
@@ -481,37 +467,9 @@
             calculatePotentialWin: function () {
                 //TODO replace
                 if (this.currentCountry == null) return 0;
-                return (this.info.jackpot + 50) * 0.7 / this.currentCountry.length;
+                return (this.info.jackpot + 50) * 0.7 / this.universalMap(this.currentCountry).length;
             },
-            countryToName: function(){
-                return this.countriesObj[this.currentCountry]
-            },
-            countryToInt: function(){
-                let converted = 0;
-                for (var i = 0; i <= this.currentCountry.length - 1; i++) {
-                    converted += this.currentCountry.charCodeAt(i) * (Math.pow(100, i))
-                }
-                return converted
-            }
-
         },
-        // asyncComputed: {
-        //     async account() {
-        //         const account = await window.tronWeb.trx.getAccount();
-        //         const accountAddress = account.address; // HexString(Ascii)
-        //         const accountAddressInBase58 = window.tronWeb.address.fromHex(
-        //           accountAddress
-        //         ); // Base58
-        //         return accountAddressInBase58
-        //     },
-        //     async balance() {
-        //         const balanceInSun = await window.tronWeb.trx.getBalance(); //number
-        //         const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
-        //         // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
-
-        //         return balanceInTRX
-        //     }
-        // },
         mounted() {
             window.onmessage = (event) => {
               // Waiting for that message.
