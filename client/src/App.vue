@@ -27,7 +27,7 @@
         <v-toolbar color="primary" app fixed clipped-left>
             <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
             <v-avatar class="ml-3">
-              <img src="/img/logo.jpg">
+              <img src="/img/logo.png">
             </v-avatar>
 
             <span class="headline ml-3 mr-5">Tron<span class="font-weight-light">WarBot</span></span>
@@ -83,7 +83,7 @@
                 heading: 'Wallet Login'
             },
                 {
-                    icon: 'lightbulb_outline',
+                    icon: 'fa-paper-plane',
                     text: 'Login with Wallet',
                 },
                 {
@@ -93,7 +93,7 @@
                     heading: 'Help'
                 },
                 {
-                    icon: 'help',
+                    icon: 'fa-gamepad',
                     text: 'How To Play'
                 },
                 {
@@ -111,11 +111,11 @@
                     heading: 'Social'
                 },
                 {
-                    icon: 'archive',
+                    icon: 'fab fa-facebook-square',
                     text: 'Facebook Page'
                 },
                 {
-                    icon: 'delete',
+                    icon: 'fab fa-telegram',
                     text: 'Telegram'
                 }
             ]

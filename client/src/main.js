@@ -6,6 +6,7 @@ import './plugins/vueAsync'
 import mapping from './assets/mapping.js'
 
 import App from './App.vue'
+import '@fortawesome/fontawesome-free/css/all.css'
 
 Vue.config.productionTip = false;
 
@@ -32,4 +33,5 @@ Vue.mixin({
 
 new Vue({
     render: h => h(App),
+    iconfont: 'fab'
 }).$mount('#app');

@@ -70,14 +70,18 @@
                                                           disabled></v-text-field>
                                         </v-flex>
                                         <v-flex xs4>
-                                            <v-select
+                                            <!--<v-select
                                                     v-model="currency"
                                                     :items="currencies"
                                                     :rules="currencyRule"
                                                     label="Currency"
                                                     required
                                                     outline
-                                            ></v-select>
+                                            ></v-select>-->
+                                            <v-text-field v-model="currency"
+                                                          label="Currency"
+                                                          outline
+                                                          disabled></v-text-field>
                                         </v-flex>
                                     </v-layout>
 
@@ -208,17 +212,10 @@
             <v-container grid-list-md text-xs-center>
                 <v-layout row wrap>
                     <!-- Countries -->
-                    <v-flex>
+                    <v-flex xs6>
                         <v-card>
                             <v-toolbar color="primary" dark>
                                 <v-toolbar-title>Stats</v-toolbar-title>
-                                <v-spacer></v-spacer>
-                                <v-btn icon>
-                                    <v-icon>search</v-icon>
-                                </v-btn>
-                                <v-btn icon>
-                                    <v-icon>sort</v-icon>
-                                </v-btn>
                             </v-toolbar>
                             <v-container grid-list-md text-xs-center class="font-weight-light">
                                 <v-layout row wrap>
@@ -249,7 +246,7 @@
                         </v-card>
                     </v-flex>
                     <!-- History -->
-                    <v-flex>
+                    <v-flex xs6>
                         <v-card>
                             <v-toolbar color="primary" dark>
                                 <v-toolbar-title>History</v-toolbar-title>
