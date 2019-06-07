@@ -37,12 +37,12 @@ var jackpotRef = db.ref('data/jackpot')
 var nextTurnRef = db.ref('data/nextTurn')
 var payoutRef = db.ref('payout')
 
-// Append new data to an array
+//Append new data to an array
 // historyRef.push().set(
 //   {
 //     conquest:["France","Portugal"],
 //     prev: "Italy",
-//     turn: 1080
+//     turn: 1116
 //   }
 // )
 
@@ -98,8 +98,7 @@ function computeCountryFromId(id, turn){
   })
 }
 
-// TODO fare una promise per leggere i dati
-
+//TODO farlo tutto con await e async
 let alreadyCalled = false
 async function syncServer(){
   //get the latest turn saved on DB from History
@@ -113,6 +112,7 @@ async function syncServer(){
         while(lastTurnOnDb != lastTurnOnAPI){
           lastTurnOnDb ++ 
           getTurnFromAPI(lastTurnOnDb).then((turn) => {
+            console.log("TURN: ", turn)
             computeCountryFromId(turn.conquest[0], turn.turn - 1).then((conquer) => {
               computeCountryFromId(turn.conquest[1], turn.turn - 1).then((prev) => {
                 historyRef.push().set({
@@ -120,18 +120,18 @@ async function syncServer(){
                   prev:  prev,
                   turn: turn.turn 
                 })
-                //TODO update countries controlled by
-                //retrieve entry to be updated
-                // let controlled = countrieNameId.nameToId['prev']
-                // let newController = countrieNameId.nameToId['conquer']
-                // console.log(controlled)
-                // console.log(newController)
-                // countriesRef.orderByChild('id').equalTo(controlled).on('value', function(snapshot){
-                //   countriesRef.child(snapshot.val()).update({
-                //     id: id,
-                //     controlledBy: newController
-                //   })
-                // })
+                let controlled = countrieNameId.nameToId[territories[turn.conquest[1]][1]]
+                let newController = countrieNameId.nameToId[conquer]
+                console.log("controlled", controlled)
+                console.log("newController", newController)
+                countriesRef.orderByChild('id').equalTo(controlled).once('value', function(snapshot){
+                  let key = Object.keys(snapshot.val())[0]
+                  console.log(snapshot.val())
+                  countriesRef.child(key).update({
+                    id: controlled,
+                    controlledBy: newController
+                  })
+                })
               })
             })
           })  
@@ -165,58 +165,67 @@ async function syncServer(){
 var latestTurn = -1
 var currentTurn = -1
 
-// function pollForNewTurn() {
-//   https.get('https://worldwarbot.com/api/v0.1/?request=conquest&turn=last', (resp) => {
-//     let data = '';
-//     // A chunk of data has been recieved.
-//     resp.on('data', (chunk) => {
-//       data += chunk;
-//       // fire STOP_GAME
-//     });
-//     // The whole response has been received. Print out the result.
-//     resp.on('end', () => {
-//       console.log(`statusCode: ${resp.statusCode}`)
-//       let turn = JSON.parse(data)
-//       console.log(turn);
-//       if (turn.turn === currentTurn + 1) {
-//         computeCountryFromId(turn.conquest[0], turn.turn - 1).then((conquer) => {
-//           computeCountryFromId(turn.conquest[1], turn.turn - 1).then((prev) => {
-//             historyRef.push().set({
-//               conquest: [ conquer, territories[turn.conquest[1]][1]],
-//               prev:  prev,
-//               turn: turn.turn 
-//             })
-//             //TODO update countries controlled by
-//           })
-//         })
-//         currentTurn++
-//         utils.consoleLog("new Turn - " + latestTurn)
-//       } else if (turn.turn > currentTurn + 1){
-//         console.log("LOST A TURN")
-//         //syncServer
-//       }
-//     });
-//   }).on("error", (err) => {
-//     console.log("Error: " + err.message);
-//   });
-// }
+function pollForNewTurn() {
+  https.get('https://worldwarbot.com/api/v0.1/?request=conquest&turn=last', (resp) => {
+    let data = '';
+    // A chunk of data has been recieved.
+    resp.on('data', (chunk) => {
+      data += chunk;
+      // fire STOP_GAME
+    });
+    // The whole response has been received. Print out the result.
+    resp.on('end', () => {
+      console.log(`statusCode: ${resp.statusCode}`)
+      let turn = JSON.parse(data)
+      console.log(turn);
+      if (turn.turn === currentTurn + 1) {
+        computeCountryFromId(turn.conquest[0], turn.turn - 1).then((conquer) => {
+          computeCountryFromId(turn.conquest[1], turn.turn - 1).then((prev) => {
+            historyRef.push().set({
+              conquest: [ conquer, territories[turn.conquest[1]][1]],
+              prev:  prev,
+              turn: turn.turn 
+            })
+            let controlled = countrieNameId.nameToId[territories[turn.conquest[1]][1]]
+            let newController = countrieNameId.nameToId[conquer]
+            
+            countriesRef.orderByChild('id').equalTo(controlled).once('value', function(snapshot){
+              let key = Object.keys(snapshot.val())[0]
+              countriesRef.child(key).update({
+                id: controlled,
+                controlledBy: newController
+              })
+            })
+          })
+        })
+        currentTurn++
+        utils.consoleLog("new Turn - " + latestTurn)
+      } else if (turn.turn > currentTurn + 1){
+        console.log("LOST A TURN")
+        //syncServer
+      }
+    });
+  }).on("error", (err) => {
+    console.log("Error: " + err.message);
+  });
+}
 
 
-// //start polling the api server at every :13 of each hour (edit second star with 13)
-// cron.schedule("1 13 * * * *", function() {
-//   utils.consoleLog("start polling WWB server for new turn")
-//   //fetch latest turn number
-//   latestTurn = // fetch latest history entry.turn
-//   currentTurn = currentTurn === -1 ? latestTurn : currentTurn //TODO fetch from db
+//start polling the api server at every :13 of each hour (edit second star with 13)
+cron.schedule("1 13 * * * *", function() {
+  utils.consoleLog("start polling WWB server for new turn")
+  //fetch latest turn number
+  latestTurn = // fetch latest history entry.turn
+  currentTurn = currentTurn === -1 ? latestTurn : currentTurn //TODO fetch from db
 
-//   //start polling every 15 seconds. The function then quits as the turn changes
-//   while (currentTurn === latestTurn) {
-//     setTimeout(function() {
-//       console.log("ciao")
-//       pollForNewTurn()
-//     }, 2000);
-//   }
-// });
+  //start polling every 15 seconds. The function then quits as the turn changes
+  while (currentTurn === latestTurn) {
+    setTimeout(function() {
+      console.log("ciao")
+      pollForNewTurn()
+    }, 2000);
+  }
+});
 
 ///////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// DB and Server StartUp /////////////////////////////

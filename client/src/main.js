@@ -8,6 +8,14 @@ import App from './App.vue'
 
 Vue.config.productionTip = false;
 
+Vue.mixin({
+  methods: {
+    	universalMap(){
+    		
+    	}
+    }
+})
+
 new Vue({
     render: h => h(App),
 }).$mount('#app');

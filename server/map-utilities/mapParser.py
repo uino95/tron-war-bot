@@ -37,33 +37,38 @@ i = len(colorBlue) - 1
 # 	i = i-1
 # 	if i < 0 : i=len(colorBlue) - 1
 
-obj = {}
 
-for item in distros_dict:
 
-	obj[item['controlledBy']] = item['id'] 
+# for item in territories:
+# 	obj['id'] = 
 
-	
- 
-# for item in features:
-#     featuresList.append(item['properties']['name'])
-#     for item2 in territories:
-#     	if item['properties']['name'] == item2[1]:
-#     		print("found", i)
-#     		break
-#     	i = i+1
-#     if i > len(territories) :
-#     	print(item['properties']['name'])
-#     	features.pop(j)
-#     i = 0
-#     j = j+1
+
+numberId = 0
+name = ''
+charId	= ''
+
+for item in territories:
+    numberId = item[0]
+    for item2 in distros_dict:
+    	if item2['controlledBy'] == item[1]:
+    		name = item2['controlledBy']
+    		charId = item2['id']
+    		featuresList.append(
+	    		{
+	    			"numberId": numberId,
+	    			"charId": charId,
+	    			"name": name
+	    		}
+    		)
+    		break
+    	
 
 #print(len(features))
-print(len(territories))
 
 
-with open('./country.json', 'w') as f:
-    json.dump(obj,f)
+
+with open('./mapping.json', 'w') as f:
+    json.dump(featuresList,f)
 
 # def anydup(thelist):
 #   seen = set()
