@@ -26,7 +26,6 @@ app.use(bodyParser.json());
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// Startup ///////////////////////////////////////
 
-
 //init db
 admin.initializeApp({
   credential: admin.credential.cert(config.firebase),
@@ -36,16 +35,28 @@ var db = admin.database();
 var historyRef = db.ref('history')
 var betsRef = db.ref('bets')
 var countriesRef = db.ref('countries')
-var jackpotRef = db.ref('data/jackpot')
-var nextTurnRef = db.ref('data/nextTurn')
-var payoutRef = db.ref('payout')
+var dataRef = db.ref('data')
+
+//fetch current snapshot from db
+async function fetchLatestTurnOnDb(){
+  return new Promise(async function(resolve, reject) {
+    historyRef.orderByChild('turn').limitToLast(1).once('value', function(snapshot){
+      let key = Object.keys(snapshot.val())
+      resolve(snapshot.child(key).val().turn)
+    })
+  })
+}
+
+var latestTurn = -1
 
 //sync
-module.exports.startup = async function (){
+async function startUp (){
   var l = await twb.getCurrentRound(0);
   if (!l.stoppedAt) return;
   var r = await twb.startGame(0);
 }
+
+startUp()
 
 //TODO farlo tutto con await e async
 // let alreadyCalled = false
@@ -131,69 +142,82 @@ var getTurnFromAPI = function(turn) {
 async function computeCountryFromId(id, turn){
   let found = false
   return new Promise(async function(resolve, reject) {
-    var data = await rp.get('http://192.168.1.15:3000/conquest_countries').catch(console.error); 
-    let res = JSON.parse(data)
-    for (var i = res.countries.length - 1; i >= 0; i--) {
-      for (var j = res.countries[i][1].length - 1; j >= 0; j--) {
-        if(res.countries[i][1][j] === id){
-          found = true
-          resolve(res.countries[i][0])
+    try{
+      var data = await rp.get('http://localhost:3000/conquest_countries')
+      let res = JSON.parse(data)
+      for (var i = res.countries.length - 1; i >= 0; i--) {
+        for (var j = res.countries[i][1].length - 1; j >= 0; j--) {
+          if(res.countries[i][1][j] === id){
+            found = true
+            resolve(res.countries[i][0])
+          }
         }
       }
-    }
-    if(!found){
-      reject("somwthing went wrong while computing id for country ")
+      if(!found){
+        reject("somwthing went wrong while computing id for country ")
+      }
+    } catch(err) {
+      console.log(err)
     }
   })
 }
 
-var latestTurn = -1
 var currentTurn = -1
 async function pollForNewTurn() {
-  var data = await rp.get('http://192.168.1.15:3000/conquest').catch(console.error);
-  let turn = JSON.parse(data)
-  console.log(turn);
-  console.log(turn.turn)
-  if (turn.turn > currentTurn + 1){
-    // TODO syncserver
-    throw"LOST A TURN";
+  try{
+    var data = await rp.get('http://localhost:3000/conquest')
+    let turn = JSON.parse(data)
+    console.log(turn);
+    console.log(turn.turn)
+    if (turn.turn > currentTurn + 1){
+      // TODO syncserver
+      throw"LOST A TURN";
+    }
+    else if (turn.turn < currentTurn) throw "E' un cazzo di casino moh...";
+    else if (turn.turn == currentTurn + 1){
+      let conqueredId = turn.conquest[1];
+      let conquerId = turn.conquest[0]
+      let realConquerName = await computeCountryFromId(conquerId, turn.turn - 1);
+      let prevOwnerName = await computeCountryFromId(conqueredId, turn.turn - 1);
+      let realConquerId = utils.universalMap(realConquerName,'numberId')
+      let prevOwnerId = utils.universalMap(prevOwnerName,'numberId')
+      historyRef.push().set({
+        conquest: [ realConquerId, conqueredId],
+        prev:  prevOwnerId,
+        turn: turn.turn
+      })
+      countriesRef.orderByKey().equalTo(conqueredId.toString()).once('value', function(snapshot){
+        let key = Object.keys(snapshot.val())[0]
+        countriesRef.child(key).update({
+          controlledBy: conquerId
+        })
+      }) 
+      let d1 = new Date()
+      let nextTurn = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate(), d1.getHours(), 15, 0, 0).getTime();
+      
+      dataRef.update({nextTurn})
+      currentTurn++
+      utils.consoleLog("new Turn - " + currentTurn)
+      
+      var r = await twb.startGame(0);
+      console.log("game started")
+      return conquerId
+    } else{
+      console.log("turn not changed")
+    }
+  } catch(err) {
+    console.log(err)
   }
-  if (turn.turn < currentTurn + 1) throw "E' un cazzo di casino moh...";
-
-  let conqueredId = turn.conquest[1];
-  let conquerId = turn.conquest[0]
-  let realConquerName = await computeCountryFromId(conquerId, turn.turn - 1);
-  let prevOwnerName = await computeCountryFromId(conqueredId, turn.turn - 1);
-  let realConquerId = utils.universalMap(realConquerName,'numberId')
-  let prevOwnerId = utils.universalMap(prevOwnerName,'numberId')
-  historyRef.push().set({
-    conquest: [ realConquerId, conqueredId],
-    prev:  prevOwnerId,
-    turn: turn.turn
-  })
-
-  countriesRef.orderByKey().equalTo(conqueredId.toString()).once('value', function(snapshot){
-    let key = Object.keys(snapshot.val())[0]
-    countriesRef.child(key).update({
-      controlledBy: conquerId
-    })
-  })
-
-  // update next turn ond db
-  var r = await twb.startGame(0);
-  currentTurn++
-  utils.consoleLog("new Turn - " + latestTurn)
-
-  return conquerId
 }
 
 //start polling the api server at every :13 of each hour (edit second star with 13)
-cron.schedule("1 * * * * *", async function() {
+cron.schedule("15 * * * * *", async function() {
   utils.consoleLog("start polling WWB server for new turn")
-  //fetch latest turn number
-  latestTurn = 1
+
+  latestTurn = await fetchLatestTurnOnDb()
   currentTurn = currentTurn === -1 ? latestTurn : currentTurn //TODO fetch from db
   var r = await twb.endGame(0);
+  console.log("game ended")
 
   //start polling every 15 seconds. The function then quits as the turn changes
   while (currentTurn === latestTurn) {
