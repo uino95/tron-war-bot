@@ -123,7 +123,9 @@ twb.watchEvents('Bet', async function(r){
     result: -1,
     time: new Date().getTime()
   })
-  // TODO console.log(newJackpot)
+  let jackpot = await twb.availableJackpot(0,bet.round)
+  jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
+  dataRef.update({jackpot})
 })
 
 
