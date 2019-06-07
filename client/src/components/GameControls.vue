@@ -178,7 +178,7 @@
                                 </v-layout>
                                 <v-divider style="margin-bottom: 3%"></v-divider>
 
-                                <v-layout row wrap v-for="bet in latestBets" :key="bet">
+                                <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
                                     <v-flex xs4 style="text-align: start" class="subheading">
                                         <v-tooltip bottom>
                                             <template v-slot:activator="{ on }">
@@ -232,7 +232,8 @@
                                 <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
                                     <v-flex xs1>
                                         <v-avatar size="90%">
-                                            <vuetify-lazy-image :src="getFlagString(country[0])" :alt="country[0]"/>
+                                            <v-lazy-image src-placeholder="/img/placeholder.svg"
+                                                          :src="getFlagString(country[0])" :alt="country[0]"/>
                                         </v-avatar>
                                     </v-flex>
                                     <v-flex xs5 style="text-align: start" class="subheading">
@@ -300,7 +301,6 @@
 
     import {db} from '../plugins/firebase';
     import mapping from '../assets/mapping';
-    import VuetifyLazyImage from "vuetify-lazy-image";
 
 
     String.prototype.replaceAll = function (search, replace) {
@@ -310,9 +310,11 @@
         return this.split(search).join(replace);
     };
 
+    import VLazyImage from "v-lazy-image";
+
     export default {
         components: {
-            VuetifyLazyImage
+            VLazyImage
         },
         data: () => ({
             search: '',
@@ -348,7 +350,6 @@
             placeBet() {
                 let _this = this;
                 if (this.currentCountry == null) {
-
                     this.snackbarText = "Select a country from map or search it";
                     this.snackbarColor = "error";
                     this.snackbar = true;
@@ -359,20 +360,19 @@
                     let _txId;
                     let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
                     window.tronWeb.contract().at(contract_address).then(contract => {
-                     contract.bet(0, _this.currentCountry).send({callValue:window.tronWeb.toSun(1)}).then(
-                        txId => _txId = txId)
+                        contract.bet(0, _this.currentCountry).send({callValue: window.tronWeb.toSun(1)}).then(
+                            txId => _txId = txId)
                     });
 
-                    setTimeout(function(){
+                    setTimeout(function () {
                         window.tronWeb.trx.getTransaction(_txId).then(tx => {
-                            if (tx.ret[0].contractRet=="SUCCESS") {
+                            if (tx.ret[0].contractRet == "SUCCESS") {
                                 _this.snackbarColor = "success";
                                 _this.snackbarText = `Successfully bet on ${_this.universalMap(_this.currentCountry)}!`;
-                                setTimeout(function(){
+                                setTimeout(function () {
                                     _this.fetchBalance()
                                 }, 2000)
-                            }
-                            else {
+                            } else {
                                 _this.snackbarText = tx.ret[0].contractRet;
                                 _this.snackbarColor = "error";
                             }
@@ -381,17 +381,17 @@
                     }, 10000)
                 }
             },
-            async fetchAccount(){
+            async fetchAccount() {
                 const account = await window.tronWeb.trx.getAccount();
                 const accountAddress = account.address; // HexString(Ascii)
                 const accountAddressInBase58 = window.tronWeb.address.fromHex(
-                  accountAddress
+                    accountAddress
                 ); // Base58
 
                 this.account = accountAddressInBase58
 
             },
-            async fetchBalance(){
+            async fetchBalance() {
                 const balanceInSun = await window.tronWeb.trx.getBalance(); //number
                 const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
                 // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
@@ -418,7 +418,7 @@
                 } else {
                     min = 14 - min;
                 }
-                sec = 59- sec;
+                sec = 59 - sec;
                 sec = sec < 10 ? `0${sec}` : sec;
                 min = min < 10 ? `0${min}` : min;
                 this.turnTimer = `${min}:${sec}`;
@@ -428,8 +428,8 @@
                     //this.setTimer();
                 }, 1000);
             },
-            convertResultBet: function(betResult){
-                if(betResult < 0){
+            convertResultBet: function (betResult) {
+                if (betResult < 0) {
                     return '-'
                 } else {
                     return betResult
@@ -438,14 +438,16 @@
         },
         props: ['currentCountry'],
         computed: {
-            countryStatus: function(){
+            countryStatus: function () {
                 let result = [];
                 let arr = [];
                 let tmp = [];
                 for (var i = this.mapStatus.length - 1; i >= 0; i--) {
                     arr.push(this.universalMap(i));
                     for (var j = this.mapStatus.length - 1; j >= 0; j--) {
-                        if(this.mapStatus[j]['controlledBy'] === i){tmp.push(j)}
+                        if (this.mapStatus[j]['controlledBy'] === i) {
+                            tmp.push(j)
+                        }
                     }
                     arr.push(tmp);
                     tmp = [];
@@ -466,10 +468,10 @@
                 let arr = this.countryStatus;
                 return arr.sort(compare);
             },
-            myBets: function() {
+            myBets: function () {
                 return this.bets.filter(bet => bet.address === this.account)
             },
-            latestBets: function() {
+            latestBets: function () {
                 return this.bets.slice(-10, this.bets.lenght)
             },
             calculatePotentialWin: function () {
@@ -480,12 +482,12 @@
         },
         mounted() {
             window.onmessage = (event) => {
-              // Waiting for that message.
+                // Waiting for that message.
 
-              if(event.data.message.action === 'setAccount'){
-                this.fetchBalance();
-                this.fetchAccount();
-              }
+                if (event.data.message.action === 'setAccount') {
+                    this.fetchBalance();
+                    this.fetchAccount();
+                }
             };
             this.fetchBalance();
             this.fetchAccount();

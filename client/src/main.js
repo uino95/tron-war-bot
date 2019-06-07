@@ -24,12 +24,13 @@ Vue.mixin({
                             return i
                         }
                     }
+                    break;
                 default:
                     return mapping[id]['name'];
             }
         }
     }
-})
+});
 
 new Vue({
     render: h => h(App),
