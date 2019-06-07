@@ -83,7 +83,7 @@
                 heading: 'Wallet Login'
             },
                 {
-                    icon: 'lightbulb_outline',
+                    icon: 'fa-paper-plane',
                     text: 'Login with Wallet',
                 },
                 {
@@ -93,7 +93,7 @@
                     heading: 'Help'
                 },
                 {
-                    icon: 'help',
+                    icon: 'fa-gamepad',
                     text: 'How To Play'
                 },
                 {
@@ -111,11 +111,11 @@
                     heading: 'Social'
                 },
                 {
-                    icon: 'archive',
+                    icon: 'fab fa-facebook-square',
                     text: 'Facebook Page'
                 },
                 {
-                    icon: 'delete',
+                    icon: 'fab fa-telegram',
                     text: 'Telegram'
                 }
             ]
