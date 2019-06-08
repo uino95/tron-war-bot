@@ -219,7 +219,7 @@ async function pollForNewTurn() {
 }
 
 //start polling the api server at every :13 of each hour (edit second star with 13)
-cron.schedule("15 8 * * * *", async function() {
+cron.schedule("1 * * * * *", async function() {
   utils.consoleLog("start polling WWB server for new turn")
 
   latestTurn = await fetchLatestTurnOnDb()
