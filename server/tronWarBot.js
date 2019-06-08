@@ -166,6 +166,22 @@ module.exports.payout = async function (gameType, gameRound, winningChoice) {
   // if (true) {console.log(winningAmount.toString());return winningBets;}
   let a = await this.availableJackpot(gameType, gameRound);
   if (!a.finalJackpot.eq(a.availableFunds)) throw "Payout has already been paid";
+  if (!winningBets.length) {
+    let txId = await this.twb.payout(gameType, gameRound, this.twb.address, a.finalJackpot.toString()).send();
+    await sleep(10000);
+    let tx = await this.tronWeb.trx.getTransaction(txId);
+    if (tx.ret[0].contractRet!="SUCCESS") {
+      console.error("[PAYOUT ERROR]" +
+        "\n\tNo winners at this turn. Funds did NOT return to the jackpot." +
+        "\n\tPayout txId => " + txId )
+      return false;
+    }
+    console.info("[PAYOUT EMPTY]" +
+      "\n\tNo winners at this turn. Funds were returned to the jackpot." +
+      "\n\tFunds returned => " +   a.finalJackpot.toString() + " SUN" +
+      "\n\tPayout txId => " + txId  );
+    return true;
+  }
   for (var b of winningBets) {
     let txId, tx;
     let skip = false;
@@ -183,16 +199,16 @@ module.exports.payout = async function (gameType, gameRound, winningChoice) {
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
         "\n\tWinning Choice => " +  winningChoice.toString() +
         "\n\tBet txId => " + b.txId +
-        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() +
-        "\n\tWin => " + win.toString() +
+        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
+        "\n\tWin => " + win.toString() + " SUN" +
         "\n\tPayout txId => " + txId)
     }
     if (skip || tx.ret[0].contractRet!="SUCCESS")
       console.error("[PAYOUT ERROR] - PAYMENT TO USER HAS NOT GONE THROUGH!" +
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
         "\n\tWinning Choice => " +  winningChoice.toString() +
-        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() +
-        "\n\tExpectedWin => " + win.toString() +
+        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
+        "\n\tExpectedWin => " + win.toString() + " SUN" +
         "\n\tTxId => " + b.txId);
   }
   return true;
@@ -204,4 +220,3 @@ module.exports.startUp = async function(gameType){
   if (!l.stoppedAt) return;
   var r = await this.startGame(gameType);
 }
- 
