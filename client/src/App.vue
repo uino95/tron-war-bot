@@ -46,6 +46,7 @@
                             @close="closeModal"
                             v-bind:isModalVisible = "isModalVisible"
                             v-bind:header-tile = "items[itemClicked].text"
+                            v-bind:body-tile ="items[itemClicked].body"
                             />
                     </v-flex>
                 </v-layout>
@@ -85,6 +86,7 @@
                 {
                     icon: 'fa-paper-plane',
                     text: 'Login With Tronlink',
+                    body: 'WIP'
                 },
                 {
                     divider: true
@@ -94,15 +96,18 @@
                 },
                 {
                     icon: 'fa-gamepad',
-                    text: 'How To Play'
+                    text: 'How To Play',
+                    body: 'WIP'
                 },
                 {
                     icon: 'help',
-                    text: 'FAQ'
+                    text: 'FAQ',
+                    body: 'WIP'
                 },
                 {
                     icon: 'add',
-                    text: 'Whitepaper'
+                    text: 'Whitepaper',
+                    body: 'WIP'
                 },
                 {
                     divider: true
@@ -112,11 +117,13 @@
                 },
                 {
                     icon: 'fab fa-facebook-square',
-                    text: 'Facebook Page'
+                    text: 'Facebook Page',
+                    body: "https://www.facebook.com/TronWarBot/"
                 },
                 {
                     icon: 'fab fa-telegram',
-                    text: 'Telegram'
+                    text: 'Telegram',
+                    body: "https://t.me/joinchat/J8ocIxZoXsD4stn4nxg24A"
                 }
             ]
         }),

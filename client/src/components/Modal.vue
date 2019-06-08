@@ -5,7 +5,7 @@
                 <v-card-title class="headline grey lighten-2" primary-title>{{headerTile}}</v-card-title>
 
                 <v-card-text v-if="headerTile != 'Login With Tronlink'">
-                    {{lorem}}{{bodyTile}}<br /><br />{{footerTile}}
+                    {{bodyTile}}<br /><br />{{footerTile}}
                 </v-card-text>
 
                 <v-card-text v-if="headerTile == 'Login With Tronlink' && this.isLoggedIn()">
@@ -13,7 +13,7 @@
                 </v-card-text>
 
                 <v-card-text v-if="headerTile == 'Login With Tronlink' && !this.isLoggedIn()" >
-                    Please login to your TRONLink wallet. If you do not have TRONLink wallet installed please visit <a href="http://u6.gg/gmc5D"> http://u6.gg/gmc5D</a> and download the chrome extension. (TRONbet is only availble using Chrome browser for the time being) <br /><br />{{footerTile}}
+                    Please login to your TRONLink wallet. If you do not have TRONLink wallet installed please visit <a href="http://u6.gg/gmc5D"> http://u6.gg/gmc5D</a> and download the chrome extension. (Tron War Bot is only availble using Chrome browser for the time being) <br /><br />{{footerTile}}
                 </v-card-text>
 
                 <v-card-actions>

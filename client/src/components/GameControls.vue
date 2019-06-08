@@ -374,7 +374,7 @@
                     let _txId;
                     let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
                     window.tronWeb.contract().at(contract_address).then(contract => {
-                        contract.bet(0, _this.currentCountry).send({callValue: window.tronWeb.toSun(50)}).then(
+                        contract.bet(0, _this.currentCountry).send({callValue: window.tronWeb.toSun(1)}).then(
                             txId => _txId = txId)
                     });
 
