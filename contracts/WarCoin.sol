@@ -76,4 +76,24 @@ contract WarCoin is IWarCoin, ERC20Pausable, ERC20Detailed("WarCoin","WAR", 18),
     return true;
   }
 
+
+  /**
+   * @notice Function to burn a specific amount of tokens restricted to frontend contracts.
+   * @param _value The amount of token to be burned.
+   * @return A boolean that indicates if the operation was successful.
+   */
+  function burn(uint256 _value) public
+    onlyFrontend
+    whenNotPaused
+    returns(bool)
+  {
+    /**
+     * @dev tx.origin because only the legitimate caller is allowed to burn coin.
+     * This is necessary for security reasons and to avoid creating a system with a single point of failure.
+     */
+    ERC20._burn(tx.origin, _value);
+    return true;
+  }
+
+
 }

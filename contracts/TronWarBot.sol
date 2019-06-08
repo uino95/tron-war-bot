@@ -40,6 +40,23 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
   mapping (uint256 => uint256) public jackpot;
   mapping (uint256 => mapping( uint256 => RoundFunds ) ) public roundFunds;
 
+  /* MINING PARAMS */
+  /* In total 100M WAR will ever be mined.
+  The mining rate of WAR goes through 100 steps.
+  To begin with, 500 TRX are required to mine 1 WAR.
+  Every time the supply of WAR increases of one percentage point (the step) with respect to the total cap,
+  the mining requirement increases of 50 TRX per WAR.
+  In this way, the last mining step will see a mining requirement of 5500 TRX per WAR */
+
+  uint256 public war = 1000000000000000000;
+  uint256 public miningCap = 100000000; //WAR
+  uint256 public miningStep =  1000000; //WAR
+  uint256 public miningRateDelta = 50; //TRX per WAR
+  uint256 public initialMiningRate = 500; //TRX per WAR
+  uint256 public miningRate;
+
+
+
   /* SETTERS */
   /* Set the payable address of the house */
   function setHouseAddress(address _houseAddress)
@@ -101,9 +118,15 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
   /* INTERNALS */
   function _mineTokens(address _recipient, uint256 _amount)
     internal
+    returns (bool)
   {
-    /* uint256 _currSupply = Frontend.WAR().totalSupply(); */
-    Frontend.WAR().mint(_recipient, _amount);
+    uint256 _currSupply = Frontend.WAR().totalSupply().div(war);
+    if (_currSupply >= miningCap) return false;
+    uint256 _step = _currSupply.div(miningStep);
+    uint256 _delta = _step.mul(miningRateDelta);
+    miningRate = initialMiningRate.add(_delta);
+    uint256 _tokens = _amount.mul(war).div(1 trx).div(miningRate);
+    return Frontend.WAR().mint(_recipient, _tokens);
   }
 
   function _payHouse(uint256 _amount)
