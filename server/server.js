@@ -107,7 +107,7 @@ twb.startUp(0)
 /////////////////////////////////// Start Working ///////////////////////////////////
 
 
-// TODO watch for new bets
+// watch for new bets
 twb.watchEvents('Bet', async function(r){
   let bet = r.result
   betsRef.push().set({
@@ -151,7 +151,7 @@ async function computeCountryFromId(id, turn){
   let found = false
   return new Promise(async function(resolve, reject) {
     try{
-      var data = await rp.get('http://localhost:3000/conquest_countries')
+      var data = await rp.get(`https://worldwarbot.com/api/v0.1/?request=conquest&turn=${turn}`)
       let res = JSON.parse(data)
       for (var i = res.countries.length - 1; i >= 0; i--) {
         for (var j = res.countries[i][1].length - 1; j >= 0; j--) {
@@ -173,7 +173,7 @@ async function computeCountryFromId(id, turn){
 var currentTurn = -1
 async function pollForNewTurn() {
   try{
-    var data = await rp.get('http://localhost:3000/conquest')
+    var data = await rp.get('https://worldwarbot.com/api/v0.1/?request=conquest&turn=last')
     let turn = JSON.parse(data)
     console.log(turn);
     console.log(turn.turn)
@@ -209,7 +209,7 @@ async function pollForNewTurn() {
       
       var r = await twb.startGame(0);
       console.log("game started")
-      return conquerId
+      return realConquerId
     } else{
       console.log("turn not changed")
     }

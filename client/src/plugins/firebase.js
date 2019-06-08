@@ -1,5 +1,7 @@
 import Vue from 'vue'
-import Firebase from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/app'
+import 'firebase/database'
 import {rtdbPlugin} from 'vuefire'
 
 Vue.use(rtdbPlugin)
@@ -14,7 +16,7 @@ let config = {
         appId: "1:544798361307:web:55edba6f788a0d39"
     };
 
-const firebaseApp = Firebase.initializeApp(config);
+firebase.initializeApp(config);
 
-export const db = firebaseApp.database();
+export const db = firebase.database();
 

@@ -20,7 +20,7 @@ Vue.mixin({
                     return mapping[id]['charId'];
                 case 'numberId':
                     for (var i = mapping.length - 1; i >= 0; i--) {
-                        if (mapping[i]['charId'] === id) {
+                        if (mapping[i]['name'] === id) {
                             return i
                         }
                     }

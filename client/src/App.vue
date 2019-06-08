@@ -84,7 +84,7 @@
             },
                 {
                     icon: 'fa-paper-plane',
-                    text: 'Login with Wallet',
+                    text: 'Login With Tronlink',
                 },
                 {
                     divider: true
@@ -134,7 +134,7 @@
             selectedCountryChild(country){
 
                 this.selected_country = country;
-            }
+            },
         },
         mounted(){
         }
