@@ -41,9 +41,14 @@
                     for (var i = snapshot.val().length - 1; i >= 0; i--) {
                         data[i]['color'] = _this.colorBlue[j];
                         data[i]['id'] = _this.universalMap(i, 'charId')
-                        data[i]['controlledBy'] = _this.universalMap(data[i]['controlledBy'])
                         j --;
                         if (j < 0) { j=_this.colorBlue.length - 1}
+                    }
+                    console.log(data)
+                    for (var k = data.length - 1; k >= 0; k--) {
+
+                        data[k]['color'] = data[data[k]['controlledBy']]['color']
+                        data[k]['controlledBy'] = _this.universalMap(data[k]['controlledBy'])
                     }
                     _this.polygonSeries.data = data
                     _this.polygonSeries.invalidateData()
