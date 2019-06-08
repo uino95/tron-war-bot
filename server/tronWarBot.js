@@ -198,3 +198,10 @@ module.exports.payout = async function (gameType, gameRound, winningChoice) {
   return true;
 
 }
+
+module.exports.startUp = async function(gameType){
+  var l = await this.getCurrentRound(gameType);
+  if (!l.stoppedAt) return;
+  var r = await this.startGame(gameType);
+}
+ 

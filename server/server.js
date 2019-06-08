@@ -49,15 +49,9 @@ async function fetchLatestTurnOnDb(){
 
 var latestTurn = -1
 
+twb.startUp(0)
+
 //sync
-async function startUp (){
-  var l = await twb.getCurrentRound(0);
-  if (!l.stoppedAt) return;
-  var r = await twb.startGame(0);
-}
-
-startUp()
-
 //TODO farlo tutto con await e async
 // let alreadyCalled = false
 // async function syncServer(){
@@ -225,20 +219,19 @@ async function pollForNewTurn() {
 }
 
 //start polling the api server at every :13 of each hour (edit second star with 13)
-cron.schedule("1 13 * * * *", async function() {
+cron.schedule("15 8 * * * *", async function() {
   utils.consoleLog("start polling WWB server for new turn")
 
   latestTurn = await fetchLatestTurnOnDb()
   currentTurn = currentTurn === -1 ? latestTurn : currentTurn //TODO fetch from db
   var r = await twb.endGame(0);
-  console.log("game ended")
 
   //start polling every 15 seconds. The function then quits as the turn changes
   while (currentTurn === latestTurn) {
     await sleep(2000);
     var winner = await pollForNewTurn();
   }
-  await twb.payout(0,r.round, winner);
+  await twb.payout(0,r, winner);
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////
