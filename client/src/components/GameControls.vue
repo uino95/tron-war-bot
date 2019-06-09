@@ -445,12 +445,13 @@ export default {
       return this.bets.filter(bet => bet.address === this.account)
     },
     latestBets: function() {
-      return this.bets.slice(-10, this.bets.lenght)
+      return this.bets.slice(-20, this.bets.lenght)
     },
     calculatePotentialWin: function() {
       //TODO replace
       if (this.currentCountry == null) return 0;
-      return (this.info.jackpot + 50) * 0.7 / this.universalMap(this.currentCountry).length;
+      let betsOnThatCountry = this.latestBets.filter(bet => bet.country === this.currentCountry).length + 1
+      return (parseFloat(this.info.jackpot) + 50) * 0.7 / betsOnThatCountry;
     },
   },
   mounted() {
