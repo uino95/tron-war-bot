@@ -59,8 +59,8 @@
                     </v-flex>
                   </v-layout>
 
-                  <v-btn v-if="turnTimer != '00:00'" color="success" @click="placeBet">Bet 50 {{currency}}</v-btn>
-                  <v-btn v-else color="info" @click="battleInProgress">Battle in progress...</v-btn>
+                  <v-btn v-if="turnTimer == '00:00'" color="info" @click="battleInProgress">Battle in progress...</v-btn>
+                  <v-btn v-else color="success" @click="placeBet">Bet 50 {{currency}}</v-btn>
 
 
                 </v-form>
@@ -360,6 +360,7 @@ export default {
       let _this = this;
       this.snackbarText = "Battle in progress! Please wait...";
       this.snackbarColor = "info";
+      this.snackbarTimeout = 2000;
       this.snackbar = true;
     },
     async fetchAccount() {
