@@ -287,6 +287,7 @@ export default {
     bets: [],
     mapStatus: [],
     mapping: mapping,
+    intervalId: null
   }),
 
 
@@ -380,10 +381,13 @@ export default {
       sec = sec < 10 ? `0${sec}` : sec;
       min = min < 10 ? `0${min}` : min;
       this.turnTimer = `${min}:${sec}`;
+      if (min === '00' && sec === '00'){
+        clearInterval(this.intervalId)
+      }
       //this.turnTimer = timer;
     },
     startTimer: function() {
-      setInterval(() => {
+      this.intervalId = setInterval(() => {
         this.setTimer();
       }, 1000);
     },
