@@ -11,7 +11,7 @@
                         </v-flex>
                     </v-layout>
                     <v-divider v-else-if="item.divider" :key="i" dark class="my-3"></v-divider>
-                    <v-list-tile v-else-if="!item.link" :key="i" @click="showModal(i)">
+                    <v-list-tile v-else-if="!item.link" :key="i" @click.stop="showModal(i)">
                         <v-list-tile-action>
                             <v-icon>{{ item.icon }}</v-icon>
                         </v-list-tile-action>
@@ -52,9 +52,8 @@
                         <GameControls
                             v-bind:current-country = "selected_country"
                             />
-                        <modal
-                            @close="closeModal"
-                            v-bind:isModalVisible = "isModalVisible"
+                        <Modal
+                                v-model="isModalVisible"
                             v-bind:header-tile = "items[itemClicked].text"
                             v-bind:body-tile ="items[itemClicked].body"
                             />
