@@ -41,6 +41,7 @@
                         <GameMap @select="selectedCountryChild"/>
                         <GameControls
                             v-bind:current-country = "selected_country"
+                            @showModal="showModal(1)"
                             />
                         <modal
                             @close="closeModal"
