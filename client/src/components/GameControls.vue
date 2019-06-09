@@ -1,53 +1,47 @@
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
-<v-container>
-  <modal @close="closeModal" v-bind:isModalVisible="isModalVisible" header-tile="Login With Tronlink" />
-  <v-tabs centered color="secondary" dark icons-and-text>
-    <v-tabs-slider color="secondary"></v-tabs-slider>
-
-    <v-tab href="#tab-1">
-      Bet Panel
-      <v-icon>attach_money</v-icon>
-    </v-tab>
-
-    <v-tab href="#tab-2">
-      Current Run Stats
-      <v-icon>bar_chart</v-icon>
-    </v-tab>
-
-    <v-tab-item id="tab-1">
-      <v-container grid-list-md text-xs-center>
-        <v-layout row wrap>
-          <!-- Place a bet -->
-          <v-flex>
-            <v-card>
-              <v-toolbar color="primary" dark>
-                <v-toolbar-title>Place a bet</v-toolbar-title>
-                <v-spacer></v-spacer>
-              </v-toolbar>
-              <v-card-title primary-title class="justify-center">
-                <v-form ref="form" v-model="valid" lazy-validation>
-                  <v-layout row wrap>
-                    <v-flex md4>
-                      <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name" :loading="isLoading" :search-input.sync="search" item-value="numberId" hide-no-data hide-selected label="Select Country"
-                        placeholder="Type in or pick from map"></v-autocomplete>
-                    </v-flex>
-                    <v-flex md4>
-                      <v-text-field v-model="calculatePotentialWin" label="Potential win" outline disabled></v-text-field>
-                    </v-flex>
-                    <v-flex md4>
-                      <v-text-field v-model="turnTimer" label="Next Turn" outline disabled></v-text-field>
-                    </v-flex>
-                  </v-layout>
-                  <v-layout row wrap>
-                    <v-flex md4>
-                      <v-text-field v-model="balance" label="Your Balance" outline disabled></v-text-field>
-                    </v-flex>
-                    <v-flex md4>
-
-                      <v-text-field v-model="info.jackpot" label="Current Jackpot" outline disabled></v-text-field>
-                    </v-flex>
-                    <v-flex md4>
-                      <!--<v-select
+<v-tabs centered color="secondary" dark icons-and-text>
+  <v-tabs-slider color="secondary"></v-tabs-slider>
+  <v-tab href="#tab-1">
+    Bet Panel
+    <v-icon>attach_money</v-icon>
+  </v-tab>
+  <v-tab href="#tab-2">
+    Current Run Stats
+    <v-icon>bar_chart</v-icon>
+  </v-tab>
+  <v-tab-item id="tab-1">
+    <v-container grid-list-md text-xs-center>
+      <v-layout row wrap>
+        <!-- Place a bet -->
+        <v-flex>
+          <v-card>
+            <v-toolbar color="primary" dark>
+              <v-toolbar-title>Place a bet</v-toolbar-title>
+              <v-spacer></v-spacer>
+            </v-toolbar>
+            <v-card-title primary-title class="justify-center">
+              <v-form ref="form" v-model="valid" lazy-validation>
+                <v-layout row wrap>
+                  <v-flex md4>
+                    <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name" :loading="isLoading" :search-input.sync="search" item-value="numberId" hide-no-data hide-selected label="Select Country"
+                      placeholder="Type in or pick from map"></v-autocomplete>
+                  </v-flex>
+                  <v-flex md4>
+                    <v-text-field v-model="calculatePotentialWin" label="Potential win" outline disabled></v-text-field>
+                  </v-flex>
+                  <v-flex md4>
+                    <v-text-field v-model="turnTimer" label="Next Turn" outline disabled></v-text-field>
+                  </v-flex>
+                </v-layout>
+                <v-layout row wrap>
+                  <v-flex md4>
+                    <v-text-field v-model="balance" label="Your Balance" outline disabled></v-text-field>
+                  </v-flex>
+                  <v-flex md4>
+                    <v-text-field v-model="info.jackpot" label="Current Jackpot" outline disabled></v-text-field>
+                  </v-flex>
+                  <v-flex md4>
+                    <!--<v-select
                                                         v-model="currency"
                                                         :items="currencies"
                                                         :rules="currencyRule"
@@ -55,221 +49,210 @@
                                                         required
                                                         outline
                                                 ></v-select>-->
-                      <v-text-field v-model="currency" label="Currency" outline disabled></v-text-field>
-                    </v-flex>
-                  </v-layout>
-
-                  <v-btn v-if="turnTimer == '00:00'" color="info" @click="battleInProgress">Battle in progress...</v-btn>
-                  <v-btn v-else color="success" @click="placeBet">Bet 50 {{currency}}</v-btn>
-
-
-                </v-form>
-              </v-card-title>
-              <v-snackbar v-model="snackbar" 57*0.7 :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
-                <span class="title">{{snackbarText}}</span>
-                <v-btn dark flat @click="snackbar = false">
-                  Close
-                </v-btn>
-              </v-snackbar>
-            </v-card>
-          </v-flex>
-        </v-layout>
-        <v-layout row wrap>
-          <!-- My latest bets -->
-          <v-flex>
-            <v-card>
-              <v-toolbar color="primary" dark>
-                <v-toolbar-title>My Latest Bets</v-toolbar-title>
-                <v-spacer></v-spacer>
-              </v-toolbar>
-              <v-container grid-list-md text-xs-centerm class="gameTab">
-                <v-layout row wrap class="gameTabHeader">
-                  <v-flex xs3 class="title">
-                    Country
-                  </v-flex>
-                  <v-flex xs3 class="title">
-                    Bet
-                  </v-flex>
-                  <v-flex xs3 class="title">
-                    Time
-                  </v-flex>
-                  <v-flex xs3 class="title">
-                    Result
+                    <v-text-field v-model="currency" label="Currency" outline disabled></v-text-field>
                   </v-flex>
                 </v-layout>
-                <v-divider class="gameTabDivider"></v-divider>
-                <v-container class="gameTabContent">
-                  <v-layout row wrap v-for="bet in myBets" :key="bet.time">
-                    <v-flex xs3 class="subheading">
-                      {{universalMap(bet.country)}}
-                    </v-flex>
-                    <v-flex xs3 class="subheading">
-                      {{bet.bet+"TRX"}}
-                    </v-flex>
-                    <v-flex xs3 class="subheading">
-                      {{bet.time}}
-                    </v-flex>
-                    <v-flex xs3 class="subheading">
-                      {{convertResultBet(bet.result)}}
-                    </v-flex>
-                  </v-layout>
-                </v-container>
-              </v-container>
-            </v-card>
-          </v-flex>
-          <!-- Latest bets -->
-          <v-flex>
-            <v-card>
-              <v-toolbar color="primary" dark>
-                <v-toolbar-title>Latest Bets</v-toolbar-title>
-                <v-spacer></v-spacer>
-              </v-toolbar>
-              <v-container grid-list-md text-xs-center class="gameTab">
-                <v-layout row wrap class="gameTabHeader">
-                  <v-flex xs3 style="text-align: start" class="title">
-                    <span>Address</span>
+                <v-btn v-if="turnTimer == '00:00'" color="info" @click="battleInProgress">Battle in progress...</v-btn>
+                <v-btn v-else color="success" @click="placeBet">Bet 50 {{currency}}</v-btn>
+              </v-form>
+            </v-card-title>
+            <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
+              <span class="title">{{snackbarText}}</span>
+              <v-btn dark flat @click="snackbar = false">
+                Close
+              </v-btn>
+            </v-snackbar>
+          </v-card>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <!-- My latest bets -->
+        <v-flex>
+          <v-card>
+            <v-toolbar color="primary" dark>
+              <v-toolbar-title>My Latest Bets</v-toolbar-title>
+              <v-spacer></v-spacer>
+            </v-toolbar>
+            <v-container grid-list-md text-xs-centerm class="gameTab">
+              <v-layout row wrap class="gameTabHeader">
+                <v-flex xs3 class="title">
+                  Country
+                </v-flex>
+                <v-flex xs3 class="title">
+                  Bet
+                </v-flex>
+                <v-flex xs3 class="title">
+                  Time
+                </v-flex>
+                <v-flex xs3 class="title">
+                  Result
+                </v-flex>
+              </v-layout>
+              <v-divider class="gameTabDivider"></v-divider>
+              <v-container class="gameTabContent">
+                <v-layout row wrap v-for="bet in myBets" :key="bet.time">
+                  <v-flex xs3 class="subheading">
+                    {{universalMap(bet.country)}}
                   </v-flex>
-                  <v-flex xs3 class="title">
-                    <span>Country</span>
+                  <v-flex xs3 class="subheading">
+                    {{bet.bet+"TRX"}}
                   </v-flex>
-                  <v-flex xs2 class="title">
-                    <span>Bet</span>
+                  <v-flex xs3 class="subheading">
+                    {{formatTime(bet.time)}}
                   </v-flex>
-                  <v-flex xs2 class="title">
-                    <span>Time</span>
-                  </v-flex>
-                  <v-flex xs2 class="title">
-                    Result
-                  </v-flex>
-                </v-layout>
-                <v-divider class="gameTabDivider"></v-divider>
-                <v-container class="gameTabContent">
-                  <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
-                    <v-flex xs3 style="text-align: start" class="subheading">
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                          <span v-on="on" v-text="bet.address.substring(0,8)+'...'" v-bind:alt="bet.address"></span>
-                        </template>
-                        <span>{{bet.address}}</span>
-                      </v-tooltip>
-                    </v-flex>
-                    <v-flex xs3 class="subheading">
-                      <span>{{universalMap(bet.country)}}</span>
-                    </v-flex>
-                    <v-flex xs2 class="subheading">
-                      <span>{{bet.bet+"TRX"}}</span>
-                    </v-flex>
-                    <v-flex xs2 class="subheading">
-                      <span>{{bet.time}}</span>
-                    </v-flex>
-                    <v-flex xs2 class="subheading">
-                      {{convertResultBet(bet.result)}}
-                    </v-flex>
-                  </v-layout>
-                </v-container>
-              </v-container>
-            </v-card>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-tab-item>
-
-
-    <v-tab-item id="tab-2">
-      <v-container grid-list-md text-xs-center>
-        <v-layout row wrap>
-          <!-- Countries -->
-          <v-flex d-flex sm12 md4 shrink>
-            <v-card>
-              <v-toolbar color="primary" dark>
-                <v-toolbar-title>Stats</v-toolbar-title>
-              </v-toolbar>
-              <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
-                <v-layout row wrap class="gameTabHeader">
-                  <v-flex xs8 style="text-align: start;" class="title">
-                    Country
-                  </v-flex>
-                  <v-flex xs4 style="text-align: end;" class="title">
-                    Territories
+                  <v-flex xs3 class="subheading">
+                    {{convertResultBet(bet.result)}}
                   </v-flex>
                 </v-layout>
-
-                <v-divider class="gameTabDivider"></v-divider>
-                <v-container class="gameTabContent">
-                  <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
-                    <v-flex xs2>
-                      <v-avatar size="95%">
-                        <v-lazy-image src-placeholder="/img/flags/placeholder.svg" :src="getFlagString(country[0])" :alt="country[0]" />
-                      </v-avatar>
-                    </v-flex>
-                    <v-flex xs6 style="text-align:start; margin-top:5px;" class="subheading">
-                      {{country[0]}}
-                    </v-flex>
-                    <v-flex xs4 class="title" style="text-align: end">
-                      {{country[1].length}}
-                    </v-flex>
-                  </v-layout>
-                </v-container>
               </v-container>
-            </v-card>
-          </v-flex>
-          <!-- History -->
-          <v-flex d-flex sm12 md8 grow>
-            <v-card>
-              <v-toolbar color="primary" dark>
-                <v-toolbar-title>History</v-toolbar-title>
-                <v-spacer></v-spacer>
-              </v-toolbar>
-              <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
-                <v-layout row wrap class="gameTabHeader">
-                  <v-flex xs1 style="text-align: start;" class="title">
-                    Turn
+            </v-container>
+          </v-card>
+        </v-flex>
+        <!-- Latest bets -->
+        <v-flex>
+          <v-card>
+            <v-toolbar color="primary" dark>
+              <v-toolbar-title>Latest Bets</v-toolbar-title>
+              <v-spacer></v-spacer>
+            </v-toolbar>
+            <v-container grid-list-md text-xs-center class="gameTab">
+              <v-layout row wrap class="gameTabHeader">
+                <v-flex xs3 style="text-align: start" class="title">
+                  <span>Address</span>
+                </v-flex>
+                <v-flex xs3 class="title">
+                  <span>Country</span>
+                </v-flex>
+                <v-flex xs2 class="title">
+                  <span>Bet</span>
+                </v-flex>
+                <v-flex xs2 class="title">
+                  <span>Time</span>
+                </v-flex>
+                <v-flex xs2 class="title">
+                  Result
+                </v-flex>
+              </v-layout>
+              <v-divider class="gameTabDivider"></v-divider>
+              <v-container class="gameTabContent">
+                <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
+                  <v-flex xs3 style="text-align: start" class="subheading">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on }">
+                        <span v-on="on" v-text="bet.address.substring(0,8)+'...'" v-bind:alt="bet.address"></span>
+                      </template>
+                      <span>{{bet.address}}</span>
+                    </v-tooltip>
                   </v-flex>
-                  <v-flex xs7 class="title">
-                    Conquest
+                  <v-flex xs3 class="subheading">
+                    <span>{{universalMap(bet.country)}}</span>
                   </v-flex>
-                  <v-flex xs4 class="title">
-                    Prev. owned by
+                  <v-flex xs2 class="subheading">
+                    <span>{{bet.bet+"TRX"}}</span>
+                  </v-flex>
+                  <v-flex xs2 class="subheading">
+                    <span>{{formatTime(bet.time)}}</span>
+                  </v-flex>
+                  <v-flex xs2 class="subheading">
+                    {{convertResultBet(bet.result)}}
                   </v-flex>
                 </v-layout>
-
-                <v-divider class="gameTabDivider"></v-divider>
-                <v-container class="gameTabContent">
-                  <v-layout row wrap v-for="conquest in history.slice().reverse()" :key="conquest.turn">
-                    <v-flex xs1 style="text-align: start" class="subheading">
-                      {{conquest.turn}}
-                    </v-flex>
-                    <v-flex xs3 class="subheading" style="color:#558b2f;">
-                      {{universalMap(conquest.conquest[0])}}
-                    </v-flex>
-                    <v-flex xs1>
-                      <v-icon>arrow_forward</v-icon>
-                    </v-flex>
-                    <v-flex xs3 class="subheading" style="color:#b71c1c;">
-                      {{universalMap(conquest.conquest[1])}}
-                    </v-flex>
-                    <v-flex xs4 class="subheading">
-                      {{universalMap(conquest.prev)}}
-                    </v-flex>
-                  </v-layout>
-                </v-container>
               </v-container>
-            </v-card>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-tab-item>
-  </v-tabs>
-</v-container>
+            </v-container>
+          </v-card>
+        </v-flex>
+      </v-layout>
+    </v-container>
+  </v-tab-item>
+  <v-tab-item id="tab-2">
+    <v-container grid-list-md text-xs-center>
+      <v-layout row wrap>
+        <!-- Countries -->
+        <v-flex d-flex sm12 md4 shrink>
+          <v-card>
+            <v-toolbar color="primary" dark>
+              <v-toolbar-title>Stats</v-toolbar-title>
+            </v-toolbar>
+            <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
+              <v-layout row wrap class="gameTabHeader">
+                <v-flex xs8 style="text-align: start;" class="title">
+                  Country
+                </v-flex>
+                <v-flex xs4 style="text-align: end;" class="title">
+                  Territories
+                </v-flex>
+              </v-layout>
+              <v-divider class="gameTabDivider"></v-divider>
+              <v-container class="gameTabContent">
+                <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
+                  <v-flex xs2>
+                    <v-avatar size="95%">
+                      <v-lazy-image src-placeholder="/img/flags/placeholder.svg" :src="getFlagString(country[0])" :alt="country[0]" />
+                    </v-avatar>
+                  </v-flex>
+                  <v-flex xs6 style="text-align:start; margin-top:5px;" class="subheading">
+                    {{country[0]}}
+                  </v-flex>
+                  <v-flex xs4 class="title" style="text-align: end">
+                    {{country[1].length}}
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-container>
+          </v-card>
+        </v-flex>
+        <!-- History -->
+        <v-flex d-flex sm12 md8 grow>
+          <v-card>
+            <v-toolbar color="primary" dark>
+              <v-toolbar-title>History</v-toolbar-title>
+              <v-spacer></v-spacer>
+            </v-toolbar>
+            <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
+              <v-layout row wrap class="gameTabHeader">
+                <v-flex xs1 style="text-align: start;" class="title">
+                  Turn
+                </v-flex>
+                <v-flex xs7 class="title">
+                  Conquest
+                </v-flex>
+                <v-flex xs4 class="title">
+                  Prev. owned by
+                </v-flex>
+              </v-layout>
+              <v-divider class="gameTabDivider"></v-divider>
+              <v-container class="gameTabContent">
+                <v-layout row wrap v-for="conquest in history.slice().reverse()" :key="conquest.turn">
+                  <v-flex xs1 style="text-align: start" class="subheading">
+                    {{conquest.turn}}
+                  </v-flex>
+                  <v-flex xs3 class="subheading" style="color:#558b2f;">
+                    {{universalMap(conquest.conquest[0])}}
+                  </v-flex>
+                  <v-flex xs1>
+                    <v-icon>arrow_forward</v-icon>
+                  </v-flex>
+                  <v-flex xs3 class="subheading" style="color:#b71c1c;">
+                    {{universalMap(conquest.conquest[1])}}
+                  </v-flex>
+                  <v-flex xs4 class="subheading">
+                    {{universalMap(conquest.prev)}}
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-container>
+          </v-card>
+        </v-flex>
+      </v-layout>
+    </v-container>
+  </v-tab-item>
+</v-tabs>
 </template>
-
 <script>
 import {
   db
 } from '../plugins/firebase';
 import mapping from '../assets/mapping';
-import Modal from './Modal'
-
 
 String.prototype.replaceAll = function(search, replace) {
   if (replace === undefined) {
@@ -283,7 +266,6 @@ import VLazyImage from "v-lazy-image";
 export default {
   components: {
     VLazyImage,
-    Modal
   },
   data: () => ({
     search: '',
@@ -305,13 +287,12 @@ export default {
     bets: [],
     mapStatus: [],
     mapping: mapping,
-    isModalVisible: false,
-
   }),
+
 
   firebase: {
     history: db.ref('history').orderByChild('turn'),
-    bets: db.ref('bets'),
+    bets: db.ref('bets').orderByChild('time'),
     info: db.ref('data'),
     mapStatus: db.ref('countries')
   },
@@ -320,13 +301,14 @@ export default {
     placeBet() {
       let _this = this;
       if (!window.tronWeb || !window.tronWeb.ready) {
-        this.isModalVisible = true
+        this.$emit('showModal', 'login')
       } else if (this.currentCountry == null) {
         this.snackbarText = "Select a country from map or search it";
         this.snackbarColor = "error";
         this.snackbar = true;
       } else {
-        this.snackbarText = "The blockchain is processing your bet! Wait a sec...";
+
+        this.snackbarText = "We are processing your bet! Wait for the result";
         this.snackbarColor = "info";
         this.snackbar = true;
         let _txId;
@@ -337,7 +319,6 @@ export default {
           }).then(
             txId => _txId = txId)
         });
-
         setTimeout(function() {
           window.tronWeb.trx.getTransaction(_txId).then(tx => {
             if (tx.ret[0].contractRet == "SUCCESS") {
@@ -413,9 +394,16 @@ export default {
         return betResult
       }
     },
-    closeModal() {
-      this.isModalVisible = false;
-    },
+    formatTime: function(time) {
+      let date = new Date(time)
+      let hours = date.getHours()
+      let min = date.getMinutes()
+      let sec = date.getSeconds()
+      hours = hours < 10 ? `0${hours}` : hours;
+      sec = sec < 10 ? `0${sec}` : sec;
+      min = min < 10 ? `0${min}` : min;
+      return hours + ':' + min + ':' + sec
+    }
   },
   props: ['currentCountry'],
   computed: {
@@ -445,7 +433,6 @@ export default {
           return 1;
         return 0;
       }
-
       let arr = this.countryStatus;
       return arr.sort(compare);
     },
@@ -475,7 +462,6 @@ export default {
   }
 }
 </script>
-
 <style scoped>
 .gameTab {
   padding: 0px;
