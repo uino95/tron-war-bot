@@ -440,7 +440,7 @@ export default {
       return this.bets.filter(bet => bet.address === this.account)
     },
     latestBets: function() {
-      return this.bets.slice(-20, this.bets.lenght)
+      return this.bets.slice(-20, this.bets.lenght).reverse()
     },
     calculatePotentialWin: function() {
       if (this.currentCountry == null) return 0;
