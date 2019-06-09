@@ -100,7 +100,7 @@
                   <v-flex xs3 class="subheading">
                     {{formatTime(bet.time)}}
                   </v-flex>
-                  <v-flex xs3 class="subheading">
+                  <v-flex xs3 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
                     {{convertResultBet(bet.result)}}
                   </v-flex>
                 </v-layout>
@@ -153,7 +153,7 @@
                   <v-flex xs2 class="subheading">
                     <span>{{formatTime(bet.time)}}</span>
                   </v-flex>
-                  <v-flex xs2 class="subheading">
+                  <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
                     {{convertResultBet(bet.result)}}
                   </v-flex>
                 </v-layout>
@@ -226,13 +226,13 @@
                   <v-flex xs1 style="text-align: start" class="subheading">
                     {{conquest.turn}}
                   </v-flex>
-                  <v-flex xs3 class="subheading" style="color:#558b2f;">
+                  <v-flex xs3 class="subheading greenText">
                     {{universalMap(conquest.conquest[0])}}
                   </v-flex>
                   <v-flex xs1>
                     <v-icon>arrow_forward</v-icon>
                   </v-flex>
-                  <v-flex xs3 class="subheading" style="color:#b71c1c;">
+                  <v-flex xs3 class="subheading redText">
                     {{universalMap(conquest.conquest[1])}}
                   </v-flex>
                   <v-flex xs4 class="subheading">
@@ -381,7 +381,7 @@ export default {
       sec = sec < 10 ? `0${sec}` : sec;
       min = min < 10 ? `0${min}` : min;
       this.turnTimer = `${min}:${sec}`;
-      if (min === '00' && sec === '00'){
+      if (min === '00' && sec === '00') {
         clearInterval(this.intervalId)
       }
       //this.turnTimer = timer;
@@ -486,5 +486,13 @@ export default {
   max-height: 600px;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.greenText {
+  color: #558b2f;
+}
+
+.redText {
+  color: #b71c1c;
 }
 </style>
