@@ -27,18 +27,18 @@
                       placeholder="Type in or pick from map"></v-autocomplete>
                   </v-flex>
                   <v-flex md4>
-                    <v-text-field v-model="calculatePotentialWin" label="Potential win" outline disabled></v-text-field>
+                    <v-text-field :value="calculatePotentialWin" label="Potential win" outline disabled></v-text-field>
                   </v-flex>
                   <v-flex md4>
-                    <v-text-field v-model="turnTimer" label="Next Turn" outline disabled></v-text-field>
+                    <v-text-field :value="turnTimer" label="Next Turn" outline disabled></v-text-field>
                   </v-flex>
                 </v-layout>
                 <v-layout row wrap>
                   <v-flex md4>
-                    <v-text-field v-model="balance" label="Your Balance" outline disabled></v-text-field>
+                    <v-text-field :value="balance?(balance + ' TRX'):'no account'" label="Your Balance" outline disabled></v-text-field>
                   </v-flex>
                   <v-flex md4>
-                    <v-text-field v-model="info.jackpot" label="Current Jackpot" outline disabled></v-text-field>
+                    <v-text-field :value="info.jackpot?(info.jackpot + ' TRX'):'loading...'" label="Current Jackpot" outline disabled></v-text-field>
                   </v-flex>
                   <v-flex md4>
                     <!--<v-select
@@ -308,7 +308,7 @@ export default {
         this.snackbar = true;
       } else {
 
-        this.snackbarText = "We are processing your bet! Wait for the result";
+        this.snackbarText = "The blockchain is processing your bet. Please wait...";
         this.snackbarColor = "info";
         this.snackbar = true;
         let _txId;
@@ -323,7 +323,7 @@ export default {
           window.tronWeb.trx.getTransaction(_txId).then(tx => {
             if (tx.ret[0].contractRet == "SUCCESS") {
               _this.snackbarColor = "success";
-              _this.snackbarText = `Successfully bet on ${_this.universalMap(_this.currentCountry)}!`;
+              _this.snackbarText = `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
               setTimeout(function() {
                 _this.fetchBalance()
               }, 2000)
@@ -445,8 +445,11 @@ export default {
     calculatePotentialWin: function() {
       if (this.currentCountry == null) return 0;
       let betsOnThatCountry = this.latestBets.filter(bet => bet.country === this.currentCountry).length + 1
-      return (parseFloat(this.info.jackpot) + 50) * 0.7 / betsOnThatCountry;
+      return (parseFloat(this.info.jackpot) + 50) * 0.7 / betsOnThatCountry + ' TRX';
     },
+    appendTRX: function(toWhat) {
+      return toWhat + ' TRX'
+    }
   },
   mounted() {
     window.onmessage = (event) => {
