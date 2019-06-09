@@ -270,7 +270,7 @@ export default {
   data: () => ({
     search: '',
     snackbar: false,
-    turnTimer: "00:00",
+    turnTimer: "00:01",
     snackbarText: "",
     snackbarColor: "",
     info: {},

@@ -7,8 +7,13 @@ import mapping from './assets/mapping.js'
 
 import App from './App.vue'
 import '@fortawesome/fontawesome-free/css/all.css'
+import VueAnalytics from 'vue-analytics'
 
 Vue.config.productionTip = false;
+
+Vue.use(VueAnalytics, {
+  id: 'UA-141721214-1'
+})
 
 Vue.mixin({
     methods: {
