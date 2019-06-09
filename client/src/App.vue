@@ -118,10 +118,10 @@
                     body: 'WIP'
                 },
                 {
-                    icon: 'add',
+                    icon: 'assignment',
                     text: 'Whitepaper',
                     link: true,
-                    body: 'WIP'
+                    body: '/files/WhitePaper.pdf'
                 },
                 {
                     divider: true
