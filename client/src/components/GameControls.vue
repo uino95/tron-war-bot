@@ -117,9 +117,6 @@
                                 <v-toolbar color="primary" dark>
                                     <v-toolbar-title>My Latest Bets</v-toolbar-title>
                                     <v-spacer></v-spacer>
-                                    <v-btn icon>
-                                        <v-icon>sort</v-icon>
-                                    </v-btn>
                                 </v-toolbar>
                                 <v-container grid-list-md text-xs-center>
                                     <v-layout row wrap>
@@ -158,11 +155,8 @@
                         <v-flex>
                             <v-card>
                                 <v-toolbar color="primary" dark>
-                                    <v-toolbar-title>Latest turn bets</v-toolbar-title>
+                                    <v-toolbar-title>Latest Bets</v-toolbar-title>
                                     <v-spacer></v-spacer>
-                                    <v-btn icon>
-                                        <v-icon>sort</v-icon>
-                                    </v-btn>
                                 </v-toolbar>
                                 <v-container grid-list-md text-xs-center>
                                     <v-layout row wrap>
@@ -188,7 +182,7 @@
                                         <v-flex xs4 style="text-align: start" class="subheading">
                                             <v-tooltip bottom>
                                                 <template v-slot:activator="{ on }">
-                                                    <span v-on="on" v-text="bet.address.substring(0,12)+'...'"></span>
+                                                    <span v-on="on" v-text="bet.address.substring(0,8)+'...'" v-bind:alt="bet.address"></span>
                                                 </template>
                                                 <span>{{bet.address}}</span>
                                             </v-tooltip>
@@ -218,52 +212,50 @@
                 <v-container grid-list-md text-xs-center>
                     <v-layout row wrap>
                         <!-- Countries -->
-                        <v-flex xs6>
+                        <v-flex d-flex sm12 md4 shrink>
                             <v-card>
                                 <v-toolbar color="primary" dark>
                                     <v-toolbar-title>Stats</v-toolbar-title>
                                 </v-toolbar>
-                                <v-container grid-list-md text-xs-center class="font-weight-light">
-                                    <v-layout row wrap>
-                                        <v-flex xs6 style="text-align: start;" class="title">
+                                <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
+                                    <v-layout row wrap class="gameTabHeader">
+                                        <v-flex xs8 style="text-align: start;" class="title">
                                             Country
                                         </v-flex>
-                                        <v-flex xs6 style="text-align: end;" class="title">
-                                            Owned Territories
+                                        <v-flex xs4 style="text-align: end;" class="title">
+                                            Territories
                                         </v-flex>
                                     </v-layout>
 
-                                    <v-divider style="margin-bottom: 3%"></v-divider>
-
+                                    <v-divider style="margin-bottom:10px;"></v-divider>
+                                    <v-container class="gameTabContent">
                                     <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
-                                        <v-flex xs1>
-                                            <v-avatar size="90%">
+                                        <v-flex xs2>
+                                            <v-avatar size="95%">
                                                 <v-lazy-image src-placeholder="/img/flags/placeholder.svg"
                                                               :src="getFlagString(country[0])" :alt="country[0]"/>
                                             </v-avatar>
                                         </v-flex>
-                                        <v-flex xs5 style="text-align: start" class="subheading">
+                                        <v-flex xs6 style="text-align:start; margin-top:5px;" class="subheading">
                                             {{country[0]}}
                                         </v-flex>
-                                        <v-flex xs6 class="title" style="text-align: end">
+                                        <v-flex xs4 class="title" style="text-align: end">
                                             {{country[1].length}}
                                         </v-flex>
                                     </v-layout>
+                                  </v-container>
                                 </v-container>
                             </v-card>
                         </v-flex>
                         <!-- History -->
-                        <v-flex xs6>
+                        <v-flex d-flex sm12 md8 grow>
                             <v-card>
                                 <v-toolbar color="primary" dark>
                                     <v-toolbar-title>History</v-toolbar-title>
                                     <v-spacer></v-spacer>
-                                    <v-btn icon>
-                                        <v-icon>sort</v-icon>
-                                    </v-btn>
                                 </v-toolbar>
-                                <v-container grid-list-md text-xs-center class="font-weight-light">
-                                    <v-layout row wrap>
+                                <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
+                                    <v-layout row wrap class="gameTabHeader">
                                         <v-flex xs1 style="text-align: start;" class="title">
                                             Turn
                                         </v-flex>
@@ -275,25 +267,26 @@
                                         </v-flex>
                                     </v-layout>
 
-                                    <v-divider style="margin-bottom: 3%"></v-divider>
-
-                                    <v-layout row wrap v-for="conquest in history" :key="conquest.turn">
+                                    <v-divider style="margin-bottom:10px;"></v-divider>
+                                    <v-container class="gameTabContent">
+                                    <v-layout row wrap v-for="conquest in history.slice().reverse()" :key="conquest.turn">
                                         <v-flex xs1 style="text-align: start" class="subheading">
                                             {{conquest.turn}}
                                         </v-flex>
-                                        <v-flex xs3 class="subheading" style="color: green;">
+                                        <v-flex xs3 class="subheading" style="color:#558b2f;">
                                             {{universalMap(conquest.conquest[0])}}
                                         </v-flex>
                                         <v-flex xs1>
                                             <v-icon>arrow_forward</v-icon>
                                         </v-flex>
-                                        <v-flex xs3 class="subheading" style="color: red;">
+                                        <v-flex xs3 class="subheading" style="color:#b71c1c;">
                                             {{universalMap(conquest.conquest[1])}}
                                         </v-flex>
-                                        <v-flex xs4 class="subheading" style="color: red;">
+                                        <v-flex xs4 class="subheading">
                                             {{universalMap(conquest.prev)}}
                                         </v-flex>
                                     </v-layout>
+                                  </v-container>
                                 </v-container>
                             </v-card>
                         </v-flex>
@@ -301,7 +294,7 @@
                 </v-container>
             </v-tab-item>
         </v-tabs>
-    </v-container>    
+    </v-container>
 </template>
 
 <script>
@@ -512,6 +505,16 @@
     }
 </script>
 
-<style>
-
+<style scoped>
+.gameTab{
+  padding:0px;
+}
+.gameTabHeader{
+  padding: 16px 16px 0 16px;
+}
+.gameTabContent{
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 </style>
