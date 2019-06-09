@@ -347,7 +347,6 @@ export default {
                 _this.fetchBalance()
               }, 2000)
             } else {
-              console.log(tx.ret[0].contractRet)
               _this.snackbarText = tx.ret[0].contractRet;
               _this.snackbarColor = "error";
             }
@@ -357,7 +356,6 @@ export default {
       }
     },
     battleInProgress() {
-      let _this = this;
       this.snackbarText = "Battle in progress! Please wait...";
       this.snackbarColor = "info";
       this.snackbarTimeout = 2000;
