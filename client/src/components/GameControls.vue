@@ -444,12 +444,12 @@ export default {
       return this.bets.filter(bet => bet.address === this.account)
     },
     latestBets: function() {
-      return this.bets.slice(-20, this.bets.lenght)
+      return this.bets.slice(-20, this.bets.lenght).reverse()
     },
     calculatePotentialWin: function() {
       if (this.currentCountry == null) return 0;
       let betsOnThatCountry = this.latestBets.filter(bet => bet.country === this.currentCountry).length + 1
-      return (parseFloat(this.info.jackpot) + 50) * 0.7 / betsOnThatCountry + ' TRX';
+      return ((parseFloat(this.info.jackpot) + 50) * 0.7 / betsOnThatCountry).toFixed(3) + ' TRX';
     },
     appendTRX: function(toWhat) {
       return toWhat + ' TRX'
