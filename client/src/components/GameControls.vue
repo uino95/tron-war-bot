@@ -268,6 +268,8 @@ export default {
     VLazyImage,
   },
   data: () => ({
+    isLoading: false,
+    valid: false,
     search: '',
     snackbar: false,
     turnTimer: "00:01",
