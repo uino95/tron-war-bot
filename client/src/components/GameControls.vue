@@ -59,12 +59,13 @@
                     </v-flex>
                   </v-layout>
 
-                  <v-btn color="success" @click="placeBet">Bet 50 {{currency}}</v-btn>
+                  <v-btn v-if="turnTimer != '00:00'" color="success" @click="placeBet">Bet 50 {{currency}}</v-btn>
+                  <v-btn v-else color="info" @click="battleInProgress">Battle in progress...</v-btn>
 
 
                 </v-form>
               </v-card-title>
-              <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
+              <v-snackbar v-model="snackbar" 57*0.7 :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
                 <span class="title">{{snackbarText}}</span>
                 <v-btn dark flat @click="snackbar = false">
                   Close
@@ -290,7 +291,6 @@ export default {
     info: {},
     snackbarTimeout: 6000,
     potentialWin: 0,
-    betText: "Bet 50 TRX",
     currencies: ["TRX", "WAR"],
     currency: "TRX",
     currencyRule: [v => !!v || 'Select a currency',
@@ -323,7 +323,7 @@ export default {
         this.snackbarColor = "error";
         this.snackbar = true;
       } else {
-        this.snackbarText = "We are processing your bet! Wait for the result";
+        this.snackbarText = "The blockchain is processing your bet! Wait a sec...";
         this.snackbarColor = "info";
         this.snackbar = true;
         let _txId;
@@ -352,6 +352,12 @@ export default {
           })
         }, 10000)
       }
+    },
+    battleInProgress() {
+      let _this = this;
+      this.snackbarText = "Battle in progress! Please wait...";
+      this.snackbarColor = "info";
+      this.snackbar = true;
     },
     async fetchAccount() {
       const account = await window.tronWeb.trx.getAccount();
@@ -448,7 +454,6 @@ export default {
       return this.bets.slice(-20, this.bets.lenght)
     },
     calculatePotentialWin: function() {
-      //TODO replace
       if (this.currentCountry == null) return 0;
       let betsOnThatCountry = this.latestBets.filter(bet => bet.country === this.currentCountry).length + 1
       return (parseFloat(this.info.jackpot) + 50) * 0.7 / betsOnThatCountry;
@@ -457,7 +462,6 @@ export default {
   mounted() {
     window.onmessage = (event) => {
       // Waiting for that message.
-
       if (event.data.message && event.data.message.action === 'setAccount') {
         this.fetchBalance();
         this.fetchAccount();
