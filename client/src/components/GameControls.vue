@@ -82,8 +82,8 @@
                 <v-toolbar-title>My Latest Bets</v-toolbar-title>
                 <v-spacer></v-spacer>
               </v-toolbar>
-              <v-container grid-list-md text-xs-center>
-                <v-layout row wrap>
+              <v-container grid-list-md text-xs-centerm class="gameTab">
+                <v-layout row wrap class="gameTabHeader">
                   <v-flex xs3 class="title">
                     Country
                   </v-flex>
@@ -97,37 +97,39 @@
                     Result
                   </v-flex>
                 </v-layout>
-                <v-divider style="margin-bottom: 3%"></v-divider>
-                <v-layout row wrap v-for="bet in myBets" :key="bet.time">
-                  <v-flex xs3 class="subheading">
-                    {{universalMap(bet.country)}}
-                  </v-flex>
-                  <v-flex xs3 class="subheading">
-                    {{bet.bet+"TRX"}}
-                  </v-flex>
-                  <v-flex xs3 class="subheading">
-                    {{bet.time}}
-                  </v-flex>
-                  <v-flex xs3 class="subheading">
-                    {{convertResultBet(bet.result)}}
-                  </v-flex>
-                </v-layout>
+                <v-divider class="gameTabDivider"></v-divider>
+                <v-container class="gameTabContent">
+                  <v-layout row wrap v-for="bet in myBets" :key="bet.time">
+                    <v-flex xs3 class="subheading">
+                      {{universalMap(bet.country)}}
+                    </v-flex>
+                    <v-flex xs3 class="subheading">
+                      {{bet.bet+"TRX"}}
+                    </v-flex>
+                    <v-flex xs3 class="subheading">
+                      {{bet.time}}
+                    </v-flex>
+                    <v-flex xs3 class="subheading">
+                      {{convertResultBet(bet.result)}}
+                    </v-flex>
+                  </v-layout>
+                </v-container>
               </v-container>
             </v-card>
           </v-flex>
-          <!-- Latest turn bets -->
+          <!-- Latest bets -->
           <v-flex>
             <v-card>
               <v-toolbar color="primary" dark>
                 <v-toolbar-title>Latest Bets</v-toolbar-title>
                 <v-spacer></v-spacer>
               </v-toolbar>
-              <v-container grid-list-md text-xs-center>
-                <v-layout row wrap>
-                  <v-flex xs4 style="text-align: start" class="title">
+              <v-container grid-list-md text-xs-center class="gameTab">
+                <v-layout row wrap class="gameTabHeader">
+                  <v-flex xs3 style="text-align: start" class="title">
                     <span>Address</span>
                   </v-flex>
-                  <v-flex xs2 class="title">
+                  <v-flex xs3 class="title">
                     <span>Country</span>
                   </v-flex>
                   <v-flex xs2 class="title">
@@ -140,30 +142,31 @@
                     Result
                   </v-flex>
                 </v-layout>
-                <v-divider style="margin-bottom: 3%"></v-divider>
-
-                <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
-                  <v-flex xs4 style="text-align: start" class="subheading">
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on" v-text="bet.address.substring(0,8)+'...'" v-bind:alt="bet.address"></span>
-                      </template>
-                      <span>{{bet.address}}</span>
-                    </v-tooltip>
-                  </v-flex>
-                  <v-flex xs2 class="subheading">
-                    <span>{{universalMap(bet.country)}}</span>
-                  </v-flex>
-                  <v-flex xs2 class="subheading">
-                    <span>{{bet.bet+"TRX"}}</span>
-                  </v-flex>
-                  <v-flex xs2 class="subheading">
-                    <span>{{bet.time}}</span>
-                  </v-flex>
-                  <v-flex xs2 class="subheading">
-                    {{convertResultBet(bet.result)}}
-                  </v-flex>
-                </v-layout>
+                <v-divider class="gameTabDivider"></v-divider>
+                <v-container class="gameTabContent">
+                  <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
+                    <v-flex xs3 style="text-align: start" class="subheading">
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <span v-on="on" v-text="bet.address.substring(0,8)+'...'" v-bind:alt="bet.address"></span>
+                        </template>
+                        <span>{{bet.address}}</span>
+                      </v-tooltip>
+                    </v-flex>
+                    <v-flex xs3 class="subheading">
+                      <span>{{universalMap(bet.country)}}</span>
+                    </v-flex>
+                    <v-flex xs2 class="subheading">
+                      <span>{{bet.bet+"TRX"}}</span>
+                    </v-flex>
+                    <v-flex xs2 class="subheading">
+                      <span>{{bet.time}}</span>
+                    </v-flex>
+                    <v-flex xs2 class="subheading">
+                      {{convertResultBet(bet.result)}}
+                    </v-flex>
+                  </v-layout>
+                </v-container>
               </v-container>
             </v-card>
           </v-flex>
@@ -191,7 +194,7 @@
                   </v-flex>
                 </v-layout>
 
-                <v-divider style="margin-bottom:10px;"></v-divider>
+                <v-divider class="gameTabDivider"></v-divider>
                 <v-container class="gameTabContent">
                   <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
                     <v-flex xs2>
@@ -230,7 +233,7 @@
                   </v-flex>
                 </v-layout>
 
-                <v-divider style="margin-bottom:10px;"></v-divider>
+                <v-divider class="gameTabDivider"></v-divider>
                 <v-container class="gameTabContent">
                   <v-layout row wrap v-for="conquest in history.slice().reverse()" :key="conquest.turn">
                     <v-flex xs1 style="text-align: start" class="subheading">
@@ -481,6 +484,10 @@ export default {
 
 .gameTabHeader {
   padding: 16px 16px 0 16px;
+}
+
+.gameTabDivider {
+  margin: 0px 16px 0px 16px;
 }
 
 .gameTabContent {
