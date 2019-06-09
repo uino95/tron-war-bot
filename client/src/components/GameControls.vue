@@ -117,26 +117,26 @@
             </v-toolbar>
             <v-container grid-list-md text-xs-center class="gameTab">
               <v-layout row wrap class="gameTabHeader">
-                <v-flex xs3 style="text-align: start" class="title">
+                <v-flex xs2 class="title">
                   <span>Address</span>
                 </v-flex>
-                <v-flex xs3 class="title">
+                <v-flex xs4 class="title">
                   <span>Country</span>
                 </v-flex>
-                <v-flex xs2 class="title">
+                <v-flex xs2 class="title" style="text-align:start;">
                   <span>Bet</span>
                 </v-flex>
-                <v-flex xs2 class="title">
+                <v-flex xs2 class="title" style="text-align: start;">
                   <span>Time</span>
                 </v-flex>
-                <v-flex xs2 class="title">
+                <v-flex xs2 class="title" style="text-align: start;">
                   Result
                 </v-flex>
               </v-layout>
               <v-divider class="gameTabDivider"></v-divider>
-              <v-container class="gameTabContent">
+              <v-container class="gameTabContent" text-xs-center>
                 <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
-                  <v-flex xs3 style="text-align: start" class="subheading">
+                  <v-flex xs2 class="subheading">
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on }">
                         <span v-on="on" v-text="bet.address.substring(0,8)+'...'" v-bind:alt="bet.address"></span>
@@ -144,7 +144,7 @@
                       <span>{{bet.address}}</span>
                     </v-tooltip>
                   </v-flex>
-                  <v-flex xs3 class="subheading">
+                  <v-flex xs4 class="subheading">
                     <span>{{universalMap(bet.country)}}</span>
                   </v-flex>
                   <v-flex xs2 class="subheading">
@@ -437,7 +437,7 @@ export default {
       return arr.sort(compare);
     },
     myBets: function() {
-      return this.bets.filter(bet => bet.address === this.account)
+      return this.bets.filter(bet => bet.address === this.account).reverse()
     },
     latestBets: function() {
       return this.bets.slice(-20, this.bets.lenght).reverse()
