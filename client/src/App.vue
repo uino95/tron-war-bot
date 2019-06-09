@@ -11,7 +11,17 @@
                         </v-flex>
                     </v-layout>
                     <v-divider v-else-if="item.divider" :key="i" dark class="my-3"></v-divider>
-                    <v-list-tile v-else :key="i" @click="showModal(i)">
+                    <v-list-tile v-else-if="!item.link" :key="i" @click.stop="showModal(i)">
+                        <v-list-tile-action>
+                            <v-icon>{{ item.icon }}</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title class="grey--text">
+                                {{ item.text }}
+                            </v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+                    <v-list-tile v-else :key="i" @click="openLink(item.body)">
                         <v-list-tile-action>
                             <v-icon>{{ item.icon }}</v-icon>
                         </v-list-tile-action>
@@ -43,9 +53,8 @@
                             v-bind:current-country = "selected_country"
                             @showModal="showModal(1)"
                             />
-                        <modal
-                            @close="closeModal"
-                            v-bind:isModalVisible = "isModalVisible"
+                        <Modal
+                                v-model="isModalVisible"
                             v-bind:header-tile = "items[itemClicked].text"
                             v-bind:body-tile ="items[itemClicked].body"
                             />
@@ -87,6 +96,7 @@
                 {
                     icon: 'fa-paper-plane',
                     text: 'Login With Tronlink',
+                    link: false,
                     body: 'WIP'
                 },
                 {
@@ -98,17 +108,20 @@
                 {
                     icon: 'fa-gamepad',
                     text: 'How To Play',
+                    link: false,
                     body: 'WIP'
                 },
                 {
                     icon: 'help',
                     text: 'FAQ',
+                    link: false,
                     body: 'WIP'
                 },
                 {
-                    icon: 'add',
+                    icon: 'assignment',
                     text: 'Whitepaper',
-                    body: 'WIP'
+                    link: true,
+                    body: '/files/WhitePaper.pdf'
                 },
                 {
                     divider: true
@@ -119,11 +132,13 @@
                 {
                     icon: 'fab fa-facebook-square',
                     text: 'Facebook Page',
+                    link: true,
                     body: "https://www.facebook.com/TronWarBot/"
                 },
                 {
                     icon: 'fab fa-telegram',
                     text: 'Telegram',
+                    link: true,
                     body: "https://t.me/joinchat/J8ocIxZoXsD4stn4nxg24A"
                 }
             ]
@@ -143,6 +158,9 @@
 
                 this.selected_country = country;
             },
+            openLink(link) {
+                window.open(link, "_blank")
+            }
         },
         mounted(){
         }
