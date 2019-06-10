@@ -460,7 +460,7 @@ export default {
     calculatePotentialWin: function() {
       if (this.currentCountry == null) return 0;
       let betsOnThatCountry = this.countryStatus.filter(bet => bet.country === this.currentCountry).length + 1
-      return ((parseFloat(this.info.jackpot) + 50) * 0.7 / betsOnThatCountry).toFixed(3) + ' TRX';
+      return ((parseFloat(this.info.jackpot) + this.minimumBet) * 0.7 / betsOnThatCountry).toFixed(3) + ' TRX';
     },
     appendTRX: function(toWhat) {
       return toWhat + ' TRX'
