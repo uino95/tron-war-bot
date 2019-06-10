@@ -98,7 +98,7 @@
                     {{bet.bet+"TRX"}}
                   </v-flex>
                   <v-flex xs3 class="subheading">
-                    {{formatTime(bet.time)}}
+                    {{bet.turn}}
                   </v-flex>
                   <v-flex xs3 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
                     {{convertResultBet(bet.result)}}
@@ -151,7 +151,7 @@
                     <span>{{bet.bet+"TRX"}}</span>
                   </v-flex>
                   <v-flex xs2 class="subheading">
-                    <span>{{formatTime(bet.time)}}</span>
+                    <span>{{bet.turn}}</span>
                   </v-flex>
                   <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
                     {{convertResultBet(bet.result)}}
