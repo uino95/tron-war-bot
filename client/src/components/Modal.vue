@@ -24,7 +24,7 @@
 
       <v-card-text v-if="headerTile === 'How To Play'">
         The game is based on WorldWarBot 2020
-        (<a href="https://www.facebook.com/worldwarbot/">https://www.facebook.com/worldwarbot/</a>).<br />
+        (<a href="https://www.facebook.com/worldwarbot/" target="_blank">https://www.facebook.com/worldwarbot/</a>).<br />
         The bot simulates a world war: every turn ,one per hour, a country (randomly chosen) conquers another country. The conquest probability is proportional to the number of conquered countries (see Stats panel for current status).
         <br /><br>
         In the game each gamer can bet that a country will conquer another country during the next turn. The bet prize is 50TRX.
