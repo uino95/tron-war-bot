@@ -314,7 +314,7 @@ export default {
         this.snackbarColor = "info";
         this.snackbar = true;
         let _txId;
-        let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
+        let contract_address = "TQXiV4TeKS4zF54PiCsUyKTQ22yYY6KuzL";
         window.tronWeb.contract().at(contract_address).then(contract => {
           contract.bet(0, _this.currentCountry).send({
             callValue: window.tronWeb.toSun(this.info.minBet)
