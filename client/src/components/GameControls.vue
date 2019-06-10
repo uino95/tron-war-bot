@@ -53,7 +53,7 @@
                   </v-flex>
                 </v-layout>
                 <v-btn v-if="turnTimer == '00:00'" color="info" @click="battleInProgress">Battle in progress...</v-btn>
-                <v-btn v-else color="success" @click="placeBet">Bet 50 {{currency}}</v-btn>
+                <v-btn v-else color="success" @click="placeBet">Bet {{minimumBet}} {{currency}}</v-btn>
               </v-form>
             </v-card-title>
             <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
@@ -268,6 +268,8 @@ export default {
     VLazyImage,
   },
   data: () => ({
+    isLoading: false,
+    valid: false,
     search: '',
     snackbar: false,
     turnTimer: "00:01",
@@ -287,7 +289,8 @@ export default {
     bets: [],
     mapStatus: [],
     mapping: mapping,
-    intervalId: null
+    intervalId: null,
+    minimumBet: 0
   }),
 
 
@@ -316,7 +319,7 @@ export default {
         let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
         window.tronWeb.contract().at(contract_address).then(contract => {
           contract.bet(0, _this.currentCountry).send({
-            callValue: window.tronWeb.toSun(1)
+            callValue: window.tronWeb.toSun(this.minimumBet)
           }).then(
             txId => _txId = txId)
         });
@@ -407,6 +410,16 @@ export default {
       sec = sec < 10 ? `0${sec}` : sec;
       min = min < 10 ? `0${min}` : min;
       return hours + ':' + min + ':' + sec
+    },
+    fetchGameParam: function(gameType){
+        let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
+        window.tronWeb.contract().at(contract_address).then(contract => {
+          contract.gameParams(gameType).call().then(
+            gameParams => {
+                let amount = window.tronWeb.fromSun(gameParams.minimumBet.toString())
+                this.minimumBet = parseInt(amount,10)
+            })
+        });
     }
   },
   props: ['currentCountry'],
@@ -448,10 +461,9 @@ export default {
     },
     calculatePotentialWin: function() {
       if (this.currentCountry == null) return 0;
-
-      let betsOnThatCountry = this.latestBets.filter(bet => bet.country == this.currentCountry).length + 1
+      let betsOnThatCountry = this.countryStatus.filter(bet => bet.country === this.currentCountry).length + 1
       console.log('>>>>>>>>>>>> ' + betsOnThatCountry)
-      return ((parseFloat(this.info.jackpot) + 50) * 0.8 / betsOnThatCountry).toFixed(3) + ' TRX';
+      return ((parseFloat(this.info.jackpot) + this.minimumBet) * 0.8 / betsOnThatCountry).toFixed(3) + ' TRX';
     }
   },
   mounted() {
@@ -462,6 +474,7 @@ export default {
         this.fetchAccount();
       }
     };
+    this.fetchGameParam(0)
     this.fetchBalance();
     this.fetchAccount();
     this.startTimer();
