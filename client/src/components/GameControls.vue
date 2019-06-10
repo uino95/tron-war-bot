@@ -53,7 +53,7 @@
                   </v-flex>
                 </v-layout>
                 <v-btn v-if="turnTimer == '00:00'" color="info" @click="battleInProgress">Battle in progress...</v-btn>
-                <v-btn v-else color="success" @click="placeBet">Bet {{minimumBet}} {{currency}}</v-btn>
+                <v-btn v-else color="success" @click="placeBet">Bet {{info.minBet}} {{currency}}</v-btn>
               </v-form>
             </v-card-title>
             <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
@@ -82,7 +82,7 @@
                   Bet
                 </v-flex>
                 <v-flex xs3 class="title">
-                  Time
+                  Turn
                 </v-flex>
                 <v-flex xs3 class="title">
                   Result
@@ -98,7 +98,7 @@
                     {{bet.bet+"TRX"}}
                   </v-flex>
                   <v-flex xs3 class="subheading">
-                    {{formatTime(bet.time)}}
+                    {{bet.turn}}
                   </v-flex>
                   <v-flex xs3 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
                     {{convertResultBet(bet.result)}}
@@ -127,7 +127,7 @@
                   <span>Bet</span>
                 </v-flex>
                 <v-flex xs2 class="title" style="text-align: start;">
-                  <span>Time</span>
+                  <span>Turn</span>
                 </v-flex>
                 <v-flex xs2 class="title" style="text-align: start;">
                   Result
@@ -151,7 +151,7 @@
                     <span>{{bet.bet+"TRX"}}</span>
                   </v-flex>
                   <v-flex xs2 class="subheading">
-                    <span>{{formatTime(bet.time)}}</span>
+                    <span>{{bet.turn}}</span>
                   </v-flex>
                   <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
                     {{convertResultBet(bet.result)}}
@@ -289,8 +289,7 @@ export default {
     bets: [],
     mapStatus: [],
     mapping: mapping,
-    intervalId: null,
-    minimumBet: 0
+    intervalId: null
   }),
 
 
@@ -311,7 +310,6 @@ export default {
         this.snackbarColor = "error";
         this.snackbar = true;
       } else {
-
         this.snackbarText = "The blockchain is processing your bet. Please wait...";
         this.snackbarColor = "info";
         this.snackbar = true;
@@ -319,7 +317,7 @@ export default {
         let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
         window.tronWeb.contract().at(contract_address).then(contract => {
           contract.bet(0, _this.currentCountry).send({
-            callValue: window.tronWeb.toSun(this.minimumBet)
+            callValue: window.tronWeb.toSun(this.info.minBet)
           }).then(
             txId => _txId = txId)
         });
@@ -360,7 +358,6 @@ export default {
       const balanceInSun = await window.tronWeb.trx.getBalance(); //number
       const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
       // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
-
       this.balance = balanceInTRX
     },
     getFlagString(str) {
@@ -376,18 +373,17 @@ export default {
     },
     setTimer: function() {
       let offset = new Date().getTimezoneOffset() * 60 * 1000;
-      let nextTurn = this.info.nextTurn - offset;
+      let nextTurn = this.info.nextTurnTime - offset;
       let now = new Date().getTime();
       let timer = new Date(nextTurn - now);
       let min = timer.getMinutes();
       let sec = timer.getSeconds();
       sec = sec < 10 ? `0${sec}` : sec;
       min = min < 10 ? `0${min}` : min;
-      this.turnTimer = `${min}:${sec}`;
+      this.turnTimer = '#' + this.info.nextTurn + ` in ${min}:${sec}`;
       if (min === '00' && sec === '00') {
         clearInterval(this.intervalId)
       }
-      //this.turnTimer = timer;
     },
     startTimer: function() {
       this.intervalId = setInterval(() => {
@@ -410,16 +406,6 @@ export default {
       sec = sec < 10 ? `0${sec}` : sec;
       min = min < 10 ? `0${min}` : min;
       return hours + ':' + min + ':' + sec
-    },
-    fetchGameParam: function(gameType){
-        let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
-        window.tronWeb.contract().at(contract_address).then(contract => {
-          contract.gameParams(gameType).call().then(
-            gameParams => {
-                let amount = window.tronWeb.fromSun(gameParams.minimumBet.toString())
-                this.minimumBet = parseInt(amount,10)
-            })
-        });
     }
   },
   props: ['currentCountry'],
@@ -461,9 +447,12 @@ export default {
     },
     calculatePotentialWin: function() {
       if (this.currentCountry == null) return 0;
-      let betsOnThatCountry = this.countryStatus.filter(bet => bet.country === this.currentCountry).length + 1
-      console.log('>>>>>>>>>>>> ' + betsOnThatCountry)
-      return ((parseFloat(this.info.jackpot) + this.minimumBet) * 0.8 / betsOnThatCountry).toFixed(3) + ' TRX';
+      let nextTurn = this.info.nextTurn;
+      let country = this.currentCountry;
+      let betsOnThatCountry = this.latestBets.filter(function(bet) {
+        return bet.turn == nextTurn && bet.country == country;
+      }).length + 1
+      return ((parseFloat(this.info.jackpot) + this.info.minBet) * (1 - this.info.houseEdge - 0.1) / betsOnThatCountry).toFixed(3) + ' TRX';
     }
   },
   mounted() {
@@ -474,7 +463,7 @@ export default {
         this.fetchAccount();
       }
     };
-    this.fetchGameParam(0)
+    // this.fetchGameParam(0)
     this.fetchBalance();
     this.fetchAccount();
     this.startTimer();
