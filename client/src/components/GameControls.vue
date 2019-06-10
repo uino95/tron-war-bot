@@ -186,8 +186,9 @@
               <v-container class="gameTabContent">
                 <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
                   <v-flex xs2>
-                    <v-avatar size="95%">
-                      <v-lazy-image src-placeholder="/img/flags/placeholder.svg" :src="getFlagString(country[0])" :alt="country[0]" />
+                    <v-avatar size="90%">
+                      <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                                    :src="getFlagString(country[0])" :alt="country[0]"/>
                     </v-avatar>
                   </v-flex>
                   <v-flex xs6 style="text-align:start; margin-top:5px;" class="subheading">
@@ -271,6 +272,7 @@ export default {
     isLoading: false,
     valid: false,
     search: '',
+    placeholderFlag: "/img/flags/placeholder.svg",
     snackbar: false,
     turnTimer: "00:01",
     snackbarText: "",
@@ -288,7 +290,6 @@ export default {
     history: [],
     bets: [],
     mapStatus: [],
-    mapping: mapping,
     intervalId: null
   }),
 
@@ -438,6 +439,12 @@ export default {
       }
       let arr = this.countryStatus;
       return arr.sort(compare);
+    },
+    mapping: function () {
+      let arr = mapping;
+      return arr.sort((a, b) => {
+        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+      });
     },
     myBets: function() {
       return this.bets.filter(bet => bet.address === this.account).reverse()
