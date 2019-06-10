@@ -290,6 +290,7 @@ export default {
     history: [],
     bets: [],
     mapStatus: [],
+    mapping: mapping,
     intervalId: null
   }),
 
@@ -439,12 +440,6 @@ export default {
       }
       let arr = this.countryStatus;
       return arr.sort(compare);
-    },
-    mapping: function () {
-      let arr = mapping;
-      return arr.sort((a, b) => {
-        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-      });
     },
     myBets: function() {
       return this.bets.filter(bet => bet.address === this.account).reverse()
