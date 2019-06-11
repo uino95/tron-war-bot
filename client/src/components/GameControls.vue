@@ -38,7 +38,7 @@
                     <v-text-field :value="balance?(balance + ' TRX'):'no account'" label="Your Balance" outline disabled></v-text-field>
                   </v-flex>
                   <v-flex md4>
-                    <v-text-field :value="info.jackpot?(info.jackpot + ' TRX'):'loading...'" label="Current Jackpot" outline disabled></v-text-field>
+                    <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'" label="Current Jackpot" outline disabled></v-text-field>
                   </v-flex>
                   <v-flex md4>
                     <!--<v-select
@@ -52,8 +52,9 @@
                     <v-text-field v-model="currency" label="Currency" outline disabled></v-text-field>
                   </v-flex>
                 </v-layout>
-                <v-btn v-if="turnTimer == '00:00'" color="info" @click="battleInProgress">Battle in progress...</v-btn>
-                <v-btn v-else color="success" @click="placeBet">Bet {{info.minBet}} {{currency}}</v-btn>
+                <b>Who is going to conquer next?</b><br>
+                <v-btn v-if="turnTimer.substr(-5) == '00:00'" color="info" @click="battleInProgress">Battle in progress...</v-btn>
+                <v-btn v-else color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry?'on ' + universalMap(currentCountry):''}}</v-btn>
               </v-form>
             </v-card-title>
             <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
@@ -139,7 +140,7 @@
                   <v-flex xs2 class="subheading">
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on }">
-                        <span v-on="on" v-text="bet.address.substring(0,8)+'...'" v-bind:alt="bet.address"></span>
+                        <span v-on="on" v-text="bet.address.substring(0,5)+'..'" v-bind:alt="bet.address"></span>
                       </template>
                       <span>{{bet.address}}</span>
                     </v-tooltip>
@@ -187,8 +188,7 @@
                 <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
                   <v-flex xs2>
                     <v-avatar size="90%">
-                      <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                                    :src="getFlagString(country[0])" :alt="country[0]"/>
+                      <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag" :src="getFlagString(country[0])" :alt="country[0]" />
                     </v-avatar>
                   </v-flex>
                   <v-flex xs6 style="text-align:start; margin-top:5px;" class="subheading">
@@ -374,17 +374,19 @@ export default {
         .replaceAll("í", "i") + ".svg";
     },
     setTimer: function() {
-      let offset = new Date().getTimezoneOffset() * 60 * 1000;
-      let nextTurn = this.info.nextTurnTime - offset;
+      let nextTurn = this.info.nextTurnTime;
       let now = new Date().getTime();
-      let timer = new Date(nextTurn - now);
-      let min = timer.getMinutes();
-      let sec = timer.getSeconds();
-      sec = sec < 10 ? `0${sec}` : sec;
-      min = min < 10 ? `0${min}` : min;
-      this.turnTimer = '#' + this.info.nextTurn + ` in ${min}:${sec}`;
-      if (min === '00' && sec === '00') {
-        clearInterval(this.intervalId)
+      let minsUntilNextTurn = nextTurn - now + 3600000;
+      let timer = new Date(minsUntilNextTurn);
+      let nextTurnNumber = this.info.nextTurn || ' loading...';
+      if (minsUntilNextTurn <= 0) {
+        this.turnTimer = '#' + nextTurnNumber + ` in 00:00`;
+      } else {
+        let min = timer.getMinutes();
+        let sec = timer.getSeconds();
+        sec = sec < 10 ? `0${sec}` : sec;
+        min = min < 10 ? `0${min}` : min;
+        this.turnTimer = '#' + nextTurnNumber + ` in ${min}:${sec}`;
       }
     },
     startTimer: function() {
