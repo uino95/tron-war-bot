@@ -54,7 +54,7 @@
                 </v-layout>
                 <b>Who is going to conquer next?</b><br>
                 <v-btn v-if="turnTimer.substr(-5) == '00:00'" color="info" @click="battleInProgress">Battle in progress...</v-btn>
-                <v-btn v-else color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry?'on ' + universalMap(currentCountry):''}}</v-btn>
+                <v-btn v-else color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
               </v-form>
             </v-card-title>
             <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
