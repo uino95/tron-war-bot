@@ -132,6 +132,12 @@ export default {
         text: 'Telegram',
         link: true,
         body: "https://t.me/joinchat/J8ocIxZoXsD4stn4nxg24A"
+      },
+      {
+        icon: 'fab fa-twitter',
+        text: 'Twitter',
+        link: true,
+        body: "https://twitter.com/tronwarbot"
       }
     ]
   }),
