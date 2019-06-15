@@ -1,3 +1,31 @@
+<style scoped>
+.gameTab {
+  padding: 0px;
+}
+
+.gameTabHeader {
+  padding: 16px 16px 0 16px;
+}
+
+.gameTabDivider {
+  margin: 0px 16px 0px 16px;
+}
+
+.gameTabContent {
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.greenText {
+  color: #558b2f;
+}
+
+.redText {
+  color: #b71c1c;
+}
+</style>
+
 <template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
 <v-tabs centered color="secondary" dark icons-and-text>
   <v-tabs-slider color="secondary"></v-tabs-slider>
@@ -52,9 +80,12 @@
                     <v-text-field v-model="currency" label="Currency" outline disabled></v-text-field>
                   </v-flex>
                 </v-layout>
-                <b>Who is going to conquer next?</b><br>
-                <v-btn v-if="turnTimer.substr(-5) == '00:00'" color="info" @click="battleInProgress">Battle in progress...</v-btn>
-                <v-btn v-else color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+                <b>Who is going to conquer next?</b>
+                <br>
+                <v-btn v-if="info.serverStatus == 200" color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+                <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...</v-btn>
+                <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...</v-btn>
+                <v-btn v-else color="warning">Loading...</v-btn>
               </v-form>
             </v-card-title>
             <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
@@ -249,10 +280,12 @@
   </v-tab-item>
 </v-tabs>
 </template>
+
 <script>
 import {
   db
-} from '../plugins/firebase';
+}
+from '../plugins/firebase';
 import mapping from '../assets/mapping';
 
 String.prototype.replaceAll = function(search, replace) {
@@ -342,6 +375,12 @@ export default {
     },
     battleInProgress() {
       this.snackbarText = "Battle in progress! Please wait...";
+      this.snackbarColor = "info";
+      this.snackbarTimeout = 2000;
+      this.snackbar = true;
+    },
+    payoutInProgress() {
+      this.snackbarText = "Payout in progress. Please wait a few more seconds...";
       this.snackbarColor = "info";
       this.snackbarTimeout = 2000;
       this.snackbar = true;
@@ -447,7 +486,7 @@ export default {
       return this.bets.filter(bet => bet.address === this.account).reverse()
     },
     latestBets: function() {
-      return this.bets.slice(-20, this.bets.lenght).reverse()
+      return this.bets.slice(-30, this.bets.lenght).reverse()
     },
     calculatePotentialWin: function() {
       if (this.currentCountry == null) return 0;
@@ -474,30 +513,3 @@ export default {
   }
 }
 </script>
-<style scoped>
-.gameTab {
-  padding: 0px;
-}
-
-.gameTabHeader {
-  padding: 16px 16px 0 16px;
-}
-
-.gameTabDivider {
-  margin: 0px 16px 0px 16px;
-}
-
-.gameTabContent {
-  max-height: 600px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.greenText {
-  color: #558b2f;
-}
-
-.redText {
-  color: #b71c1c;
-}
-</style>
