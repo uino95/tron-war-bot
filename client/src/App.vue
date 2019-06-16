@@ -92,6 +92,12 @@ export default {
         body: 'WIP'
       },
       {
+        icon: 'people',
+        text: 'Referral',
+        link: false,
+        body: 'WIP'
+      },
+      {
         divider: true
       },
       {

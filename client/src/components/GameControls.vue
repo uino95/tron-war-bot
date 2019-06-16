@@ -155,7 +155,7 @@
                 <v-flex xs4 class="title">
                   <span>Country</span>
                 </v-flex>
-                <v-flex xs2 class="title" style="text-align:start;">
+                  <v-flex xs2 class="title" style="text-align: start;">
                   <span>Bet</span>
                 </v-flex>
                 <v-flex xs2 class="title" style="text-align: start;">
