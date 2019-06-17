@@ -158,7 +158,7 @@
                         Copy
                         <v-icon right dark>filter_none</v-icon>
                     </v-btn>-->
-                    <a v-if="isLoggedIn" :href="'https://tronwarbot.com/?ref='+this.account">Link!</a>
+                    <a v-if="this.account != null" :href="'https://tronwarbot.com/ref='+this.account">Link!</a>
                     <span v-else>Please login first</span>
                     <input type="hidden" id="copy" value="ciao"><br>
                     You'll eran 1% out of each of his bets <b>forever</b>!<br>
@@ -185,9 +185,9 @@
                         </v-layout>
                         <v-divider></v-divider>
                         <v-container style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
-                            <v-layout row wrap v-for="referral in referrals" :key="referral.address">
+                            <v-layout row wrap v-for="referral in myReferrals" :key="referral.user_addr">
                                 <v-flex xs6 class="subheading">
-                                    {{referral.address}}
+                                    {{referral.user_addr}}
                                 </v-flex>
                                 <v-flex xs6 class="subheading" style="text-align: end">
                                     {{referral.amount}}
@@ -210,6 +210,7 @@
 </template>
 
 <script>
+    import {db} from '../plugins/firebase';
     export default {
         name: 'Modal',
         props: {
@@ -253,49 +254,36 @@
                 set(value) {
                     this.$emit('input', value)
                 }
+            },
+            myReferrals: function(){
+                let keys = Object.keys(this.referrals)
+                let myReferrals = []
+                for (var i = keys.length - 1; i >= 0; i--) {
+                    if(this.account != null && this.referrals[keys[i]].referrer_addr === this.account){
+                    myReferrals.push(
+                        {
+                            user_addr: keys[i],
+                            amount: this.referrals[keys[i]].amount
+                        }
+                    )}   
+                }
+                return myReferrals
             }
         },
         mounted() {
             this.fetchAccount();
+            window.onmessage = (event) => {
+              // Waiting for that message.
+              if (event.data.message && event.data.message.action === 'setAccount') {
+                this.fetchAccount();
+              }
+            };
+        },
+        firebase:{
+            referrals: db.ref('referral/map')
         },
         data: () => ({
             account: null,
-            referrals: [
-                {
-                    address: "asdhdaj",
-                    amount: 1298
-                },
-                {
-                    address: "asdhdaj",
-                    amount: 1298
-                },
-                {
-                    address: "asdhdaj",
-                    amount: 1298
-                }, {
-                    address: "asdhdaj",
-                    amount: 1298
-                },
-                {
-                    address: "asdhdaj",
-                    amount: 1298
-                },
-                {
-                    address: "asdhdaj",
-                    amount: 1298
-                }, {
-                    address: "asdhdaj",
-                    amount: 1298
-                },
-                {
-                    address: "asdhdaj",
-                    amount: 1298
-                },
-                {
-                    address: "asdhdaj",
-                    amount: 1298
-                },
-            ],
             faq: [{
                 question: "What do I do if I'm not able to place the bet?",
                 answer: "Check if you have got enough Energy and Bandwidth."
