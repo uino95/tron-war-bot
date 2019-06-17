@@ -254,6 +254,7 @@ import {
   db
 } from '../plugins/firebase';
 import mapping from '../assets/mapping';
+import axios from 'axios'
 
 String.prototype.replaceAll = function(search, replace) {
   if (replace === undefined) {
@@ -316,10 +317,10 @@ export default {
         this.snackbarColor = "info";
         this.snackbar = true;
         let _txId;
-        let contract_address = "TQXiV4TeKS4zF54PiCsUyKTQ22yYY6KuzL";
+        let contract_address = "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e";
         window.tronWeb.contract().at(contract_address).then(contract => {
           contract.bet(0, _this.currentCountry).send({
-            callValue: window.tronWeb.toSun(this.info.minBet)
+            callValue: window.tronWeb.toSun(1)
           }).then(
             txId => _txId = txId)
         });
@@ -328,6 +329,9 @@ export default {
             if (tx.ret[0].contractRet == "SUCCESS") {
               _this.snackbarColor = "success";
               _this.snackbarText = `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
+              if (window.location.pathname.startsWith('/ref')){
+                _this.postReferral(_txId)
+              }
               setTimeout(function() {
                 _this.fetchBalance()
               }, 2000)
@@ -339,6 +343,20 @@ export default {
           })
         }, 10000)
       }
+    },
+    async postReferral(txId){
+      try {
+        await axios.post(`http://localhost:3000/referral`, {
+            user_addr: this.account,
+            txId: txId,
+            referrer_addr: window.location.pathname.slice(5)
+          })
+      } catch (e) {
+          this.snackbarText = e.message;
+          this.snackbarColor = "error";
+          this.snackbarTimeout = 2000;
+          this.snackbar = true;
+        }
     },
     battleInProgress() {
       this.snackbarText = "Battle in progress! Please wait...";
