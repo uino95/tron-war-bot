@@ -34,24 +34,33 @@
         }),
 
         firebase: {
-            countries: db.ref('countries').once('value').then((snapshot) => {
+            countries: db.ref('countries').once('value', function(snapshot){
                 let j = _this.colorBlue.length
-                let data = snapshot.val()
+                let data = snapshot.val();
                 if(_this.polygonSeries ){
-                    for (var i = snapshot.val().length - 1; i >= 0; i--) {
-                        data[i]['color'] = _this.colorBlue[j];
-                        data[i]['id'] = _this.universalMap(i, 'charId')
+                    data.map((el,index) => {
+                        el['color'] = _this.colorBlue[j]
+                        el['id'] = _this.universalMap(index, 'charId')
                         j --;
                         if (j < 0) { j=_this.colorBlue.length - 1}
-                    }
-                    for (var k = data.length - 1; k >= 0; k--) {
-
-                        data[k]['color'] = data[data[k]['controlledBy']]['color']
-                        data[k]['controlledBy'] = _this.universalMap(data[k]['controlledBy'])
-                    }
+                    })
+                    // for (var i = data.length - 1; i >= 0; i--) {
+                    //     data[i]['color'] = _this.colorBlue[j];
+                    //     data[i]['id'] = _this.universalMap(i, 'charId')
+                    //     j --;
+                    //     if (j < 0) { j=_this.colorBlue.length - 1}
+                    // }
+                    data.map(el =>{
+                        el['color'] = data[el['controlledBy']]['color'];
+                        el['controlledBy'] =  _this.universalMap(el['controlledBy'])
+                    })
+                    // for (var k = data.length - 1; k >= 0; k--) {
+                    //     data[k]['color'] = data[data[k]['controlledBy']]['color']
+                    //     data[k]['controlledBy'] = _this.universalMap(data[k]['controlledBy'])
+                    // }
                     _this.polygonSeries.data = data
-                    _this.polygonSeries.invalidateData()
-                } 
+                    // _this.polygonSeries.invalidateData()
+                }
             }),
             mapStatus: db.ref('countries').on('child_changed', function(){
                 location.reload()
@@ -164,7 +173,8 @@
         methods: {
             clicked(ev){
                 this.$emit('select', this.universalMap(ev.target.dataItem.dataContext.controlledBy,'numberId'))   
-            }
+            },
+                
         },
 
         beforeDestroy() {
