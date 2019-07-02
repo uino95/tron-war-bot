@@ -1,0 +1,172 @@
+<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
+<v-container grid-list-md text-xs-center>
+  <v-layout row wrap>
+    <!-- Countries -->
+    <v-flex d-flex sm12 md4 shrink>
+      <v-card>
+        <v-toolbar color="primary" dark>
+          <v-toolbar-title>Stats</v-toolbar-title>
+        </v-toolbar>
+        <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
+          <v-layout row wrap class="gameTabHeader">
+            <v-flex xs8 style="text-align: start;" class="title">
+              Country
+            </v-flex>
+            <v-flex xs4 style="text-align: end;" class="title">
+              Territories
+            </v-flex>
+          </v-layout>
+          <v-divider class="gameTabDivider"></v-divider>
+          <v-container class="gameTabContent">
+            <v-layout row wrap v-for="country in sortedArray" :key="country[0]">
+              <v-flex xs2>
+                <v-avatar size="90%">
+                  <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag" :src="getFlagString(country[0])" :alt="country[0]" />
+                </v-avatar>
+              </v-flex>
+              <v-flex xs6 style="text-align:start; margin-top:5px;" class="subheading">
+                {{country[0]}}
+              </v-flex>
+              <v-flex xs4 class="title" style="text-align: end">
+                {{country[1].length}}
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-container>
+      </v-card>
+    </v-flex>
+    <!-- History -->
+    <v-flex d-flex sm12 md8 grow>
+      <v-card>
+        <v-toolbar color="primary" dark>
+          <v-toolbar-title>History</v-toolbar-title>
+          <v-spacer></v-spacer>
+        </v-toolbar>
+        <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
+          <v-layout row wrap class="gameTabHeader">
+            <v-flex xs1 style="text-align: start;" class="title">
+              Turn
+            </v-flex>
+            <v-flex xs7 class="title">
+              Conquest
+            </v-flex>
+            <v-flex xs4 class="title">
+              Prev. owned by
+            </v-flex>
+          </v-layout>
+          <v-divider class="gameTabDivider"></v-divider>
+          <v-container class="gameTabContent">
+            <v-layout row wrap v-for="conquest in history.slice().reverse()" :key="conquest.turn">
+              <v-flex xs1 style="text-align: start" class="subheading">
+                {{conquest.turn}}
+              </v-flex>
+              <v-flex xs3 class="subheading greenText">
+                {{universalMap(conquest.conquest[0])}}
+              </v-flex>
+              <v-flex xs1>
+                <v-icon>arrow_forward</v-icon>
+              </v-flex>
+              <v-flex xs3 class="subheading redText">
+                {{universalMap(conquest.conquest[1])}}
+              </v-flex>
+              <v-flex xs4 class="subheading">
+                {{universalMap(conquest.prev)}}
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-container>
+      </v-card>
+    </v-flex>
+  </v-layout>
+</v-container>
+</template>
+
+<script>
+import {
+  db
+}
+from '../plugins/firebase';
+import mapping from '../assets/mapping';
+import VLazyImage from "v-lazy-image";
+
+export default {
+  components: {
+    VLazyImage,
+  },
+  data: () => ({
+    isLoading: false,
+    valid: false,
+    placeholderFlag: "/img/flags/placeholder.svg",
+    snackbar: false,
+    turnTimer: "00:01",
+    snackbarText: "",
+    snackbarColor: "",
+    info: {},
+    snackbarTimeout: 6000,
+    potentialWin: 0,
+    currencies: ["TRX", "WAR"],
+    currency: "TRX",
+    currencyRule: [v => !!v || 'Select a currency',
+      //v => v < 50 || 'You don\'t have enough money'
+    ],
+    balance: null,
+    account: null,
+    history: [],
+    bets: [],
+    mapStatus: [],
+    mapping: mapping,
+    intervalId: null
+  }),
+
+
+  firebase: {
+    history: db.ref('history').orderByChild('turn'),
+    info: db.ref('data'),
+    mapStatus: db.ref('countries')
+  },
+  methods: {
+    getFlagString(str) {
+      return "/img/flags/" + str.toLowerCase()
+        .replaceAll(" ", "-")
+        .replaceAll("ã", "a")
+        .replaceAll("ì", "i")
+        .replaceAll("è", "e")
+        .replaceAll("ì", "i")
+        .replaceAll("å", "a")
+        .replaceAll("é", "e")
+        .replaceAll("í", "i") + ".svg";
+    }
+  },
+  computed: {
+    countryStatus: function() {
+      let result = [];
+      let arr = [];
+      let tmp = [];
+      for (var i = this.mapStatus.length - 1; i >= 0; i--) {
+        arr.push(this.universalMap(i));
+        for (var j = this.mapStatus.length - 1; j >= 0; j--) {
+          if (this.mapStatus[j]['controlledBy'] === i) {
+            tmp.push(j)
+          }
+        }
+        arr.push(tmp);
+        tmp = [];
+        result.push(arr);
+        arr = []
+      }
+      return result
+    },
+    sortedArray: function() {
+      function compare(a, b) {
+        if (a[1].length > b[1].length)
+          return -1;
+        if (a[1].length < b[1].length)
+          return 1;
+        return 0;
+      }
+      let arr = this.countryStatus;
+      return arr.sort(compare);
+    }
+  }
+}
+</script>
