@@ -26,7 +26,6 @@
             lastSelected: null,
             polygonSeries : null,
             loading : true,
-            countries: [],
             countriesData: null,
             colorsGray : ["#eceff1","#cfd8dc","#b0bec5","#90a4ae","#78909c","#607d8b","#546e7a","#455a64","#37474f","#263238","#fafafa","#f5f5f5","#eeeeee","#e0e0e0","#bdbdbd","#9e9e9e","#757575","#616161","#424242","#212121"],
             colorsGreen : ["#e8f5e9","#c8e6c9","#a5d6a7","#81c784","#66bb6a","#4caf50","#43a047","#388e3c","#2e7d32","#1b5e20","#b9f6ca","#69f0ae","#00e676","#00c853","#e0f2f1","#b2dfdb","#80cbc4","#4db6ac","#26a69a","#009688","#00897b","#00796b","#00695c","#004d40","#a7ffeb","#64ffda","#1de9b6","#00bfa5"],
@@ -35,36 +34,38 @@
             colorBlue : ["#e3f2fd","#bbdefb","#90caf9","#64b5f6","#42a5f5","#2196f3","#1e88e5","#1976d2","#1565c0","#0d47a1","#82b1ff","#448aff","#2979ff","#2962ff]","#e1f5fe","#b3e5fc","#81d4fa","#4fc3f7","#29b6f6","#03a9f4","#039be5","#0288d1","#0277bd","#01579b","#80d8ff","#40c4ff","#00b0ff","#0091ea"]
 
         }),
-
-        firebase: {
-            countries: db.ref('countries').once('value', function(snapshot){
-                let j = _this.colorBlue.length
-                let data = snapshot.val();
-                data.map((el,index) => {
-                    el['color'] = _this.colorBlue[j]
-                    el['id'] = _this.universalMap(index, 'charId')
-                    j --;
-                    if (j < 0) { j=_this.colorBlue.length - 1}
-                })
-                data.map(el =>{
-                    el['color'] = data[el['controlledBy']]['color'];
-                    el['controlledBy'] =  _this.universalMap(el['controlledBy'])
-                })
-                _this.countriesData = data
-                //_this.polygonSeries.invalidateData()
-                _this.loading = false
-                _this.loadChart();   
-            }),
+        firebase:{
             mapStatus: db.ref('countries').on('child_changed', function(){
                 location.reload();
             })
         },
-        beforeMount(){
-            _this = this
+        mounted(){
+            console.log("I'm loading")
+            db.ref('countries').once('value', (snapshot) => {
+                let j = this.colorBlue.length
+                let data = snapshot.val();
+                data.map((el,index) => {
+                    el['color'] = this.colorBlue[j]
+                    el['id'] = this.universalMap(index, 'charId')
+                    j --;
+                    if (j < 0) { j=this.colorBlue.length - 1}
+                })
+                data.map(el =>{
+                    el['color'] = data[el['controlledBy']]['color'];
+                    el['controlledBy'] =  this.universalMap(el['controlledBy'])
+                })
+                this.countriesData = data
+                //this.polygonSeries.invalidateData()
+                this.loading = false
+                this.loadChart();   
+            })
         },
         methods: {
             clicked(ev){
                 this.$emit('select', this.universalMap(ev.target.dataItem.dataContext.controlledBy,'numberId'))   
+            },
+            loaded(){
+                this.$emit('loaded')
             },
             loadChart() {
             /* Create map instance */
@@ -165,6 +166,7 @@
                 homeButton.insertBefore(chart.zoomControl.plusButton);
 
                 this.chart = chart;
+                this.loaded();
             }
                 
         },

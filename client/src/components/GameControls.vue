@@ -10,7 +10,7 @@
     <v-icon>bar_chart</v-icon>
   </v-tab>
   <v-tab-item id="tab-1">
-    <BetNextTab></BetNextTab>
+    <BetNextTab :current-country="currentCountry" :balance="balance" :account="account"></BetNextTab>
   </v-tab-item>
   <v-tab-item id="tab-2">
     <StatsTab></StatsTab>
@@ -26,7 +26,12 @@ export default {
   components: {
     BetNextTab,
     StatsTab
-  }
+  },
+  props: ['currentCountry', 'balance', 'account'],
+  data:() => ({
+
+
+  })
 }
 </script>
 
