@@ -1,7 +1,5 @@
 <template>
-
-    <div  id="chartdiv"></div>
-
+    <div id="chartdiv"/>
 </template>
 
 <script>
@@ -10,10 +8,14 @@
     import am4themes_spiritedaway from "@amcharts/amcharts4/themes/spiritedaway.js";
     import am4geodata_worldLow from "../assets/worldLow.js"
     import {db} from "../plugins/firebase"
+    import Loader from 'vue-spinner/src/PacmanLoader.vue'
 
     am4core.useTheme(am4themes_spiritedaway);
     let _this
     export default {
+        components:{
+            'Loader' : Loader
+        },
         props: {
             projects: Array,
             name: String
@@ -23,8 +25,9 @@
             height: 0,
             lastSelected: null,
             polygonSeries : null,
-            loaded: false,
+            loading : true,
             countries: [],
+            countriesData: null,
             colorsGray : ["#eceff1","#cfd8dc","#b0bec5","#90a4ae","#78909c","#607d8b","#546e7a","#455a64","#37474f","#263238","#fafafa","#f5f5f5","#eeeeee","#e0e0e0","#bdbdbd","#9e9e9e","#757575","#616161","#424242","#212121"],
             colorsGreen : ["#e8f5e9","#c8e6c9","#a5d6a7","#81c784","#66bb6a","#4caf50","#43a047","#388e3c","#2e7d32","#1b5e20","#b9f6ca","#69f0ae","#00e676","#00c853","#e0f2f1","#b2dfdb","#80cbc4","#4db6ac","#26a69a","#009688","#00897b","#00796b","#00695c","#004d40","#a7ffeb","#64ffda","#1de9b6","#00bfa5"],
             colorsYellow : ["#fffde7","#fff9c4","#fff59d","#fff176","#ffee58","#ffeb3b","#fdd835","#fbc02d","#f9a825","#f57f17","#ffff8d","#ffff00","#ffea00","#ffd600","#f9fbe7","#f0f4c3","#e6ee9c","#dce775","#d4e157","#cddc39","#c0ca33","#afb42b","#9e9d24","#827717","#f4ff81","#eeff41","#c6ff00","#aeea00"],
@@ -37,39 +40,33 @@
             countries: db.ref('countries').once('value', function(snapshot){
                 let j = _this.colorBlue.length
                 let data = snapshot.val();
-                if(_this.polygonSeries ){
-                    data.map((el,index) => {
-                        el['color'] = _this.colorBlue[j]
-                        el['id'] = _this.universalMap(index, 'charId')
-                        j --;
-                        if (j < 0) { j=_this.colorBlue.length - 1}
-                    })
-                    // for (var i = data.length - 1; i >= 0; i--) {
-                    //     data[i]['color'] = _this.colorBlue[j];
-                    //     data[i]['id'] = _this.universalMap(i, 'charId')
-                    //     j --;
-                    //     if (j < 0) { j=_this.colorBlue.length - 1}
-                    // }
-                    data.map(el =>{
-                        el['color'] = data[el['controlledBy']]['color'];
-                        el['controlledBy'] =  _this.universalMap(el['controlledBy'])
-                    })
-                    // for (var k = data.length - 1; k >= 0; k--) {
-                    //     data[k]['color'] = data[data[k]['controlledBy']]['color']
-                    //     data[k]['controlledBy'] = _this.universalMap(data[k]['controlledBy'])
-                    // }
-                    _this.polygonSeries.data = data
-                    // _this.polygonSeries.invalidateData()
-                }
+                data.map((el,index) => {
+                    el['color'] = _this.colorBlue[j]
+                    el['id'] = _this.universalMap(index, 'charId')
+                    j --;
+                    if (j < 0) { j=_this.colorBlue.length - 1}
+                })
+                data.map(el =>{
+                    el['color'] = data[el['controlledBy']]['color'];
+                    el['controlledBy'] =  _this.universalMap(el['controlledBy'])
+                })
+                _this.countriesData = data
+                //_this.polygonSeries.invalidateData()
+                _this.loading = false
+                _this.loadChart();   
             }),
             mapStatus: db.ref('countries').on('child_changed', function(){
-                location.reload()
+                location.reload();
             })
         },
         beforeMount(){
             _this = this
         },
-          mounted() {
+        methods: {
+            clicked(ev){
+                this.$emit('select', this.universalMap(ev.target.dataItem.dataContext.controlledBy,'numberId'))   
+            },
+            loadChart() {
             /* Create map instance */
                 var chart = am4core.create("chartdiv", am4maps.MapChart);
 
@@ -88,7 +85,7 @@
                 /* Make map load polygon (like country names) data from GeoJSON */
                 polygonSeries.useGeodata = true;
 
-                //polygonSeries.data = this.countriesRef;
+                polygonSeries.data = this.countriesData
                 this.polygonSeries = polygonSeries
 
                 /* Configure series */
@@ -167,13 +164,8 @@
                 homeButton.parent = chart.zoomControl;
                 homeButton.insertBefore(chart.zoomControl.plusButton);
 
-            this.chart = chart;
-
-        },
-        methods: {
-            clicked(ev){
-                this.$emit('select', this.universalMap(ev.target.dataItem.dataContext.controlledBy,'numberId'))   
-            },
+                this.chart = chart;
+            }
                 
         },
 
@@ -192,4 +184,9 @@
         width: 100%;
         height: 600px;
     }
+    #loader {
+        width: 100%;
+        height: 600px;
+    }
+
 </style>
