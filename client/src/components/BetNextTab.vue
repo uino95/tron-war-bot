@@ -320,7 +320,7 @@ export default {
       return hours + ':' + min + ':' + sec
     }
   },
-  props: ['currentCountry'],
+  props: ['currentCountry', 'balance', 'account'],
   computed: {
     countryStatus: function() {
       let result = [];
@@ -368,13 +368,6 @@ export default {
     }
   },
   mounted() {
-    window.onmessage = (event) => {
-      // Waiting for that message.
-      if (event.data.message && event.data.message.action === 'setAccount') {
-        this.fetchBalance();
-        this.fetchAccount();
-      }
-    };
     // this.fetchGameParam(0)
     this.fetchBalance();
     this.fetchAccount();

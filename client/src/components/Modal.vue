@@ -217,7 +217,8 @@
             value: Boolean,
             headerTile: String,
             footerTile: String,
-            bodyTile: String
+            bodyTile: String,
+            account: String
         },
 
         methods: {
@@ -272,18 +273,11 @@
         },
         mounted() {
             this.fetchAccount();
-            window.onmessage = (event) => {
-              // Waiting for that message.
-              if (event.data.message && event.data.message.action === 'setAccount') {
-                this.fetchAccount();
-              }
-            };
         },
         firebase:{
             referrals: db.ref('referral/map')
         },
         data: () => ({
-            account: null,
             faq: [{
                 question: "What do I do if I'm not able to place the bet?",
                 answer: "Check if you have got enough Energy and Bandwidth."
