@@ -1,4 +1,4 @@
-<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
+<template>
     <v-layout row justify-center>
         <v-dialog v-model="isVisible" max-width="500">
             <v-card>
@@ -9,7 +9,8 @@
                           </v-card-text>-->
 
                 <v-card-text v-if="headerTile === 'Login With Tronlink' && this.isLoggedIn()">
-                    Already logged in with TronLink.<br/><br/>{{footerTile}}
+                    Already logged in with account address: {{this.$store.state.loggedInAccount}}
+                    <br/><br/>{{footerTile}}
                 </v-card-text>
 
                 <v-card-text v-if="headerTile === 'Login With Tronlink' && !this.isLoggedIn()">
@@ -266,7 +267,7 @@
                             user_addr: keys[i],
                             amount: this.referrals[keys[i]].amount
                         }
-                    )}   
+                    )}
                 }
                 return myReferrals
             }

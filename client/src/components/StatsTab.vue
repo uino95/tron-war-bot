@@ -1,11 +1,11 @@
-<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
-<v-container grid-list-md text-xs-center>
+<template>
+<v-container grid-list-md text-xs-center class="outerTabContainer">
   <v-layout row wrap>
     <!-- Countries -->
     <v-flex d-flex sm12 md4 shrink>
       <v-card>
         <v-toolbar color="primary" dark>
-          <v-toolbar-title>Stats</v-toolbar-title>
+          <v-toolbar-title>Current Run Stats</v-toolbar-title>
         </v-toolbar>
         <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
           <v-layout row wrap class="gameTabHeader">
@@ -89,6 +89,13 @@ from '../plugins/firebase';
 import mapping from '../assets/mapping';
 import VLazyImage from "v-lazy-image";
 
+String.prototype.replaceAll = function(search, replace) {
+  if (replace === undefined) {
+    return this.toString();
+  }
+  return this.split(search).join(replace);
+};
+
 export default {
   components: {
     VLazyImage,
@@ -117,8 +124,6 @@ export default {
     mapping: mapping,
     intervalId: null
   }),
-
-
   firebase: {
     history: db.ref('history').orderByChild('turn'),
     info: db.ref('data'),

@@ -17,7 +17,12 @@
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title class="grey--text">
-              {{ item.text }}
+              <span v-if="item.login && $store.state.loggedInAccount!=null">
+                {{($store.state.loggedInAccount).substring(0,10)}}...
+              </span>
+              <span v-else>
+                {{ item.text }}
+              </span>
             </v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
@@ -59,7 +64,6 @@
 <script>
 /////////////////////// import component //////////////////////////
 export default {
-
   name: 'App',
   data: () => ({
     drawer: null,
@@ -74,7 +78,7 @@ export default {
         icon: 'fa-paper-plane',
         text: 'Login With Tronlink',
         link: false,
-        body: 'WIP'
+        login: true
       },
       {
         icon: 'people',
@@ -157,18 +161,18 @@ export default {
     async fetchAccount() {
       const account = await window.tronWeb.trx.getAccount();
       const accountAddress = account.address; // HexString(Ascii)
-      const accountAddressInBase58 = window.tronWeb.address.fromHex(
-        accountAddress
-      ); // Base58
-
-      this.account = accountAddressInBase58
-
+      const accountAddressInBase58 = window.tronWeb.address.fromHex(accountAddress); // Base58
+      this.$store.commit('setLoggedInAccount', {
+        accountAddress: accountAddressInBase58
+      })
     },
     async fetchBalance() {
       const balanceInSun = await window.tronWeb.trx.getBalance(); //number
       const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
       // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
-      this.balance = balanceInTRX
+      this.$store.commit('setAccountBalance', {
+        accountBalance: balanceInTRX
+      })
     }
   },
   mounted() {

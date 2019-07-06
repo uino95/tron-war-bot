@@ -4,6 +4,7 @@ import './plugins/vuetify'
 import './plugins/firebase'
 import './plugins/vueAsync'
 import router from './router'
+import store from './store'
 import mapping from './assets/mapping.js'
 
 import App from './App.vue'
@@ -40,6 +41,7 @@ Vue.mixin({
 
 new Vue({
     router,
+    store,
     render: h => h(App),
     iconfont: 'fab'
 }).$mount('#app');

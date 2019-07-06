@@ -1,32 +1,26 @@
 <template>
-<!-- <v-tabs centered color="secondary" dark icons-and-text>
-  <v-tabs-slider color="secondary"></v-tabs-slider>
-  <v-tab href="#tab-1">
-    Bet Panel
-    <v-icon>attach_money</v-icon>
-  </v-tab>
-  <v-tab href="#tab-2">
-    Current Run Stats
-    <v-icon>bar_chart</v-icon>
-  </v-tab> -->
 <v-card flat>
-  <v-toolbar color="secondary" dark extended flat>
+  <v-toolbar color="secondary" dark flat>
+    <v-spacer></v-spacer>
     <v-toolbar-items>
       <v-btn flat replace to="/betnext">
-        <v-icon>attach_money</v-icon>
-        Bet Next
+        <v-icon>attach_money</v-icon> Bet Next
       </v-btn>
-      <v-btn flat replace to="/stats">Stats</v-btn>
-      <v-btn flat replace to="/betnext">Link Three</v-btn>
+      <v-btn flat replace to="/betfinal">
+        <v-icon>public</v-icon> Bet Final
+      </v-btn>
+      <v-btn flat replace to="/stats">
+        <v-icon>poll</v-icon> Stats
+      </v-btn>
     </v-toolbar-items>
+    <v-spacer></v-spacer>
   </v-toolbar>
   <v-card class="card--flex-toolbar">
     <transition name="fade" mode="out-in">
       <router-view></router-view>
     </transition>
   </v-card>
-
-  </v-card flat>
+</v-card>
 </template>
 
 <script>
@@ -36,6 +30,10 @@ export default {
 </script>
 
 <style>
+.outerTabContainer{
+  max-width:1200px;
+}
+
 .gameTab {
   padding: 0px;
 }
@@ -60,9 +58,5 @@ export default {
 
 .redText {
   color: #b71c1c;
-}
-
-.card--flex-toolbar {
-  margin-top: -32px;
 }
 </style>

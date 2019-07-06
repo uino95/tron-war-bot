@@ -9,13 +9,18 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'betnext',
+      name: 'home',
       component: BetNextTab
     },
     {
       path: '/betnext',
       name: 'betnext',
       component: BetNextTab
+    },
+    {
+      path: '/betfinal',
+      name: 'betfinal',
+      component: () => import('./components/BetFinalTab.vue')
     },
     {
       path: '/stats',
