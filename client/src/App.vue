@@ -2,7 +2,7 @@
 <v-app id="keep">
   <v-navigation-drawer v-model="drawer" fixed clipped class="secondary" app dark>
     <v-list dense class="secondary" dark>
-      <template v-for="(item, i) in items">
+      <template v-for="(item, i) in menuItems">
         <v-layout v-if="item.heading" :key="i" row align-center>
           <v-flex xs6>
             <v-subheader v-if="item.heading">
@@ -71,7 +71,7 @@ export default {
     itemClicked: 4,
     tronLinkStatus: null,
     selected_country: null,
-    items: [{
+    menuItems: [{
         heading: 'Wallet Login'
       },
       {
@@ -145,7 +145,6 @@ export default {
       this.isModalVisible = false;
     },
     selectedCountryChild(country) {
-
       this.selected_country = country;
     },
     openLink(link) {
