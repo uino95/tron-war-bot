@@ -54,7 +54,7 @@
         <v-flex>
           <core-game-map @select="selectedCountryChild" />
           <core-game-controls v-bind:current-country="selected_country" @showModal="showModal(1)" />
-          <core-modal v-model="isModalVisible" v-bind:header-tile="items[itemClicked].text" v-bind:body-tile="items[itemClicked].body" />
+          <core-modal v-model="isModalVisible" v-bind:header-tile="menuItems[itemClicked].text" v-bind:body-tile="menuItems[itemClicked].body" />
         </v-flex>
       </v-layout>
     </v-container>

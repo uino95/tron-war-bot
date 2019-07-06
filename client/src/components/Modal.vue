@@ -159,16 +159,15 @@
                         Copy
                         <v-icon right dark>filter_none</v-icon>
                     </v-btn>-->
-                    <a v-if="this.account != null" :href="'https://tronwarbot.com/ref='+this.account">Link!</a>
+                    <span class="font-weight-bold font-italic" v-if="this.$store.state.loggedInAccount != null" >https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}</span>
                     <span v-else>Please login first</span>
-                    <input type="hidden" id="copy" value="ciao"><br>
-                    You'll eran 1% out of each of his bets <b>forever</b>!<br>
+                    <br><br>
+                    You'll earn <b>1%</b> out of each of his bets <b>forever</b>!<br><br>
                     Once an address starts using a referral link, that can't change and it will always provide you that
                     1%.<br>
                     Every 50TRX piled up you will automatically receive the earned TRX. Below you can see how much your
-                    referred links are earning you <br><br>
-                    <v-divider></v-divider>
-                    <v-container grid-list-md style="padding: 0px;">
+                    referred links are earning you
+                    <v-container grid-list-md style="padding: 0px;" mt-2>
                         <v-layout row>
                             <v-flex xs12 style="text-align: center">
                                 <v-card color="primary" dark>
