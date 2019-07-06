@@ -47,10 +47,9 @@
     <v-container fluid fill-height fill-width class="grey pa-0 ma-0">
       <v-layout justify-center align-center>
         <v-flex>
-
-          <GameMap @select="selectedCountryChild" />
-          <GameControls v-bind:current-country="selected_country" @showModal="showModal(1)" />
-          <Modal v-model="isModalVisible" v-bind:header-tile="items[itemClicked].text" v-bind:body-tile="items[itemClicked].body" />
+          <core-game-map @select="selectedCountryChild" />
+          <core-game-controls v-bind:current-country="selected_country" @showModal="showModal(1)" />
+          <core-modal v-model="isModalVisible" v-bind:header-tile="items[itemClicked].text" v-bind:body-tile="items[itemClicked].body" />
         </v-flex>
       </v-layout>
     </v-container>
@@ -63,19 +62,9 @@
 
 <script>
 /////////////////////// import component //////////////////////////
-
-import GameMap from './components/GameMap'
-import GameControls from './components/GameControls'
-import Modal from './components/Modal'
-
 export default {
 
   name: 'App',
-  components: {
-    GameControls,
-    GameMap,
-    Modal
-  },
   data: () => ({
     drawer: null,
     isModalVisible: false,
@@ -159,7 +148,6 @@ export default {
       this.isModalVisible = false;
     },
     selectedCountryChild(country) {
-
       this.selected_country = country;
     },
     openLink(link) {
