@@ -166,13 +166,6 @@ from '../plugins/firebase';
 import mapping from '../assets/mapping';
 import axios from 'axios'
 
-String.prototype.replaceAll = function(search, replace) {
-  if (replace === undefined) {
-    return this.toString();
-  }
-  return this.split(search).join(replace);
-};
-
 export default {
   data: () => ({
     isLoading: false,
@@ -202,8 +195,7 @@ export default {
   firebase: {
     history: db.ref('history').orderByChild('turn'),
     bets: db.ref('bets').orderByChild('time'),
-    info: db.ref('data'),
-    mapStatus: db.ref('countries')
+    info: db.ref('data')
   },
 
   methods: {
@@ -290,7 +282,7 @@ export default {
       this.balance = balanceInTRX
     },
     setTimer: function() {
-      let nextTurn = this.info.nextTurnTime;
+      let nextTurn = this.info.nextTurnTime || 0;
       let now = new Date().getTime();
       let minsUntilNextTurn = nextTurn - now + 3600000;
       let timer = new Date(minsUntilNextTurn);

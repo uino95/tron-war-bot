@@ -1,8 +1,9 @@
 import Vue from 'vue'
 
-import './plugins/firebase'
 import './plugins/vuetify'
+import './plugins/firebase'
 import './plugins/vueAsync'
+import router from './router'
 import mapping from './assets/mapping.js'
 
 import App from './App.vue'
@@ -38,6 +39,7 @@ Vue.mixin({
 });
 
 new Vue({
+    router,
     render: h => h(App),
     iconfont: 'fab'
 }).$mount('#app');
