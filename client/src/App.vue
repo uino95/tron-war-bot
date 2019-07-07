@@ -52,8 +52,16 @@
     <v-container fluid fill-height fill-width class="grey pa-0 ma-0">
       <v-layout justify-center align-center>
         <v-flex>
-          <core-game-map @select="selectedCountryChild" />
-          <core-game-controls v-bind:current-country="selected_country" @showModal="showModal(1)" />
+          <div class="btn-mobile" v-if="isMobile() && noShowMap">
+            <v-btn v-on:click="showMobileMap()"> Load Map </v-btn>
+          </div>
+          <div v-else-if="!noShowMap">
+            <div v-if="loading" class="loader-container">
+              <v-progress-circular :size="70" :width="8" color="amber" indeterminate />
+            </div>
+            <core-game-map v-bind:style="{ display: toDisplay }" />
+          </div>
+          <core-game-controls @showModal="showModal(1)" />
           <core-modal v-model="isModalVisible" v-bind:header-tile="menuItems[itemClicked].text" v-bind:body-tile="menuItems[itemClicked].body" />
         </v-flex>
       </v-layout>
@@ -66,6 +74,9 @@
 export default {
   name: 'App',
   data: () => ({
+    loading: true,
+    noShowMap: true,
+    toDisplay: 'none',
     drawer: null,
     isModalVisible: false,
     itemClicked: 4,
@@ -153,10 +164,6 @@ export default {
     track() {
       this.$ga.page('/')
     },
-    display() {
-      this.toDisplay = "flex"
-      this.toDisplay1 = 'none'
-    },
     async fetchAccount() {
       const account = await window.tronWeb.trx.getAccount();
       const accountAddress = account.address; // HexString(Ascii)
@@ -172,15 +179,26 @@ export default {
       this.$store.commit('setAccountBalance', {
         accountBalance: balanceInTRX
       })
+    },
+    showMobileMap() {
+      this.loading = true
+      this.noShowMap = false
+      this.startLoading()
+    },
+    startLoading() {
+      setTimeout(() => {
+        this.loading = false
+        this.toDisplay = "flex"
+        console.log("ok now display it ")
+      }, 4000)
     }
   },
   mounted() {
     this.track()
-    setTimeout(() => {
-      this.loading = false
-      this.toDisplay = "flex"
-      console.log("ok now display it ")
-    }, 4000)
+    if (!this.isMobile()) {
+      this.noShowMap = false
+      this.startLoading()
+    }
     window.onmessage = (event) => {
       // Waiting for that message.
       if (event.data.message && event.data.message.action === 'setAccount') {
@@ -199,6 +217,11 @@ export default {
 .loader-container {
     widht: 100%;
     height: 600px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.btn-mobile {
     text-align: center;
 }
 </style>

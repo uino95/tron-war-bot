@@ -30,8 +30,8 @@ export default {
 </script>
 
 <style>
-.outerTabContainer{
-  max-width:1200px;
+.outerTabContainer {
+  max-width: 1200px;
 }
 
 .gameTab {

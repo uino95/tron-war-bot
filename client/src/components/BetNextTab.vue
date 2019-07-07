@@ -327,7 +327,7 @@ export default {
       return hours + ':' + min + ':' + sec
     }
   },
-  props: ['currentCountry', 'balance', 'account'],
+  props: ['balance', 'account'],
   computed: {
     countryStatus: function() {
       let result = [];
@@ -372,6 +372,9 @@ export default {
         return bet.turn == nextTurn && bet.country == country;
       }).length + 1
       return ((parseFloat(this.info.jackpot) + this.info.minBet) * (1 - this.info.houseEdge - 0.1) / betsOnThatCountry).toFixed(3) + ' TRX';
+    },
+    currentCountry(){
+      return this.$store.state.selectedCountry
     }
   },
   mounted() {

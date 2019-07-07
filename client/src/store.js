@@ -7,6 +7,7 @@ export default new Vuex.Store({
   state: {
     loggedInAccount: null,
     accountBalance: -1,
+    selectedCountry: -1
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -14,6 +15,9 @@ export default new Vuex.Store({
     },
     setAccountBalance(state, payload) {
       state.accountBalance = payload.balance
+    },
+    setSelectedCountry(state, payload) {
+      state.selectedCountry = payload.country
     }
   }
 })
