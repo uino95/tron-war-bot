@@ -189,7 +189,6 @@ export default {
       setTimeout(() => {
         this.loading = false
         this.toDisplay = "flex"
-        console.log("ok now display it ")
       }, 4000)
     }
   },

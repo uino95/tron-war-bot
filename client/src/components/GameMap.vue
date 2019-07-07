@@ -12,7 +12,6 @@ import {
 } from "../plugins/firebase"
 
 am4core.useTheme(am4themes_spiritedaway);
-let _this
 export default {
   data: () => ({
     width: 0,
