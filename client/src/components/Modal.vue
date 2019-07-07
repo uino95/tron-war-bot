@@ -4,16 +4,12 @@
     <v-card>
       <v-card-title class="headline grey lighten-2" primary-title>{{headerTile}}</v-card-title>
 
-      <!--<v-card-text v-if="headerTile !== 'Login With Tronlink'">
-                              {{bodyTile}}<br/><br/>{{footerTile}}
-                          </v-card-text>-->
-
-      <v-card-text v-if="headerTile === 'Login With Tronlink' && this.isLoggedIn()">
+      <v-card-text v-if="headerTile === 'Login With Tronlink' && this.$store.state.loggedInAccount!=null">
         Already logged in with account address: {{this.$store.state.loggedInAccount}}
         <br /><br />{{footerTile}}
       </v-card-text>
 
-      <v-card-text v-if="headerTile === 'Login With Tronlink' && !this.isLoggedIn()">
+      <v-card-text v-if="headerTile === 'Login With Tronlink' && !this.$store.state.loggedInAccount!=null">
         Please, login to your TRONLink wallet.<br />
         If you do not have TRONLink wallet installed, please visit
         <a href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.<br /><br />
@@ -220,9 +216,6 @@ export default {
   },
 
   methods: {
-    isLoggedIn() {
-      return window.tronWeb && window.tronWeb.ready
-    },
     copyRefToClipboard() {
       let el = document.createElement('textarea');
       el.value = "https://tronwarbot.com/?ref=" + this.account;
