@@ -164,22 +164,6 @@ export default {
     track() {
       this.$ga.page('/')
     },
-    async fetchAccount() {
-      const account = await window.tronWeb.trx.getAccount();
-      const accountAddress = account.address; // HexString(Ascii)
-      const accountAddressInBase58 = window.tronWeb.address.fromHex(accountAddress); // Base58
-      this.$store.commit('setLoggedInAccount', {
-        accountAddress: accountAddressInBase58
-      })
-    },
-    async fetchBalance() {
-      const balanceInSun = await window.tronWeb.trx.getBalance(); //number
-      const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
-      // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
-      this.$store.commit('setAccountBalance', {
-        accountBalance: balanceInTRX
-      })
-    },
     showMobileMap() {
       this.loading = true
       this.noShowMap = false
@@ -198,11 +182,13 @@ export default {
       this.noShowMap = false
       this.startLoading()
     }
+    this.$store.dispatch('updateAccountBalance')
+    this.$store.dispatch('updateLoggedInAccount')
     window.onmessage = (event) => {
       // Waiting for that message.
       if (event.data.message && event.data.message.action === 'setAccount') {
-        this.fetchBalance();
-        this.fetchAccount();
+        this.$store.dispatch('updateAccountBalance')
+        this.$store.dispatch('updateLoggedInAccount')
       }
     };
   }

@@ -62,9 +62,7 @@ export default {
   },
   methods: {
     clicked(ev) {
-      this.$store.commit('setSelectedCountry', {
-        country: this.universalMap(ev.target.dataItem.dataContext.controlledBy, 'numberId')
-      })
+      this.$store.commit('setSelectedCountry', this.universalMap(ev.target.dataItem.dataContext.controlledBy, 'numberId'))
     },
     loadChart() {
       /* Create map instance */

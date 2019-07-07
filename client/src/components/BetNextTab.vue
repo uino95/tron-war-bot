@@ -189,8 +189,6 @@ export default {
     currencyRule: [v => !!v || 'Select a currency',
       //v => v < 50 || 'You don\'t have enough money'
     ],
-    balance: null,
-    account: null,
     history: [],
     bets: [],
     mapStatus: [],
@@ -235,7 +233,7 @@ export default {
                 _this.postReferral(_txId)
               }
               setTimeout(function() {
-                _this.fetchBalance()
+                _this.$store.dispatch('updateAccountBalance')
               }, 2000)
             } else {
               _this.snackbarText = tx.ret[0].contractRet;
@@ -271,22 +269,6 @@ export default {
       this.snackbarColor = "info";
       this.snackbarTimeout = 2000;
       this.snackbar = true;
-    },
-    async fetchAccount() {
-      const account = await window.tronWeb.trx.getAccount();
-      const accountAddress = account.address; // HexString(Ascii)
-      const accountAddressInBase58 = window.tronWeb.address.fromHex(
-        accountAddress
-      ); // Base58
-
-      this.account = accountAddressInBase58
-
-    },
-    async fetchBalance() {
-      const balanceInSun = await window.tronWeb.trx.getBalance(); //number
-      const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
-      // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
-      this.balance = balanceInTRX
     },
     setTimer: function() {
       // let nextTurn = this.info.nextTurnTime || 0;
@@ -327,7 +309,6 @@ export default {
       return hours + ':' + min + ':' + sec
     }
   },
-  props: ['balance', 'account'],
   computed: {
     countryStatus: function() {
       let result = [];
@@ -373,14 +354,23 @@ export default {
       }).length + 1
       return ((parseFloat(this.info.jackpot) + this.info.minBet) * (1 - this.info.houseEdge - 0.1) / betsOnThatCountry).toFixed(3) + ' TRX';
     },
-    currentCountry(){
-      return this.$store.state.selectedCountry
+    currentCountry: {
+      get() {
+        return this.$store.state.selectedCountry
+      },
+      set(value) {
+        this.$store.commit('setSelectedCountry', value)
+      }
+    },
+    balance() {
+      return this.$store.state.accountBalance
+    },
+    account() {
+      return this.$store.state.loggedInAccount
     }
   },
   mounted() {
     // this.fetchGameParam(0)
-    this.fetchBalance();
-    this.fetchAccount();
     this.startTimer();
   }
 }

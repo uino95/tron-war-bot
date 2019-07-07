@@ -217,22 +217,11 @@ export default {
     headerTile: String,
     footerTile: String,
     bodyTile: String,
-    account: String
   },
 
   methods: {
     isLoggedIn() {
       return window.tronWeb && window.tronWeb.ready
-    },
-    async fetchAccount() {
-      const account = await window.tronWeb.trx.getAccount();
-      const accountAddress = account.address; // HexString(Ascii)
-      const accountAddressInBase58 = window.tronWeb.address.fromHex(
-        accountAddress
-      ); // Base58
-
-      this.account = accountAddressInBase58
-
     },
     copyRefToClipboard() {
       let el = document.createElement('textarea');
@@ -270,10 +259,10 @@ export default {
         }
       }
       return myReferrals
+    },
+    account(){
+      return this.$store.state.loggedInAccount
     }
-  },
-  mounted() {
-    this.fetchAccount();
   },
   firebase: {
     referrals: db.ref('referral/map')

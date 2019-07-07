@@ -14,10 +14,28 @@ export default new Vuex.Store({
       state.loggedInAccount = payload.accountAddress
     },
     setAccountBalance(state, payload) {
-      state.accountBalance = payload.balance
+      state.accountBalance = payload.accountBalance
     },
     setSelectedCountry(state, payload) {
-      state.selectedCountry = payload.country
+      state.selectedCountry = payload
     }
+  },
+  actions: {
+    async updateLoggedInAccount(context) {
+      const account = await window.tronWeb.trx.getAccount();
+      const accountAddress = account.address; // HexString(Ascii)
+      const accountAddressInBase58 = window.tronWeb.address.fromHex(accountAddress); // Base58
+      context.commit('setLoggedInAccount', {
+        accountAddress: accountAddressInBase58
+      })
+    },
+    async updateAccountBalance(context) {
+      const balanceInSun = await window.tronWeb.trx.getBalance(); //number
+      const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
+      // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
+      context.commit('setAccountBalance', {
+        accountBalance: balanceInTRX
+      })
+    },
   }
 })
