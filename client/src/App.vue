@@ -57,7 +57,7 @@
           </div>
           <div v-else-if="!noShowMap">
             <div v-if="loading" class="loader-container">
-              <v-progress-circular :size="70" :width="8" color="amber" indeterminate />
+              <v-progress-circular :size="70" :width="8" color="primary" indeterminate mt-5/>
             </div>
             <core-game-map v-bind:style="{ display: toDisplay }" />
           </div>
@@ -204,6 +204,10 @@ export default {
     height: 600px;
     text-align: center;
     vertical-align: middle;
+}
+
+.loader-container div{
+  margin-top:220px;
 }
 
 .btn-mobile {
