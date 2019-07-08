@@ -15,7 +15,7 @@
     </v-toolbar-items>
     <v-spacer></v-spacer>
   </v-toolbar>
-  <v-card class="card--flex-toolbar">
+  <v-card style="background-color:rgb(158, 158, 158);">
     <transition name="fade" mode="out-in">
       <router-view></router-view>
     </transition>

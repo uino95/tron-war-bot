@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import BetNextTab from './components/BetNextTab.vue'
-import StatsTab from './components/StatsTab.vue'
 
 Vue.use(Router)
 
