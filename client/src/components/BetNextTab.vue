@@ -19,14 +19,14 @@
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-layout row wrap>
               <v-flex md4>
-                <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name" :loading="isLoading" :search-input.sync="search" item-value="numberId" hide-no-data hide-selected label="Select Country"
+                <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name" :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
                   placeholder="Type in or pick from map"></v-autocomplete>
               </v-flex>
               <v-flex md4>
                 <v-text-field :value="calculatePotentialWin" label="Potential win" outline disabled></v-text-field>
               </v-flex>
               <v-flex md4>
-                <core-timer ref="turnTimer" isTurnTimer/>
+                <core-timer isTurnTimer/>
               </v-flex>
             </v-layout>
             <v-layout row wrap>
@@ -349,7 +349,6 @@ export default {
   },
   mounted() {
     // this.fetchGameParam(0)
-    this.$refs.turnTimer.startTimer();
   }
 }
 </script>

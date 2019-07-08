@@ -7,7 +7,8 @@ export default new Vuex.Store({
   state: {
     loggedInAccount: null,
     accountBalance: -1,
-    selectedCountry: -1
+    selectedCountry: -1,
+    isMobile: false
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -18,6 +19,9 @@ export default new Vuex.Store({
     },
     setSelectedCountry(state, payload) {
       state.selectedCountry = payload
+    },
+    setIsMobile(state, value){
+      state.isMobile = value
     }
   },
   actions: {

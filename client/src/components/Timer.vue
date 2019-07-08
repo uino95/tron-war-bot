@@ -1,5 +1,6 @@
 <template>
-  <v-text-field v-if="isTurnTimer" :value="timerValue" label="Next Turn" outline disabled></v-text-field>
+<v-text-field v-if="isTurnTimer" :value="timerValue" label="Next Turn" outline disabled></v-text-field>
+<v-chip disabled dark  v-else>{{this.timerValue}}</v-chip>
 </template>
 
 <script>
@@ -9,39 +10,81 @@ import {
 from '../plugins/firebase';
 
 export default {
-    data: () => ({
-      timerValue: "00:01",
-      info: {},
-    }),
-    firebase:{
-      info: db.ref('data')
+  data: () => ({
+    timerValue: "00:00",
+    info: {},
+  }),
+  firebase: {
+    info: db.ref('data')
+  },
+  props: {
+    isTurnTimer: Boolean,
+    isRunTimer: Boolean,
+  },
+  methods: {
+    updateRunTimer: function() {
+      var now = new Date().getTime();
+
+      // Find the distance between now and the count down date
+      var distance = this.info.nextTurnTime - now;
+
+      // Time calculations for days, hours, minutes and seconds
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      hours = hours < 10 ? `0${hours}` : hours
+      minutes = minutes < 10 ? `0${minutes}` : minutes
+      seconds = seconds < 10 ? `0${seconds}` : seconds
+
+      // If the count down is finished, write some text
+      if (distance < 0) {
+        this.timerValue = `00:00:00`
+      } else {
+        this.timerValue = `${hours}:${minutes}:${seconds}`
+      }
+      setTimeout(() => {
+        this.updateRunTimer();
+      }, 1000);
     },
-    props: {
-      isTurnTimer: Boolean,
-      isRunTimer: Boolean,
+
+    updateTurnTimer: function() {
+      var now = new Date().getTime();
+
+      // Find the distance between now and the count down date
+      var distance = this.info.nextTurnTime - now;
+
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      // If the count down is finished, write some text
+      if (distance < 0) {
+        this.timerValue = '#' + (this.info.nextTurn || ' loading...') + ` in 00:00`
+      } else {
+        this.timerValue = '#' + (this.info.nextTurn || ' loading...') + ` in ${minutes}:${seconds}`
+      }
+      setTimeout(() => {
+        this.updateTurnTimer();
+      }, 1000);
     },
-    methods: {
-      setTimer: function() {
-        let nextEvent = this.info.nextTurnTime || 0;
-        let now = new Date().getTime();
-        let minsUntilNextEvent = nextEvent - now + 3600000;
-        let timer = new Date(minsUntilNextEvent);
-        if (minsUntilNextEvent <= 0) {
-          this.timerValue = this.isTurnTimer ? '#' + (this.info.nextTurn || ' loading...') + ` in 00:00` : `00:00`
-        } else {
-          let min = timer.getMinutes();
-          let sec = timer.getSeconds();
-          sec = sec < 10 ? `0${sec}` : sec;
-          min = min < 10 ? `0${min}` : min;
-          this.timerValue = this.isTurnTimer ? '#' + (this.info.nextTurn || ' loading...') + ` in ${min}:${sec}` : `${min}:${sec}`
-        }
-      },
-      startTimer: function() {
-        this.intervalId = setInterval(() => {
-          this.setTimer();
+
+    startTimer: function() {
+      console.log("started new timer")
+      if (this.isTurnTimer) {
+        this.intervalId = setTimeout(() => {
+          this.updateTurnTimer();
         }, 1000);
-      },
+      } else {
+        this.intervalId = setTimeout(() => {
+          this.updateRunTimer();
+        }, 1000);
+      }
     },
+  },
+  mounted(){
+    this.startTimer();
+  }
+
 }
 </script>
 

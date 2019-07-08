@@ -20,7 +20,7 @@
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-layout row wrap>
               <v-flex md4>
-                <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name" :loading="isLoading" :search-input.sync="search" item-value="numberId" hide-no-data hide-selected label="Select Country"
+                <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name" :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
                   placeholder="Type in or pick from map"></v-autocomplete>
               </v-flex>
               <v-flex md4>
@@ -29,9 +29,6 @@
                   </v-text-field>
                   <span>Here you can see what you will win if you bet on the selected country. </span>
                 </v-tooltip>
-              </v-flex>
-              <v-flex md4>
-                <core-timer ref="runTimer" isTurnTimer/>
               </v-flex>
             </v-layout>
             <v-layout row wrap>
@@ -50,8 +47,10 @@
             <!-- <v-btn v-if="info.serverStatus == 200" color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
               <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...</v-btn>
               <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...</v-btn> -->
-            <v-btn color="warning">Cannot bet at the moment</v-btn>
-            <core-timer ref="runTimer" isTurnTimer />
+            <v-flex md4>
+              <v-btn color="warning">Cannot bet at the moment</v-btn>
+              <core-timer ref="runTimer" isRunTimer />
+            </v-flex>
           </v-form>
         </v-card-title>
         <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
@@ -347,7 +346,7 @@ export default {
   },
   mounted() {
     // this.fetchGameParam(0)
-    this.$refs.runTimer.startTimer();
+    //this.$refs.runTimer.startTimer();
   }
 }
 </script>
