@@ -8,7 +8,7 @@
           <v-toolbar-title>Bet on Next Conqueror
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
-                <v-icon color="secondary" dark v-on="on">help</v-icon>
+                <v-icon color="secondary" dark v-on="on">info</v-icon>
               </template>
               <span>Here you can bet on the next conqueror</span>
             </v-tooltip>
@@ -26,7 +26,7 @@
                 <v-text-field :value="calculatePotentialWin" label="Potential win" outline disabled></v-text-field>
               </v-flex>
               <v-flex md4>
-                <v-text-field :value="turnTimer" label="Next Turn" outline disabled></v-text-field>
+                <core-timer ref="turnTimer" isTurnTimer/>
               </v-flex>
             </v-layout>
             <v-layout row wrap>
@@ -178,7 +178,6 @@ export default {
     isLoading: false,
     valid: false,
     snackbar: false,
-    turnTimer: "00:01",
     snackbarText: "",
     snackbarColor: "",
     info: {},
@@ -270,27 +269,6 @@ export default {
       this.snackbarTimeout = 2000;
       this.snackbar = true;
     },
-    setTimer: function() {
-      // let nextTurn = this.info.nextTurnTime || 0;
-      // let now = new Date().getTime();
-      // let minsUntilNextTurn = nextTurn - now + 3600000;
-      // let timer = new Date(minsUntilNextTurn);
-      // let nextTurnNumber = this.info.nextTurn || ' loading...';
-      // if (minsUntilNextTurn <= 0) {
-      //   this.turnTimer = '#' + nextTurnNumber + ` in 00:00`;
-      // } else {
-      //   let min = timer.getMinutes();
-      //   let sec = timer.getSeconds();
-      //   sec = sec < 10 ? `0${sec}` : sec;
-      //   min = min < 10 ? `0${min}` : min;
-      //   this.turnTimer = '#' + nextTurnNumber + ` in ${min}:${sec}`;
-      // }
-    },
-    startTimer: function() {
-      // this.intervalId = setInterval(() => {
-      //   this.setTimer();
-      // }, 1000);
-    },
     convertResultBet: function(betResult) {
       if (betResult < 0) {
         return '-'
@@ -371,7 +349,7 @@ export default {
   },
   mounted() {
     // this.fetchGameParam(0)
-    this.startTimer();
+    this.$refs.turnTimer.startTimer();
   }
 }
 </script>

@@ -34,12 +34,10 @@ export default {
     ]
 
   }),
-  firebase: {
-    mapStatus: db.ref('countries').on('child_changed', function() {
+  mounted() {
+    db.ref('countries').on('child_changed', function() {
       location.reload();
     })
-  },
-  mounted() {
     db.ref('countries').once('value', (snapshot) => {
       let j = this.colorBlue.length
       let data = snapshot.val();

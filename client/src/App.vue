@@ -182,11 +182,9 @@ export default {
       this.noShowMap = false
       this.startLoading()
     }
-    this.$store.dispatch('updateAccountBalance')
-    this.$store.dispatch('updateLoggedInAccount')
     window.onmessage = (event) => {
       // Waiting for that message.
-      if (event.data.message && event.data.message.action === 'setAccount') {
+      if (event.data.isTronLink || (event.data.message && event.data.message.action === 'setAccount')) {
         this.$store.dispatch('updateAccountBalance')
         this.$store.dispatch('updateLoggedInAccount')
       }
