@@ -31,6 +31,7 @@ wiki
 
 # Dependency directory
 node_modules/
+tron-war-bot-server/
 
 # Debug log from npm
 npm-debug.log*
