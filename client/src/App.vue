@@ -173,7 +173,7 @@ export default {
       setTimeout(() => {
         this.loading = false
         this.toDisplay = "flex"
-      }, 4000)
+      }, this.$store.state.isMobile ? 8000 : 4000)
     },
     isMobile() {
       var check = false;
