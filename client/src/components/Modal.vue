@@ -69,65 +69,13 @@
         </ol>
 
         <h2 class="headline mt-4">How to get TRX</h2>
-        Are you running out of your skin to start gaming?<br />
-        Here's a rapid getting started guide!<br />
-        Prepare your
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <span v-on="on">identity document <v-icon small>fa-info-circle</v-icon></span>
-          </template>
-          <span>i.e. ID card, passport or driver’s license</span>
-        </v-tooltip>
-        and your credit card &dash; you'll only need 10 minutes!<br /><br />
-        There are two ways to obtain TRX: the first method is faster, the second one has less fee cost.
-        <v-expansion-panel class="mt-2 mb-2">
-          <v-expansion-panel-content>
-            <template v-slot:header data-icon="fa-info-circle">
-              <div>Method A
-                <v-chip color="green" text-color="white">Faster, more fees</v-chip>
-              </div>
-            </template>
-            <v-card>
-              <v-card-text>
-                <ol>
-                  <li>
-                    Register on <a href="https://www.binance.com/en/" target="_blank">Binance</a>
-                    and get TRX directly from there (3.5% fees)
-                  </li>
-                  <li>Move your TRX on your TRX Wallet and get ready for the game!</li>
-                </ol>
-              </v-card-text>
-            </v-card>
-          </v-expansion-panel-content>
-          <v-expansion-panel-content>
-            <template v-slot:header>
-              <div>
-                Method B
-                <v-chip color="secondary" text-color="white">Slower, fewer fees</v-chip>
-              </div>
-            </template>
-            <v-card>
-              <v-card-text>
-                <ol>
-                  <li>
-                    Register on <a href="https://coinbase.com" target="_blank">Coinbase</a>
-                    and get ETH
-                  </li>
-                  <li>
-                    Register on <a href="https://www.binance.com/en/" target="_blank">Binance</a>
-                    and move your ETH there
-                  </li>
-                  <li>Exchange ETH to TRX on Binance</li>
-                  <li>Move your TRX on your TRXWallet and get ready for the game!</li>
-                </ol>
-              </v-card-text>
-            </v-card>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
+        Are you running out of your skin to start gaming?<br /> Jump into the crypto world now!<br />
+        <br>
+        <v-btn round color="primary" href="https://changelly.com/" target="_blank" dark pa-2>BUY TRX</v-btn>
+        <br><br>
 
         Once you start playing, your TRX are safe because you don’t move them on our website. They
-        remain in your secure wallet and moved out whenever you place a bet. Transactions are safe since
-        they are written on the blockchain!
+        remain in your secure wallet and moved out whenever you place a bet. So no need to trust us or anyone, you control your crypto assets. That's one of the nice things about using the blockchain.
       </v-card-text>
 
       <v-card-text v-if="headerTile === 'FAQ'">
@@ -253,7 +201,7 @@ export default {
       }
       return myReferrals
     },
-    account(){
+    account() {
       return this.$store.state.loggedInAccount
     }
   },

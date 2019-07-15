@@ -33,7 +33,7 @@
             </v-layout>
             <v-layout row wrap>
               <v-flex md4>
-                <v-text-field :value="balance?(balance + ' TRX'):'no account'" label="Your Balance" outline disabled></v-text-field>
+                <core-balance-button />
               </v-flex>
               <v-flex md4>
                 <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'" label="Current Jackpot" outline disabled></v-text-field>
@@ -336,9 +336,6 @@ export default {
       set(value) {
         this.$store.commit('setSelectedCountry', value)
       }
-    },
-    balance() {
-      return this.$store.state.accountBalance
     },
     account() {
       return this.$store.state.loggedInAccount

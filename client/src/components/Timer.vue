@@ -69,7 +69,6 @@ export default {
     },
 
     startTimer: function() {
-      console.log("started new timer")
       if (this.isTurnTimer) {
         this.intervalId = setTimeout(() => {
           this.updateTurnTimer();

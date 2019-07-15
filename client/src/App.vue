@@ -143,7 +143,7 @@ export default {
         icon: 'fab fa-twitter',
         text: 'Twitter',
         link: true,
-        body: "https://twitter.com/tronwarbot"
+        body: "https://twitter.com/TronWarBot"
       }
     ]
   }),
