@@ -4,20 +4,79 @@
     <v-card>
       <v-card-title class="headline grey lighten-2" primary-title>{{headerTile}}</v-card-title>
 
-      <v-card-text v-if="headerTile === 'Login With Tronlink' && this.$store.state.loggedInAccount!=null">
+      <v-card-text v-if="headerTile === 'Login With Tronlink'">
+      <div v-if="this.$store.state.loggedInAccount!=null">
         Already logged in with account address: {{this.$store.state.loggedInAccount}}
         <br /><br />{{footerTile}}
-      </v-card-text>
-
-      <v-card-text v-if="headerTile === 'Login With Tronlink' && !this.$store.state.loggedInAccount!=null">
+      </div>
+      <div v-else>
         Please, login to your TRONLink wallet.<br />
         If you do not have TRONLink wallet installed, please visit
         <a href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.<br /><br />
-
         <v-alert :value="true" type="warning">
-          Tron War Bot is only available on Google Chrome for the time being.
+          Tron War Bot is only available on Google Chrome or on TronLink mobile app for the time being.
         </v-alert>
+      </div>
       </v-card-text>
+
+      <v-card-text v-if="headerTile === 'Referral'">
+        Refer a friend by sharing your referral link with him.<br>
+        Here is your referral link:
+        <v-chip v-if="this.$store.state.loggedInAccount != null" label outline color="primary">https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}</v-chip>
+        <v-chip v-else label outline color="red">Login First</v-chip>
+        <br><br>
+        You'll earn <b>1%</b> out of each of his bets <b>forever</b>!<br><br>
+        Once an address starts using a referral link, that can't change and it will always provide you that
+        1%.<br>
+        Every 50TRX piled up you will automatically receive the earned TRX. Below you can see how much your
+        referred links are earning you
+        <v-container grid-list-md style="padding: 0px;" mt-2>
+          <v-layout row>
+            <v-flex xs12 style="text-align: center">
+              <v-card color="primary" dark>
+                <v-card-text class="title">Your Referrals</v-card-text>
+              </v-card>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap style="padding: 16px 16px 0 16px;">
+            <v-flex xs6 class="title">
+              Address
+            </v-flex>
+            <v-flex xs6 class="title" style="text-align: end;">
+              Amount
+            </v-flex>
+          </v-layout>
+          <v-divider></v-divider>
+          <v-container v-if="myReferrals.length > 0" style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
+            <v-layout row wrap v-for="referral in myReferrals" :key="referral.user_addr">
+              <v-flex xs6 class="subheading">
+                {{referral.user_addr}}
+              </v-flex>
+              <v-flex xs6 class="subheading" style="text-align: end">
+                {{referral.amount}}
+              </v-flex>
+            </v-layout>
+          </v-container>
+          <v-container v-else class="text-md-center">
+          <v-chip label outline color="red">Still no one played with your link... :(</v-chip>
+          </v-container>
+        </v-container>
+      </v-card-text>
+
+      <v-card-text v-if="headerTile === 'Dividends'">
+        100% of TronWarBot profits are shared back to token holders! (..but yes we detain around 50% of the current token supply). After every stage you will need 50 more TRX to mine one WAR. Dividend payout will happen at the end of the run.
+        <br><br>
+        <v-divider mt-3 />
+        <br>
+        <span class="headling">We are in stage 1 of 10. You need to play 50 TRX to mine 1 WAR</span>
+        <v-progress-linear color="primary" height="15" v-model="dividendStage"></v-progress-linear>
+        Available Dividends: <div class="display-1">100,567 <v-avatar tile size="40"><img src="https://cdn.coinranking.com/behejNqQs/trx.svg"></v-avatar> TRX </div>
+        <v-divider mt-3 />
+        You have: <div class="display-1">5.678 <v-avatar tile size="42"><img src="/img/logo.png"></v-avatar> WAR </div>
+        <v-divider mt-3 />
+        There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout (end of the run)
+      </v-card-text>
+
 
       <v-card-text v-if="headerTile === 'How To Play'">
         The game is based on WorldWarBot 2020 <a href="https://www.facebook.com/worldwarbot/" target="_blank">Facebook Page</a>.<br />
@@ -69,65 +128,13 @@
         </ol>
 
         <h2 class="headline mt-4">How to get TRX</h2>
-        Are you running out of your skin to start gaming?<br />
-        Here's a rapid getting started guide!<br />
-        Prepare your
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <span v-on="on">identity document <v-icon small>fa-info-circle</v-icon></span>
-          </template>
-          <span>i.e. ID card, passport or driver’s license</span>
-        </v-tooltip>
-        and your credit card &dash; you'll only need 10 minutes!<br /><br />
-        There are two ways to obtain TRX: the first method is faster, the second one has less fee cost.
-        <v-expansion-panel class="mt-2 mb-2">
-          <v-expansion-panel-content>
-            <template v-slot:header data-icon="fa-info-circle">
-              <div>Method A
-                <v-chip color="green" text-color="white">Faster, more fees</v-chip>
-              </div>
-            </template>
-            <v-card>
-              <v-card-text>
-                <ol>
-                  <li>
-                    Register on <a href="https://www.binance.com/en/" target="_blank">Binance</a>
-                    and get TRX directly from there (3.5% fees)
-                  </li>
-                  <li>Move your TRX on your TRX Wallet and get ready for the game!</li>
-                </ol>
-              </v-card-text>
-            </v-card>
-          </v-expansion-panel-content>
-          <v-expansion-panel-content>
-            <template v-slot:header>
-              <div>
-                Method B
-                <v-chip color="secondary" text-color="white">Slower, fewer fees</v-chip>
-              </div>
-            </template>
-            <v-card>
-              <v-card-text>
-                <ol>
-                  <li>
-                    Register on <a href="https://coinbase.com" target="_blank">Coinbase</a>
-                    and get ETH
-                  </li>
-                  <li>
-                    Register on <a href="https://www.binance.com/en/" target="_blank">Binance</a>
-                    and move your ETH there
-                  </li>
-                  <li>Exchange ETH to TRX on Binance</li>
-                  <li>Move your TRX on your TRXWallet and get ready for the game!</li>
-                </ol>
-              </v-card-text>
-            </v-card>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
+        Are you running out of your skin to start gaming?<br /> Jump into the crypto world now!<br />
+        <br>
+        <v-btn round color="primary" href="https://changelly.com/" target="_blank" dark pa-2>BUY TRX</v-btn>
+        <br><br>
 
         Once you start playing, your TRX are safe because you don’t move them on our website. They
-        remain in your secure wallet and moved out whenever you place a bet. Transactions are safe since
-        they are written on the blockchain!
+        remain in your secure wallet and moved out whenever you place a bet. So no need to trust us or anyone, you control your crypto assets. That's one of the nice things about using the blockchain.
       </v-card-text>
 
       <v-card-text v-if="headerTile === 'FAQ'">
@@ -143,52 +150,6 @@
         </v-expansion-panel>
       </v-card-text>
 
-      <v-card-text v-if="headerTile === 'Referral'">
-        Refer a friend by sharing your referral link with him.<br>
-        Here is your referral link:
-        <!--<v-btn color="primary"
-                            class="white&#45;&#45;text"
-                            @click="copyRefToClipboard">
-                        Copy
-                        <v-icon right dark>filter_none</v-icon>
-                    </v-btn>-->
-        <span class="font-weight-bold font-italic" v-if="this.$store.state.loggedInAccount != null">https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}</span>
-        <span v-else>Please login first</span>
-        <br><br>
-        You'll earn <b>1%</b> out of each of his bets <b>forever</b>!<br><br>
-        Once an address starts using a referral link, that can't change and it will always provide you that
-        1%.<br>
-        Every 50TRX piled up you will automatically receive the earned TRX. Below you can see how much your
-        referred links are earning you
-        <v-container grid-list-md style="padding: 0px;" mt-2>
-          <v-layout row>
-            <v-flex xs12 style="text-align: center">
-              <v-card color="primary" dark>
-                <v-card-text class="title">Your Referrals</v-card-text>
-              </v-card>
-            </v-flex>
-          </v-layout>
-          <v-layout row wrap style="padding: 16px 16px 0 16px;">
-            <v-flex xs6 class="title">
-              Address
-            </v-flex>
-            <v-flex xs6 class="title" style="text-align: end;">
-              Amount
-            </v-flex>
-          </v-layout>
-          <v-divider></v-divider>
-          <v-container style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
-            <v-layout row wrap v-for="referral in myReferrals" :key="referral.user_addr">
-              <v-flex xs6 class="subheading">
-                {{referral.user_addr}}
-              </v-flex>
-              <v-flex xs6 class="subheading" style="text-align: end">
-                {{referral.amount}}
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-container>
-      </v-card-text>
 
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -214,23 +175,6 @@ export default {
     footerTile: String,
     bodyTile: String,
   },
-
-  methods: {
-    copyRefToClipboard() {
-      let el = document.createElement('textarea');
-      el.value = "https://tronwarbot.com/?ref=" + this.account;
-      el.setAttribute('readonly', '');
-      el.style = {
-        position: 'absolute',
-        left: '-9999px'
-      };
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      alert("copied!");
-    }
-  },
   computed: {
     isVisible: {
       get() {
@@ -253,7 +197,7 @@ export default {
       }
       return myReferrals
     },
-    account(){
+    account() {
       return this.$store.state.loggedInAccount
     }
   },
@@ -261,7 +205,9 @@ export default {
     referrals: db.ref('referral/map')
   },
   data: () => ({
-    faq: [{
+    dividendStage: 30, 
+    faq: [
+      {
         question: "What do I do if I'm not able to place the bet?",
         answer: "Check if you have got enough Energy and Bandwidth."
       },

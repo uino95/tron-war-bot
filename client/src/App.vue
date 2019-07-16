@@ -69,8 +69,9 @@
   </v-content>
 </v-app>
 </template>
+
+
 <script>
-/////////////////////// import component //////////////////////////
 export default {
   name: 'App',
   data: () => ({
@@ -94,6 +95,12 @@ export default {
       {
         icon: 'people',
         text: 'Referral',
+        link: false,
+        body: 'WIP'
+      },
+      {
+        icon: 'attach_money',
+        text: 'Dividends',
         link: false,
         body: 'WIP'
       },
@@ -143,7 +150,7 @@ export default {
         icon: 'fab fa-twitter',
         text: 'Twitter',
         link: true,
-        body: "https://twitter.com/tronwarbot"
+        body: "https://twitter.com/TronWarBot_"
       }
     ]
   }),
