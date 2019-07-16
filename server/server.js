@@ -1,4 +1,4 @@
-// require('./fakeBots');
+require('./fakeBots');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -65,11 +65,11 @@ app.get('/', (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// STARTUP ////////////////////////////////////////
 
-// twb.startUp(0);
-// backendLogic.syncServer(false);
-// backendLogic.watchBet();
-// backendLogic.watchNewTurn();
-// referral.watchPayer();
+twb.startUp(0);
+backendLogic.syncServer(false);
+backendLogic.watchBet();
+backendLogic.watchNewTurn();
+referral.watchPayer();
 
 var PORT = process.env.PORT || 3000;
 
