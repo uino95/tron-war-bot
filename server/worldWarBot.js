@@ -1,28 +1,30 @@
 
 // SIMULATION PARAMS
-const COHESION_BIAS = 0.25;
+const COHESION_BIAS = 0.3;
 const COUNTRIES = 200;
-const CIVIL_WAR_LIKELIHOOD = 0.1;
-const SIMULATIONS = 20;
+const CIVIL_WAR_LIKELIHOOD = 0.2;
+const SIMULATIONS = 400;
 
-// the countryMap is an array of (CountryIndex => CountryStatus) where CountryStatus is:
+// the countriesMap is an array of (CountryIndex => CountryStatus) where CountryStatus is:
 // {
 //   occupiedBy: CountryIndex,
 //   angerIndex: [0-1], Index representing the unity of the country that impacting on civil rebelions probability
 // }
-var countryMap;
+var countriesMap;
 
 // the neighborCountries is an array of (CountryIndex => [CountryIndexes])
 var neighborCountries;
 
 var turn;
+var turnData = {};
+var simulation = false;
 
 const init = async () => {
   turn = 0;
-  countryMap = new Array(COUNTRIES).fill(0).map((e,idx)=>{
+  countriesMap = new Array(COUNTRIES).fill(0).map((e,idx)=>{
    return {
      occupiedBy: idx,
-     cohesion: 1
+     cohesion: 0.5
    }
   });
   // the neighborCountries is an array of (CountryIndex => [CountryIndexes])
@@ -53,42 +55,86 @@ const loadSavedState = async () => {};
 const saveCurrentState = async () => {};
 
 // Returns array of countryIndexes
-const conquerableTerritories = (c) => {
+const conquerableTerritoriesOf = (c) => {
   return neighborCountries[c].filter((t)=>{
-    return countryMap[t].occupiedBy != countryMap[c].occupiedBy;
+    return countriesMap[t].occupiedBy != countriesMap[c].occupiedBy;
   })
 }
 
-const conqueredTerritories = (c) => {
-  return Object.keys(countryMap).filter((t)=>countryMap[t].occupiedBy==c);
+const conqueredTerritoriesOf = (c) => {
+  return Object.keys(countriesMap).filter((t)=>countriesMap[t].occupiedBy==c);
 }
 
 // Returns array of countryIndexes
-const countryOnTheBorders = () => {
-  return Object.keys(countryMap).filter((c)=>{
-    return conquerableTerritories(c).length;
+const countriesOnTheBorders = () => {
+  return Object.keys(countriesMap).filter((c)=>{
+    return conquerableTerritoriesOf(c).length;
   })
 }
 
 // Returns array of countryIndexes
 const countriesStillAlive = () => {
   return [...new Set(
-    countryMap.map((c)=>{return c.occupiedBy;})
+    countriesMap.map((c)=>{return c.occupiedBy;})
   )];
 }
 
+const rawPdf = () => {
+  return countriesMap.map((c,idx)=>{
+    let pOfConquest = Math.min(conquerableTerritoriesOf(idx).length,1) * countriesMap[c.occupiedBy].cohesion;
+    let pOfCivilWar =  (c.occupiedBy != idx ? 1 : 0) * c.cohesion * CIVIL_WAR_LIKELIHOOD;
+    return [pOfConquest,  pOfCivilWar];
+  })
+}
+
+const pdf = () => {
+  let r = rawPdf();
+  let total = r.reduce((acc, c) => acc + c[0] + c[1], 0);
+  return r.map(c=>[c[0]/total, c[1]/total]);
+}
+
+const cumulatedPdf = () => {
+  let cumulated = 0;
+  return pdf().map(c=>{
+    return [cumulated += c[0], cumulated += c[1]]
+  });
+}
+
 const winner = () => {
-  if (!countryOnTheBorders().length) return countryMap[0].occupiedBy;
+  if (!countriesOnTheBorders().length) return countriesMap[0].occupiedBy;
   return false;
 }
 
-const updateCohesion = (cr, cd) => {
-  let cRatio = conqueredTerritories(cr).length / countryMap.length;
-  let cRand = Math.random() - COHESION_BIAS;
-  let crDelta = cRatio * cRand * countryMap[cd].cohesion;
-  let cdDelta = cRatio * cRand * (1 - countryMap[cr].cohesion);
-  countryMap[cr].cohesion =  Math.max(0, Math.min(1, countryMap[cr].cohesion - crDelta));
-  countryMap[cd].cohesion = Math.max(0, Math.min(1, countryMap[cd].cohesion + cdDelta));
+const updateCohesion = (o, d, ot, dt) => {
+  let o_amp = conqueredTerritoriesOf(o).length / COUNTRIES;
+  let d_amp = conqueredTerritoriesOf(d).length / COUNTRIES;
+  let rnd = COHESION_BIAS - Math.random();
+  let c_o = countriesMap[o].cohesion - 0.5;
+  let c_d = countriesMap[d].cohesion - 0.5;
+  let c_ot = countriesMap[ot].cohesion - 0.5;
+  let c_dt = countriesMap[dt].cohesion - 0.5;
+  let delta_o = (rnd - c_ot - c_d - c_dt) * o_amp;
+  let delta_d = (rnd + c_ot - c_o - c_dt) * d_amp;
+  let delta_ot = (rnd - c_o + c_d + c_dt) * o_amp;
+  let delta_dt = (rnd - c_o + c_d + c_ot) * d_amp;
+  let new_o = countriesMap[o].cohesion + delta_o;
+  let new_d = countriesMap[d].cohesion + delta_d;
+  let new_ot = countriesMap[ot].cohesion + delta_ot;
+  let new_dt = countriesMap[dt].cohesion + delta_dt;
+  countriesMap[dt].cohesion = Math.max(0, Math.min(1, new_dt));
+  countriesMap[ot].cohesion =  Math.max(0, Math.min(1, new_ot));
+  countriesMap[d].cohesion = Math.max(0.001, Math.min(1, new_d));
+  countriesMap[o].cohesion =  Math.max(0.001, Math.min(1, new_o));
+  turnData.cohesion = {
+    o :countriesMap[o].cohesion,
+    d :countriesMap[d].cohesion,
+    ot :countriesMap[ot].cohesion,
+    dt :countriesMap[dt].cohesion,
+    delta_o,
+    delta_d,
+    delta_ot,
+    delta_dt,
+  }
 }
 
 
@@ -96,89 +142,105 @@ const updateCohesion = (cr, cd) => {
 // Returns is game on?
 const nextTurn = async () => {
   // Calculate countries on the borders
-  let availableTerritories = countryOnTheBorders();
+  let availableTerritories = countriesOnTheBorders();
   if (!availableTerritories.length) return false;
-
-  let conquerer, conquered, civilWar;
 
   // COMPUTE NEW TURN
   turn += 1;
 
-  let events = COUNTRIES;
-  // CALCULATE CIVIL WAR
-  for (var i = 0; i<events; i++) {
-    let t = getRandom(COUNTRIES);
-    let o = countryMap[t].occupiedBy;
-    if (o == t) continue;
-    civilWar = Math.random() < (CIVIL_WAR_LIKELIHOOD * (countryMap[t].cohesion  * (1 - countryMap[o].cohesion)) / events);
-    if (civilWar) {
-      console.log("[WWB]:KABOOM! There was a civil war: " + t + " rebelled on " + o);
-      conquerer = t;
-      conquered = t;
-      break;
-    }
+  let cpdf = cumulatedPdf().reduce((acc, val) => acc.concat(val), []);
+  let rand = Math.random();
+  if (!simulation) console.log("[WWB]:Random is: " + rand)
+  let scenario = cpdf.length - 1;
+  for (var i in cpdf) {
+    if (rand > cpdf[i]) continue;
+    scenario = i;
+    break;
   }
+  let conquererTerritory = Math.floor(scenario / 2);
+  let civilWar = scenario % 2;
+  let conquerer = civilWar ? conquererTerritory : countriesMap[conquererTerritory].occupiedBy;
+  let cts = conquerableTerritoriesOf(conquererTerritory);
+  let conqueredTerritory = civilWar ? conquerer : cts[getRandom(cts.length)];
+  let conquered = civilWar ? countriesMap[conquererTerritory].occupiedBy : countriesMap[conqueredTerritory].occupiedBy;
 
-  // CALCULATE CONQUERER
-  if (!civilWar){
-    // console.log("[WWB]:Conquerer countries: " + JSON.stringify(availableTerritories));
-    let odds = availableTerritories.length;
-    let conquererCountry = availableTerritories[getRandom(odds)];
-    conquerer = countryMap[conquererCountry].occupiedBy;
-    // console.log("[WWB]:Conquerer is: " + conquerer + "  from country: " + conquererCountry);
+  if (!simulation && civilWar) console.log("[WWB]:KABOOM! There was a civil war: " + conquerer + " rebelled on " + conquered);
+  if (!simulation) console.log("[WWB]:Conquerer is: " + conquerer + "  on: " + conquered + "   from country: " + conquererTerritory);
 
-    // CALCULATE CONQUERED
-    availableTerritories = conquerableTerritories(conquererCountry);
-    // console.log("[WWB]:Conquerable countries: " + JSON.stringify(availableTerritories));
-    odds = availableTerritories.length;
-    conquered = availableTerritories[getRandom(odds)];
-    // console.log("[WWB]:Conquered is: " + conquered);
+  turnData = {
+    turn,
+    civilWar,
+    o: conquerer,
+    ot: conquererTerritory,
+    d: conquered,
+    dt: conqueredTerritory,
   }
+  updateCohesion(conquerer, conquered, conquererTerritory, conqueredTerritory);
+
+  countriesMap[conqueredTerritory].occupiedBy = conquerer;
 
 
-  updateCohesion(conquerer, conquered);
-  countryMap[conquered].occupiedBy = conquerer;
   await saveCurrentState();
-  // printStatus();
-  return !!countryOnTheBorders().length;
+  printStatus();
+  return !!countriesOnTheBorders().length;
 }
 
+const currentTurnData = () => turnData;
+
 const printStatus = ()=>{
-  countryMap.forEach((c,idx)=>console.log(idx + " => " + c.occupiedBy + "  cohesion:" + c.cohesion.toFixed(4)));
+  if (!simulation) countriesMap.forEach((c,idx)=>console.log(idx + " => " + c.occupiedBy + "  cohesion:" + c.cohesion.toFixed(4)));
 }
 
 const currentTurn = () => turn;
-
+const mapState = () => countriesMap;
 
 
 const simulate = async () => {
-  var wins = new Array(countryMap.length).fill(0);
+  var wins = new Array(COUNTRIES).fill(0);
+  var conquest = new Array(COUNTRIES).fill(0);
+  var cohesion = new Array(COUNTRIES).fill(0);
   var rounds = 0;
   var maxRounds = 0;
+  var civilWars = 0;
+  simulation = true;
   for (var i=0; i<SIMULATIONS; i++){
     init();
     while (!!(await nextTurn())) {
-      // console.log("[WWB]:Next turn is: " + turn)
+      let d = currentTurnData()
+      civilWars += d.civilWar;
+      conquest[d.o] += 1;
+      cohesion = cohesion.map((e,idx)=> e + countriesMap[idx].cohesion);
     };
-    console.log("[WWB]:Winner is:  " + winner());
+    let c_tot = countriesMap.reduce((acc, c) => acc + c.cohesion, 0);
+    console.log("[WWB]:Winner is:  " + winner() + " in turns: " + turn + "  g_cohesion: " + (c_tot/COUNTRIES).toFixed(4));
     if (turn> maxRounds) maxRounds = turn;
     wins[winner()]+=1;
     rounds += turn;
   }
+  simulation = false;
+  cohesion = cohesion.map((e,idx)=> e / rounds);
+  conquest = conquest.map((e,idx)=> e / SIMULATIONS);
   console.log("[WWB]:###########  Results ###########")
-  console.log("[WWB]:Average turn: " + rounds/SIMULATIONS);
+  console.log("[WWB]:Average turns: " + rounds/SIMULATIONS);
   console.log("[WWB]:Max turn: " + maxRounds);
-  console.log("[WWB]:Wins:")
-  // wins.forEach((c,idx)=>console.log(idx + " => " + c));
+  console.log("[WWB]:Average civil wars: " + civilWars/SIMULATIONS);
+  console.log("[WWB]:Civil wars a posteriori likelihood: " + (civilWars/rounds).toFixed(3));
+  console.log("[WWB]: Wins:   Conquest:   \tCohesion: ")
+  wins.forEach((c,idx)=>console.log(idx + " => \t" + c + "    \t" + (conquest[idx]).toFixed(2) + "    \t" + (cohesion[idx]).toFixed(5)));
 }
 
 module.exports = {
   init,
   currentTurn,
+  currentTurnData,
+  mapState,
   nextTurn,
-  conquerableTerritories,
-  conqueredTerritories,
-  countryOnTheBorders,
+  conquerableTerritoriesOf,
+  conqueredTerritoriesOf,
+  countriesOnTheBorders,
+  cumulatedPdf,
+  printStatus,
+  pdf,
   simulate
 }
 
