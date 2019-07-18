@@ -5,6 +5,12 @@ module.exports = {
     tronWarBotAddress: process.env.TRON_WAR_BOT_ADDRESS || "TQXiV4TeKS4zF54PiCsUyKTQ22yYY6KuzL",
     warCoinAddress: process.env.WAR_COIN_ADDRESS || "TTbPmiq35XjAhQThatnukS45pNYd7xV2m1"
   },
+  tronTest: {
+    privateKey: process.env.TRON_PRIVATE_KEY || "",
+    fullHost: process.env.TRON_FULL_HOST || 'https://api.trongrid.io',
+    tronWarBotAddress: "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e",
+    warCoinAddress: "TJ6kbSxQ8ctPGuHmRb3W92gUN42AooHeNt"
+  },
   game: {
     preservedJackpotRateForNextTurn: 0.1
   },
@@ -20,7 +26,20 @@ module.exports = {
 	  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
 	  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xemt9%40tron-war-bot.iam.gserviceaccount.com"
   },
+  firebaseTest: {
+    "type": "service_account",
+    "project_id": "tron-war-bot-test",
+    "private_key_id": "90870ff61f2f2e1dc6b57e2a336d0db2bbe7ae7c",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQClHKoxtoE+lmWL\n4SP651zyhFhSGbNp17nTlIVtf77NV19H0nWnf+DvzlNgZrTYEUxB9YvEDt8WOMN7\n/OOjzbgiqoEfFyOqyJaKOweuIpffww9Qbz2CD7O0uvsbOWmmkagTNjFa1469VI1H\n4ZWoTZXI393PGQQk81d+DCJS3F2fKKn0PTHSOJO4bQmoK/yNSjHMyQKl4nt4Qcp4\ndNHD07MDSLYWXNKechn+WaKjUOko4yuh6l0SWuVwj4OYFma701kcF+cIw3tPPtIS\nOf1KSct4NepLm9uojRf34NZk2WaBi9GRuDnBCcoNv88fKRdZoEd+qiIazqW3576m\nCpSHR9UhAgMBAAECggEADFLepX3BWVDOl67FqaSgWc3vgqyTk9xBF436bzEYUR7K\n8uMo8B2EcO8LPELbj39WXAZODjjsRUNrhy2vDFWelLXPE+k9UAdklxYvV/u8hBF8\n1eHWVdwYAMQZBHqX9xG1mWjTgmaG61JBhk02h1HyfVmvkQAwFer0y5Nvx2lWco/Z\nfZTeO9DUJ4l9Bp0FZdeBHfgV/R4e3vpGRD7jU0MWgAZXDdh1KhXHOVTwopUgOEIK\nY187u0bjPEdvVvpn0fc5w/oZ0vXRGNTcGrPifjy8WDrQjHQv99I6ywzrgCLsdVYq\n9I/LALwiGH/bKRvDFW2IoP6GvA6zdzb6iuOvTc78TQKBgQDP5LrpPztMvBDxYub0\nL478gri3FgQ0XPnR7kqdMoPMwXbIJeYCzWRu56GJ1EU7+QEQ6MVblsLVlEOFQVP8\nYGSjFuWVvZxQW76yLSFSK7BmBLV7Hghsa2Fsm90q2vjfBhmgLU30L+KoxOoONJ6v\nc/GY+A1cGIZ2EIFkUQ3i42B55QKBgQDLUaDUnMpHUeS7uWlD5ToQw++4De/jljmz\nglHT6jPzt/y+cKzNprV1lFKhVOVIJu71QHDqlfXK/OoQhWTzo1epsqvsakEZ3WVJ\n9uZEvNEuTz9FiTgfhP+bMNXwm9zGCyabMUViqwVbVZS9tCxXaRfeCj1G052krurJ\nIbM+t77KjQKBgANb+9U3C1tDErcD1R2PAy17Y0a6GVlLQ1IsGpKNtWmCmsvDKQNU\nlFHidk7G2lOMw4KlcEL5na5b1fd6RcQnPpkQDqerx7HYua0hY49zW0davh/+LT6r\nQYjCwAEoRqs76wAWm1LdzzjQ7cNLAGFvazEAmR6q2slfnOelE6dd6zotAoGAIfO/\np8GHBeHnEHIl4fClgac2oMWzCY5MlG1uvLSfeFOBIUwvjygHpVrfcZF7uFDIFqxs\nLsBcC0mwzJF6CjV8rhnoG9KijG8sOu3ABjqBs/oH1tTTSnArPv8ousVMWMYD7GaN\n76wfeOERtZwgy3gBRFLxaKJt8NJE4tF93TtR4QECgYEAxszQ6MFUkQUs4Ew8htqA\nutgaAiY20/bxKK1Qd+Hhi2MSucRJIlI4Yf6ZvCHzmPQEheLTlJiVsz7pTJgKzQF2\n4FTD1xDpHrt2BEr2Isc2l7LXX3sKi7OGKoXCSVIetiqwXFKScslIBfUINrqtAls9\n8rEol43NofnF0yKAcA2zUc8=\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-fk2r7@tron-war-bot-test.iam.gserviceaccount.com",
+    "client_id": "110214308616889396478",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fk2r7%40tron-war-bot-test.iam.gserviceaccount.com"
+  },
   heroku: {
     apiKey: 'bfbc8a87-fa94-4885-bb7f-e18ca83ec1d8'
-  }
+  },
+  test: true
 }

@@ -35,6 +35,9 @@ module.exports.checkBetOnDb = async function(txId){
 
 module.exports.createReferral = async function(user_addr, referrer_addr, amount){
   return new Promise(async function(resolve, reject) {
+    if(user_addr === referrer_addr){
+      reject("cannot create a circular referral")
+    }
     referralRef.child('map').once('value', async function(snapshot){
       	if(!snapshot.child(user_addr).exists()){
       		var premiumAddress = await isPremiumAddress(referrer_addr)
@@ -51,15 +54,17 @@ module.exports.createReferral = async function(user_addr, referrer_addr, amount)
 
 module.exports.updateReferral = async function(bet){  
 	let user_addr = bet.address
-	let amount = bet.bet
+  let amount = bet.bet
 	referralRef.child('map').once('value', async function(referralSnapshot){
-		let currentRefferalSnap = referralSnapshot.child(user_addr)
+    let currentRefferalSnap = referralSnapshot.child(user_addr)
 		if(currentRefferalSnap.exists()){
 			let premiumAddress = await isPremiumAddress(currentRefferalSnap.val().referrer_addr)
 			let newAmount = premiumAddress ? amount * 0.2 : amount * 0.01
 			referralRef.child('map').child(user_addr).update({
 				amount: currentRefferalSnap.val().amount + newAmount
-			})
+      })
+      console.log("updated Referral of user address: " + user_addr)
+      console.log("new amount: " + (currentRefferalSnap.val().amount + newAmount))
 		}
 	})
 }
