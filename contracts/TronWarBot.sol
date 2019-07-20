@@ -203,7 +203,7 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
     roundStartedAt[_gameType] = 0;
     emit EndGame(_gameType, currentRound[_gameType], block.number, jackpot[_gameType]);
 
-    // IF GAME IS AGAINST DEALER HOUSEEDGE IS CALCULATED DURING PAYOUT 
+    // IF GAME IS AGAINST DEALER HOUSEEDGE IS CALCULATED DURING PAYOUT
     if (roundFunds[_gameType][currentRound[_gameType]].playAgainstDealer) return true;
 
     uint256 _jackpot = jackpot[_gameType];
@@ -237,13 +237,10 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
       roundFunds[_gameType][_round].houseEdge = roundFunds[_gameType][_round].houseEdge.add(_houseEdge);
       emit Payout(_gameType, _round, _recipient, _amount);
       _payHouse(_houseEdge);
-      _recipient.transfer(_amount);
+      if (_recipient != address(this)) _recipient.transfer(_amount);
+      else houseReserves = houseReserves.add(_amount);
       return true;
     }
-      /* 1. Withdraw from reserves  */
-      /* 2. Update houseEdge amount  */
-      /* 3. Pay house */
-      /* 4. Pay user */
 
     require(roundFunds[_gameType][_round].availableFunds >= _amount, "Payout must not exceed available funds");
     roundFunds[_gameType][_round].availableFunds = roundFunds[_gameType][_round].availableFunds.sub(_amount);
