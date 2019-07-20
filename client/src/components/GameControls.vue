@@ -3,11 +3,11 @@
   <v-toolbar color="secondary" dark flat>
     <v-spacer></v-spacer>
     <v-toolbar-items>
-      <v-btn flat replace to="/betnext">
-        <v-icon>attach_money</v-icon> Bet Next
-      </v-btn>
       <v-btn flat replace to="/betfinal">
         <v-icon>public</v-icon> Bet Final
+      </v-btn>
+      <v-btn flat replace to="/betnext">
+        <v-icon>attach_money</v-icon> Bet Next
       </v-btn>
       <v-btn flat replace to="/stats">
         <v-icon>poll</v-icon> Stats
