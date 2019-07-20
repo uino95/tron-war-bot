@@ -4,21 +4,28 @@
       <!-- Place a bet -->
       <v-flex>
         <v-card>
+
           <v-toolbar color="primary" dark>
             <v-toolbar-title>
-              Bet on World Conqueror
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
-                  <v-icon color="secondary" dark v-on="on">info</v-icon>
-                </template>
-                <span>Here you can bet on the world conqueror</span>
-              </v-tooltip>
+              <v-layout align-center justify-space-between row>
+                <v-flex> Bet on World Conqueror </v-flex>
+                <v-flex>
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                      <v-icon color="secondary" dark v-on="on">info</v-icon>
+                    </template>
+                    <span>Here you can bet on the world conqueror</span>
+                  </v-tooltip>
+                </v-flex>
+              </v-layout>
             </v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
+
           <v-card-title primary-title class="justify-center">
             <v-form ref="form" v-model="valid" lazy-validation>
-              <v-layout row wrap>
+
+              <v-layout row align-center justify-center wrap>
                 <v-flex md4>
                   <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
                     :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
@@ -26,14 +33,14 @@
                 </v-flex>
                 <v-flex md4>
                   <v-tooltip slot="append" top>
-                    <v-text-field slot="activator" :value="calculatePotentialWin" label="Potential win" outline
-                      disabled>
+                    <v-text-field slot="activator" :value="calculatePotentialWin" label="Potential win" outline disabled>
                     </v-text-field>
                     <span>Here you can see what you will win if you bet on the selected country. </span>
                   </v-tooltip>
                 </v-flex>
               </v-layout>
-              <v-layout row wrap>
+
+              <v-layout align-center justify-center row wrap>
                 <v-flex md4>
                   <core-balance-button />
                 </v-flex>
@@ -45,13 +52,16 @@
                   <v-text-field v-model="currency" label="Currency" outline disabled></v-text-field>
                 </v-flex>
               </v-layout>
+
               <v-btn v-if="info.serverStatus == 200" color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
               <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...</v-btn>
               <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...</v-btn> 
               <core-timer ref="runTimer" isRunTimer />
+
               <!-- <v-flex md4>
                 <v-btn color="warning">Cannot bet at the moment</v-btn>
               </v-flex> -->
+
             </v-form>
           </v-card-title>
           <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
@@ -72,37 +82,53 @@
             <v-spacer></v-spacer>
           </v-toolbar>
           <v-container grid-list-md text-xs-centerm class="gameTab">
-            <v-layout row wrap class="gameTabHeader">
-              <v-flex xs3 class="title">
-                Country
-              </v-flex>
-              <v-flex xs3 class="title">
-                Bet
-              </v-flex>
-              <v-flex xs3 class="title">
-                Turn
-              </v-flex>
-              <v-flex xs3 class="title">
-                Result
+
+            <!-- if the user has already placed at least one bet -->
+            <v-layout v-if="myBets.length === 0">
+              <v-flex class="subheading">
+                You do not have any bet yet.
               </v-flex>
             </v-layout>
-            <v-divider class="gameTabDivider"></v-divider>
-            <v-container class="gameTabContent">
-              <v-layout row wrap v-for="bet in myBets" :key="bet.time">
-                <v-flex xs3 class="subheading">
-                  {{universalMap(bet.country)}}
+
+            <!-- else show the bets -->
+            <v-layout v-else>
+              <v-flex class="title">
+                You do not have any bet yet.
+              </v-flex>
+
+              <v-layout row wrap class="gameTabHeader">
+                <v-flex xs3 class="title">
+                  Country
                 </v-flex>
-                <v-flex xs3 class="subheading">
-                  {{bet.bet+"TRX"}}
+                <v-flex xs3 class="title">
+                  Bet
                 </v-flex>
-                <v-flex xs3 class="subheading">
-                  {{bet.turn}}
+                <v-flex xs3 class="title">
+                  Turn
                 </v-flex>
-                <v-flex xs3 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                  {{convertResultBet(bet.result)}}
+                <v-flex xs3 class="title">
+                  Result
                 </v-flex>
               </v-layout>
-            </v-container>
+
+              <v-divider class="gameTabDivider"></v-divider>
+              <v-container class="gameTabContent">
+                <v-layout row wrap v-for="bet in myBets" :key="bet.time">
+                  <v-flex xs3 class="subheading">
+                    {{universalMap(bet.country)}}
+                  </v-flex>
+                  <v-flex xs3 class="subheading">
+                    {{bet.bet+"TRX"}}
+                  </v-flex>
+                  <v-flex xs3 class="subheading">
+                    {{bet.turn}}
+                  </v-flex>
+                  <v-flex xs3 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
+                    {{convertResultBet(bet.result)}}
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-layout>
           </v-container>
         </v-card>
       </v-flex>
@@ -113,7 +139,44 @@
             <v-toolbar-title>Latest Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
-          <v-container grid-list-md text-xs-center class="gameTab">
+
+          <!-- if the user is using a mobile device -->
+          <v-container v-if="this.$store.state.isMobile" grid-list-md text-xs-center class="gameTab">
+            <v-layout row wrap class="gameTabHeader">
+              <v-flex xs5 class="title">
+                <span>Country</span>
+              </v-flex>
+              <v-flex xs2 class="title" style="text-align: start;">
+                <span>Bet</span>
+              </v-flex>
+              <v-flex xs2 class="title" style="text-align: start;">
+                <span>Turn</span>
+              </v-flex>
+              <v-flex xs2 class="title" style="text-align: start;">
+                Result
+              </v-flex>
+            </v-layout>
+            <v-divider class="gameTabDivider"></v-divider>
+            <v-container class="gameTabContent" text-xs-center>
+              <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
+                <v-flex xs5 class="subheading">
+                  <span>{{universalMap(bet.country)}}</span>
+                </v-flex>
+                <v-flex xs2 class="subheading">
+                  <span>{{bet.bet+"TRX"}}</span>
+                </v-flex>
+                <v-flex xs2 class="subheading">
+                  <span>{{bet.turn}}</span>
+                </v-flex>
+                <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
+                  {{convertResultBet(bet.result)}}
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-container>
+
+          <!-- else, the user is on pc -->
+          <v-container v-else grid-list-md text-xs-center class="gameTab">
             <v-layout row wrap class="gameTabHeader">
               <v-flex xs2 class="title">
                 <span>Address</span>
@@ -157,6 +220,7 @@
               </v-layout>
             </v-container>
           </v-container>
+
         </v-card>
       </v-flex>
     </v-layout>
@@ -225,7 +289,7 @@
                 _this.snackbarText =
                   `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
                 if (window.location.pathname.startsWith('/ref')) {
-                  _this.postReferral(_txId)
+                  //_this.postReferral(_txId)
                 }
               } else {
                 _this.snackbarText = tx.ret[0].contractRet;
