@@ -51,10 +51,17 @@
             <v-container v-if="myReferrals.length > 0" style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
               <v-layout row wrap v-for="referral in myReferrals" :key="referral.user_addr">
                 <v-flex xs6 class="subheading">
-                  {{referral.user_addr}}
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                      <div class="text-truncate" v-on="on">
+                        {{referral.user_addr}}
+                      </div>
+                    </template>
+                    <span> {{referral.user_addr}} </span>
+                  </v-tooltip>
                 </v-flex>
                 <v-flex xs6 class="subheading" style="text-align: end">
-                  {{referral.amount}}
+                  {{referral.amount.toFixed(3)}}
                 </v-flex>
               </v-layout>
             </v-container>
@@ -161,7 +168,14 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-
+          <v-tooltip  bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on">
+                Claim your Dividends
+              </v-btn>
+            </template>
+            <span> It will be available when the run is finished </span>
+          </v-tooltip>
           <v-btn color="green darken-1" flat="flat" @click.stop="isVisible = false">
             Close
           </v-btn>
