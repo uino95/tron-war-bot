@@ -42,19 +42,22 @@ interface ITronWarBot {
 
   /* LOGIC */
   /* Officially start another round of the game */
-  function startGame(uint256 _gameType) external returns (bool);
+  function startGame(uint256 _gameType, bool _playAgainstDealer) external returns (bool);
   /* It places the bet, it mines tokens for the user and for the house according to houseMiningRate and records it in an event */
-  function bet(uint256 _gameType, uint256 _userChoice) external payable returns (bool);
+  function bet(uint256 _gameType, uint256 _userChoice, uint256 _betReference) external payable returns (bool);
   /* It deducts and send the house edge, it mantains a _preservedJackpotRate for next round's jackpot and move off the jackpot needed for winning users.
      It returns the closing round number */
   function endGame(uint256 _gameType, uint256 _preservedJackpotRate) external returns (bool);
   /* It pays the winning users using available roundFunds */
   function payout(uint256 _gameType, uint256 _round, address _recipient, uint256 _amount) external returns (bool);
+  /* Function to reload contract funds */
+  function deposit() external payable returns (bool);
 
-  event Bet(uint256 indexed gameType, uint256 indexed round, address indexed from, uint256 amount, uint256 userChoice);
+  event Bet(uint256 indexed gameType, uint256 indexed round, address from, uint256 amount, uint256 userChoice, uint256 indexed betReference);
   event Payout(uint256 indexed gameType, uint256 indexed round, address indexed to, uint256 amount);
   event StartGame(uint256 indexed gameType, uint256 indexed round, uint256 startBlock, uint256 initialJackpot);
   event EndGame(uint256 indexed gameType, uint256 indexed round, uint256 endBlock, uint256 finalJackpot);
+  event GameParamsChanged(uint256 indexed gameType, uint256 houseEdge, uint256 minimumBet, uint256 maximumBet);
 
   /*********/
   /* UTILS */

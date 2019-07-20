@@ -9,7 +9,7 @@ import "./utils/Destructible.sol";
 import './architecture/Frontend.sol';
 
 /**
- * @title TronWarBot v0.1
+ * @title TronWarBot v0.2
  * @author Samuele Rodi (a.k.a. Sam Fisherman)
  * @notice This TronWarBot contract is the first release of the TronWarBot logic contract.
  */
@@ -24,6 +24,7 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
   }
 
   struct RoundFunds {
+    bool playAgainstDealer;
     uint256 finalJackpot;
     uint256 availableFunds;
     uint256 houseEdge;
@@ -33,6 +34,8 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
   address public divPoolAddress;
   uint256 public houseMiningRate;
   uint256 public dividendsToProfitsRate;
+
+  uint256 public houseReserves;
 
   mapping (uint256 => GameParams) public gameParams;
   mapping (uint256 => uint256) public currentRound;
@@ -112,6 +115,7 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
     require(_minimumBet != 0, "Minimum bet must be a valid positive number");
     require(_maximumBet != 0, "Maximum bet must be a valid positive number");
     gameParams[_gameType] = GameParams(_houseEdge, _minimumBet, _maximumBet);
+    emit GameParamsChanged(_gameType, _houseEdge, _minimumBet, _maximumBet);
     return true;
   }
 
@@ -141,7 +145,7 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
 
   /* LOGIC */
   /* Officially start another round of the game */
-  function startGame(uint256 _gameType)
+  function startGame(uint256 _gameType, bool _playAgainstDealer)
     onlyFrontendAdmin
     whenNotPaused
     public
@@ -152,12 +156,17 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
     require(roundStartedAt[_gameType]==0, "Game must have been stopped first");
     currentRound[_gameType]++;
     roundStartedAt[_gameType] = block.number;
+    roundFunds[_gameType][currentRound[_gameType]] = RoundFunds(_playAgainstDealer, 0, 0, 0);
+    if (_playAgainstDealer) {
+      houseReserves = houseReserves.add(jackpot[_gameType]);
+      jackpot[_gameType] = 0;
+    }
     emit StartGame(_gameType, currentRound[_gameType], block.number, jackpot[_gameType]);
     return true;
   }
 
   /* It places the bet, it mines tokens for the user and for the house according to houseMiningRate and records it in an event */
-  function bet(uint256 _gameType, uint256 _userChoice)
+  function bet(uint256 _gameType, uint256 _userChoice, uint256 _betReference)
     public
     payable
     whenNotPaused
@@ -167,11 +176,18 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
     uint256 _amount = msg.value;
     require(_amount >= gameParams[_gameType].minimumBet, "Bet amount must be equal or greater than minimum bet");
     require(_amount <= gameParams[_gameType].maximumBet, "Bet amount must be equal or lower than maximum bet");
-    jackpot[_gameType] = jackpot[_gameType].add(_amount);
-    uint256 _houseAmount = _amount.mul(houseMiningRate).div(1 trx);
+
+    if (roundFunds[_gameType][currentRound[_gameType]].playAgainstDealer){
+       houseReserves = houseReserves.add(_amount);
+       roundFunds[_gameType][currentRound[_gameType]].finalJackpot = roundFunds[_gameType][currentRound[_gameType]].finalJackpot.add(_amount);
+    } else {
+      jackpot[_gameType] = jackpot[_gameType].add(_amount);
+    }
+
+    uint256 _houseMiningAmount = _amount.mul(houseMiningRate).div(1 trx);
     _mineTokens(msg.sender, msg.value);
-    _mineTokens(houseAddress, _houseAmount);
-    emit Bet(_gameType, currentRound[_gameType], msg.sender, msg.value, _userChoice);
+    _mineTokens(houseAddress, _houseMiningAmount);
+    emit Bet(_gameType, currentRound[_gameType], msg.sender, msg.value, _userChoice, _betReference);
     return true;
   }
 
@@ -186,14 +202,21 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
     require(roundStartedAt[_gameType]!=0, "Game must have been started");
     roundStartedAt[_gameType] = 0;
     emit EndGame(_gameType, currentRound[_gameType], block.number, jackpot[_gameType]);
+
+    // IF GAME IS AGAINST DEALER HOUSEEDGE IS CALCULATED DURING PAYOUT
+    if (roundFunds[_gameType][currentRound[_gameType]].playAgainstDealer) return true;
+
     uint256 _jackpot = jackpot[_gameType];
-    uint256 _houseEdge = _jackpot.mul(gameParams[_gameType].houseEdge).div(1 trx);
-    _jackpot = _jackpot.sub(_houseEdge);
     uint256 _preservedJackpot = _jackpot.mul(_preservedJackpotRate).div(1 trx);
     _jackpot = _jackpot.sub(_preservedJackpot);
-    roundFunds[_gameType][currentRound[_gameType]] = RoundFunds(_jackpot, _jackpot, _houseEdge);
+    uint256 _houseEdge = _jackpot.mul(gameParams[_gameType].houseEdge).div(1 trx);
+    _jackpot = _jackpot.sub(_houseEdge);
+    roundFunds[_gameType][currentRound[_gameType]].finalJackpot = _jackpot;
+    roundFunds[_gameType][currentRound[_gameType]].availableFunds = _jackpot;
+    roundFunds[_gameType][currentRound[_gameType]].houseEdge = _houseEdge;
     jackpot[_gameType] = _preservedJackpot;
     _payHouse(_houseEdge);
+
     return true;
   }
 
@@ -205,6 +228,20 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
     whenNotPaused
     returns (bool)
   {
+
+    if (roundFunds[_gameType][_round].playAgainstDealer) {
+      require(houseReserves >= _amount, "Payout must not exceed available funds");
+      houseReserves = houseReserves.sub(_amount);
+      uint256 _houseEdge = _amount.mul(gameParams[_gameType].houseEdge).div(1 trx);
+      _amount = _amount.sub(_houseEdge);
+      roundFunds[_gameType][_round].houseEdge = roundFunds[_gameType][_round].houseEdge.add(_houseEdge);
+      emit Payout(_gameType, _round, _recipient, _amount);
+      _payHouse(_houseEdge);
+      if (_recipient != address(this)) _recipient.transfer(_amount);
+      else houseReserves = houseReserves.add(_amount);
+      return true;
+    }
+
     require(roundFunds[_gameType][_round].availableFunds >= _amount, "Payout must not exceed available funds");
     roundFunds[_gameType][_round].availableFunds = roundFunds[_gameType][_round].availableFunds.sub(_amount);
     emit Payout(_gameType, _round, _recipient, _amount);
@@ -216,5 +253,12 @@ contract TronWarBot is  ITronWarBot, Frontend, ReentrancyGuard, Destructible {
   /**
    * @notice This contract accepts ether payments
    */
-  function() external payable {}
+  function deposit()
+    public
+    payable
+    returns (bool)
+  {
+    houseReserves = houseReserves.add(msg.value);
+    return true;
+  }
 }
