@@ -2,6 +2,7 @@ import store from '../store'
 
 let pollForUpdate = function () {
   let tronWeb = window.tronweb
+  store.dispatch('registerContractsInstance') 
   setInterval(async () => {
     if (tronWeb) {
       // update current account
@@ -62,8 +63,11 @@ let pollForUpdate = function () {
       }
     } else {
       tronWeb = window.tronWeb
+      if(store.state.contracts.WarCoinInstance == null){
+        store.dispatch('registerContractsInstance') 
+      }
     }
-  }, 2000)
+  }, 1000)
 }
 
 export default pollForUpdate

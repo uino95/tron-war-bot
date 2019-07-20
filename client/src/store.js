@@ -55,6 +55,6 @@ export default new Vuex.Store({
         warCoin: warCoinInstance,
         tronWarBot: tronWarBotInstance
       })
-    }
+    } 
   }
 })

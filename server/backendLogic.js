@@ -246,7 +246,7 @@ module.exports.watchBet = function() {
         let jackpot = await twb.availableJackpot(0, bet.round)
         jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
         dataRef.update({ jackpot })
-        console.log("stored on db bet ", r.transaction)
+        utils.consoleLog("stored on db bet " + r.transaction + " at " + betTime )
         console.log("new jackpot: ", jackpot)
     })
 }

@@ -192,8 +192,7 @@ export default {
     }
   },
   beforeCreate(){
-    this.$store.dispatch('registerContractsInstance') 
-    pollForUpdate()
+    pollForUpdate()    
   },
   mounted() {
     this.$store.commit('setIsMobile', this.isMobile())

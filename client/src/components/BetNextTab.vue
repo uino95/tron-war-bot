@@ -2,7 +2,7 @@
   <v-flex v-if="!showBetNextTab">
     <v-img src="https://i.imgur.com/GKCAJ6A.jpg">
       <v-card-text>
-        <div class="text-xs-center display-3 white--text text-capitalize">Will be there as the run starts</div>
+        <div class="text-xs-center display-3 white--text text-capitalize">Will be there as the next run starts</div>
       </v-card-text>
     </v-img>
   </v-flex>
@@ -341,8 +341,7 @@
         return this.bets.filter(bet => bet.address === this.account && bet.gameType == 0).reverse()
       },
       latestBets: function () {
-        let filteredBets = this.bets.filter(bet => bet.gameType == 0)
-        return filteredBets.slice(-30, this.bets.lenght).reverse()
+        return this.bets.filter(bet => bet.gameType == 0).reverse
       },
       calculatePotentialWin: function () {
         if (this.currentCountry == null) return 0;
