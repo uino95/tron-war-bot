@@ -22,7 +22,11 @@ async function init(){
       console.error("Invalid configuration for bot " + i + ". Skipping...");
       continue;
     }
-    const twb = await tronWeb.contract().at(config.tron.tronWarBotAddress)
+    if(config.test){
+      const twb = await tronWeb.contract().at(config.tronTest.tronWarBotAddress)
+    } else {
+      const twb = await tronWeb.contract().at(config.tron.tronWarBotAddress)
+    }
     module.exports.bots.push({tronWeb, twb});
   }
 }

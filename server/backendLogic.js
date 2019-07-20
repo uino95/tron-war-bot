@@ -37,10 +37,8 @@ async function fetchLatestTurnOnDb() {
 }
 
 async function checkBetOnDb(txId) {
-    console.log(txId)
     return new Promise(async function(resolve, reject) {
         betsRef.once('value', function(snapshot) {
-            console.log(snapshot.child(txId).exists())
             resolve(snapshot.child(txId).exists())
         })
     })
@@ -57,7 +55,6 @@ module.exports.syncServer = async function(updateCurrentTurn) {
     let turn = await wwb.getTurnFromAPI('last');
     let lastTurnOnApi = turn.turn
     turn = turn.turn
-    let conquerId
     let conqueredId
     let prevOwnerId
     while (lastTurnOnDb != lastTurnOnApi) {
@@ -231,17 +228,17 @@ module.exports.watchBet = function() {
     twb.watchEvents('Bet', async function(r) {
         let bet = r.result
         let isBetAlreadyOnDb = await checkBetOnDb(r.transaction)
-        if (!!isBetAlreadyOnDb) return console.log("bet already on db");
+        if (!!isBetAlreadyOnDb) return console.log("bet " + r.transaction + " already on db");
         let turn = await fetchLatestTurnOnDb();
         turn++
-        let d1 = new Date()
-        let betTime = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate(), d1.getHours(), d1.getMinutes(), d1.getSeconds(), d1.getMilliseconds()).getTime();
+        let betTime = new Date().getTime()
         let betObj = {
             address: twb.tronWeb.address.fromHex(bet.from),
             bet: twb.tronWeb.fromSun(bet.amount),
             country: bet.userChoice,
             result: -1,
             time: betTime,
+            gameType: bet.gameType,
             turn: turn
         }
         betsRef.child(r.transaction).set(betObj)
@@ -249,6 +246,7 @@ module.exports.watchBet = function() {
         let jackpot = await twb.availableJackpot(0, bet.round)
         jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
         dataRef.update({ jackpot })
-        console.log("stored a bet on db")
+        console.log("stored on db bet ", r.transaction)
+        console.log("new jackpot: ", jackpot)
     })
 }

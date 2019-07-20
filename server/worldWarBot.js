@@ -1,9 +1,12 @@
+// DB interface
+const firebase = require('./firebase')
+const db = firebase.db
 
 // SIMULATION PARAMS
 const COHESION_BIAS = 0.3;
-const COUNTRIES = 200;
+const COUNTRIES = 241;
 const CIVIL_WAR_LIKELIHOOD = 0.2;
-const SIMULATIONS = 400;
+const SIMULATIONS = 1;
 
 // the countriesMap is an array of (CountryIndex => CountryStatus) where CountryStatus is:
 // {
@@ -11,6 +14,8 @@ const SIMULATIONS = 400;
 //   angerIndex: [0-1], Index representing the unity of the country that impacting on civil rebelions probability
 // }
 var countriesMap;
+// db ref
+var countriesMapRef = db.ref('countriesMap')
 
 // the neighborCountries is an array of (CountryIndex => [CountryIndexes])
 var neighborCountries;
@@ -18,6 +23,11 @@ var neighborCountries;
 var turn;
 var turnData = {};
 var simulation = false;
+
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 const init = async () => {
   turn = 0;
@@ -50,9 +60,17 @@ const getRandom = (odds) => {
   return Math.floor(Math.random() * odds);
 }
 
-const loadSavedState = async () => {};
+const loadSavedState = async () => {
+  return new Promise(async function(resolve, reject) {
+    countriesMapRef.once('value', function(snapshot) {
+      resolve(snapshot.val())
+    })
+  })
+};
 
-const saveCurrentState = async () => {};
+const saveCurrentState = async () => {
+  countriesMapRef.set(countriesMap)
+};
 
 // Returns array of countryIndexes
 const conquerableTerritoriesOf = (c) => {
@@ -206,6 +224,7 @@ const simulate = async () => {
   for (var i=0; i<SIMULATIONS; i++){
     init();
     while (!!(await nextTurn())) {
+      await sleep(5000);
       let d = currentTurnData()
       civilWars += d.civilWar;
       conquest[d.o] += 1;

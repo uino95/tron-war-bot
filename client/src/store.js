@@ -3,12 +3,15 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+export const test = true;
+
 export default new Vuex.Store({
   state: {
     loggedInAccount: null,
     accountBalance: -1,
-    selectedCountry: -1,
-    isMobile: false
+    selectedCountry: null,
+    isMobile: false,
+    test: test, //REMEBER TO SWITCH TO FALSE
   },
   mutations: {
     setLoggedInAccount(state, payload) {

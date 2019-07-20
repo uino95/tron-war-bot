@@ -50,10 +50,10 @@
             </v-layout>
             <b>Spain conqured the world! <br>Next run will start soon. Stay tuned!</b>
             <br>
-            <!-- <v-btn v-if="info.serverStatus == 200" color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
-              <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...</v-btn>
-              <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...</v-btn> -->
-            <v-btn color="warning">Cannot bet at the moment</v-btn>
+            <v-btn v-if="info.serverStatus == 200" color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+            <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...</v-btn>
+            <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...</v-btn> 
+            <!--<v-btn color="warning">Cannot bet at the moment</v-btn>-->
           </v-form>
         </v-card-title>
         <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
@@ -205,8 +205,10 @@ export default {
   methods: {
     placeBet() {
       let _this = this;
-      if (!window.tronWeb || !window.tronWeb.ready) {
-        this.$emit('showModal', 'login')
+      if (this.$store.state.loggedInAccount == null) {
+        this.snackbarText = "Login First";
+        this.snackbarColor = "error";
+        this.snackbar = true;
       } else if (this.currentCountry == null) {
         this.snackbarText = "Select a country from map or search it";
         this.snackbarColor = "error";
@@ -216,7 +218,9 @@ export default {
         this.snackbarColor = "info";
         this.snackbar = true;
         let _txId;
-        let contract_address = "TQXiV4TeKS4zF54PiCsUyKTQ22yYY6KuzL";
+        console.log(this.$store.state)
+        let contract_address = this.$store.state.test ?  "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e" : "TQXiV4TeKS4zF54PiCsUyKTQ22yYY6KuzL";
+        console.log(contract_address)
         window.tronWeb.contract().at(contract_address).then(contract => {
           contract.bet(0, _this.currentCountry).send({
             callValue: window.tronWeb.toSun(this.info.minBet)
@@ -245,7 +249,7 @@ export default {
     },
     async postReferral(txId) {
       try {
-        await axios.post(`https://tronwarbot.herokuapp.com/referral`, {
+        await axios.post(this.$store.state.test ? `https://localhost:3000/referral` : `https://api.tronwarbot.com/referral`, {
           user_addr: this.account,
           txId: txId,
           referrer_addr: window.location.pathname.slice(5)
@@ -318,10 +322,11 @@ export default {
       return arr.sort(compare);
     },
     myBets: function() {
-      return this.bets.filter(bet => bet.address === this.account).reverse()
+      return this.bets.filter(bet => bet.address === this.account && bet.gameType == 0).reverse()
     },
     latestBets: function() {
-      return this.bets.slice(-30, this.bets.lenght).reverse()
+      let filteredBets = this.bets.filter(bet => bet.gameType == 0)
+      return filteredBets.slice(-30, this.bets.lenght).reverse()
     },
     calculatePotentialWin: function() {
       if (this.currentCountry == null) return 0;

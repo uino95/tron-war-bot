@@ -62,8 +62,13 @@ const createWatchEvents = function(c){
 
 module.exports.init = async function(){
   if (twb && war) return;
-  twb = await tronWeb.contract().at(config.tron.tronWarBotAddress)
-  war = await tronWeb.contract().at(config.tron.warCoinAddress)
+  if(config.test){
+    twb = await tronWeb.contract().at(config.tronTest.tronWarBotAddress)
+    war = await tronWeb.contract().at(config.tronTest.warCoinAddress)
+  } else {
+    twb = await tronWeb.contract().at(config.tron.tronWarBotAddress)
+    war = await tronWeb.contract().at(config.tron.warCoinAddress)
+  }
   twb.getEvents = createEventsFilter(twb);
   twb.watchEvents = createWatchEvents(twb);
   war.getEvents = createEventsFilter(war);
@@ -245,6 +250,8 @@ module.exports.payout = async function (gameType, gameRound, winningChoice) {
 }
 
 module.exports.startUp = async function(gameType){
+  // if (!twb || !war) await this.init();
+  // let txId = await this.twb.startGame(gameType).send();
   var l = await this.getCurrentRound(gameType);
   if (!l.stoppedAt) return;
   var r = await this.startGame(gameType);
