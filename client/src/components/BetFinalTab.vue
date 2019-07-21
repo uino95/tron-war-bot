@@ -87,7 +87,7 @@
             <!-- if the user has already placed at least one bet -->
             <v-layout v-if="myBets.length === 0">
               <v-flex class="subheading">
-                You do not have any bet yet.
+                <v-chip label outline color="red">No bets yet...</v-chip>
               </v-flex>
             </v-layout>
 

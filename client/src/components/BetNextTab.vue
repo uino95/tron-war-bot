@@ -2,7 +2,7 @@
   <v-flex v-if="!showBetNextTab">
     <v-card >
       <v-card-text >
-        <div class="text-xs-center display-3 text-capitalize">Will be there as the next run starts</div>
+        <div class="text-xs-center display-1 text-capitalize">It will be available as next run starts</div>
       </v-card-text>
     </v-card>
   </v-flex>
