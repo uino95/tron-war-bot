@@ -81,6 +81,7 @@
             <v-toolbar-title>My Latest Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
+          
           <v-container grid-list-md text-xs-centerm class="gameTab">
 
             <!-- if the user has already placed at least one bet -->
@@ -91,27 +92,22 @@
             </v-layout>
 
             <!-- else show the bets -->
-            <v-layout v-else>
-              <v-flex class="title">
-                You do not have any bet yet.
+            <v-layout v-else row wrap class="gameTabHeader">
+              <v-flex xs3 class="title">
+                Country
+              </v-flex>
+              <v-flex xs3 class="title">
+                Bet
+              </v-flex>
+              <v-flex xs3 class="title">
+                Turn
+              </v-flex>
+              <v-flex xs3 class="title">
+                Result
               </v-flex>
 
-              <v-layout row wrap class="gameTabHeader">
-                <v-flex xs3 class="title">
-                  Country
-                </v-flex>
-                <v-flex xs3 class="title">
-                  Bet
-                </v-flex>
-                <v-flex xs3 class="title">
-                  Turn
-                </v-flex>
-                <v-flex xs3 class="title">
-                  Result
-                </v-flex>
-              </v-layout>
-
               <v-divider class="gameTabDivider"></v-divider>
+
               <v-container class="gameTabContent">
                 <v-layout row wrap v-for="bet in myBets" :key="bet.time">
                   <v-flex xs3 class="subheading">
@@ -128,7 +124,9 @@
                   </v-flex>
                 </v-layout>
               </v-container>
+
             </v-layout>
+
           </v-container>
         </v-card>
       </v-flex>

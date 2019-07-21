@@ -19,6 +19,7 @@
           <v-divider class="gameTabDivider"></v-divider>
 
           <v-container class="gameTabContent">
+            <v-layout  column>
             <v-layout row wrap v-for="country in sortedArray.slice(10 * currentRunPagination - 10, 10 * currentRunPagination )" :key="country[0]">
               <v-flex xs2>
                 <v-avatar size="90%">
@@ -32,11 +33,13 @@
                 {{country[1].length}}
               </v-flex>
             </v-layout>
+
             <v-pagination
               v-model="currentRunPagination"
               :length="25"
             >
             </v-pagination>
+            </v-layout>
           </v-container>
 
         </v-container>
@@ -53,6 +56,7 @@
         </v-toolbar>
 
         <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
+
           <v-layout align-center justify-space-between row wrap class="gameTabHeader">
             <v-flex xs3 class="title">
               Turn
@@ -69,7 +73,7 @@
 
           <v-container class="gameTabContent">
 
-            <v-layout align-center justify-space-between row wrap v-for="conquest in history.slice().reverse().splice(10 * currentHistoryPagination - 10, 10 * currentHistoryPagination)" :key="conquest.turn">
+            <v-layout align-center justify-space-between row wrap v-for="conquest in history.slice().reverse().slice(10 * currentHistoryPagination - 10, 10 * currentHistoryPagination)" :key="conquest.turn">
               <v-flex xs2 style="text-align: start" class="subheading">
                 {{conquest.turn}}
               </v-flex>
@@ -87,12 +91,12 @@
               </v-flex>
             </v-layout>
 
-            <v-pagination
-              v-model="currentHistoryPagination"
-              :length="Math.ceil(history.length/10)">
-            </v-pagination>
-
           </v-container>
+          <v-pagination
+            v-model="currentHistoryPagination"
+            :length="Math.ceil(history.length/10)">
+          </v-pagination>
+
         </v-container>
       </v-card>
     </v-flex>
