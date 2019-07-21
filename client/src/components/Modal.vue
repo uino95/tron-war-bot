@@ -76,11 +76,15 @@
           100% of TronWarBot profits are shared back to token holders! (..but yes we detain around 50% of the current
           token supply). After every stage you will need 50 more TRX to mine one WAR. Dividend payout will happen at the
           end of the run.
-          <br><br>
+          <br>
           <v-divider mt-3 />
           <br>
           <span class="headling">We are in stage 1 of 10. You need to play 50 TRX to mine 1 WAR</span>
-          <v-progress-linear color="primary" height="15" v-model="dividendStage"></v-progress-linear>
+          <v-progress-linear color="primary" height="30" v-model="dividendStage">
+             <p class="white-text text-xs-center pt-1">
+               <core-timer />  
+             </p>
+          </v-progress-linear>
           <v-divider mt-8 />
           <br>
           <v-layout row wrap>
@@ -120,54 +124,10 @@
             </v-flex>
             <v-spacer />
           </v-layout>
-          <!-- <v-layout row wrap>
-            <v-flex xs4>
-              <span class="display-3"> Available Dividends: </span>
-              <span class="display-1">{{availableTRX}}</span>
-            </v-flex>
-            <v-flex xs3>
-              <v-avatar class="xs3" tile size="40">
-                <img src="https://cdn.coinranking.com/behejNqQs/trx.svg">
-              </v-avatar>
-              <span class="display-1 xs1">TRX </span>
-            </v-flex>
-          </v-layout>
 
-          <v-divider mt-3 />
+          <v-divider/>
 
-          Total Mined:
-          <v-layout row wrap>
-            <v-flex xs9>
-              <span class="display-1">{{totalWARSupply}}</span>
-            </v-flex>
-            <v-flex xs3>
-              <v-avatar class="xs3" tile size="42">
-                <img src="/img/logo.png">
-              </v-avatar>
-              <span class="display-1 xs1">WAR </span>
-            </v-flex>
-          </v-layout>
-
-          You have:
-          <v-layout row wrap>
-            <v-flex xs9>
-              <span class="display-1">{{myWAR}}</span>
-            </v-flex>
-            <v-flex xs3>
-              <v-avatar class="xs3" tile size="42">
-                <img src="/img/logo.png">
-              </v-avatar>
-              <span class="display-1 xs1">WAR </span>
-            </v-flex>
-          </v-layout> -->
-
-          <v-divider mt-3 />
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-text-area v-on="on"> At the end of the run by clicking the button "Claim your dividends" you will get 100 TRX every 10 WAR: {{100 * (myWAR/10)}} </v-text-area>
-            </template>
-            <span> 100 TRX every 10 WAR </span>
-          </v-tooltip>
+          <v-text-area mt-3> At the end of the run by clicking the button "Claim your dividends" you will get 100 TRX every 10 WAR. <b>Right now you will receive: {{100 * (myWAR/10)}} TRX</b> </v-text-area>
           
           <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
           (end of the run) -->

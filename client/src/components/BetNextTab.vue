@@ -1,10 +1,10 @@
 <template>
   <v-flex v-if="!showBetNextTab">
-    <v-img src="https://i.imgur.com/GKCAJ6A.jpg">
-      <v-card-text>
-        <div class="text-xs-center display-3 white--text text-capitalize">Will be there as the next run starts</div>
+    <v-card >
+      <v-card-text >
+        <div class="text-xs-center display-3 text-capitalize">Will be there as the next run starts</div>
       </v-card-text>
-    </v-img>
+    </v-card>
   </v-flex>
   <v-container v-else grid-list-md text-xs-center class="outerTabContainer">
     <v-layout row wrap>
@@ -234,7 +234,6 @@
           let _txId;
           let contract_address = this.$store.state.test ? "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e" :
             "TQXiV4TeKS4zF54PiCsUyKTQ22yYY6KuzL";
-          console.log(contract_address)
           window.tronWeb.contract().at(contract_address).then(contract => {
             contract.bet(0, _this.currentCountry).send({
               callValue: window.tronWeb.toSun(this.info.minBet)
