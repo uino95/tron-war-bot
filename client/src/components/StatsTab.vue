@@ -58,13 +58,13 @@
         <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
 
           <v-layout align-center justify-space-between row wrap class="gameTabHeader">
-            <v-flex xs3 class="title">
+            <v-flex style="text-align: start;" xs3 class="title">
               Turn
             </v-flex>
-            <v-flex xs6 class="title">
+            <v-flex xs6 class="title" style="text-align: center;">
               Conquest
             </v-flex>
-            <v-flex xs3 class="title">
+            <v-flex xs3 class="title" style="text-align: end;">
               Prev. owner
             </v-flex>
           </v-layout>
@@ -77,17 +77,36 @@
               <v-flex xs2 style="text-align: start" class="subheading">
                 {{conquest.turn}}
               </v-flex>
-              <v-flex xs3 class="subheading greenText">
-                {{universalMap(conquest.conquest[0])}}
+
+              <v-flex xs3 text-truncated class="subheading greenText text-truncate">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <span v-on="on" v-text="universalMap(conquest.conquest[0])" v-bind:alt="snackbar"></span>
+                  </template>
+                  <span>{{universalMap(conquest.conquest[0])}}</span>
+                </v-tooltip>
               </v-flex>
+
               <v-flex xs1>
                 <v-icon>arrow_forward</v-icon>
               </v-flex>
-              <v-flex xs3 class="subheading redText">
-                {{universalMap(conquest.conquest[1])}}
+
+              <v-flex xs3 class="subheading redText text-truncate">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <span v-on="on" v-text="universalMap(conquest.conquest[1])" v-bind:alt="snackbar"></span>
+                  </template>
+                  <span>{{universalMap(conquest.conquest[1])}}</span>
+                </v-tooltip>
               </v-flex>
-              <v-flex xs3 class="subheading">
-                {{universalMap(conquest.prev)}}
+
+              <v-flex xs3 class="subheading text-truncate">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <span v-on="on" v-text="universalMap(conquest.prev)" v-bind:alt="snackbar"></span>
+                  </template>
+                  <span>{{universalMap(conquest.prev)}}</span>
+                </v-tooltip>
               </v-flex>
             </v-layout>
 
