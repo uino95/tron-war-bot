@@ -20,7 +20,8 @@ export default new Vuex.Store({
     },
     currentAddressWarBalance: 0,
     availableDividends: 0,
-    accountOperator: "TPisPeMpZALp41Urg6un6S4kJJSZdtw6Kw"
+    accountOperator: "TPisPeMpZALp41Urg6un6S4kJJSZdtw6Kw",
+    totalWARSupply: 0
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -45,6 +46,9 @@ export default new Vuex.Store({
     },
     setCurrentAddressWarBalance(state, payload) {
       state.currentAddressWarBalance = payload.currentAddressWarBalance
+    },
+    setTotalWarSupply(state, payload){
+      state.totalWARSupply = payload.totalWARSupply
     }
   },
   actions: {

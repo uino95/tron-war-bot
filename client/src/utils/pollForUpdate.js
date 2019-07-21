@@ -47,6 +47,15 @@ let pollForUpdate = function () {
         })
       }
 
+      // update total war balance supply
+      const currentTotalWARSupply = await store.state.contracts.WarCoinInstance.totalSupply().call();
+      const currentTotalWARSupplyInTRX = tronWeb.fromSun(currentTotalWARSupply)
+      if (currentTotalWARSupply !== store.state.totalWARSupply) {
+        store.commit('setTotalWarSupply', {
+          totalWARSupply: currentTotalWARSupplyInTRX
+        })
+      }
+
       // update current address war balance
       if(store.state.loggedInAccount !== null){
         const currentWarBalanceInSun = await store.state.contracts.WarCoinInstance.balanceOf(store.state.loggedInAccount).call();
@@ -61,6 +70,8 @@ let pollForUpdate = function () {
           currentAddressWarBalance: 0
         })
       }
+
+
     } else {
       tronWeb = window.tronWeb
       if(store.state.contracts.WarCoinInstance == null){
