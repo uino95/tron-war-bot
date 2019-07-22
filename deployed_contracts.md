@@ -2,7 +2,7 @@
 
 ### Test Contracts v0.1
   WarCoin     = TJ6kbSxQ8ctPGuHmRb3W92gUN42AooHeNt
-  TronWarBot  = TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e
+  TronWarBot  = TYUyBmkVZdtftSJf9c5StD8rMXFf37thab
 
 
 ### Production Live Contracts v1.0

@@ -2,13 +2,13 @@ module.exports = {
   tron: {
     privateKey: process.env.TRON_PRIVATE_KEY || "",
     fullHost: process.env.TRON_FULL_HOST || 'https://api.trongrid.io',
-    tronWarBotAddress: process.env.TRON_WAR_BOT_ADDRESS || "TQXiV4TeKS4zF54PiCsUyKTQ22yYY6KuzL",
+    tronWarBotAddress: process.env.TRON_WAR_BOT_ADDRESS || "TY7KWcSvmwA1J7pCy42S1wBbf9c1siCkMo",
     warCoinAddress: process.env.WAR_COIN_ADDRESS || "TTbPmiq35XjAhQThatnukS45pNYd7xV2m1"
   },
   tronTest: {
     privateKey: process.env.TRON_PRIVATE_KEY || "",
     fullHost: process.env.TRON_FULL_HOST || 'https://api.trongrid.io',
-    tronWarBotAddress: "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e",
+    tronWarBotAddress: "TYUyBmkVZdtftSJf9c5StD8rMXFf37thab",
     warCoinAddress: "TJ6kbSxQ8ctPGuHmRb3W92gUN42AooHeNt"
   },
   game: {

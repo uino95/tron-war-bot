@@ -11,7 +11,7 @@ const SIMULATIONS = 1;
 // the countriesMap is an array of (CountryIndex => CountryStatus) where CountryStatus is:
 // {
 //   occupiedBy: CountryIndex,
-//   angerIndex: [0-1], Index representing the unity of the country that impacting on civil rebelions probability
+//   cohesion: [0-1], Index representing the unity of the country that impacting on civil rebelions probability
 // }
 var countriesMap;
 // db ref
@@ -29,14 +29,15 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const init = async () => {
+const init = async (restart) => {
   turn = 0;
   countriesMap = new Array(COUNTRIES).fill(0).map((e,idx)=>{
-   return {
-     occupiedBy: idx,
-     cohesion: 0.5
-   }
+    return {
+      occupiedBy: idx,
+      cohesion: 0.5
+    }
   });
+  if (!restart) countriesMap = await loadSavedState();
   // the neighborCountries is an array of (CountryIndex => [CountryIndexes])
   neighborCountries = new Array(COUNTRIES).fill(0).map(()=>[]);
   for (var c=0; c<COUNTRIES; c++){
@@ -61,9 +62,9 @@ const getRandom = (odds) => {
 }
 
 const loadSavedState = async () => {
-  return new Promise(async function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
     countriesMapRef.once('value', function(snapshot) {
-      resolve(snapshot.val())
+      return resolve(snapshot.val())
     })
   })
 };
