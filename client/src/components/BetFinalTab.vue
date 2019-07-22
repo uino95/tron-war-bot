@@ -48,15 +48,11 @@
                   <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
                     label="Current Jackpot" outline disabled></v-text-field>
                 </v-flex>
-                <v-flex md4>
-                  <v-text-field v-model="currency" label="Currency" outline disabled></v-text-field>
-                </v-flex>
               </v-layout>
 
               <v-btn v-if="info.serverStatus == 200" color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
               <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...</v-btn>
-              <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...</v-btn> 
-              <core-timer ref="runTimer" isRunTimer />
+              <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...</v-btn>
 
               <!-- <v-flex md4>
                 <v-btn color="warning">Cannot bet at the moment</v-btn>
@@ -287,7 +283,7 @@
                 _this.snackbarText =
                   `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
                 if (window.location.pathname.startsWith('/ref')) {
-                  //_this.postReferral(_txId)
+                  _this.postReferral(_txId)
                 }
               } else {
                 _this.snackbarText = tx.ret[0].contractRet;

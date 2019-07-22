@@ -18,8 +18,8 @@
 
           <v-divider class="gameTabDivider"></v-divider>
 
-          <v-container class="gameTabContent">
-            <v-layout  column>
+          <v-container>
+            <v-layout column>
             <v-layout row wrap v-for="country in sortedArray.slice(10 * currentRunPagination - 10, 10 * currentRunPagination )" :key="country[0]">
               <v-flex xs2>
                 <v-avatar size="90%">
