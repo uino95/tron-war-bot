@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import BetNextTab from './components/BetNextTab.vue'
+import BetFinalTab from './components/BetFinalTab.vue'
 
 Vue.use(Router)
 
@@ -9,17 +9,17 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: BetNextTab
-    },
-    {
-      path: '/betnext',
-      name: 'betnext',
-      component: BetNextTab
+      component: BetFinalTab
     },
     {
       path: '/betfinal',
       name: 'betfinal',
-      component: () => import('./components/BetFinalTab.vue')
+      component: BetFinalTab
+    },
+    {
+      path: '/betnext',
+      name: 'betnext',
+      component: () => import('./components/BetNextTab.vue')
     },
     {
       path: '/stats',

@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-export const test = true;
+export const test = true; //REMEBER TO SWITCH TO FALSE
 
 export default new Vuex.Store({
   state: {
@@ -11,7 +11,17 @@ export default new Vuex.Store({
     accountBalance: -1,
     selectedCountry: null,
     isMobile: false,
-    test: test, //REMEBER TO SWITCH TO FALSE
+    test: test, 
+    contracts:{
+      WarCoinAddress: test ? "TJ6kbSxQ8ctPGuHmRb3W92gUN42AooHeNt" : "TTbPmiq35XjAhQThatnukS45pNYd7xV2m1",
+      TronWarBotAddress: test ? "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e" : "TQXiV4TeKS4zF54PiCsUyKTQ22yYY6KuzL",
+      WarCoinInstance: null,
+      TronWarBotInstance: null
+    },
+    currentAddressWarBalance: 0,
+    availableDividends: 0,
+    accountOperator: "TPisPeMpZALp41Urg6un6S4kJJSZdtw6Kw",
+    totalWARSupply: 0
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -25,24 +35,30 @@ export default new Vuex.Store({
     },
     setIsMobile(state, value){
       state.isMobile = value
+    },
+    setContractsInstance(state, payload){
+      console.log("setting contracts instance ", payload)
+      state.contracts.TronWarBotInstance = payload.tronWarBot
+      state.contracts.WarCoinInstance = payload.warCoin
+    },
+    setAvailableDividends(state, payload) {
+      state.availableDividends = payload.availableDividends
+    },
+    setCurrentAddressWarBalance(state, payload) {
+      state.currentAddressWarBalance = payload.currentAddressWarBalance
+    },
+    setTotalWarSupply(state, payload){
+      state.totalWARSupply = payload.totalWARSupply
     }
   },
   actions: {
-    async updateLoggedInAccount(context) {
-      const account = await window.tronWeb.trx.getAccount();
-      const accountAddress = account.address; // HexString(Ascii)
-      const accountAddressInBase58 = window.tronWeb.address.fromHex(accountAddress); // Base58
-      context.commit('setLoggedInAccount', {
-        accountAddress: accountAddressInBase58
+    async registerContractsInstance({commit, state}){
+      const tronWarBotInstance = await window.tronWeb.contract().at(state.contracts.TronWarBotAddress)
+      const warCoinInstance = await window.tronWeb.contract().at(state.contracts.WarCoinAddress)
+      commit('setContractsInstance', {
+        warCoin: warCoinInstance,
+        tronWarBot: tronWarBotInstance
       })
-    },
-    async updateAccountBalance(context) {
-      const balanceInSun = await window.tronWeb.trx.getBalance(); //number
-      const balanceInTRX = window.tronWeb.fromSun(balanceInSun); //string
-      // const changeBackToSun = window.tronWeb.toSun(balanceInTRX); //string
-      context.commit('setAccountBalance', {
-        accountBalance: balanceInTRX
-      })
-    },
+    } 
   }
 })

@@ -252,8 +252,12 @@ module.exports.payout = async function (gameType, gameRound, winningChoice) {
 module.exports.startUp = async function(gameType){
   // if (!twb || !war) await this.init();
   // let txId = await this.twb.startGame(gameType).send();
+  // console.log(txId)
   var l = await this.getCurrentRound(gameType);
-  if (!l.stoppedAt) return;
+  if (!l.stoppedAt) {
+    console.log("START-UP completed")
+    return;
+  }
   var r = await this.startGame(gameType);
   console.log("START-UP completed")
 }

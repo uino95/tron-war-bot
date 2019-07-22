@@ -70,7 +70,7 @@ app.get('/', (req, res) => {
 ///////////////////////////////////// STARTUP ////////////////////////////////////////
 
 twb.startUp(0);
-//backendLogic.syncServer(false);
+backendLogic.syncServer(false);
 backendLogic.watchBet();
 backendLogic.watchNewTurn();
 referral.watchPayer();

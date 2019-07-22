@@ -72,6 +72,7 @@
 
 
 <script>
+import pollForUpdate from './utils/pollForUpdate'
 export default {
   name: 'App',
   data: () => ({
@@ -190,6 +191,9 @@ export default {
       return check;
     }
   },
+  beforeCreate(){
+    pollForUpdate()    
+  },
   mounted() {
     this.$store.commit('setIsMobile', this.isMobile())
     this.track()
@@ -197,13 +201,6 @@ export default {
       this.noShowMap = false
       this.startLoading()
     }
-    window.onmessage = (event) => {
-      // Waiting for that message.
-      if (event.data.isTronLink || (event.data.message && event.data.message.action === 'setAccount')) {
-        this.$store.dispatch('updateAccountBalance')
-        this.$store.dispatch('updateLoggedInAccount')
-      }
-    };
   }
 }
 </script>

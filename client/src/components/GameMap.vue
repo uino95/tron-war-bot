@@ -8,7 +8,6 @@
     Button,
     Sprite,
     useTheme,
-    color
   } from "@amcharts/amcharts4/core";
   import {
     MapChart,
@@ -22,9 +21,6 @@
   import {
     db
   } from "../plugins/firebase"
-  import {
-    hslToRgb
-  } from '@amcharts/amcharts4/.internal/core/utils/Colors';
 
   useTheme(am4themes_spiritedaway);
   export default {
@@ -83,7 +79,6 @@
     }),
     mounted() {
       db.ref('countriesMap').on('child_changed', (snapshot) => {
-        let data = snapshot.val();
         let id = snapshot.key;
         db.ref('countriesMap').orderByKey().equalTo(id).once('value', (snapshotChild) => {
           let id1 = Object.keys(snapshotChild.val())[0]
@@ -148,7 +143,6 @@
 
       hexToHsl(hex) {
         var result = this.hexToRgb(hex);
-        console.log(result)
         var r = result.r;
         var g = result.g;
         var b = result.b
