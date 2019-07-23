@@ -1,7 +1,8 @@
 <template>
   <v-container grid-list-md text-xs-center class="outerTabContainer">
+
+    <!-- Place a bet -->
     <v-layout row wrap>
-      <!-- Place a bet -->
       <v-flex>
         <v-card>
 
@@ -26,25 +27,25 @@
             <v-form ref="form" v-model="valid" lazy-validation>
 
               <v-layout row align-center justify-center wrap>
-                <v-flex md4>
+                <v-flex md9>
                   <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
                     :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
                     placeholder="Type in or pick from map"></v-autocomplete>
                 </v-flex>
-                <v-flex md4>
+              </v-layout>
+
+              <v-layout align-center justify-center row wrap>
+                <v-flex md3>
                   <v-tooltip slot="append" top>
                     <v-text-field slot="activator" :value="calculatePotentialWin" label="Potential win" outline disabled>
                     </v-text-field>
                     <span>Here you can see what you will win if you bet on the selected country. </span>
                   </v-tooltip>
                 </v-flex>
-              </v-layout>
-
-              <v-layout align-center justify-center row wrap>
-                <v-flex md4>
+                <v-flex md3>
                   <core-balance-button />
                 </v-flex>
-                <v-flex md4>
+                <v-flex md3>
                   <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
                     label="Current Jackpot" outline disabled></v-text-field>
                 </v-flex>
@@ -69,155 +70,202 @@
         </v-card>
       </v-flex>
     </v-layout>
+
     <v-layout row wrap>
       <!-- My latest bets -->
-      <v-flex>
-        <v-card>
-          <v-toolbar color="primary" dark>
-            <v-toolbar-title>My Latest Bets</v-toolbar-title>
-            <v-spacer></v-spacer>
-          </v-toolbar>
-          
-          <v-container grid-list-md text-xs-centerm class="gameTab">
+      <v-flex column wrap>
 
-            <!-- if the user has already placed at least one bet -->
-            <v-layout v-if="myBets.length === 0">
-              <v-flex class="subheading">
-                <v-chip label outline color="red">No bets yet...</v-chip>
-              </v-flex>
-            </v-layout>
+        <v-flex>
+          <v-card>
+            <v-toolbar color="primary" dark>
+              <v-toolbar-title>My Latest Bets</v-toolbar-title>
+              <v-spacer></v-spacer>
+            </v-toolbar>
 
-            <!-- else show the bets -->
-            <v-layout v-else row wrap class="gameTabHeader">
-              <v-flex xs3 class="title">
-                Country
-              </v-flex>
-              <v-flex xs3 class="title">
-                Bet
-              </v-flex>
-              <v-flex xs3 class="title">
-                Turn
-              </v-flex>
-              <v-flex xs3 class="title">
-                Result
-              </v-flex>
+            <v-container grid-list-md text-xs-centerm class="gameTab">
+
+              <!-- if the user has already placed at least one bet -->
+              <v-layout v-if="myBets.length === 0">
+                <v-flex class="subheading">
+                  <v-chip label outline color="red">No bets yet...</v-chip>
+                </v-flex>
+              </v-layout>
+
+              <!-- else show the bets -->
+              <v-layout v-else row wrap class="gameTabHeader">
+                <v-flex xs3 class="title">
+                  Country
+                </v-flex>
+                <v-flex xs3 class="title">
+                  Bet
+                </v-flex>
+                <v-flex xs3 class="title">
+                  Turn
+                </v-flex>
+                <v-flex xs3 class="title">
+                  Result
+                </v-flex>
+
+                <v-divider class="gameTabDivider"></v-divider>
+
+                <v-container class="gameTabContent">
+                  <v-layout row wrap v-for="bet in myBets" :key="bet.time">
+                    <v-flex xs3 class="subheading">
+                      {{universalMap(bet.country)}}
+                    </v-flex>
+                    <v-flex xs3 class="subheading">
+                      {{bet.bet+"TRX"}}
+                    </v-flex>
+                    <v-flex xs3 class="subheading">
+                      {{bet.turn}}
+                    </v-flex>
+                    <v-flex xs3 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
+                      {{convertResultBet(bet.result)}}
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+
+              </v-layout>
+
+            </v-container>
+          </v-card>
+        </v-flex>
+        <!-- Latest bets -->
+        <v-flex>
+          <v-card>
+            <v-toolbar color="primary" dark>
+              <v-toolbar-title>Latest Bets</v-toolbar-title>
+              <v-spacer></v-spacer>
+            </v-toolbar>
+
+            <!-- if the user is using a mobile device -->
+            <v-container v-if="this.$store.state.isMobile" grid-list-md text-xs-center class="gameTab">
+
+              <v-layout row wrap class="gameTabHeader">
+                <v-flex xs6 class="title">
+                  <span>Country</span>
+                </v-flex>
+                <v-flex xs3 class="title">
+                  <span>Bet</span>
+                </v-flex>
+                <v-flex xs3 class="title">
+                  <span>Turn</span>
+                </v-flex>
+              </v-layout>
 
               <v-divider class="gameTabDivider"></v-divider>
+              <v-container class="gameTabContent" text-xs-center>
 
-              <v-container class="gameTabContent">
-                <v-layout row wrap v-for="bet in myBets" :key="bet.time">
-                  <v-flex xs3 class="subheading">
-                    {{universalMap(bet.country)}}
+                <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
+                  <v-flex xs6 class="subheading">
+                    <span>{{universalMap(bet.country)}}</span>
                   </v-flex>
                   <v-flex xs3 class="subheading">
-                    {{bet.bet+"TRX"}}
+                    <span>{{bet.bet+"TRX"}}</span>
                   </v-flex>
                   <v-flex xs3 class="subheading">
-                    {{bet.turn}}
-                  </v-flex>
-                  <v-flex xs3 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                    {{convertResultBet(bet.result)}}
+                    <span>{{bet.turn}}</span>
                   </v-flex>
                 </v-layout>
+
               </v-container>
+            </v-container>
 
-            </v-layout>
+            <!-- else, the user is on pc -->
+            <v-container v-else grid-list-md text-xs-center class="gameTab">
+              <v-layout row wrap class="gameTabHeader">
+                <v-flex xs3 class="title">
+                  <span>Address</span>
+                </v-flex>
+                <v-flex xs5 class="title">
+                  <span>Country</span>
+                </v-flex>
+                <v-flex xs2 class="title">
+                  <span>Bet</span>
+                </v-flex>
+                <v-flex xs2 class="title">
+                  <span>Turn</span>
+                </v-flex>
+              </v-layout>
+              <v-divider class="gameTabDivider"></v-divider>
+              <v-container class="gameTabContent" text-xs-center>
+                <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
 
-          </v-container>
-        </v-card>
+                  <v-flex xs3 class="subheading">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on }">
+                        <span v-on="on" v-text="bet.address.substring(0,5)+'..'" v-bind:alt="bet.address"></span>
+                      </template>
+                      <span>{{bet.address}}</span>
+                    </v-tooltip>
+                  </v-flex>
+
+                  <v-flex xs5 class="subheading">
+                    <span>{{universalMap(bet.country)}}</span>
+                  </v-flex>
+
+                  <v-flex xs2 class="subheading">
+                    <span>{{bet.bet+"TRX"}}</span>
+                  </v-flex>
+
+                  <v-flex xs2 class="subheading">
+                    <span>{{bet.turn}}</span>
+                  </v-flex>
+
+                </v-layout>
+              </v-container>
+            </v-container>
+
+          </v-card>
+        </v-flex>
       </v-flex>
-      <!-- Latest bets -->
-      <v-flex>
+
+      <!-- Number of bets per country -->
+      <v-flex xs12 md6>
         <v-card>
           <v-toolbar color="primary" dark>
-            <v-toolbar-title>Latest Bets</v-toolbar-title>
-            <v-spacer></v-spacer>
+            <v-toolbar-title>Number of bets per country</v-toolbar-title>
           </v-toolbar>
 
-          <!-- if the user is using a mobile device -->
-          <v-container v-if="this.$store.state.isMobile" grid-list-md text-xs-center class="gameTab">
-            <v-layout row wrap class="gameTabHeader">
-              <v-flex xs5 class="title">
-                <span>Country</span>
-              </v-flex>
-              <v-flex xs2 class="title" style="text-align: start;">
-                <span>Bet</span>
-              </v-flex>
-              <v-flex xs2 class="title" style="text-align: start;">
-                <span>Turn</span>
-              </v-flex>
-              <v-flex xs2 class="title" style="text-align: start;">
-                Result
-              </v-flex>
+          <v-container grid-list-md text-xs-center class="gameTab">
+            <v-layout align-center justify-space-between row wrap class="gameTabHeader">
+              <v-flex style="text-align: start;" class="title">Country</v-flex>
+              <v-flex style="text-align: end;" class="title">Placed bets</v-flex>
             </v-layout>
+
             <v-divider class="gameTabDivider"></v-divider>
-            <v-container class="gameTabContent" text-xs-center>
-              <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
-                <v-flex xs5 class="subheading">
-                  <span>{{universalMap(bet.country)}}</span>
-                </v-flex>
-                <v-flex xs2 class="subheading">
-                  <span>{{bet.bet+"TRX"}}</span>
-                </v-flex>
-                <v-flex xs2 class="subheading">
-                  <span>{{bet.turn}}</span>
-                </v-flex>
-                <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                  {{convertResultBet(bet.result)}}
-                </v-flex>
+
+            <v-container>
+              <v-layout column>
+                <v-layout row wrap v-for="country in betsPerCountry.slice(10 * currentRunPagination - 10, 10 * currentRunPagination )" :key="country.countryId">
+
+                  <v-flex xs2>
+                    <v-avatar>
+                      <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag" :src="getFlagString(universalMap(country.countryId))" :alt="country.countryId" />
+                    </v-avatar>
+                  </v-flex>
+                  <v-flex xs6 style="text-align:start; margin-top:5px;" class="subheading">
+                    {{universalMap(country.countryId)}}
+                  </v-flex>
+                  <v-flex xs4 class="title" style="text-align: end">
+                    {{country.numberOfBets}}
+                  </v-flex>
+                </v-layout>
+
+                <v-pagination
+                  v-model="currentRunPagination"
+                  :length="25"
+                >
+                </v-pagination>
               </v-layout>
             </v-container>
-          </v-container>
 
-          <!-- else, the user is on pc -->
-          <v-container v-else grid-list-md text-xs-center class="gameTab">
-            <v-layout row wrap class="gameTabHeader">
-              <v-flex xs2 class="title">
-                <span>Address</span>
-              </v-flex>
-              <v-flex xs4 class="title">
-                <span>Country</span>
-              </v-flex>
-              <v-flex xs2 class="title" style="text-align: start;">
-                <span>Bet</span>
-              </v-flex>
-              <v-flex xs2 class="title" style="text-align: start;">
-                <span>Turn</span>
-              </v-flex>
-              <v-flex xs2 class="title" style="text-align: start;">
-                Result
-              </v-flex>
-            </v-layout>
-            <v-divider class="gameTabDivider"></v-divider>
-            <v-container class="gameTabContent" text-xs-center>
-              <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
-                <v-flex xs2 class="subheading">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <span v-on="on" v-text="bet.address.substring(0,5)+'..'" v-bind:alt="bet.address"></span>
-                    </template>
-                    <span>{{bet.address}}</span>
-                  </v-tooltip>
-                </v-flex>
-                <v-flex xs4 class="subheading">
-                  <span>{{universalMap(bet.country)}}</span>
-                </v-flex>
-                <v-flex xs2 class="subheading">
-                  <span>{{bet.bet+"TRX"}}</span>
-                </v-flex>
-                <v-flex xs2 class="subheading">
-                  <span>{{bet.turn}}</span>
-                </v-flex>
-                <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                  {{convertResultBet(bet.result)}}
-                </v-flex>
-              </v-layout>
-            </v-container>
           </v-container>
-
         </v-card>
       </v-flex>
     </v-layout>
+
+
   </v-container>
 </template>
 
@@ -228,11 +276,26 @@
   from '../plugins/firebase';
   import mapping from '../assets/mapping';
   import axios from 'axios'
+  import DataIterable from "vuetify/lib/mixins/data-iterable";
+  import VLazyImage from "v-lazy-image";
+
+  String.prototype.replaceAll = function(search, replace) {
+    if (replace === undefined) {
+      return this.toString();
+    }
+    return this.split(search).join(replace);
+  };
 
   export default {
+    components: {
+      DataIterable,
+      VLazyImage
+    },
     data: () => ({
+      currentRunPagination:1,
       isLoading: false,
       valid: false,
+      placeholderFlag: "/img/flags/placeholder.svg",
       snackbar: false,
       snackbarText: "",
       snackbarColor: "",
@@ -251,7 +314,6 @@
       intervalId: null
     }),
 
-
     firebase: {
       history: db.ref('history').orderByChild('turn'),
       bets: db.ref('bets').orderByChild('time'),
@@ -259,6 +321,19 @@
     },
 
     methods: {
+      getFlagString(str) {
+        str = "/img/flags/" + str.toLowerCase()
+          .replaceAll(" ", "-")
+          .replaceAll("ã", "a")
+          .replaceAll("ì", "i")
+          .replaceAll("è", "e")
+          .replaceAll("ì", "i")
+          .replaceAll("å", "a")
+          .replaceAll("é", "e")
+          .replaceAll("í", "i") + ".svg"
+        console.log(str)
+        return str;
+      },
       placeBet: async function() {
         const _this = this
         if (this.$store.state.loggedInAccount == null) {
@@ -371,6 +446,29 @@
       },
       myBets: function () {
         return this.bets.filter(bet => bet.address === this.account && bet.gameType == this.info.gameType).reverse()
+      },
+      //returns an array of objects [{countryId: "id", numberOfBets: x}, ...]
+      betsPerCountry: function () {
+        // it will contain all the countries for which there is at least one bet
+        let countries = []
+        this.bets.forEach(bet =>{
+          countries.push(bet.country)
+        })
+
+        var betsPerCountryList = [];
+        for (const x of Array(241).keys()) {
+          betsPerCountryList.push({countryId: x, numberOfBets: 0})
+        }
+
+        for(var element of countries){
+            betsPerCountryList[element].numberOfBets += 1;
+        }
+
+        betsPerCountryList.sort((a,b) => {
+          return  b.numberOfBets - a.numberOfBets
+        })
+
+        return betsPerCountryList
       },
       latestBets: function () {
         return this.bets.filter(bet => bet.gameType == this.info.gameType).reverse()
