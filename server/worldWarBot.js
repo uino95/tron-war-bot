@@ -20,7 +20,7 @@ var countriesMapRef = db.ref('countriesMap')
 // the neighborCountries is an array of (CountryIndex => [CountryIndexes])
 var neighborCountries;
 
-var turn;
+var turn = 0;
 var turnData = {};
 var simulation = false;
 
@@ -263,6 +263,3 @@ module.exports = {
   pdf,
   simulate
 }
-
-
-init();

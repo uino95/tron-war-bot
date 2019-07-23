@@ -3,9 +3,11 @@ const cron = require("node-cron");
 
 const firebase = require('./firebase')
 const wwb = require('./worldWarBotApi')
+const theRealWwb = require('./worldWarBot')
 const twb = require('./tronWarBot')
 const utils = require('./utils')
 const referral = require('./referral')
+const betValidator = require('./bet')
 const config = require('./config')
 const db = firebase.db
 
@@ -225,28 +227,35 @@ module.exports.watchNewTurn = function() {
 
 // watch for new bets
 module.exports.watchBet = function() {
-    twb.watchEvents('Bet', async function(r) {
-        let bet = r.result
-        let isBetAlreadyOnDb = await checkBetOnDb(r.transaction)
-        if (!!isBetAlreadyOnDb) return console.log("bet " + r.transaction + " already on db");
-        let turn = await fetchLatestTurnOnDb();
-        turn++
-        let betTime = new Date().getTime()
-        let betObj = {
-            address: twb.tronWeb.address.fromHex(bet.from),
-            bet: twb.tronWeb.fromSun(bet.amount),
-            country: bet.userChoice,
-            result: -1,
-            time: betTime,
-            gameType: bet.gameType,
-            turn: turn
-        }
-        betsRef.child(r.transaction).set(betObj)
-        referral.updateReferral(betObj)
-        let jackpot = await twb.availableJackpot(0, bet.round)
-        jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
-        dataRef.update({ jackpot })
-        utils.consoleLog("stored on db bet " + r.transaction + " at " + betTime )
-        console.log("new jackpot: ", jackpot)
-    })
+  return twb.watchEvents('Bet', async function(r) {
+      let bet = r.result
+      if (!betValidator.validate(bet))
+        return console.error("[INVALID_BET]: Received an invalid bet for gameType: " + bet.gameType.toString()
+                            + "\n\tof amount: " + tronWeb.fromSun(bet.amount.toString())
+                            + "\n\tby: " + bet.from.toString()
+                            + "\n\twith user choice: " + bet.userChoice.toString()
+                            + "\n\tbetReference: " + bet.betReference.toString() );
+      let isBetAlreadyOnDb = await checkBetOnDb(r.transaction);
+      if (!!isBetAlreadyOnDb) return console.error("[GENERIC]: Bet " + r.transaction + " is already on DB");
+      let turn = theRealWwb.currentTurn();
+      let betTime = new Date().getTime()
+      let betObj = {
+          address: twb.tronWeb.address.fromHex(bet.from),
+          bet: twb.tronWeb.fromSun(bet.amount),
+          country: bet.userChoice,
+          round: bet.round,
+          betReference : bet.betReference,
+          result: -1,
+          time: betTime,
+          gameType: bet.gameType,
+          turn: turn
+      }
+      betsRef.child(r.transaction).set(betObj)
+      referral.updateReferral(betObj)
+      let jackpot = await twb.availableJackpot(0, bet.round);
+      jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
+      dataRef.update({ jackpot })
+      console.info("Successfully registered bet in tx " + r.transaction + " at " + betTime )
+      console.info("Jackpot is: ", jackpot)
+  })
 }
