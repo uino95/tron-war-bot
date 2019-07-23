@@ -75,7 +75,7 @@
 
             <v-layout v-if="history.length <= 1">
               <v-flex class="subheading">
-                <v-chip label outline color="red">Run not start yet...</v-chip>
+                <v-chip label outline color="red">Run has not started yet...</v-chip>
               </v-flex>
             </v-layout>
 
