@@ -71,7 +71,7 @@ app.get('/', (req, res) => {
 
 twb.startUp(0, false);
 twb.startUp(1, true);
-backendLogic.syncServer(false);
+//backendLogic.syncServer(false);
 backendLogic.watchBet();
 backendLogic.watchNewTurn();
 referral.watchPayer();

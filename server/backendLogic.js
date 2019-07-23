@@ -46,8 +46,6 @@ async function checkBetOnDb(txId) {
     })
 }
 
-
-
 var latestTurn = -1
 var currentTurn = -1
 

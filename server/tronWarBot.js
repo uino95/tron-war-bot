@@ -146,12 +146,10 @@ module.exports.endGame = async function (gameType) {
   return round.round;
 }
 
-
-// // DEPRECATED
-// module.exports.watchEvents = async function (opts, fn=false) {
-//   if (!twb || !war) await this.init();
-//   return this.twb.watchEvents(opts,fn);
-// }
+module.exports.watchEvents = async function (opts, fn=false) {
+  if (!twb || !war) await this.init();
+  return this.twb.watchEvents(opts,fn);
+}
 
 module.exports.availableJackpot = async function (gameType, gameRound) {
   if (!twb || !war) await this.init();
@@ -171,9 +169,9 @@ module.exports.availableJackpot = async function (gameType, gameRound) {
 //4. FOR EACH WINNING BET DIVIDE THE BET AMOUNT FOR THE WINNING AMOUNT
 //5. MULTIPLIES FOR THE AVAILABLE JACKPOT
 //6. PAYOUT LOOP
-module.exports.jackpotPayout = async function (gameType, gameRound, winningChoice, bets) {
+module.exports.jackpotPayout = async function (gameType, gameRound, winningChoice, _bets) {
   if (!twb || !war) await this.init();
-  let bets = bets || await twb.getEvents({
+  let bets = _bets || await twb.getEvents({
     onlyConfirmed:true,
     eventName: "Bet",
     orderBy:"timestamp,desc",
@@ -249,9 +247,9 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
 
 }
 
-module.exports.housePayout = async function (gameType, gameRound, winningChoice, winRate, bets) {
+module.exports.housePayout = async function (gameType, gameRound, winningChoice, winRate, _bets) {
   if (!twb || !war) await this.init();
-  let bets = bets || await twb.getEvents({
+  let bets = _bets || await twb.getEvents({
     onlyConfirmed:true,
     eventName: "Bet",
     orderBy:"timestamp,desc",

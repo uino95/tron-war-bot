@@ -34,7 +34,10 @@ const init = async (restart) => {
   countriesMap = new Array(COUNTRIES).fill(0).map((e,idx)=>{
     return {
       occupiedBy: idx,
-      cohesion: 0.5
+      cohesion: 0.5,
+      occupied: 1,
+      finalBetAmount: 0,
+      probability: 0 
     }
   });
   if (!restart) countriesMap = await loadSavedState();
@@ -54,6 +57,7 @@ const init = async (restart) => {
     }
   }
   neighborCountries = neighborCountries.map((e)=>{return [...new Set(e)]});
+  saveCurrentState()
 };
 
 
