@@ -73,7 +73,13 @@
 
           <v-container class="gameTabContent">
 
-            <v-layout align-center justify-space-between row wrap v-for="conquest in history.slice().reverse().slice(10 * currentHistoryPagination - 10, 10 * currentHistoryPagination)" :key="conquest.turn">
+            <v-layout v-if="history.length <= 1">
+              <v-flex class="subheading">
+                <v-chip label outline color="red">Run not start yet...</v-chip>
+              </v-flex>
+            </v-layout>
+
+            <v-layout v-else align-center justify-space-between row wrap v-for="conquest in history.slice().reverse().slice(10 * currentHistoryPagination - 10, 10 * currentHistoryPagination)" :key="conquest.turn">
               <v-flex xs2 style="text-align: start" class="subheading">
                 {{conquest.turn}}
               </v-flex>
@@ -172,7 +178,7 @@ export default {
   firebase: {
     history: db.ref('history').orderByChild('turn'),
     info: db.ref('data'),
-    mapStatus: db.ref('countries')
+    mapStatus: db.ref('countriesMap')
   },
   methods: {
     getFlagString(str) {
@@ -195,7 +201,7 @@ export default {
       for (var i = this.mapStatus.length - 1; i >= 0; i--) {
         arr.push(this.universalMap(i));
         for (var j = this.mapStatus.length - 1; j >= 0; j--) {
-          if (this.mapStatus[j]['controlledBy'] === i) {
+          if (this.mapStatus[j]['occupiedBy'] === i) {
             tmp.push(j)
           }
         }

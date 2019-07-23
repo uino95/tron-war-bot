@@ -26,9 +26,10 @@ let pollForUpdate = function () {
       if(store.state.loggedInAccount !== null){
         const balanceInSun = await tronWeb.trx.getBalance(store.state.loggedInAccount); //number
         const balanceInTRX = tronWeb.fromSun(balanceInSun); //string
-        if (balanceInTRX !== store.state.accountBalance){
+        const balanceNumber = parseFloat(balanceInTRX).toFixed(3) 
+        if (balanceNumber !== store.state.accountBalance){
           store.commit('setAccountBalance', {
-            accountBalance: balanceInTRX
+            accountBalance: balanceNumber
           })
         }
       } else {
@@ -41,18 +42,21 @@ let pollForUpdate = function () {
       // update available dividends
       const availableDividensInSun = await tronWeb.trx.getBalance(store.state.accountOperator); //number
       const availableDividensInTRX = tronWeb.fromSun(availableDividensInSun); //string
-      if (availableDividensInTRX !== store.state.availableDividens){
+      const availableDividendsFixed = parseFloat(availableDividensInTRX).toFixed(3)
+      console.log(availableDividendsFixed)
+      if (availableDividendsFixed !== store.state.availableDividens){
         store.commit('setAvailableDividends', {
-          availableDividends: availableDividensInTRX
+          availableDividends: availableDividendsFixed
         })
       }
 
       // update total war balance supply
       const currentTotalWARSupply = await store.state.contracts.WarCoinInstance.totalSupply().call();
       const currentTotalWARSupplyInTRX = tronWeb.fromSun(currentTotalWARSupply)
-      if (currentTotalWARSupply !== store.state.totalWARSupply) {
+      const currentTotalWARSupplyFixed = parseFloat(currentTotalWARSupplyInTRX).toFixed(3) 
+      if (currentTotalWARSupplyFixed !== store.state.totalWARSupply) {
         store.commit('setTotalWarSupply', {
-          totalWARSupply: currentTotalWARSupplyInTRX
+          totalWARSupply: currentTotalWARSupplyFixed
         })
       }
 
@@ -60,9 +64,10 @@ let pollForUpdate = function () {
       if(store.state.loggedInAccount !== null){
         const currentWarBalanceInSun = await store.state.contracts.WarCoinInstance.balanceOf(store.state.loggedInAccount).call();
         const currentWarBalanceInTRX = tronWeb.fromSun(currentWarBalanceInSun)
-        if (currentWarBalanceInTRX !== store.state.currentAddressWarBalance) {
+        const currentWarBalanceFixed = parseFloat(currentWarBalanceInTRX).toFixed(3) 
+        if (currentWarBalanceFixed !== store.state.currentAddressWarBalance) {
           store.commit('setCurrentAddressWarBalance', {
-            currentAddressWarBalance: currentWarBalanceInTRX
+            currentAddressWarBalance: currentWarBalanceFixed
           })
         }
       } else {
@@ -78,7 +83,7 @@ let pollForUpdate = function () {
         store.dispatch('registerContractsInstance') 
       }
     }
-  }, 1000)
+  }, 4000)
 }
 
 export default pollForUpdate

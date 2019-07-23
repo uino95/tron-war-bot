@@ -81,9 +81,9 @@
           <br>
           <span class="headling">We are in stage 1 of 10. You need to play 50 TRX to mine 1 WAR</span>
           <v-progress-linear color="primary" height="30" v-model="dividendStage">
-             <p class="white-text text-xs-center pt-1">
+            <!-- <p class=" text-xs-center pt-1">
                <core-timer />  
-             </p>
+             </p> -->
           </v-progress-linear>
           <v-divider mt-8 />
           <br>
@@ -101,7 +101,7 @@
             <v-spacer />
 
             <v-flex xs12 sm5>
-              <v-text-field :value="totalWARSupply + '  WAR'" label="Total War mined" outline readonly>
+              <v-text-field :value="totalWARSupply + '  WAR'" label="Total WAR mined" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="/img/logo.png">
@@ -125,10 +125,12 @@
             <v-spacer />
           </v-layout>
 
-          <v-divider/>
+          <v-divider />
 
-          <v-text-area mt-3> At the end of the run by clicking the button "Claim your dividends" you will get 100 TRX every 10 WAR. <b>Right now you will receive: {{100 * (myWAR/10)}} TRX</b> </v-text-area>
-          
+          <v-text-area mt-3> At the end of the run by clicking the button "Claim your dividends" you will get 100 TRX
+            every 10 WAR. <b>Right now you will receive:
+              {{parseFloat(availableTRX * (myWAR/totalWARSupply)).toFixed(3)}} TRX</b> </v-text-area>
+
           <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
           (end of the run) -->
         </v-card-text>
@@ -232,6 +234,7 @@
   import {
     db
   } from '../plugins/firebase';
+import { functions } from 'firebase';
   export default {
     name: 'Modal',
     props: {
@@ -239,6 +242,12 @@
       headerTile: String,
       footerTile: String,
       bodyTile: String,
+    },
+    methods: {
+      formatter: function(num) {
+        return Math.abs(num) > 999 ? Math.abs(num) > 999999 ? Math.sign(num) * ((Math.abs(num) / 1000000).toFixed(
+          1)) + 'M' : Math.sign(num) * ((Math.abs(num) / 1000).toFixed(1)) + 'k' : Math.sign(num) * Math.abs(num)
+      }
     },
     computed: {
       isVisible: {
@@ -266,20 +275,23 @@
         return this.$store.state.loggedInAccount
       },
       availableTRX() {
-        return this.$store.state.availableDividends
+        return this.formatter(parseFloat(this.$store.state.availableDividends))
       },
       myWAR() {
-        return this.$store.state.currentAddressWarBalance
+        return this.formatter(parseFloat(this.$store.state.currentAddressWarBalance))
       },
       totalWARSupply() {
-        return this.$store.state.totalWARSupply
+        return this.formatter(parseFloat(this.$store.state.totalWARSupply))
+      },
+      dividendStage() {
+        return Math.floor((100000 - this.totalWARSupply) / 100)
       }
     },
     firebase: {
       referrals: db.ref('referral/map')
     },
     data: () => ({
-      dividendStage: 30,
+
       faq: [{
           question: "What do I do if I'm not able to place the bet?",
           answer: "Check if you have got enough Energy and Bandwidth."
