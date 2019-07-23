@@ -283,7 +283,7 @@
                 _this.snackbarText =
                   `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
                 if (window.location.pathname.startsWith('/ref')) {
-                  _this.postReferral(_txId)
+                  _this.postReferral(txId)
                 }
               } else {
                 _this.snackbarText = tx.ret[0].contractRet;
