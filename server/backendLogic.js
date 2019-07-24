@@ -226,6 +226,7 @@ module.exports.watchNewTurn = function() {
 
 // watch for new bets
 module.exports.watchBet = function() {
+  console.log("[LOGIC]: Watching user bets...")
   return twb.watchEvents('Bet', async function(r) {
       let bet = r.result
       if (!betValidator.validate(bet))

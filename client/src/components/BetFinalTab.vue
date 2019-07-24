@@ -15,7 +15,7 @@
                     <template v-slot:activator="{ on }">
                       <v-icon color="secondary" dark v-on="on">info</v-icon>
                     </template>
-                    <span>Here you can bet on the world conqueror</span>
+                    <span>Bet on the final winner of the World War! Each bet goes into the jackpot. At the end of the run (45 days on average) 80% of the jackpot is given to the winners, and 20% is given to WAR token holders. As the time goes it will be more expensive to bet on countries, also depending on how good they are doing. The first you bet, the better!</span>
                   </v-tooltip>
                 </v-flex>
               </v-layout>
@@ -39,7 +39,7 @@
                   <v-tooltip slot="append" top>
                     <v-text-field slot="activator" :value="calculatePotentialWin" label="Potential win" outline disabled>
                     </v-text-field>
-                    <span>Here you can see what you will win if you bet on the selected country. </span>
+                    <span>If the run was to end today and you win, this is how much you would win! </span>
                   </v-tooltip>
                 </v-flex>
                 <v-flex md3>
@@ -93,7 +93,7 @@
 
               <!-- else show the bets -->
               <v-layout v-else row wrap class="gameTabHeader">
-                <v-flex xs3 class="title">
+                <v-flex xs6 class="title">
                   Country
                 </v-flex>
                 <v-flex xs3 class="title">
@@ -101,9 +101,6 @@
                 </v-flex>
                 <v-flex xs3 class="title">
                   Turn
-                </v-flex>
-                <v-flex xs3 class="title">
-                  Result
                 </v-flex>
 
                 <v-divider class="gameTabDivider"></v-divider>
@@ -118,9 +115,6 @@
                     </v-flex>
                     <v-flex xs3 class="subheading">
                       {{bet.turn}}
-                    </v-flex>
-                    <v-flex xs3 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                      {{convertResultBet(bet.result)}}
                     </v-flex>
                   </v-layout>
                 </v-container>
@@ -230,7 +224,7 @@
           <v-container grid-list-md text-xs-center class="gameTab">
             <v-layout align-center justify-space-between row wrap class="gameTabHeader">
               <v-flex style="text-align: start;" class="title">Country</v-flex>
-              <v-flex style="text-align: end;" class="title">Placed bets</v-flex>
+              <v-flex style="text-align: end;" class="title">Bets Placed</v-flex>
             </v-layout>
 
             <v-divider class="gameTabDivider"></v-divider>
@@ -276,7 +270,6 @@
   from '../plugins/firebase';
   import mapping from '../assets/mapping';
   import axios from 'axios'
-  import DataIterable from "vuetify/lib/mixins/data-iterable";
   import VLazyImage from "v-lazy-image";
   import tronweb from 'tronweb'
 
@@ -289,7 +282,6 @@
 
   export default {
     components: {
-      DataIterable,
       VLazyImage
     },
     data: () => ({
@@ -337,7 +329,6 @@
           .replaceAll("å", "a")
           .replaceAll("é", "e")
           .replaceAll("í", "i") + ".svg"
-        //console.log(str)
         return str;
       },
       placeBet: async function() {
@@ -349,7 +340,7 @@
           this.snackbar = true;
           this.isWaitingForConfirm = false
         } else if (this.currentCountry == null) {
-          this.snackbarText = "Select a country from map or search it";
+          this.snackbarText = "Select a country first";
           this.snackbarColor = "error";
           this.snackbar = true;
           this.isWaitingForConfirm = false
