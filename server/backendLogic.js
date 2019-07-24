@@ -241,8 +241,8 @@ module.exports.watchBet = function() {
       let betTime = new Date().getTime()
       let betObj = {
           address: twb.tronWeb.address.fromHex(bet.from),
-          bet: twb.tronWeb.fromSun(bet.amount),
-          country: bet.userChoice,
+          amount: bet.amount,
+          userChoice: bet.userChoice,
           round: bet.round,
           betReference : bet.betReference,
           result: -1,
