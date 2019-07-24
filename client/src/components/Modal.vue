@@ -167,16 +167,16 @@
             href="https://www.facebook.com/worldwarbot/"
             target="_blank"
           >Facebook Game</a>
-          <br />The bot simulate a world war: every turn, one every 30 minutes, a state (randomly chosen) conquers another country.
+          <br />The bot simulates a world war: every turn, one every 30 minutes, a state (randomly chosen) conquers another country.
           The conquest probability is proportional to the number of conquered countries and the cohesion index of that country.
-          A run lasts on average 45 days.
+          A World War run lasts on average 45 days.
 
           <br />
           <br>
           <b>What do I need to play?</b>
           <br>In order to play, you must own TRX, the underlying cryptocurrency of TRON’s network. Make sure you have a TronLink Wallet.
           For more information on how to create one, <a target="_blank" href="https://chrome.google.com/webstore/detail/tronlink%EF%BC%88%E6%B3%A2%E5%AE%9D%E9%92%B1%E5%8C%85%EF%BC%89/ibnejdfjmmkpcnlpebklmnkoeoihofec"> click here </a>
-          <br>To play on mobile devices, please use <a target="_blank" href="https://www.tronwallet.me/">TronWallet</a>.Note that the user experience isn’t optimized on mobile devices yet.
+          <br>To play on mobile devices, please use <a target="_blank" href="https://www.tronwallet.me/">TronWallet</a>.
 
           <br>
           <br>
@@ -315,18 +315,18 @@ export default {
         "To know more read further.\n"
       },
       {
-        question: "How does Final Bet works?",
+        question: "How does Final Bet work?",
         answer: "You can try to forecast the winner of the whole run, the country which will conquer the whole world.<br> 80% of the Final Jackpot is split among those who believed in that country and placed a bet on it, the remaining 20% goes into the Dividend Pool. The betting amount varies each turn depending on the probability a country has to win, so first movers have a huge advantage! We start with a fixed 50TRX at the beginning, then it keeps increasing as the run goes on! Please refer to the FAQ in you wanna have more details.\n"
       },
       {
-        question: "How does Bet Next works?",
+        question: "How does Bet Next work?",
         answer: "You can bet that a state will conquer another country during the next turn. You choose how much to bet and your reward will be according to the probability of that country to be the actual conqueror next.\n" +
         "<br><b>Example</b>: I think Japan will conquer another country in the next turn (doesn’t matter which one, you only care about the conqueror) so I choose Japan in the box “select country”, I choose how much to bet, then I place the bet.<br> Let’s say you bet 100TRX and the percentage of Japan to conquer next was 50%, if you win you’ll take away 190TRX! What about those missing 10TRX for a fair payout? Well, we put that in the Dividends Pool and at the end of the run they will be shared back to token holders!\n"
       },
       {
         question: "How does the Bot work?",
-        answer: "It will use a probability density function (PDF) to determine next conqueror state.\n" +
-        "PDF is based on number of conquered neighbouring countries times the cohesion index.\n"
+        answer: "It uses a probability density function (PDF) to determine next conqueror state.\n" +
+        "PDF is based on number of conquered neighbouring countries times the cohesion index.\n\n" + "<br><br><code>PDF = (NUMBER OF TERRITORIES CONQUERED ON THE BORDER) * (COHESION INDEX + PROBABILITY OF INSURRECTION BY THE FOREIGN STATE)</code>\n"
       },
       {
         question: "What is the cohesion index?",
@@ -336,11 +336,6 @@ export default {
         question: "When the cohesion index is updated?",
         answer: "It is updated anytime there is a variation in the number of countries belonging to a state, both if conquering or losing a country. It is computed taking care of the cohesion index of the conquered state.\n" +
         "<br><b>Example</b>: France conquers a very patriotic Germany and then France will have a lower cohesion index, due to the German people that want to be independent!\n"
-      },
-      {
-        question: "How the check the bot decides who to pick next?",
-        answer: "<var>PDF</var> = <var>(NUMBER OF TERRITORIES CONQUERED ON THE BORDER)</var> * <var>(COHESION INDEX + PROBABILITY OF INSURRECTION BY THE FOREIGN STATE)</var>\n" +
-        "<br><br>The probability of winning is clearly declared.\n"
       },
       {
         question: "How long is a World War?\n",
