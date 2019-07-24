@@ -185,10 +185,10 @@
               <v-container class="gameTabContent" text-xs-center>
                 <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
 
-                  <v-flex xs3 class="subheading">
+                  <v-flex xs3 class="subheading text-truncate">
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on }">
-                        <span class="text-truncate" v-on="on" v-text="(bet.from)" v-bind:alt="(bet.from)"></span>
+                        <span v-on="on" v-text="(bet.from)" v-bind:alt="(bet.from)"></span>
                       </template>
                       <span>{{bet.from}}</span>
                     </v-tooltip>

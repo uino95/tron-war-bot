@@ -45,24 +45,30 @@
                 </v-card>
               </v-flex>
             </v-layout>
-            <v-layout row wrap style="padding: 16px 16px 0 16px;">
-              <v-flex xs6 class="title">Address</v-flex>
-              <v-flex xs6 class="title" style="text-align: end;">Amount</v-flex>
-            </v-layout>
-            <v-divider></v-divider>
-            <v-container v-if="myReferrals.length > 0" style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
-              <v-layout row wrap v-for="referral in myReferrals" :key="referral.user_addr">
-                <v-flex xs6 class="subheading">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <div class="text-truncate" v-on="on">{{referral.user_addr}}</div>
-                    </template>
-                    <span>{{referral.user_addr}}</span>
-                  </v-tooltip>
-                </v-flex>
-                <v-flex xs6 class="subheading" style="text-align: end">{{referral.amount.toFixed(3)}}</v-flex>
+
+            <v-container v-if="myReferrals.length > 0">
+              <v-layout row wrap style="padding: 16px 16px 0 16px;">
+                <v-flex xs6 class="title">Address</v-flex>
+                <v-flex xs6 class="title" style="text-align: end;">Amount</v-flex>
               </v-layout>
+
+              <v-divider></v-divider>
+
+              <v-container style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
+                <v-layout row wrap v-for="referral in myReferrals" :key="referral.user_addr">
+                  <v-flex xs6 class="subheading">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on }">
+                        <div class="text-truncate" v-on="on">{{referral.user_addr}}</div>
+                      </template>
+                      <span>{{referral.user_addr}}</span>
+                    </v-tooltip>
+                  </v-flex>
+                  <v-flex xs6 class="subheading" style="text-align: end">{{referral.amount.toFixed(3)}}</v-flex>
+                </v-layout>
+              </v-container>
             </v-container>
+            
             <v-container v-else class="text-md-center">
               <v-chip label outline color="red">Still no one played with your link... :(</v-chip>
             </v-container>
@@ -194,7 +200,7 @@
             </template>
             <span>It will be available when the run is finished</span>
           </v-tooltip>
-          <v-btn color="green darken-1" flat="flat" @click.stop="isVisible = false">Close</v-btn>
+          <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
