@@ -7,7 +7,8 @@
     "serve-dist": "lite-server --baseDir='dist'",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "icons": "vsvg -s src/assets/flags -t src/components/flags"
+    "icons": "vsvg -s src/assets/flags -t src/components/flags",
+    "deploy": "firebase deploy"
   },
   "dependencies": {
     "@amcharts/amcharts4": "^4.4.8",
