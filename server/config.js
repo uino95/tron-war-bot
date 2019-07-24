@@ -41,11 +41,7 @@ const config = {
   heroku: {
     apiKey: 'bfbc8a87-fa94-4885-bb7f-e18ca83ec1d8'
   },
-<<<<<<< HEAD
   test: JSON.parse(process.env.TEST_MODE || true)
-=======
-  test: false
->>>>>>> 79b56e55c662a173681e56fe13365372bf975107
 }
 
 if (config.test) config.tron = config.tronTest;
