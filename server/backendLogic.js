@@ -41,12 +41,10 @@ async function fetchLatestTurnOnDb() {
 async function checkBetOnDb(txId) {
     return new Promise(async function(resolve, reject) {
         betsRef.once('value', function(snapshot) {
-            resolve(snapshot.child(txId).exists())
+            return resolve(snapshot.child(txId).exists())
         })
     })
 }
-
-
 
 var latestTurn = -1
 var currentTurn = -1
@@ -240,7 +238,7 @@ module.exports.watchBet = function() {
       let turn = theRealWwb.currentTurn();
       let betTime = new Date().getTime()
       let betObj = {
-          address: twb.tronWeb.address.fromHex(bet.from),
+          from: twb.tronWeb.address.fromHex(bet.from),
           amount: bet.amount,
           userChoice: bet.userChoice,
           round: bet.round,

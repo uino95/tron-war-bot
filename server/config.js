@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   tron: {
     privateKey: process.env.TRON_PRIVATE_KEY || "",
     fullHost: process.env.TRON_FULL_HOST || 'https://api.trongrid.io',
@@ -43,3 +43,7 @@ module.exports = {
   },
   test: true
 }
+
+if (config.test) config.tron = config.tronTest;
+
+module.exports = config;

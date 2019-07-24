@@ -109,6 +109,7 @@
           }
         })
         data.map(el => {
+          el['cohesion'] = data[el['occupiedBy']]['cohesion'];
           el['color'] = data[el['occupiedBy']]['color'];
           el['occupiedBy'] = this.universalMap(el['occupiedBy'])
         })
@@ -231,7 +232,7 @@
         polygonSeries.tooltip.background.fill = chart.colors.getIndex(4);
         polygonTemplate.applyOnClones = true;
         polygonTemplate.togglable = true;
-        polygonTemplate.tooltipText = "'{name}' controlled by '{occupiedBy}'";
+        polygonTemplate.tooltipText = "'{name}' controlled by '{occupiedBy}' with a cohesion of {cohesion}";
 
         polygonTemplate.nonScalingStroke = true;
         polygonTemplate.strokeOpacity = 0.5;

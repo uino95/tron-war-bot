@@ -51,7 +51,7 @@
                 </v-flex>
               </v-layout>
 
-              <v-btn v-if="info.serverStatus == 200" color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+              <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
               <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...</v-btn>
               <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...</v-btn>
 
@@ -294,30 +294,28 @@
     data: () => ({
       currentRunPagination:1,
       isLoading: false,
+      isWaitingForConfirm: false,
       valid: false,
       placeholderFlag: "/img/flags/placeholder.svg",
       snackbar: false,
       snackbarText: "",
       snackbarColor: "",
-      info: {},
       snackbarTimeout: 6000,
       potentialWin: 0,
       currencies: ["TRX", "WAR"],
       currency: "TRX",
-      currencyRule: [v => !!v || 'Select a currency',
-        //v => v < 50 || 'You don\'t have enough money'
-      ],
+
+      info: {},
       history: [],
       bets: [],
       mapStatus: [],
       mapping: mapping,
-      intervalId: null
     }),
 
     firebase: {
       history: db.ref('history').orderByChild('turn'),
       bets: db.ref('bets').orderByChild('time'),
-      info: db.ref('data')
+      info: db.ref('betFinalData')
     },
 
     methods: {
@@ -335,15 +333,18 @@
         return str;
       },
       placeBet: async function() {
+        this.isWaitingForConfirm = true
         const _this = this
         if (this.$store.state.loggedInAccount == null) {
           this.snackbarText = "Login First";
           this.snackbarColor = "error";
           this.snackbar = true;
+          this.isWaitingForConfirm = false
         } else if (this.currentCountry == null) {
           this.snackbarText = "Select a country from map or search it";
           this.snackbarColor = "error";
           this.snackbar = true;
+          this.isWaitingForConfirm = false
         } else {
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
@@ -365,6 +366,7 @@
                 _this.snackbarColor = "error";
               }
               _this.snackbar = true
+              _this.isWaitingForConfirm = false
             })
           }, 5000)
         }
@@ -496,8 +498,6 @@
       }
     },
     mounted() {
-      // this.fetchGameParam(0)
-      //this.$refs.runTimer.startTimer();
     }
   }
 </script>

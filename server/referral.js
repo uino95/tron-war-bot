@@ -34,10 +34,11 @@ const checkBetOnDb = async (txId) => {
   return new Promise(async function(resolve, reject) {
     betsRef.once('value', function(snapshot){
       if(!snapshot.child(txId).exists()) return resolve(false);
-      return resolve(snapshot.child(txId).val().bet);
+      return resolve(snapshot.child(txId).val().amount);
     })
   })
 }
+
 
 const createReferral = async function(user_addr, referrer_addr, amount){
   return new Promise(async function(resolve, reject) {
@@ -107,7 +108,7 @@ module.exports.updateReferral = async (bet) => {
 
 
 module.exports.payReferrals = async () => {
-  console.log("Paying referral");
+  console.log("[SCHEDULER]: Starting paying referral job...");
   referralRef.child('map').once('value', async (snapshot) => {
     let keys = Object.keys(snapshot.val())
     let balance
@@ -119,7 +120,7 @@ module.exports.payReferrals = async () => {
             referralRef.child('map').child(keys[i]).update({
               amount: snapshot.child(keys[i]).val().amount - 50
             })
-            console.log("paid ", snapshot.child(keys[i]).val().referrer_addr)
+            console.log("[REFERRAL]: Paid ", snapshot.child(keys[i]).val().referrer_addr)
         }
         else{
           console.error("[REFERRAL]: Insufficient funds in the master address");
@@ -127,5 +128,5 @@ module.exports.payReferrals = async () => {
       }
     }
   })
-  console.log("Paid referral")
+  console.log("[SCHEDULER]: ...end of paying referral job!");
 }

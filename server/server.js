@@ -29,8 +29,8 @@ app.get('/', (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// STARTUP ////////////////////////////////////////
 
-twb.startUp(0, false);
-twb.startUp(1, true);
+twb.launchGame(0, false);
+twb.launchGame(1, true);
 // backendLogic.syncServer(false);
 backendLogic.watchBet();
 // backendLogic.watchNewTurn();

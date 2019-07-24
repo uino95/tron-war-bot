@@ -20,17 +20,17 @@
 
           <v-container>
             <v-layout column>
-            <v-layout row wrap v-for="country in sortedArray.slice(10 * currentRunPagination - 10, 10 * currentRunPagination )" :key="country[0]">
+            <v-layout row wrap v-for="(country) in sortedArray.slice(10 * currentRunPagination - 10, 10 * currentRunPagination )" :key="country.id">
               <v-flex xs2>
                 <v-avatar size="90%">
-                  <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag" :src="getFlagString(country[0])" :alt="country[0]" />
+                  <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag" :src="getFlagString(universalMap(country.id))" :alt="universalMap(country.id)" />
                 </v-avatar>
               </v-flex>
               <v-flex xs6 style="text-align:start; margin-top:5px;" class="subheading">
-                {{country[0]}}
+                {{universalMap(country.id)}}
               </v-flex>
               <v-flex xs4 class="title" style="text-align: end">
-                {{country[1].length}}
+                {{country.occupied}}
               </v-flex>
             </v-layout>
 
@@ -194,29 +194,15 @@ export default {
     },
   },
   computed: {
-    countryStatus: function() {
-      let result = [];
-      let arr = [];
-      let tmp = [];
-      for (var i = this.mapStatus.length - 1; i >= 0; i--) {
-        arr.push(this.universalMap(i));
-        for (var j = this.mapStatus.length - 1; j >= 0; j--) {
-          if (this.mapStatus[j]['occupiedBy'] === i) {
-            tmp.push(j)
-          }
-        }
-        arr.push(tmp);
-        tmp = [];
-        result.push(arr);
-        arr = []
-      }
-      return result
+    countryStatus: function(){
+      this.mapStatus.map((el,index) => el.id = index )
+      return this.mapStatus
     },
     sortedArray: function() {
       function compare(a, b) {
-        if (a[1].length > b[1].length)
+        if (a.occupied > b.occupied)
           return -1;
-        if (a[1].length < b[1].length)
+        if (a.occupied < b.occupied)
           return 1;
         return 0;
       }
