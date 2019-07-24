@@ -4,7 +4,7 @@ const tronWeb = require('tronweb')
 
 const validateFullRunWinner = (b) => {
   // @TODO: Add bet price formula
-  return tronWeb.fromSun(b.amount.toString()) == '50';
+  return tronWeb.fromSun(b.amount.toString()) == '1';
 }
 
 const validateNextConquerer = (b) => {

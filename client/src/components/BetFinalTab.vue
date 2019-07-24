@@ -278,6 +278,7 @@
   import axios from 'axios'
   import DataIterable from "vuetify/lib/mixins/data-iterable";
   import VLazyImage from "v-lazy-image";
+  import tronweb from 'tronweb'
 
   String.prototype.replaceAll = function(search, replace) {
     if (replace === undefined) {
@@ -304,6 +305,7 @@
       potentialWin: 0,
       currencies: ["TRX", "WAR"],
       currency: "TRX",
+      unsortedBetsPerCountry: [],
 
       info: {},
       history: [],
@@ -319,8 +321,8 @@
     },
 
     filters: {
-      TRX: function(amount){
-        return window.tronweb.fromSun(amount) + 'TRX'
+      TRX: (amount) => {
+        return tronweb.fromSun(amount) + 'TRX'
       }
     },
 
@@ -335,7 +337,7 @@
           .replaceAll("å", "a")
           .replaceAll("é", "e")
           .replaceAll("í", "i") + ".svg"
-        console.log(str)
+        //console.log(str)
         return str;
       },
       placeBet: async function() {
@@ -352,6 +354,7 @@
           this.snackbar = true;
           this.isWaitingForConfirm = false
         } else {
+          console.log("instance ",this.$store.state.contracts.TronWarBotInstance)
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
@@ -360,6 +363,7 @@
           })
           setTimeout(function () {
             window.tronWeb.trx.getTransaction(txId).then((tx) => {
+              console.log(tx)
               if (tx.ret[0].contractRet == "SUCCESS") {
                 _this.snackbarColor = "success";
                 _this.snackbarText =
@@ -374,7 +378,7 @@
               _this.snackbar = true
               _this.isWaitingForConfirm = false
             })
-          }, 5000)
+          }, 10000)
         }
       },
       async postReferral(txId) {
@@ -462,7 +466,7 @@
         this.bets.forEach(bet =>{
           countries.push(bet.userChoice)
         })
-
+        console.log(countries)
         var betsPerCountryList = [];
         for (const x of Array(241).keys()) {
           betsPerCountryList.push({countryId: x, numberOfBets: 0})
@@ -484,12 +488,10 @@
       calculatePotentialWin: function () {
         if (this.currentCountry == null) return 0;
         let nextTurn = this.info.nextTurn;
-        let country = this.currentCountry;
-        let betsOnThatCountry = this.latestBets.filter(function (bet) {
-          return bet.turn == nextTurn && bet.userChoice == country;
-        }).length + 1
+        let bets = this.betsPerCountry
+        let betsOnThatCountry = bets.find(el => (el.countryId === this.currentCountry))
         return ((parseFloat(this.info.jackpot) + this.info.minBet) * (1 - this.info.houseEdge - 0.1) /
-          betsOnThatCountry).toFixed(3) + ' TRX';
+          Math.max(betsOnThatCountry.numberOfBets, 1)).toFixed(3) + ' TRX';
       },
       currentCountry: {
         get() {

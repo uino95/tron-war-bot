@@ -14,35 +14,27 @@
           <div v-else>
             Please, login to your TRONLink wallet.
             <br />If you do not have TRONLink wallet installed, please visit
-            <a
-              href="http://u6.gg/gmc5D"
-            >http://u6.gg/gmc5D</a> and download the Chrome extension.
+            <a href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.
             <br />
             <br />
-            <v-alert
-              :value="true"
-              type="warning"
-            >Tron War Bot is only available on Google Chrome or on TronLink mobile app for the time being.</v-alert>
+            <v-alert :value="true" type="warning">Tron War Bot is only available on Google Chrome or on TronLink mobile
+              app for the time being.</v-alert>
           </div>
         </v-card-text>
 
         <v-card-text v-if="headerTile === 'Referral'">
           Refer a friend by sharing your referral link with him.
           <br />Here is your referral link:
-          <v-chip
-            v-if="this.$store.state.loggedInAccount != null"
-            label
-            outline
-            color="primary"
-          >https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}</v-chip>
+          <v-chip v-if="this.$store.state.loggedInAccount != null" label outline color="primary">
+            https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}</v-chip>
           <v-chip v-else label outline color="red">Login First</v-chip>
           <br />
           <br />You'll earn
-          <b>1%</b> out of each of his bets
+          <b>{{percentage}} % </b> out of each of his bets
           <b>forever</b>!
           <br />
           <br />Once an address starts using a referral link, that can't change and it will always provide you that
-          1%.
+          {{percentage}} %
           <br />Every 50TRX piled up you will automatically receive the earned TRX. Below you can see how much your
           referred links are earning you
           <v-container grid-list-md style="padding: 0px;" mt-2>
@@ -58,10 +50,7 @@
               <v-flex xs6 class="title" style="text-align: end;">Amount</v-flex>
             </v-layout>
             <v-divider></v-divider>
-            <v-container
-              v-if="myReferrals.length > 0"
-              style="max-height: 200px; overflow-y: auto; overflow-x: hidden;"
-            >
+            <v-container v-if="myReferrals.length > 0" style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
               <v-layout row wrap v-for="referral in myReferrals" :key="referral.user_addr">
                 <v-flex xs6 class="subheading">
                   <v-tooltip bottom>
@@ -71,11 +60,7 @@
                     <span>{{referral.user_addr}}</span>
                   </v-tooltip>
                 </v-flex>
-                <v-flex
-                  xs6
-                  class="subheading"
-                  style="text-align: end"
-                >{{referral.amount.toFixed(3)}}</v-flex>
+                <v-flex xs6 class="subheading" style="text-align: end">{{referral.amount.toFixed(3)}}</v-flex>
               </v-layout>
             </v-container>
             <v-container v-else class="text-md-center">
@@ -85,7 +70,8 @@
         </v-card-text>
 
         <v-card-text v-if="headerTile === 'Dividends'">
-          We want to build this game together with our users, and that's why 100% of TronWarBot profits are shared back to token holders! (..but yes we detain around 50% of the current
+          We want to build this game together with our users, and that's why 100% of TronWarBot profits are shared back
+          to token holders! (..but yes we detain around 50% of the current
           token supply). After every stage you will need 50 more TRX to mine one WAR. Dividend payout will happen at the
           end of the run.
           <br />
@@ -97,12 +83,7 @@
           <br />
           <v-layout row wrap>
             <v-flex xs12 sm5>
-              <v-text-field
-                :value="availableTRX + '  TRX'"
-                label="Available Dividends"
-                outline
-                readonly
-              >
+              <v-text-field :value="availableTRX + '  TRX'" label="Available Dividends" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" />
@@ -114,12 +95,7 @@
             <v-spacer />
 
             <v-flex xs12 sm5>
-              <v-text-field
-                :value="totalWARSupply + '  WAR'"
-                label="Total WAR mined"
-                outline
-                readonly
-              >
+              <v-text-field :value="totalWARSupply + '  WAR'" label="Total WAR mined" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="/img/logo.png" />
@@ -147,7 +123,8 @@
 
           <v-card mt-3>
             <v-card-text style="text-align:center;">
-              At the end of the run you will be eligible to get your share of dividends by clicking the button "Claim your dividends".
+              At the end of the run you will be eligible to get your share of dividends by clicking the button "Claim
+              your dividends".
               <br />Currently, for every
               <b>100 WAR you get {{parseFloat(availableTRX / totalWARSupply * 100).toFixed(3)}} TRX</b>
             </v-card-text>
@@ -163,10 +140,7 @@
 
         <v-card-text v-if="headerTile === 'How To Play'">
           The game is inspired from WorldWarBot 2020
-          <a
-            href="https://www.facebook.com/worldwarbot/"
-            target="_blank"
-          >
+          <a href="https://www.facebook.com/worldwarbot/" target="_blank">
             Facebook
             Page
           </a>.
@@ -198,14 +172,8 @@
           <br />What do I need to play?
           <br />In order to play, you must own TRX: the underlying cryptocurrency of TRON’s network.
           <br />Make sure you have a TronLink Wallet. For more information on how to create one,
-          <a
-            href="http://u6.gg/gmc5D"
-            target="_blank"
-          >click here</a>. To play on mobile devices, please use
-          <a
-            href="https://www.tronwallet.me/"
-            target="_blank"
-          >TronWallet</a>
+          <a href="http://u6.gg/gmc5D" target="_blank">click here</a>. To play on mobile devices, please use
+          <a href="https://www.tronwallet.me/" target="_blank">TronWallet</a>
           . Note that the user
           experience isn’t optimized on mobile devices yet.
           <ol style="text-align: justify" class="mt-2">
@@ -226,14 +194,7 @@
           <br />Jump into the crypto world now!
           <br />
           <br />
-          <v-btn
-            round
-            color="primary"
-            href="https://changelly.com/"
-            target="_blank"
-            dark
-            pa-2
-          >BUY TRX</v-btn>
+          <v-btn round color="primary" href="https://changelly.com/" target="_blank" dark pa-2>BUY TRX</v-btn>
           <br />
           <br />Once you start playing, your TRX are safe because you don’t move them on our website. They
           remain in your secure wallet and moved out whenever you place a bet. So no need to trust us or anyone, you
@@ -257,12 +218,8 @@
           <v-spacer></v-spacer>
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-              <v-btn
-                v-if="headerTile === 'Dividends'"
-                color="blue darken-1"
-                flat="flat"
-                v-on="on"
-              >Claim your Dividends</v-btn>
+              <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on">Claim your Dividends
+              </v-btn>
             </template>
             <span>It will be available when the run is finished</span>
           </v-tooltip>
@@ -274,80 +231,89 @@
 </template>
 
 <script>
-import { db } from "../plugins/firebase";
-import { functions } from "firebase";
-export default {
-  name: "Modal",
-  props: {
-    value: Boolean,
-    headerTile: String,
-    footerTile: String,
-    bodyTile: String
-  },
-  methods: {
-    formatter: function(num) {
-      return Math.abs(num) > 999
-        ? Math.abs(num) > 999999
-          ? Math.sign(num) * (Math.abs(num) / 1000000).toFixed(1) + "M"
-          : Math.sign(num) * (Math.abs(num) / 1000).toFixed(1) + "k"
-        : Math.sign(num) * Math.abs(num);
-    }
-  },
-  computed: {
-    isVisible: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit("input", value);
+  import {
+    db
+  } from "../plugins/firebase";
+  import {
+    functions
+  } from "firebase";
+  export default {
+    name: "Modal",
+    props: {
+      value: Boolean,
+      headerTile: String,
+      footerTile: String,
+      bodyTile: String
+    },
+    methods: {
+      formatter: function (num) {
+        return Math.abs(num) > 999 ?
+          Math.abs(num) > 999999 ?
+          Math.sign(num) * (Math.abs(num) / 1000000).toFixed(1) + "M" :
+          Math.sign(num) * (Math.abs(num) / 1000).toFixed(1) + "k" :
+          Math.sign(num) * Math.abs(num);
       }
     },
-    myReferrals: function() {
-      let keys = Object.keys(this.referrals);
-      let myReferrals = [];
-      for (var i = keys.length - 1; i >= 0; i--) {
-        if (
-          this.account != null &&
-          this.referrals[keys[i]].referrer_addr === this.account
-        ) {
-          myReferrals.push({
-            user_addr: keys[i],
-            amount: this.referrals[keys[i]].amount
-          });
+    computed: {
+      percentage: function() {
+        if (this.percentages[this.$store.state.loggedInAccount]) {
+          return this.percentages[this.$store.state.loggedInAccount] * 100
         }
-      }
-      return myReferrals;
-    },
-    account() {
-      return this.$store.state.loggedInAccount;
-    },
-    availableTRX() {
-      return this.formatter(parseFloat(this.$store.state.availableDividends));
-    },
-    myWAR() {
-      return this.formatter(
-        parseFloat(this.$store.state.currentAddressWarBalance)
-      );
-    },
-    totalWARSupply() {
-      return this.formatter(parseFloat(this.$store.state.totalWARSupply));
-    },
-    dividendStage() {
-      return Math.floor((this.totalWARSupply % 10000) / 100);
-    }
-  },
-  firebase: {
-    referrals: db.ref("referral/map")
-  },
-  data: () => ({
-    faq: [
-      {
-        question: "What do I do if I'm not able to place the bet?",
-        answer: "Check if you have got enough Energy and Bandwidth."
+        return this.percentages.default * 100
       },
-      {
-        question: "What are Energy and Bandwidth?",
-        answer: `<b>Bandwidth:</b> For each byte array, the network consumes an equal amount of bandwidth
+      isVisible: {
+        get() {
+          return this.value;
+        },
+        set(value) {
+          this.$emit("input", value);
+        }
+      },
+      myReferrals: function () {
+        let keys = Object.keys(this.referrals);
+        let myReferrals = [];
+        for (var i = keys.length - 1; i >= 0; i--) {
+          if (
+            this.account != null &&
+            this.referrals[keys[i]].referrer_addr === this.account
+          ) {
+            myReferrals.push({
+              user_addr: keys[i],
+              amount: this.referrals[keys[i]].amount
+            });
+          }
+        }
+        return myReferrals;
+      },
+      account() {
+        return this.$store.state.loggedInAccount;
+      },
+      availableTRX() {
+        return parseFloat(this.$store.state.availableDividends);
+      },
+      myWAR() {
+        return
+        parseFloat(this.$store.state.currentAddressWarBalance);
+      },
+      totalWARSupply() {
+        return parseFloat(this.$store.state.totalWARSupply);
+      },
+      dividendStage() {
+        return Math.floor((this.totalWARSupply % 10000) / 100);
+      }
+    },
+    firebase: {
+      referrals: db.ref("referral/map"),
+      percentages: db.ref("referral/percentages")
+    },
+    data: () => ({
+      faq: [{
+          question: "What do I do if I'm not able to place the bet?",
+          answer: "Check if you have got enough Energy and Bandwidth."
+        },
+        {
+          question: "What are Energy and Bandwidth?",
+          answer: `<b>Bandwidth:</b> For each byte array, the network consumes an equal amount of bandwidth
                             points depending on the length of the array. So, if you are transmitting a transaction with
                             a byte array length of 200, you need to have 200 Bandwidth points. This prevents malicious
                             spam transactions from clogging the network and causing delayed transaction confirmations.
@@ -362,8 +328,8 @@ export default {
                             select Energy instead of Bandwidth. If you are not going to be executing smart contracts,
                             there is no reason why you should select Energy. Those who are just TRX investors or users
                             should always select Bandwidth and not Energy when freezing their tokens.`
-      }
-    ]
-  })
-};
+        }
+      ]
+    })
+  };
 </script>

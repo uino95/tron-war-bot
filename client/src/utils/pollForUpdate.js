@@ -2,6 +2,7 @@ import store from '../store'
 
 let pollForUpdate = function () {
   let tronWeb = window.tronweb
+  store.commit('setTronweb', tronWeb)
   store.dispatch('registerContractsInstance') 
   setInterval(async () => {
     if (tronWeb) {
@@ -40,9 +41,10 @@ let pollForUpdate = function () {
       
 
       // update available dividends
-      const availableDividensInSun = await tronWeb.trx.getBalance(store.state.accountOperator); //number
-      const availableDividensInTRX = tronWeb.fromSun(availableDividensInSun); //string
-      const availableDividendsFixed = parseFloat(availableDividensInTRX).toFixed(3)
+      const dividendPoolAddres = await store.state.contracts.TronWarBotInstance.divPoolAddress().call()
+      const availableDividensInSun = await tronWeb.trx.getBalance(dividendPoolAddres) / 1000000000000000000; //number
+      // const availableDividensInTRX = tronWeb.fromSun(availableDividensInSun) ; //string
+      const availableDividendsFixed = availableDividensInSun.toFixed(3)
       console.log(availableDividendsFixed)
       if (availableDividendsFixed !== store.state.availableDividens){
         store.commit('setAvailableDividends', {
@@ -51,7 +53,7 @@ let pollForUpdate = function () {
       }
 
       // update total war balance supply
-      const currentTotalWARSupply = await store.state.contracts.WarCoinInstance.totalSupply().call();
+      const currentTotalWARSupply = await store.state.contracts.WarCoinInstance.totalSupply().call()  ;
       const currentTotalWARSupplyInTRX = tronWeb.fromSun(currentTotalWARSupply)
       const currentTotalWARSupplyFixed = parseFloat(currentTotalWARSupplyInTRX).toFixed(3) 
       if (currentTotalWARSupplyFixed !== store.state.totalWARSupply) {

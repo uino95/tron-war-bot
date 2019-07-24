@@ -27,6 +27,7 @@ var historyRef = db.ref('history')
 var betsRef = db.ref('bets')
 var countriesRef = db.ref('countries')
 var dataRef = db.ref('data')
+var betFinalRef = db.ref('betFinalData')
 
 //fetch current snapshot from db
 async function fetchLatestTurnOnDb() {
@@ -229,7 +230,7 @@ module.exports.watchBet = function() {
       let bet = r.result
       if (!betValidator.validate(bet))
         return console.error("[INVALID_BET]: Received an invalid bet for gameType: " + bet.gameType.toString()
-                            + "\n\tof amount: " + tronWeb.fromSun(bet.amount.toString())
+                            + "\n\tof amount: " + twb.tronWeb.fromSun(bet.amount.toString())
                             + "\n\tby: " + bet.from.toString()
                             + "\n\twith user choice: " + bet.userChoice.toString()
                             + "\n\tbetReference: " + bet.betReference.toString() );
@@ -252,7 +253,7 @@ module.exports.watchBet = function() {
       referral.updateReferral(betObj)
       let jackpot = await twb.availableJackpot(0, bet.round);
       jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
-      dataRef.update({ jackpot })
+      betFinalRef.update({jackpot})
       console.info("Successfully registered bet in tx " + r.transaction + " at " + betTime )
       console.info("Jackpot is: ", jackpot)
   })
