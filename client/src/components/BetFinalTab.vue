@@ -93,10 +93,10 @@
 
               <!-- else show the bets -->
               <v-layout v-else row wrap class="gameTabHeader">
-                <v-flex xs6 class="title">
+                <v-flex xs5 class="title">
                   Country
                 </v-flex>
-                <v-flex xs3 class="title">
+                <v-flex xs4 class="title">
                   Bet
                 </v-flex>
                 <v-flex xs3 class="title">
@@ -107,10 +107,10 @@
 
                 <v-container class="gameTabContent">
                   <v-layout row wrap v-for="bet in myBets" :key="bet.time">
-                    <v-flex xs3 class="subheading">
+                    <v-flex xs5 class="subheading">
                       {{universalMap(bet.userChoice)}}
                     </v-flex>
-                    <v-flex xs3 class="subheading">
+                    <v-flex xs4 class="subheading">
                       {{bet.amount | TRX}}
                     </v-flex>
                     <v-flex xs3 class="subheading">
