@@ -7,7 +7,7 @@ const validateFullRunWinner = (b) => {
   // @TODO: Add bet price formula
   if (!b || !b.amount) return false;
   var fixedAmount = config.test ? "1" : "50";
-  return b.amount.eq(tronWeb.toSun(fixedAmount));
+  return b.amount.toString() == tronWeb.toSun(fixedAmount);
 }
 
 const validateNextConquerer = (b) => {
