@@ -375,7 +375,7 @@
       async postReferral(txId) {
         try {
           await axios.post(this.$store.state.test ? `https://localhost:3000/referral` :
-            `https://api.tronwarbot.com:10000/referral`, {
+            `https://api.tronwarbot.com/referral`, {
               user_addr: this.account,
               txId: txId,
               referrer_addr: window.location.pathname.slice(5)
@@ -481,8 +481,8 @@
         let nextTurn = this.info.nextTurn;
         let bets = this.betsPerCountry
         let betsOnThatCountry = bets.find(el => (el.countryId === this.currentCountry))
-        return ((parseFloat(this.info.jackpot) + this.info.minBet) * (1 - this.info.houseEdge - 0.1) /
-          Math.max(betsOnThatCountry.numberOfBets, 1)).toFixed(3) + ' TRX';
+        return ((parseFloat(this.info.jackpot) + this.info.minBet) * (1 - this.info.houseEdge) /
+          Math.max(betsOnThatCountry.numberOfBets + 1, 1)).toFixed(3) + ' TRX';
       },
       currentCountry: {
         get() {

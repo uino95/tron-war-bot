@@ -77,13 +77,13 @@
           <br />
           <v-divider mt-3 />
           <br />
-          <span class="headling">We are in stage 1 of 100. You need to play 50 TRX to mine 1 WAR</span>
+          <span class="headling">We are in stage 1 of 100. You need to play 500 TRX to mine 1 WAR</span>
           <v-progress-linear color="primary" height="30" v-model="dividendStage"></v-progress-linear>
           <v-divider mt-8 />
           <br />
           <v-layout row wrap>
             <v-flex xs12 sm5>
-              <v-text-field :value="availableTRX + '  TRX'" label="Available Dividends" outline readonly>
+              <v-text-field :value="availableTRX | TRX" label="Available Dividends" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" />
@@ -95,7 +95,7 @@
             <v-spacer />
 
             <v-flex xs12 sm5>
-              <v-text-field :value="totalWARSupply + '  WAR'" label="Total WAR mined" outline readonly>
+              <v-text-field :value="totalWARSupply | WAR" label="Total WAR mined" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="/img/logo.png" />
@@ -108,7 +108,7 @@
           <v-layout>
             <v-spacer />
             <v-flex xs12 sm5>
-              <v-text-field :value="myWAR + '  WAR'" label="You have mined" outline readonly>
+              <v-text-field :value="myWAR | WAR" label="You have mined" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="/img/logo.png" />
@@ -125,12 +125,10 @@
             <v-card-text style="text-align:center;">
               At the end of the run you will be eligible to get your share of dividends by clicking the button "Claim
               your dividends".
-              <br />Currently, for every
-              <b>100 WAR you get {{parseFloat(availableTRX / totalWARSupply * 100).toFixed(3)}} TRX</b>
             </v-card-text>
             <v-chip label outline color="primary" style="margin-left:4.5em;">
               With your current WARs you will receive:
-              {{parseFloat(availableTRX * (myWAR/totalWARSupply)).toFixed(3)}} TRX
+              {{availableTRX.times(myWAR.div(totalWARSupply).toString()) | TRX }}
             </v-chip>
           </v-card>
 
@@ -205,6 +203,7 @@
   import {
     db
   } from "../plugins/firebase";
+  import tronweb from 'tronweb'
   export default {
     name: "Modal",
     props: {
@@ -213,13 +212,14 @@
       footerTile: String,
       bodyTile: String
     },
-    methods: {
-      formatter: function (num) {
-        return Math.abs(num) > 999 ?
-          Math.abs(num) > 999999 ?
-          Math.sign(num) * (Math.abs(num) / 1000000).toFixed(1) + "M" :
-          Math.sign(num) * (Math.abs(num) / 1000).toFixed(1) + "k" :
-          Math.sign(num) * Math.abs(num);
+
+    filters:{
+      TRX: (amount) => {
+        return tronweb.fromSun(amount) + ' TRX'
+      },
+      WAR: (amount) =>{
+        console.log(amount.toString())
+        return amount.div("1000000000000000000").toString() + ' WAR'
       }
     },
 
@@ -258,14 +258,13 @@
         return this.$store.state.loggedInAccount;
       },
       availableTRX() {
-        return parseFloat(this.$store.state.availableDividends);
+        return this.$store.state.availableDividends;
       },
       myWAR() {
-        return
-        parseFloat(this.$store.state.currentAddressWarBalance);
+        return this.$store.state.currentAddressWarBalance;
       },
       totalWARSupply() {
-        return parseFloat(this.$store.state.totalWARSupply);
+        return this.$store.state.totalWARSupply;
       },
       dividendStage() {
         return Math.floor((this.totalWARSupply % 10000) / 100);
