@@ -37,7 +37,6 @@ export default new Vuex.Store({
       state.isMobile = value
     },
     setContractsInstance(state, payload){
-      console.log("setting contracts instance ", payload)
       state.contracts.TronWarBotInstance = payload.tronWarBot
       state.contracts.WarCoinInstance = payload.warCoin
     },
