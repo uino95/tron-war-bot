@@ -1,10 +1,13 @@
+const config = require('./config')
 const wwb = require('./worldWarBot')
 const tronWeb = require('tronweb')
 
 
 const validateFullRunWinner = (b) => {
   // @TODO: Add bet price formula
-  return tronWeb.fromSun(b.amount.toString()) == '50';
+  if (!b || !b.amount) return false;
+  var fixedAmount = config.test ? "1" : "50";
+  return b.amount.eq(tronWeb.toSun(fixedAmount));
 }
 
 const validateNextConquerer = (b) => {

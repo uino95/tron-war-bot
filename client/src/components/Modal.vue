@@ -235,7 +235,6 @@
 
 <script>
 import { db } from "../plugins/firebase";
-import { functions } from "firebase";
 export default {
   name: "Modal",
   props: {

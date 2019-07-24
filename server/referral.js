@@ -115,16 +115,13 @@ module.exports.payReferrals = async () => {
     for (var i = keys.length - 1; i >= 0; i--) {
       if(snapshot.child(keys[i]).val().amount >= 50){
         balance = await twb.tronWeb.trx.getBalance()
-        if(balance > 50){
-          var txId = await twb.tronWeb.trx.sendTrx(snapshot.child(keys[i]).val().referrer_addr, twb.tronWeb.toSun(50))
-            referralRef.child('map').child(keys[i]).update({
-              amount: snapshot.child(keys[i]).val().amount - 50
-            })
-            console.log("[REFERRAL]: Paid ", snapshot.child(keys[i]).val().referrer_addr)
-        }
-        else{
-          console.error("[REFERRAL]: Insufficient funds in the master address");
-        }
+        if (balance <= 50)
+          return console.error("[REFERRAL]: Insufficient funds in the master address");
+        var txId = await twb.tronWeb.trx.sendTrx(snapshot.child(keys[i]).val().referrer_addr, twb.tronWeb.toSun(50))
+        referralRef.child('map').child(keys[i]).update({
+          amount: snapshot.child(keys[i]).val().amount - 50
+        })
+        console.log("[REFERRAL]: Paid ", snapshot.child(keys[i]).val().referrer_addr)
       }
     }
   })
