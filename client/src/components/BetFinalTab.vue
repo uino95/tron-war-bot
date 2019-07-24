@@ -111,10 +111,10 @@
                 <v-container class="gameTabContent">
                   <v-layout row wrap v-for="bet in myBets" :key="bet.time">
                     <v-flex xs3 class="subheading">
-                      {{universalMap(bet.country)}}
+                      {{universalMap(bet.userChoice)}}
                     </v-flex>
                     <v-flex xs3 class="subheading">
-                      {{bet.bet+"TRX"}}
+                      {{bet.amount | TRX}}
                     </v-flex>
                     <v-flex xs3 class="subheading">
                       {{bet.turn}}
@@ -158,10 +158,10 @@
 
                 <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
                   <v-flex xs6 class="subheading">
-                    <span>{{universalMap(bet.country)}}</span>
+                    <span>{{universalMap(bet.userChoice)}}</span>
                   </v-flex>
                   <v-flex xs3 class="subheading">
-                    <span>{{bet.bet+"TRX"}}</span>
+                    <span>{{bet.amount | TRX}}</span>
                   </v-flex>
                   <v-flex xs3 class="subheading">
                     <span>{{bet.turn}}</span>
@@ -194,18 +194,18 @@
                   <v-flex xs3 class="subheading">
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on }">
-                        <span v-on="on" v-text="bet.address.substring(0,5)+'..'" v-bind:alt="bet.address"></span>
+                        <span class="text-truncate" v-on="on" v-text="(bet.from)" v-bind:alt="(bet.from)"></span>
                       </template>
-                      <span>{{bet.address}}</span>
+                      <span>{{bet.from}}</span>
                     </v-tooltip>
                   </v-flex>
 
                   <v-flex xs5 class="subheading">
-                    <span>{{universalMap(bet.country)}}</span>
+                    <span>{{universalMap(bet.userChoice)}}</span>
                   </v-flex>
 
                   <v-flex xs2 class="subheading">
-                    <span>{{bet.bet+"TRX"}}</span>
+                    <span>{{bet.amount | TRX}}</span>
                   </v-flex>
 
                   <v-flex xs2 class="subheading">
@@ -318,6 +318,12 @@
       info: db.ref('betFinalData')
     },
 
+    filters: {
+      TRX: function(amount){
+        return window.tronweb.fromSun(amount) + 'TRX'
+      }
+    },
+
     methods: {
       getFlagString(str) {
         str = "/img/flags/" + str.toLowerCase()
@@ -349,7 +355,7 @@
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
-          let txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry).send({
+          let txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry, this.info.currentTurn).send({
             callValue: window.tronWeb.toSun(this.info.minBet)
           })
           setTimeout(function () {
@@ -447,14 +453,14 @@
         return arr.sort(compare);
       },
       myBets: function () {
-        return this.bets.filter(bet => bet.address === this.account && bet.gameType == this.info.gameType).reverse()
+        return this.bets.filter(bet => (bet.from) === this.account && bet.gameType == this.info.gameType).reverse()
       },
       //returns an array of objects [{countryId: "id", numberOfBets: x}, ...]
       betsPerCountry: function () {
         // it will contain all the countries for which there is at least one bet
         let countries = []
         this.bets.forEach(bet =>{
-          countries.push(bet.country)
+          countries.push(bet.userChoice)
         })
 
         var betsPerCountryList = [];
@@ -480,7 +486,7 @@
         let nextTurn = this.info.nextTurn;
         let country = this.currentCountry;
         let betsOnThatCountry = this.latestBets.filter(function (bet) {
-          return bet.turn == nextTurn && bet.country == country;
+          return bet.turn == nextTurn && bet.userChoice == country;
         }).length + 1
         return ((parseFloat(this.info.jackpot) + this.info.minBet) * (1 - this.info.houseEdge - 0.1) /
           betsOnThatCountry).toFixed(3) + ' TRX';
