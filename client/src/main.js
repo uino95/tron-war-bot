@@ -19,20 +19,24 @@ Vue.use(VueAnalytics, {
 Vue.mixin({
   methods: {
     universalMap(id, to) {
-      switch (to) {
-        case 'name':
-          return mapping[id]['name'];
-        case 'charId':
-          return mapping[id]['charId'];
-        case 'numberId':
-          for (var i = mapping.length - 1; i >= 0; i--) {
-            if (mapping[i]['name'] === id) {
-              return i
+      try{
+        switch (to) {
+          case 'name':
+            return mapping[id]['name'];
+          case 'charId':
+            return mapping[id]['charId'];
+          case 'numberId':
+            for (var i = mapping.length - 1; i >= 0; i--) {
+              if (mapping[i]['name'] === id) {
+                return i
+              }
             }
-          }
-          break;
-        default:
-          return mapping[id]['name'];
+            break;
+          default:
+            return mapping[id]['name'];
+        }
+      } catch(error) {
+        console.log(error)
       }
     }
   }

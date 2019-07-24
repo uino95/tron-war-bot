@@ -14,35 +14,27 @@
           <div v-else>
             Please, login to your TRONLink wallet.
             <br />If you do not have TRONLink wallet installed, please visit
-            <a
-              href="http://u6.gg/gmc5D"
-            >http://u6.gg/gmc5D</a> and download the Chrome extension.
+            <a href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.
             <br />
             <br />
-            <v-alert
-              :value="true"
-              type="warning"
-            >Tron War Bot is only available on Google Chrome or on TronLink mobile app for the time being.</v-alert>
+            <v-alert :value="true" type="warning">Tron War Bot is only available on Google Chrome or on TronLink mobile
+              app for the time being.</v-alert>
           </div>
         </v-card-text>
 
         <v-card-text v-if="headerTile === 'Referral'">
           Refer a friend by sharing your referral link with him.
           <br />Here is your referral link:
-          <v-chip
-            v-if="this.$store.state.loggedInAccount != null"
-            label
-            outline
-            color="primary"
-          >https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}</v-chip>
+          <v-chip v-if="this.$store.state.loggedInAccount != null" label outline color="primary">
+            https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}</v-chip>
           <v-chip v-else label outline color="red">Login First</v-chip>
           <br />
           <br />You'll earn
-          <b>1%</b> out of each of his bets
+          <b>{{percentage}} % </b> out of each of his bets
           <b>forever</b>!
           <br />
           <br />Once an address starts using a referral link, that can't change and it will always provide you that
-          1%.
+          {{percentage}} %
           <br />Every 50TRX piled up you will automatically receive the earned TRX. Below you can see how much your
           referred links are earning you
           <v-container grid-list-md style="padding: 0px;" mt-2>
@@ -58,10 +50,7 @@
               <v-flex xs6 class="title" style="text-align: end;">Amount</v-flex>
             </v-layout>
             <v-divider></v-divider>
-            <v-container
-              v-if="myReferrals.length > 0"
-              style="max-height: 200px; overflow-y: auto; overflow-x: hidden;"
-            >
+            <v-container v-if="myReferrals.length > 0" style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
               <v-layout row wrap v-for="referral in myReferrals" :key="referral.user_addr">
                 <v-flex xs6 class="subheading">
                   <v-tooltip bottom>
@@ -71,11 +60,7 @@
                     <span>{{referral.user_addr}}</span>
                   </v-tooltip>
                 </v-flex>
-                <v-flex
-                  xs6
-                  class="subheading"
-                  style="text-align: end"
-                >{{referral.amount.toFixed(3)}}</v-flex>
+                <v-flex xs6 class="subheading" style="text-align: end">{{referral.amount.toFixed(3)}}</v-flex>
               </v-layout>
             </v-container>
             <v-container v-else class="text-md-center">
@@ -85,7 +70,8 @@
         </v-card-text>
 
         <v-card-text v-if="headerTile === 'Dividends'">
-          We want to build this game together with our users, and that's why 100% of TronWarBot profits are shared back to token holders! (..but yes we detain around 50% of the current
+          We want to build this game together with our users, and that's why 100% of TronWarBot profits are shared back
+          to token holders! (..but yes we detain around 50% of the current
           token supply). After every stage you will need 50 more TRX to mine one WAR. Dividend payout will happen at the
           end of the run.
           <br />
@@ -97,12 +83,7 @@
           <br />
           <v-layout row wrap>
             <v-flex xs12 sm5>
-              <v-text-field
-                :value="availableTRX + '  TRX'"
-                label="Available Dividends"
-                outline
-                readonly
-              >
+              <v-text-field :value="availableTRX + '  TRX'" label="Available Dividends" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" />
@@ -114,12 +95,7 @@
             <v-spacer />
 
             <v-flex xs12 sm5>
-              <v-text-field
-                :value="totalWARSupply + '  WAR'"
-                label="Total WAR mined"
-                outline
-                readonly
-              >
+              <v-text-field :value="totalWARSupply + '  WAR'" label="Total WAR mined" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="/img/logo.png" />
@@ -147,7 +123,8 @@
 
           <v-card mt-3>
             <v-card-text style="text-align:center;">
-              At the end of the run you will be eligible to get your share of dividends by clicking the button "Claim your dividends".
+              At the end of the run you will be eligible to get your share of dividends by clicking the button "Claim
+              your dividends".
               <br />Currently, for every
               <b>100 WAR you get {{parseFloat(availableTRX / totalWARSupply * 100).toFixed(3)}} TRX</b>
             </v-card-text>
@@ -162,78 +139,33 @@
         </v-card-text>
 
         <v-card-text v-if="headerTile === 'How To Play'">
-          The game is inspired from WorldWarBot 2020
-          <a
-            href="https://www.facebook.com/worldwarbot/"
-            target="_blank"
-          >
-            Facebook
-            Page
-          </a>.
-          <br />The bot simulates a world war: every turn, one per hour, a country (randomly chosen) conquers another
-          country. The conquest probability is proportional to the number of conquered countries (see Stats
-          panel for current status).
-          <br />
-          <br />In the game each gamer can bet that a country will conquer another country during the next turn. The
-          bet prize is 50TRX.
-          Example: I think Japan will conquer another country in the next turn (doesn’t matter which one, you
-          only care about the conqueror) so I choose Japan in the box “select country” and then I click “bet
-          50 TRX”.
-          <br />
-          <br />The potential win is the 80% of the Jackpot and it is equally divided among the winners, the ones
-          that have betted on the same country that has won in the turn.
-          The Jackpot consists in the total amount of bets and is divided in this way: 80% to the winners, 10%
-          is the starting jackpot of the next round and the 10% is taken by the team.
-          When there isn’t a winner the 90% of the Jackpot will be the starting jackpot of the next round.
-          <br />
-          <br />TronWarBot is not the owner of the WorldWarBot that runs the game, so it can’t control in any way
-          the events.
-          <br />Examples of the game:
-          Example 1:
-          10 people bet on Spain, Spain conquers England. The winners receive 0.8*(JACKPOT)/10.
-          Example 2:
-          Spain conquers England, but nobody bets on Spain. 0.9*(JACKPOT) will be the starting Jackpot of the
-          next round (the 10% of jackpot is taken by the developers).
-          <br />
-          <br />What do I need to play?
-          <br />In order to play, you must own TRX: the underlying cryptocurrency of TRON’s network.
-          <br />Make sure you have a TronLink Wallet. For more information on how to create one,
-          <a
-            href="http://u6.gg/gmc5D"
-            target="_blank"
-          >click here</a>. To play on mobile devices, please use
-          <a
-            href="https://www.tronwallet.me/"
-            target="_blank"
-          >TronWallet</a>
-          . Note that the user
-          experience isn’t optimized on mobile devices yet.
-          <ol style="text-align: justify" class="mt-2">
-            <li>Choose the country and place the bet (there is no limit of bets per-turn)</li>
-            <li>The BET AMOUNT is set to 50 TRX</li>
-            <li>
-              There is a turn every 15 minutes past an hour (e.g. 8:15 or 10:15), and it is won by
-              whoever placed the bet on the conqueror state
-            </li>
-            <li>
-              There is a timer which indicates as long as is possible betting.
-              It stops 2 minutes before the draw of the country
-            </li>
-            <li>Few seconds after the draw, awards will be paid to winners</li>
-          </ol>
+          The game is inspired from the popular WorldWarBot 2020
+          <a href="https://www.facebook.com/worldwarbot/" target="_blank">Facebook Game</a>
+          <br />The bot simulates a world war: every turn, one every 30 minutes, a state (randomly chosen) conquers
+          another country.
+          The conquest probability is proportional to the number of conquered countries and the cohesion index of that
+          country.
+          A World War run lasts on average 45 days.
 
-          <h2 class="headline mt-4">How to get TRX</h2>Are you running out of your skin to start gaming?
+          <br />
+          <br>
+          <b>What do I need to play?</b>
+          <br>In order to play, you must own TRX, the underlying cryptocurrency of TRON’s network. Make sure you have a
+          TronLink Wallet.
+          For more information on how to create one, <a target="_blank"
+            href="https://chrome.google.com/webstore/detail/tronlink%EF%BC%88%E6%B3%A2%E5%AE%9D%E9%92%B1%E5%8C%85%EF%BC%89/ibnejdfjmmkpcnlpebklmnkoeoihofec">
+            click here </a>
+          <br>To play on mobile devices, please use <a target="_blank" href="https://www.tronwallet.me/">TronWallet</a>.
+
+          <br>
+          <br>
+
+          <b>How to get TRX</b>
+          <br>Are you running out of your skin to start gaming?
           <br />Jump into the crypto world now!
           <br />
           <br />
-          <v-btn
-            round
-            color="primary"
-            href="https://changelly.com/"
-            target="_blank"
-            dark
-            pa-2
-          >BUY TRX</v-btn>
+          <v-btn round color="primary" href="https://changelly.com/" target="_blank" dark pa-2>BUY TRX</v-btn>
           <br />
           <br />Once you start playing, your TRX are safe because you don’t move them on our website. They
           remain in your secure wallet and moved out whenever you place a bet. So no need to trust us or anyone, you
@@ -257,12 +189,8 @@
           <v-spacer></v-spacer>
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-              <v-btn
-                v-if="headerTile === 'Dividends'"
-                color="blue darken-1"
-                flat="flat"
-                v-on="on"
-              >Claim your Dividends</v-btn>
+              <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on">Claim your Dividends
+              </v-btn>
             </template>
             <span>It will be available when the run is finished</span>
           </v-tooltip>
@@ -274,80 +202,129 @@
 </template>
 
 <script>
-import { db } from "../plugins/firebase";
-import { functions } from "firebase";
-export default {
-  name: "Modal",
-  props: {
-    value: Boolean,
-    headerTile: String,
-    footerTile: String,
-    bodyTile: String
-  },
-  methods: {
-    formatter: function(num) {
-      return Math.abs(num) > 999
-        ? Math.abs(num) > 999999
-          ? Math.sign(num) * (Math.abs(num) / 1000000).toFixed(1) + "M"
-          : Math.sign(num) * (Math.abs(num) / 1000).toFixed(1) + "k"
-        : Math.sign(num) * Math.abs(num);
-    }
-  },
-  computed: {
-    isVisible: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit("input", value);
+  import {
+    db
+  } from "../plugins/firebase";
+  export default {
+    name: "Modal",
+    props: {
+      value: Boolean,
+      headerTile: String,
+      footerTile: String,
+      bodyTile: String
+    },
+    methods: {
+      formatter: function (num) {
+        return Math.abs(num) > 999 ?
+          Math.abs(num) > 999999 ?
+          Math.sign(num) * (Math.abs(num) / 1000000).toFixed(1) + "M" :
+          Math.sign(num) * (Math.abs(num) / 1000).toFixed(1) + "k" :
+          Math.sign(num) * Math.abs(num);
       }
     },
-    myReferrals: function() {
-      let keys = Object.keys(this.referrals);
-      let myReferrals = [];
-      for (var i = keys.length - 1; i >= 0; i--) {
-        if (
-          this.account != null &&
-          this.referrals[keys[i]].referrer_addr === this.account
-        ) {
-          myReferrals.push({
-            user_addr: keys[i],
-            amount: this.referrals[keys[i]].amount
-          });
+
+    computed: {
+      percentage: function () {
+        if (this.percentages[this.$store.state.loggedInAccount]) {
+          return this.percentages[this.$store.state.loggedInAccount] * 100
         }
-      }
-      return myReferrals;
-    },
-    account() {
-      return this.$store.state.loggedInAccount;
-    },
-    availableTRX() {
-      return this.formatter(parseFloat(this.$store.state.availableDividends));
-    },
-    myWAR() {
-      return this.formatter(
-        parseFloat(this.$store.state.currentAddressWarBalance)
-      );
-    },
-    totalWARSupply() {
-      return this.formatter(parseFloat(this.$store.state.totalWARSupply));
-    },
-    dividendStage() {
-      return Math.floor((this.totalWARSupply % 10000) / 100);
-    }
-  },
-  firebase: {
-    referrals: db.ref("referral/map")
-  },
-  data: () => ({
-    faq: [
-      {
-        question: "What do I do if I'm not able to place the bet?",
-        answer: "Check if you have got enough Energy and Bandwidth."
+        return this.percentages.default * 100
       },
-      {
-        question: "What are Energy and Bandwidth?",
-        answer: `<b>Bandwidth:</b> For each byte array, the network consumes an equal amount of bandwidth
+      isVisible: {
+        get() {
+          return this.value;
+        },
+        set(value) {
+          this.$emit("input", value);
+        }
+      },
+      myReferrals: function () {
+        let keys = Object.keys(this.referrals);
+        let myReferrals = [];
+        for (var i = keys.length - 1; i >= 0; i--) {
+          if (
+            this.account != null &&
+            this.referrals[keys[i]].referrer_addr === this.account
+          ) {
+            myReferrals.push({
+              user_addr: keys[i],
+              amount: this.referrals[keys[i]].amount
+            });
+          }
+        }
+        return myReferrals;
+      },
+      account() {
+        return this.$store.state.loggedInAccount;
+      },
+      availableTRX() {
+        return parseFloat(this.$store.state.availableDividends);
+      },
+      myWAR() {
+        return
+        parseFloat(this.$store.state.currentAddressWarBalance);
+      },
+      totalWARSupply() {
+        return parseFloat(this.$store.state.totalWARSupply);
+      },
+      dividendStage() {
+        return Math.floor((this.totalWARSupply % 10000) / 100);
+      }
+    },
+    firebase: {
+      referrals: db.ref("referral/map"),
+      percentages: db.ref("referral/percentages")
+    },
+    data: () => ({
+      faq: [{
+          question: "What even is TronWarBot?",
+          answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
+            "<br><br>Basically we have a bot which decides one country every to conquer another country. It goes on like that until one country takes the whole world. It’s super addictive to keep an eye on the updates, we tried it on our own skin!!\n" +
+            "What we do is to allow betting on it! We bet using cryptocurrencies, TRX. Please read further if you wanna know more."
+        },
+        {
+          question: "Bets? How?",
+          answer: "Glad you asked! We currently support two types of bets.\n" +
+            "<br><b>Final Bet</b>: you can bet on the final winner. It’s you vs the others.\n" +
+            "<br><b>Next Conqueror Bet</b>: you can bet on who will conquer next turn. It’s you against us!\n" +
+            "You need TronLink wallet filled in with some TRX in order to bet.\n" +
+            "To know more read further.\n"
+        },
+        {
+          question: "How does Final Bet work?",
+          answer: "You can try to forecast the winner of the whole run, the country which will conquer the whole world.<br> 80% of the Final Jackpot is split among those who believed in that country and placed a bet on it, the remaining 20% goes into the Dividend Pool. The betting amount varies each turn depending on the probability a country has to win, so first movers have a huge advantage! We start with a fixed 50TRX at the beginning, then it keeps increasing as the run goes on! Please refer to the FAQ in you wanna have more details.\n"
+        },
+        {
+          question: "How does Bet Next work?",
+          answer: "You can bet that a state will conquer another country during the next turn. You choose how much to bet and your reward will be according to the probability of that country to be the actual conqueror next.\n" +
+            "<br><b>Example</b>: I think Japan will conquer another country in the next turn (doesn’t matter which one, you only care about the conqueror) so I choose Japan in the box “select country”, I choose how much to bet, then I place the bet.<br> Let’s say you bet 100TRX and the percentage of Japan to conquer next was 50%, if you win you’ll take away 190TRX! What about those missing 10TRX for a fair payout? Well, we put that in the Dividends Pool and at the end of the run they will be shared back to token holders!\n"
+        },
+        {
+          question: "How does the Bot work?",
+          answer: "It uses a probability density function (PDF) to determine next conqueror state.\n" +
+            "PDF is based on number of conquered neighbouring countries times the cohesion index.\n\n" +
+            "<br><br><code>PDF = (NUMBER OF TERRITORIES CONQUERED ON THE BORDER) * (COHESION INDEX + PROBABILITY OF INSURRECTION BY THE FOREIGN STATE)</code>\n"
+        },
+        {
+          question: "What is the cohesion index?",
+          answer: "It indicates the welfare and the feeling good together of the people. It runs from 0, which means anarchy, to 1, which means patriotic state, with people which want to defend their identity.\n"
+        },
+        {
+          question: "When the cohesion index is updated?",
+          answer: "It is updated anytime there is a variation in the number of countries belonging to a state, both if conquering or losing a country. It is computed taking care of the cohesion index of the conquered state.\n" +
+            "<br><b>Example</b>: France conquers a very patriotic Germany and then France will have a lower cohesion index, due to the German people that want to be independent!\n"
+        },
+        {
+          question: "How long is a World War?\n",
+          answer: "It has not a fixed deadline, it depends on the development of the war itself. On average it takes 45 days having one turn every 30 minutes.\n"
+        },
+        {
+          question: "What do I do if I'm not able to place the bet?",
+          answer: "Check if you have got enough Energy and Bandwidth."
+        },
+        {
+          question: "What are Energy and Bandwidth?",
+          answer: `<b>Bandwidth:</b> For each byte array, the network consumes an equal amount of bandwidth
                             points depending on the length of the array. So, if you are transmitting a transaction with
                             a byte array length of 200, you need to have 200 Bandwidth points. This prevents malicious
                             spam transactions from clogging the network and causing delayed transaction confirmations.
@@ -362,8 +339,8 @@ export default {
                             select Energy instead of Bandwidth. If you are not going to be executing smart contracts,
                             there is no reason why you should select Energy. Those who are just TRX investors or users
                             should always select Bandwidth and not Energy when freezing their tokens.`
-      }
-    ]
-  })
-};
+        }
+      ]
+    })
+  };
 </script>

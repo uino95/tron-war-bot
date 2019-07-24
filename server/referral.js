@@ -72,8 +72,7 @@ module.exports.registerReferral = async (req, res) => {
     var referrer_addr = req.body.referrer_addr
     var betOnDb = await checkBetOnDb(txId)
     if (!betOnDb) return res.status(400).send({ success: 'false', message: 'A bet is required in order to receive the referral, scammer' });
-    console.log("Bet on DB updating referral ", betOnDb)
-    await createReferral(user_addr, referrer_addr, betOnDb);
+    await createReferral(user_addr, referrer_addr, twb.tronWeb.fromSun(betOnDb));
     return res.status(200).send({
         success: 'true',
         message: 'referral associated'
@@ -86,7 +85,7 @@ module.exports.registerReferral = async (req, res) => {
 
 module.exports.updateReferral = async (bet) => {
 	let user_addr = bet.from
-  let amount = bet.amount
+  let amount = twb.tronWeb.fromSun(bet.amount)
 	referralRef.child('map').once('value', async function(referralSnapshot){
     let currentRefferalSnap = referralSnapshot.child(user_addr)
 		if(currentRefferalSnap.exists()){

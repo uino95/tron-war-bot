@@ -14,14 +14,14 @@ export default new Vuex.Store({
     test: test, 
     contracts:{
       WarCoinAddress: test ? "TJ6kbSxQ8ctPGuHmRb3W92gUN42AooHeNt" : "TTbPmiq35XjAhQThatnukS45pNYd7xV2m1",
-      TronWarBotAddress: test ? "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e" : "TQXiV4TeKS4zF54PiCsUyKTQ22yYY6KuzL",
+      TronWarBotAddress: test ? "TYUyBmkVZdtftSJf9c5StD8rMXFf37thab" : "TY7KWcSvmwA1J7pCy42S1wBbf9c1siCkMo",
       WarCoinInstance: null,
       TronWarBotInstance: null
     },
     currentAddressWarBalance: 0,
     availableDividends: 0,
-    accountOperator: "TPisPeMpZALp41Urg6un6S4kJJSZdtw6Kw",
-    totalWARSupply: 0
+    totalWARSupply: 0,
+    tronweb: null
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -37,7 +37,6 @@ export default new Vuex.Store({
       state.isMobile = value
     },
     setContractsInstance(state, payload){
-      console.log("setting contracts instance ", payload)
       state.contracts.TronWarBotInstance = payload.tronWarBot
       state.contracts.WarCoinInstance = payload.warCoin
     },
@@ -49,6 +48,9 @@ export default new Vuex.Store({
     },
     setTotalWarSupply(state, payload){
       state.totalWARSupply = payload.totalWARSupply
+    },
+    setTronWeb(state, payload){
+      state.tronweb = payload
     }
   },
   actions: {

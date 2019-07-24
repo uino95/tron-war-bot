@@ -15,7 +15,7 @@
                     <template v-slot:activator="{ on }">
                       <v-icon color="secondary" dark v-on="on">info</v-icon>
                     </template>
-                    <span>Here you can bet on the world conqueror</span>
+                    <span>Bet on the final winner of the World War! Each bet goes into the jackpot. At the end of the run (45 days on average) 80% of the jackpot is given to the winners, and 20% is given to WAR token holders. As the time goes it will be more expensive to bet on countries, also depending on how good they are doing. The first you bet, the better!</span>
                   </v-tooltip>
                 </v-flex>
               </v-layout>
@@ -39,7 +39,7 @@
                   <v-tooltip slot="append" top>
                     <v-text-field slot="activator" :value="calculatePotentialWin" label="Potential win" outline disabled>
                     </v-text-field>
-                    <span>Here you can see what you will win if you bet on the selected country. </span>
+                    <span>If the run was to end today and you win, this is how much you would win! </span>
                   </v-tooltip>
                 </v-flex>
                 <v-flex md3>
@@ -93,7 +93,7 @@
 
               <!-- else show the bets -->
               <v-layout v-else row wrap class="gameTabHeader">
-                <v-flex xs3 class="title">
+                <v-flex xs6 class="title">
                   Country
                 </v-flex>
                 <v-flex xs3 class="title">
@@ -102,25 +102,19 @@
                 <v-flex xs3 class="title">
                   Turn
                 </v-flex>
-                <v-flex xs3 class="title">
-                  Result
-                </v-flex>
 
                 <v-divider class="gameTabDivider"></v-divider>
 
                 <v-container class="gameTabContent">
                   <v-layout row wrap v-for="bet in myBets" :key="bet.time">
                     <v-flex xs3 class="subheading">
-                      {{universalMap(bet.country)}}
+                      {{universalMap(bet.userChoice)}}
                     </v-flex>
                     <v-flex xs3 class="subheading">
-                      {{bet.bet+"TRX"}}
+                      {{bet.amount | TRX}}
                     </v-flex>
                     <v-flex xs3 class="subheading">
                       {{bet.turn}}
-                    </v-flex>
-                    <v-flex xs3 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                      {{convertResultBet(bet.result)}}
                     </v-flex>
                   </v-layout>
                 </v-container>
@@ -158,10 +152,10 @@
 
                 <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
                   <v-flex xs6 class="subheading">
-                    <span>{{universalMap(bet.country)}}</span>
+                    <span>{{universalMap(bet.userChoice)}}</span>
                   </v-flex>
                   <v-flex xs3 class="subheading">
-                    <span>{{bet.bet+"TRX"}}</span>
+                    <span>{{bet.amount | TRX}}</span>
                   </v-flex>
                   <v-flex xs3 class="subheading">
                     <span>{{bet.turn}}</span>
@@ -194,18 +188,18 @@
                   <v-flex xs3 class="subheading">
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on }">
-                        <span v-on="on" v-text="bet.address.substring(0,5)+'..'" v-bind:alt="bet.address"></span>
+                        <span class="text-truncate" v-on="on" v-text="(bet.from)" v-bind:alt="(bet.from)"></span>
                       </template>
-                      <span>{{bet.address}}</span>
+                      <span>{{bet.from}}</span>
                     </v-tooltip>
                   </v-flex>
 
                   <v-flex xs5 class="subheading">
-                    <span>{{universalMap(bet.country)}}</span>
+                    <span>{{universalMap(bet.userChoice)}}</span>
                   </v-flex>
 
                   <v-flex xs2 class="subheading">
-                    <span>{{bet.bet+"TRX"}}</span>
+                    <span>{{bet.amount | TRX}}</span>
                   </v-flex>
 
                   <v-flex xs2 class="subheading">
@@ -230,7 +224,7 @@
           <v-container grid-list-md text-xs-center class="gameTab">
             <v-layout align-center justify-space-between row wrap class="gameTabHeader">
               <v-flex style="text-align: start;" class="title">Country</v-flex>
-              <v-flex style="text-align: end;" class="title">Placed bets</v-flex>
+              <v-flex style="text-align: end;" class="title">Bets Placed</v-flex>
             </v-layout>
 
             <v-divider class="gameTabDivider"></v-divider>
@@ -276,8 +270,8 @@
   from '../plugins/firebase';
   import mapping from '../assets/mapping';
   import axios from 'axios'
-  import DataIterable from "vuetify/lib/mixins/data-iterable";
   import VLazyImage from "v-lazy-image";
+  import tronweb from 'tronweb'
 
   String.prototype.replaceAll = function(search, replace) {
     if (replace === undefined) {
@@ -288,7 +282,6 @@
 
   export default {
     components: {
-      DataIterable,
       VLazyImage
     },
     data: () => ({
@@ -304,6 +297,7 @@
       potentialWin: 0,
       currencies: ["TRX", "WAR"],
       currency: "TRX",
+      unsortedBetsPerCountry: [],
 
       info: {},
       history: [],
@@ -318,6 +312,12 @@
       info: db.ref('betFinalData')
     },
 
+    filters: {
+      TRX: (amount) => {
+        return tronweb.fromSun(amount) + 'TRX'
+      }
+    },
+
     methods: {
       getFlagString(str) {
         str = "/img/flags/" + str.toLowerCase()
@@ -329,7 +329,6 @@
           .replaceAll("å", "a")
           .replaceAll("é", "e")
           .replaceAll("í", "i") + ".svg"
-        console.log(str)
         return str;
       },
       placeBet: async function() {
@@ -341,19 +340,21 @@
           this.snackbar = true;
           this.isWaitingForConfirm = false
         } else if (this.currentCountry == null) {
-          this.snackbarText = "Select a country from map or search it";
+          this.snackbarText = "Select a country first";
           this.snackbarColor = "error";
           this.snackbar = true;
           this.isWaitingForConfirm = false
         } else {
+          console.log("instance ",this.$store.state.contracts.TronWarBotInstance)
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
-          let txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry).send({
+          let txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry, this.info.currentTurn).send({
             callValue: window.tronWeb.toSun(this.info.minBet)
           })
           setTimeout(function () {
             window.tronWeb.trx.getTransaction(txId).then((tx) => {
+              console.log(tx)
               if (tx.ret[0].contractRet == "SUCCESS") {
                 _this.snackbarColor = "success";
                 _this.snackbarText =
@@ -368,7 +369,7 @@
               _this.snackbar = true
               _this.isWaitingForConfirm = false
             })
-          }, 5000)
+          }, 10000)
         }
       },
       async postReferral(txId) {
@@ -447,16 +448,16 @@
         return arr.sort(compare);
       },
       myBets: function () {
-        return this.bets.filter(bet => bet.address === this.account && bet.gameType == this.info.gameType).reverse()
+        return this.bets.filter(bet => (bet.from) === this.account && bet.gameType == this.info.gameType).reverse()
       },
       //returns an array of objects [{countryId: "id", numberOfBets: x}, ...]
       betsPerCountry: function () {
         // it will contain all the countries for which there is at least one bet
         let countries = []
         this.bets.forEach(bet =>{
-          countries.push(bet.country)
+          countries.push(bet.userChoice)
         })
-
+        console.log(countries)
         var betsPerCountryList = [];
         for (const x of Array(241).keys()) {
           betsPerCountryList.push({countryId: x, numberOfBets: 0})
@@ -478,12 +479,10 @@
       calculatePotentialWin: function () {
         if (this.currentCountry == null) return 0;
         let nextTurn = this.info.nextTurn;
-        let country = this.currentCountry;
-        let betsOnThatCountry = this.latestBets.filter(function (bet) {
-          return bet.turn == nextTurn && bet.country == country;
-        }).length + 1
+        let bets = this.betsPerCountry
+        let betsOnThatCountry = bets.find(el => (el.countryId === this.currentCountry))
         return ((parseFloat(this.info.jackpot) + this.info.minBet) * (1 - this.info.houseEdge - 0.1) /
-          betsOnThatCountry).toFixed(3) + ' TRX';
+          Math.max(betsOnThatCountry.numberOfBets, 1)).toFixed(3) + ' TRX';
       },
       currentCountry: {
         get() {
