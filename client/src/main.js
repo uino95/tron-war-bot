@@ -11,6 +11,7 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import VueAnalytics from 'vue-analytics'
 
 Vue.config.productionTip = false;
+Vue.config.devtools = true;
 
 Vue.use(VueAnalytics, {
   id: 'UA-141721214-1'

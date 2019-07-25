@@ -21,7 +21,7 @@ export default new Vuex.Store({
     currentAddressWarBalance: 0,
     availableDividends: 0,
     totalWARSupply: 0,
-    tronweb: null
+    tronWeb: null
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -49,14 +49,16 @@ export default new Vuex.Store({
     setTotalWarSupply(state, payload){
       state.totalWARSupply = payload.totalWARSupply
     },
-    setTronWeb(state, payload){
-      state.tronweb = payload
+    setTronWebInstance(state, payload){
+      console.log("tronweb set")
+      state.tronWeb = payload
     }
   },
   actions: {
     async registerContractsInstance({commit, state}){
-      const tronWarBotInstance = await window.tronWeb.contract().at(state.contracts.TronWarBotAddress)
-      const warCoinInstance = await window.tronWeb.contract().at(state.contracts.WarCoinAddress)
+      const tronWarBotInstance = await state.tronWeb.contract().at(state.contracts.TronWarBotAddress)
+      const warCoinInstance = await state.tronWeb.contract().at(state.contracts.WarCoinAddress)
+      console.log("setting contracts instances")
       commit('setContractsInstance', {
         warCoin: warCoinInstance,
         tronWarBot: tronWarBotInstance

@@ -53,7 +53,6 @@
               </v-layout>
 
               <v-divider></v-divider>
-
               <v-container style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
                 <v-layout row wrap v-for="referral in myReferrals" :key="referral.user_addr">
                   <v-flex xs6 class="subheading">
@@ -75,7 +74,7 @@
           </v-container>
         </v-card-text>
 
-        <v-card-text v-if="headerTile === 'Dividends'">
+        <v-card-text v-if="headerTile === 'Dividends' && account !== null">
           We want to build this game together with our users, and that's why 100% of TronWarBot profits are shared back
           to token holders! (..but yes we detain around 50% of the current
           token supply). After every stage you will need 50 more TRX to mine one WAR. Dividend payout will happen at the
@@ -131,6 +130,8 @@
             <v-card-text style="text-align:center;">
               At the end of the run you will be eligible to get your share of dividends by clicking the button "Claim
               your dividends".
+              <br />Currently, for every
+              <b>100 WAR you get {{availableTRX.div(totalWARSupply.div("1000000000000000000")).times('100') | TRX}}</b>
             </v-card-text>
             <v-chip label outline color="primary" style="margin-left:4.5em;">
               With your current WARs you will receive:
@@ -141,6 +142,75 @@
           <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
           (end of the run)-->
         </v-card-text>
+
+        <v-card-text v-if="headerTile === 'Dividends' && account === null">
+          We want to build this game together with our users, and that's why 100% of TronWarBot profits are shared back
+          to token holders! (..but yes we detain around 50% of the current
+          token supply). After every stage you will need 50 more TRX to mine one WAR. Dividend payout will happen at the
+          end of the run.
+          <br />
+          <v-divider mt-3 />
+          <br />
+          <span class="headling">We are in stage 1 of 100. You need to play 500 TRX to mine 1 WAR</span>
+          <v-chip style="margin-left:14em" label outline color="red">Login First</v-chip>
+          <v-divider mt-8 />
+          <br />
+          <v-layout row wrap>
+            <v-flex xs12 sm5>
+              <v-text-field :value="'0 TRX'" outline readonly>
+                <template v-slot:append>
+                  <v-avatar class="pb-2" tile size="40">
+                    <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" />
+                  </v-avatar>
+                </template>
+              </v-text-field>
+            </v-flex>
+
+            <v-spacer />
+
+            <v-flex xs12 sm5>
+              <v-text-field :value="'0 WAR' " label="Total WAR mined" outline readonly>
+                <template v-slot:append>
+                  <v-avatar class="pb-2" tile size="40">
+                    <img src="/img/logo.png" />
+                  </v-avatar>
+                </template>
+              </v-text-field>
+            </v-flex>
+          </v-layout>
+
+          <v-layout>
+            <v-spacer />
+            <v-flex xs12 sm5>
+              <v-text-field :value="'0 WAR'" label="You have mined" outline readonly>
+                <template v-slot:append>
+                  <v-avatar class="pb-2" tile size="40">
+                    <img src="/img/logo.png" />
+                  </v-avatar>
+                </template>
+              </v-text-field>
+            </v-flex>
+            <v-spacer />
+          </v-layout>
+
+          <v-divider />
+
+          <v-card mt-3>
+            <v-card-text style="text-align:center;">
+              At the end of the run you will be eligible to get your share of dividends by clicking the button "Claim
+              your dividends".
+            </v-card-text>
+            <v-chip label outline color="primary" style="margin-left:4.5em;">
+              With your current WARs you will receive:
+              {{0}}
+            </v-chip>
+          </v-card>
+
+          <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
+          (end of the run)-->
+        </v-card-text>
+
+
 
         <v-card-text v-if="headerTile === 'How To Play'">
           The game is inspired from the popular WorldWarBot 2020
@@ -221,20 +291,19 @@
 
     filters:{
       TRX: (amount) => {
-        return tronweb.fromSun(amount) + ' TRX'
+        return tronweb.fromSun(amount).toFixed(3) + ' TRX'
       },
       WAR: (amount) =>{
-        console.log(amount.toString())
         return amount.div("1000000000000000000").toString() + ' WAR'
       }
     },
 
     computed: {
       percentage: function () {
-        if (this.percentages[this.$store.state.loggedInAccount]) {
-          return this.percentages[this.$store.state.loggedInAccount] * 100
+        if (this.referrals.percentages[this.$store.state.loggedInAccount]) {
+          return this.referrals.percentages[this.$store.state.loggedInAccount] * 100
         }
-        return this.percentages.default * 100
+        return this.referrals.percentages.default * 100
       },
       isVisible: {
         get() {
@@ -245,16 +314,16 @@
         }
       },
       myReferrals: function () {
-        let keys = Object.keys(this.referrals);
+        let keys = Object.keys(this.referrals.map);
         let myReferrals = [];
         for (var i = keys.length - 1; i >= 0; i--) {
           if (
             this.account != null &&
-            this.referrals[keys[i]].referrer_addr === this.account
+            this.referrals.map[keys[i]].referrer_addr === this.account
           ) {
             myReferrals.push({
               user_addr: keys[i],
-              amount: this.referrals[keys[i]].amount
+              amount: this.referrals.map[keys[i]].amount
             });
           }
         }
@@ -264,7 +333,7 @@
         return this.$store.state.loggedInAccount;
       },
       availableTRX() {
-        return this.$store.state.availableDividends;
+        return tronweb.BigNumber(tronweb.toSun(this.betFinalData.jackpot * 0.2));
       },
       myWAR() {
         return this.$store.state.currentAddressWarBalance;
@@ -277,8 +346,8 @@
       }
     },
     firebase: {
-      referrals: db.ref("referral/map"),
-      percentages: db.ref("referral/percentages")
+      referrals: db.ref("referral"),
+      betFinalData: db.ref("betFinalData"),
     },
     data: () => ({
       faq: [{
