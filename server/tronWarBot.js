@@ -3,6 +3,9 @@ const TronWeb = require('tronweb');
 const TronGrid = require('trongrid');
 const config = require('./config');
 
+const BLOCK_CONFIRMATION = 6;
+
+
 const tronWeb = new TronWeb({
   fullHost: config.tron.fullHost,
   privateKey: config.tron.privateKey
@@ -38,13 +41,13 @@ const createWatchEvents = function(c){
     if(typeof opts == "string") opts = { eventName : opts};
     if(!fn || (typeof fn != "function")) throw "Invalid callback function";
     let b = await tronWeb.trx.getCurrentBlock();
-    var bn = b.block_header.raw_data.number;
+    var bn = b.block_header.raw_data.number - BLOCK_CONFIRMATION;
 
     var intervalId = setInterval(async ()=>{
       var events;
       try {
         let b = await tronWeb.trx.getCurrentBlock();
-        let currentBlock = b.block_header.raw_data.number;
+        let currentBlock = b.block_header.raw_data.number - BLOCK_CONFIRMATION;
         if (currentBlock<bn) return; //Skip this interval
         opts.onlyConfirmed=false;
         opts.orderBy="timestamp,desc";
