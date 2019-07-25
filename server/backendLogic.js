@@ -51,10 +51,13 @@ async function checkBetOnDb(txId) {
     })
 }
 
-async function gameOver(){
-  dataRef.update({ serverStatus: 500 });
+async function stopGame(){
   await twb.endGame(0);
   await twb.endGame(1);
+}
+
+async function gameOver(){
+  dataRef.update({ serverStatus: 500 });
   var cr = await twb.getCurrentRound(0);
   var winner = wwb.winner();
   console.log("[LOGIC]: Sleeping one minute before automatic jackpot payout...");
@@ -64,16 +67,23 @@ async function gameOver(){
   var _bets = []
 
   await twb.jackpotPayout(0, cr.round, winner, _bets);
+  console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
 }
 
 module.exports.launchNextTurn = async function() {
+  if (wwb.winner()) return;
   console.log("[SCHEDULER]: Launching next turn!")
+
   //STOP BET BUTTON
   dataRef.update({ serverStatus: 300 })
   // AWAIT FOR DATA PROPAGATION AND BET HALT
   await sleep(29000);
   var go = !(await nextTurn());
 
+  // STOP GAME BETS
+  if (go) await stopGame();
+
+  // UPDATE HISTORY
   var data = wwb.currentTurnData();
   dataRef.update({ turn: data.turn })
   dataRef.update({ turnTime: (new Date()).valueOf() })
@@ -84,8 +94,10 @@ module.exports.launchNextTurn = async function() {
                   civilWar: data.civilWar
                 });
 
-  if (go) return await gameOver();
+  // PAYOUT IN PROGESS
   dataRef.update({ serverStatus: 400 });
+
+  // PAYOUT AGAINST DEALER
   var cr = await twb.getCurrentRound(1);
 
   // @TODO GET BET RATE FOR GIVEN WINNER
@@ -96,9 +108,12 @@ module.exports.launchNextTurn = async function() {
   // @TODO GET WINNING BETS
   var _bets = []
 
-  // TURN PAYOUT
-  await twb.housePayout(1, cr.round, data.o, _winRate, _bets)
-  console.log("[SCHEDULER]: Next turn complete!")
+  await twb.housePayout(1, cr.round, data.o, _winRate, _bets);
+
+  // PAYOUT FINAL
+  if (go) await gameOver();
+
+  console.log("[SCHEDULER]: Next turn complete!");
 }
 
 
