@@ -73,7 +73,7 @@
 
     <v-layout row wrap>
       <!-- My latest bets -->
-      <v-flex column wrap>
+      <v-flex md6 column wrap>
 
         <v-flex>
           <v-card>
@@ -181,7 +181,9 @@
                   <span>Turn</span>
                 </v-flex>
               </v-layout>
+
               <v-divider class="gameTabDivider"></v-divider>
+
               <v-container class="gameTabContent" text-xs-center>
                 <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
 

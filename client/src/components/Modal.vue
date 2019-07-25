@@ -63,7 +63,7 @@
                       <span>{{referral.user_addr}}</span>
                     </v-tooltip>
                   </v-flex>
-                  <v-flex xs6 class="subheading" style="text-align: end">{{referral.amount.toFixed(3)}}</v-flex>
+                  <v-flex xs6 class="subheading" style="text-align: end">{{referral.amount.toFixed(3)}} TRX</v-flex>
                 </v-layout>
               </v-container>
             </v-container>
