@@ -1,13 +1,26 @@
 // DB interface
 const firebase = require('./firebase')
+const neighborCountriesRaw = require('./map-utilities/neighborCountries').map((e,idx)=>{
+  if (!e[idx.toString()]) throw "[COUNTRIES_VALIDATION]: Invalid ordering of neighborCountries file! Check that all countries are correctly orderd from 0 to 240";
+  return e[idx.toString()];
+});
+
+const neighborCountries = neighborCountriesRaw.map((e,idx)=>{
+  for (var c of e) {
+    if (!neighborCountriesRaw[parseInt(c)].includes(idx.toString()))
+      throw "[COUNTRIES_VALIDATION]: Invalid relationships in neighborCountries file! Check that all countries are correctly linked to each other";
+  }
+  return e.map(c=>parseInt(c));
+})
 const db = firebase.db
 
 // SIMULATION PARAMS
 const COHESION_BIAS = 0.3;
-const COUNTRIES = 241;
+const COUNTRIES = neighborCountries.length;
 const CIVIL_WAR_LIKELIHOOD = 0.2;
-const SIMULATIONS = 1;
+const SIMULATIONS = 10;
 
+console.log("Simulating " + COUNTRIES + " countries")
 // the countriesMap is an array of (CountryIndex => CountryStatus) where CountryStatus is:
 // {
 //   occupiedBy: CountryIndex,
@@ -18,7 +31,7 @@ var countriesMap;
 var countriesMapRef = db.ref('countriesMap')
 
 // the neighborCountries is an array of (CountryIndex => [CountryIndexes])
-var neighborCountries;
+// var neighborCountries;
 
 var turn = 0;
 var turnData = {};
@@ -37,27 +50,27 @@ const init = async (restart) => {
       cohesion: 0.5,
       occupied: 1,
       finalBetAmount: 0,
-      probability: 0 
+      probability: 0
     }
   });
   if (!restart) countriesMap = await loadSavedState();
   // the neighborCountries is an array of (CountryIndex => [CountryIndexes])
-  neighborCountries = new Array(COUNTRIES).fill(0).map(()=>[]);
-  for (var c=0; c<COUNTRIES; c++){
-    let t = getRandom(COUNTRIES);
-    while (t == c) t = getRandom(COUNTRIES);
-    neighborCountries[c].push(t);
-    neighborCountries[t].push(c);
-
-    if (Math.random()>0.4) {
-      t = getRandom(COUNTRIES);
-      while (t == c) t = getRandom(COUNTRIES);
-      neighborCountries[c].push(t);
-      neighborCountries[t].push(c);
-    }
-  }
-  neighborCountries = neighborCountries.map((e)=>{return [...new Set(e)]});
-  saveCurrentState()
+  // neighborCountries = new Array(COUNTRIES).fill(0).map(()=>[]);
+  // for (var c=0; c<COUNTRIES; c++){
+  //   let t = getRandom(COUNTRIES);
+  //   while (t == c) t = getRandom(COUNTRIES);
+  //   neighborCountries[c].push(t);
+  //   neighborCountries[t].push(c);
+  //
+  //   if (Math.random()>0.4) {
+  //     t = getRandom(COUNTRIES);
+  //     while (t == c) t = getRandom(COUNTRIES);
+  //     neighborCountries[c].push(t);
+  //     neighborCountries[t].push(c);
+  //   }
+  // }
+  // neighborCountries = neighborCountries.map((e)=>{return [...new Set(e)]});
+  if (!simulation) await saveCurrentState()
 };
 
 
@@ -203,7 +216,7 @@ const nextTurn = async () => {
   countriesMap[conqueredTerritory].occupiedBy = conquerer;
 
 
-  await saveCurrentState();
+  if (!simulation) await saveCurrentState();
   printStatus();
   return !!countriesOnTheBorders().length;
 }
@@ -227,9 +240,8 @@ const simulate = async () => {
   var civilWars = 0;
   simulation = true;
   for (var i=0; i<SIMULATIONS; i++){
-    init();
+    init(true);
     while (!!(await nextTurn())) {
-      await sleep(5000);
       let d = currentTurnData()
       civilWars += d.civilWar;
       conquest[d.o] += 1;
