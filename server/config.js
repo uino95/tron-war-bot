@@ -12,7 +12,7 @@ const config = {
     warCoinAddress: "TJ6kbSxQ8ctPGuHmRb3W92gUN42AooHeNt"
   },
   game: {
-    preservedJackpotRateForNextTurn: 0.1
+    preservedJackpotRateForNextTurn: 0
   },
   firebase: {
 	  "type": "service_account",

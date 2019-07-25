@@ -229,7 +229,7 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
       skip = true;
     }
     if (!skip) {
-      txId = await this.twb.payout(gameType, gameRound, b.from, win.toString()).send();
+      if (win.gt("0")) txId = await this.twb.payout(gameType, gameRound, b.from, win.toString()).send();
       await sleep(10000);
       tx = await this.tronWeb.trx.getTransaction(txId)
       console.info("[PAYOUT SUCCESSFUL]" +
@@ -297,7 +297,7 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
       skip = true;
     }
     if (!skip) {
-      txId = await this.twb.payout(gameType, gameRound, b.from, win.toString()).send();
+      if (win.gt("0")) txId = await this.twb.payout(gameType, gameRound, b.from, win.toString()).send();
       await sleep(10000);
       tx = await this.tronWeb.trx.getTransaction(txId)
       console.info("[PAYOUT SUCCESSFUL]" +

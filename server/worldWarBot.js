@@ -48,8 +48,9 @@ const init = async (restart) => {
     return {
       occupiedBy: idx,
       cohesion: 0.5,
-      occupied: 1,
-      finalBetAmount: 0,
+      finalQuote: 0, // PRICE OF FINAL BET
+      nextQuote: 0, // MULTIPLIER FOR BET ON NEXT CONQUERER
+      territories: 1,
       probability: 0
     }
   });
@@ -70,7 +71,7 @@ const init = async (restart) => {
   //   }
   // }
   // neighborCountries = neighborCountries.map((e)=>{return [...new Set(e)]});
-  if (!simulation) await saveCurrentState()
+  if (!simulation && restart) return await saveCurrentState()
 };
 
 
@@ -176,7 +177,7 @@ const updateCohesion = (o, d, ot, dt) => {
 
 
 // Returns is game on?
-const nextTurn = async () => {
+const nextTurn = async (exitScam=()=>{}) => {
   // Calculate countries on the borders
   let availableTerritories = countriesOnTheBorders();
   if (!availableTerritories.length) return false;
