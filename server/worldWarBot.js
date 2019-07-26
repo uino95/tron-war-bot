@@ -1,10 +1,34 @@
+// SIMULATION PARAMS
+const COHESION_BIAS = 0.3;
+const CIVIL_WAR_LIKELIHOOD = 0.2;
+const SIMULATIONS = 10;
 // DB interface
 const firebase = require('./firebase')
+const t = require('./tronWarBot')
+const db = firebase.db
+// db ref
+var countriesMapRef = db.ref('countriesMap')
+var betsRef = db.ref('bets')
+var dataRef = db.ref('data')
+
 const neighborCountriesRaw = require('./map-utilities/neighborCountries').map((e,idx)=>{
   if (!e[idx.toString()]) throw "[COUNTRIES_VALIDATION]: Invalid ordering of neighborCountries file! Check that all countries are correctly orderd from 0 to 240";
   return e[idx.toString()];
 });
 
+// the countriesMap is an array of (CountryIndex => CountryStatus) where CountryStatus is:
+// {
+//   occupiedBy: CountryIndex,
+//   cohesion: [0-1], Index representing the unity of the country that impacting on civil rebelions probability
+  // finalQuote: 0, // PRICE OF FINAL BET
+  // nextQuote: 0, // MULTIPLIER FOR BET ON NEXT CONQUERER
+  // territories: 1,
+  // probability: 0
+// }
+
+
+// the neighborCountries is an array of (CountryIndex => [CountryIndexes])
+// var neighborCountries;
 const neighborCountries = neighborCountriesRaw.map((e,idx)=>{
   for (var c of e) {
     if (!neighborCountriesRaw[parseInt(c)].includes(idx.toString()))
@@ -12,27 +36,10 @@ const neighborCountries = neighborCountriesRaw.map((e,idx)=>{
   }
   return e.map(c=>parseInt(c));
 })
-const db = firebase.db
 
-// SIMULATION PARAMS
-const COHESION_BIAS = 0.3;
 const COUNTRIES = neighborCountries.length;
-const CIVIL_WAR_LIKELIHOOD = 0.2;
-const SIMULATIONS = 10;
 
-console.log("Simulating " + COUNTRIES + " countries")
-// the countriesMap is an array of (CountryIndex => CountryStatus) where CountryStatus is:
-// {
-//   occupiedBy: CountryIndex,
-//   cohesion: [0-1], Index representing the unity of the country that impacting on civil rebelions probability
-// }
 var countriesMap;
-// db ref
-var countriesMapRef = db.ref('countriesMap')
-
-// the neighborCountries is an array of (CountryIndex => [CountryIndexes])
-// var neighborCountries;
-
 var turn = 0;
 var turnData = {};
 var simulation = false;
@@ -130,6 +137,15 @@ const pdf = () => {
   return r.map(c=>[c[0]/total, c[1]/total]);
 }
 
+const realPdf = () => {
+  var p = new Array(COUNTRIES).fill(0);
+  pdf().forEach((e,i)=>{
+    p[countriesMap[i].occupiedBy] += e[0];
+    p[i] += e[1];
+  })
+  return p;
+}
+
 const cumulatedPdf = () => {
   let cumulated = 0;
   return pdf().map(c=>{
@@ -141,6 +157,28 @@ const winner = () => {
   if (!countriesOnTheBorders().length) return countriesMap[0].occupiedBy;
   return false;
 }
+
+const updateExternalData = async (conquerer, conquered, conquererTerritory, conqueredTerritory) => {
+  // UPDATE TERRITORIES
+  countriesMap[conquerer].territories = countriesMap[conquerer].territories + 1;
+  countriesMap[conquered].territories = countriesMap[conquered].territories - 1;
+
+  // GET JACKPOT
+  let r = await t.getCurrentRound(0);
+  let jackpot = await dataRef.once("value").then(r=>r.val()['jackpot']);
+  let bets = await betsRef.orderByChild("gameType").equalTo(0).once("value").then(r=>(r.val() || []).filter(e=>e.round==r.round));
+  let betsPerCountry = new Array(COUNTRIES).fill(0);
+  bets.forEach((e,i)=>betsPerCountry[e.userChoice]+=1);
+
+  // CALCULATE NEW EXACT PDF
+  realPdf().forEach((e,i)=>{
+    countriesMap[i].probability = e;
+    let next = e ? Math.min(1/e, 200) : 200;
+    countriesMap[i].nextQuote = Math.floor(next*100)/100;
+    countriesMap[i].finalQuote = Math.round(((jackpot * e)/(betsPerCountry[i]+1)) + 50 + (turn/100));
+  })
+}
+
 
 const updateCohesion = (o, d, ot, dt) => {
   let o_amp = conqueredTerritoriesOf(o).length / COUNTRIES;
@@ -178,6 +216,7 @@ const updateCohesion = (o, d, ot, dt) => {
 
 // Returns is game on?
 const nextTurn = async (exitScam=()=>{}) => {
+  if (!countriesMap) await init();
   // Calculate countries on the borders
   let availableTerritories = countriesOnTheBorders();
   if (!availableTerritories.length) return false;
@@ -212,10 +251,12 @@ const nextTurn = async (exitScam=()=>{}) => {
     d: conquered,
     dt: conqueredTerritory,
   }
+
+  // UPDATE CORE DATA
   updateCohesion(conquerer, conquered, conquererTerritory, conqueredTerritory);
-
   countriesMap[conqueredTerritory].occupiedBy = conquerer;
-
+  // UPDATE EXTERNAL DATA
+  await updateExternalData(conquerer, conquered, conquererTerritory, conqueredTerritory);
 
   if (!simulation) await saveCurrentState();
   printStatus();
@@ -231,8 +272,10 @@ const printStatus = ()=>{
 const currentTurn = () => turn;
 const mapState = () => countriesMap;
 
+init();
 
 const simulate = async () => {
+  console.log("Simulating with " + COUNTRIES + " countries");
   var wins = new Array(COUNTRIES).fill(0);
   var conquest = new Array(COUNTRIES).fill(0);
   var cohesion = new Array(COUNTRIES).fill(0);
@@ -278,5 +321,6 @@ module.exports = {
   cumulatedPdf,
   printStatus,
   pdf,
-  simulate
+  simulate,
+  winner
 }

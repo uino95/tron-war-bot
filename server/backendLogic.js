@@ -2,7 +2,7 @@ const rp = require('request-promise')
 const cron = require("node-cron");
 
 const firebase = require('./firebase')
-const theFakeWwb = require('./worldWarBotApi')
+// const theFakeWwb = require('./worldWarBotApi')
 const wwb = require('./worldWarBot')
 const twb = require('./tronWarBot')
 const referral = require('./referral')
@@ -77,8 +77,8 @@ module.exports.launchNextTurn = async function() {
   //STOP BET BUTTON
   dataRef.update({ serverStatus: 300 })
   // AWAIT FOR DATA PROPAGATION AND BET HALT
-  await sleep(29000);
-  var go = !(await nextTurn());
+  await sleep(config.test ? 3000 : 29000);
+  var go = !(await wwb.nextTurn());
 
   // STOP GAME BETS
   if (go) await stopGame();
@@ -102,8 +102,6 @@ module.exports.launchNextTurn = async function() {
 
   // @TODO GET BET RATE FOR GIVEN WINNER
   var _winRate = 0
-
-  // @TODO UPDATE BET RATES AND PDF  => IN WWB
 
   // @TODO GET WINNING BETS
   var _bets = []

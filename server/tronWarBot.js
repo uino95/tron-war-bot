@@ -124,6 +124,7 @@ module.exports.getCurrentRound = async function (gameType) {
     availableJackpot,
     availableFunds,
     houseEdge,
+    houseReserves,
     stoppedAt: stopped ? (endGame.block || true) : false,
     startedAt,
   }
