@@ -47,7 +47,7 @@
                 </v-flex>
                 <v-flex md3>
                   <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
-                    label="Current Jackpot" outline disabled></v-text-field>
+                    label="Current Jackpot" outline readonly=""></v-text-field>
                 </v-flex>
               </v-layout>
 

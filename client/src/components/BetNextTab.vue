@@ -188,7 +188,7 @@
 
   export default {
     data: () => ({
-      showBetNextTab: false,
+      showBetNextTab: true,
       isLoading: false,
       valid: false,
       snackbar: false,
