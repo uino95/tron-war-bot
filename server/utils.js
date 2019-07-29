@@ -1,9 +1,6 @@
 const mapping = require( './map-utilities/mapping')
 
 module.exports = {
-    consoleLog:function(text) {
-        console.log(new Date() + ': ' + text)
-    },
     universalMap: function(id,to){
 		switch(to){
 			case 'name':
@@ -24,6 +21,3 @@ module.exports = {
     	return new Promise(resolve => setTimeout(resolve, ms));
 	}
 }
-
-
-

@@ -9,6 +9,8 @@ const betValidator = require('./bet')
 const config = require('./config')
 const db = firebase.db
 
+const utils = require('./utils')
+
 // const options = {
 //     method: "DELETE",
 //     uri: 'https://api.heroku.com/apps/tronwarbot/dynos/web',
@@ -29,7 +31,7 @@ var betFinalRef = db.ref('betFinalData')
 var countriesMapRef = db.ref('countriesMap')
 
 
-function sleep(ms) {
+async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -43,14 +45,14 @@ async function notifyTelegramBot(d) {
   return await rp({
     method: "POST",
     uri: "https://masfik.net/TronWarBot/webhook.php",
-    headers: { 'content-type': 'application/json'},
     body: {
       "auth_token": "QbdPS%I%62Bv2Sizf4*!$4iB%zz@!9",
       "turn": d.turn,
-      "conquered": d.dt,
-      "conqueror": d.o,
-      "prev_owner": d.d
-    }
+      "conquered": utils.universalMap(d.dt),
+      "conqueror": utils.universalMap(d.o),
+      "prev_owner": utils.universalMap(d.d)
+    },
+    json: true
   }).catch(console.error);
 }
 
