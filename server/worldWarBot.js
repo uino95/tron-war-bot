@@ -87,11 +87,7 @@ const getRandom = (odds) => {
 }
 
 const loadSavedState = async () => {
-  return new Promise(function(resolve, reject) {
-    countriesMapRef.once('value', function(snapshot) {
-      return resolve(snapshot.val())
-    })
-  })
+  return countriesMapRef.once('value').then(r=>r.val());
 };
 
 const saveCurrentState = async () => {

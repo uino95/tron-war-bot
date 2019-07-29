@@ -175,18 +175,19 @@ module.exports.availableJackpot = async function (gameType, gameRound) {
 //4. FOR EACH WINNING BET DIVIDE THE BET AMOUNT FOR THE WINNING AMOUNT
 //5. MULTIPLIES FOR THE AVAILABLE JACKPOT
 //6. PAYOUT LOOP
-module.exports.jackpotPayout = async function (gameType, gameRound, winningChoice, _bets) {
+module.exports.jackpotPayout = async function (gameType, gameRound, winningChoice, _bets=[]) {
   if (!twb || !war) await isReady();
-  let bets = _bets || await twb.getEvents({
-    onlyConfirmed:true,
-    eventName: "Bet",
-    orderBy:"timestamp,desc",
-    limit:200,
-    filters:{
-      gameType: gameType,
-      round: gameRound
-    }
-  });
+  let bets = _bets;
+  // let bets = await twb.getEvents({
+  //   onlyConfirmed:true,
+  //   eventName: "Bet",
+  //   orderBy:"timestamp,desc",
+  //   limit:200,
+  //   filters:{
+  //     gameType: gameType,
+  //     round: gameRound
+  //   }
+  // });
   // if (true) return bets;
   let winningBets = [];
   let winningAmount = tronWeb.toBigNumber(0);
@@ -253,18 +254,19 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
 
 }
 
-module.exports.housePayout = async function (gameType, gameRound, winningChoice, winRate, _bets) {
+module.exports.housePayout = async function (gameType, gameRound, winningChoice, winRate, _bets = []) {
   if (!twb || !war) await isReady();
-  let bets = _bets || await twb.getEvents({
-    onlyConfirmed:true,
-    eventName: "Bet",
-    orderBy:"timestamp,desc",
-    limit:200,
-    filters:{
-      gameType: gameType,
-      round: gameRound
-    }
-  });
+  let bets = _bets;
+  // let bets = await twb.getEvents({
+  //   onlyConfirmed:true,
+  //   eventName: "Bet",
+  //   orderBy:"timestamp,desc",
+  //   limit:200,
+  //   filters:{
+  //     gameType: gameType,
+  //     round: gameRound
+  //   }
+  // });
   let a = await this.availableJackpot(gameType, gameRound);
   if (!a.playAgainstDealer) throw "This is not a house payout type of game! Use a jackpot payout instead.";
   // if (true) return bets;

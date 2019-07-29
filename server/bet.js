@@ -1,21 +1,26 @@
 const config = require('./config')
 const wwb = require('./worldWarBot')
 const tronWeb = require('tronweb')
+const firebase = require('./firebase')
+const db = firebase.db
 
+var countriesMapRef = db.ref('countriesMap');
 
-const validateFullRunWinner = (b) => {
+var turn, cMap;
+
+const validateFullRunWinner = async (b) => {
   // @TODO: Add bet price formula
   if (!b || !b.amount) return false;
-  var fixedAmount = config.test ? "1" : "50";
+  if (!cMap ||turn!=wwb.currentTurn()) cMap = await countriesMapRef.once('value').then(r=>r.val());
+  turn = wwb.currentTurn();
+  var fixedAmount = config.test ? "1" : cMap[parseInt(b.userChoice)].finalQuote;
   return b.amount.toString() == tronWeb.toSun(fixedAmount);
 }
 
-const validateNextConquerer = (b) => {
+const validateNextConquerer = async (b) => {
   if (b.betReference.toString() != wwb.currentTurn.toString() ) return false;
   return true
 }
-
-
 
 
 
