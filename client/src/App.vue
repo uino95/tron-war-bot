@@ -1,5 +1,6 @@
 <template>
 <v-app id="keep">
+
   <v-navigation-drawer v-model="drawer" fixed clipped class="secondary" app dark>
     <v-list dense class="secondary" dark>
       <template v-for="(item, i) in menuItems">
@@ -39,15 +40,19 @@
       </template>
     </v-list>
   </v-navigation-drawer>
-  <v-toolbar color="primary" app fixed clipped-left>
-    <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
+
+  <v-toolbar color="#2c3e50" app fixed clipped-left>
+    <v-toolbar-side-icon @click="drawer = !drawer" style="color: white"></v-toolbar-side-icon>
+
     <v-avatar class="ml-3">
       <img src="/img/logo.png">
     </v-avatar>
 
-    <span class="headline ml-3 mr-5">Tron<span class="font-weight-light">WarBot</span></span>
+    <span class="headline ml-3 mr-5" style="color: white">Tron<span class="font-weight-light" style="color: white">WarBot</span></span>
     <v-spacer></v-spacer>
   </v-toolbar>
+
+
   <v-content>
     <v-container fluid fill-height fill-width class="grey pa-0 ma-0">
       <v-layout justify-center align-center>
@@ -67,6 +72,8 @@
       </v-layout>
     </v-container>
   </v-content>
+
+
 </v-app>
 </template>
 
