@@ -45,7 +45,7 @@
 
                 <v-flex md3>
                   <v-text-field :value="betFinal.jackpot?(parseFloat(betFinal.jackpot).toFixed(3) + ' TRX'):'loading...'"
-                    label="Current Jackpot" outline readonly=""></v-text-field>
+                    label="Current Jackpot" outline disabled readonly=""></v-text-field>
                 </v-flex>
 
                 <v-flex md3>
@@ -340,7 +340,7 @@
       history: [],
       bets: [],
       mapStatus: [],
-      info:{},
+      data:{},
       mapping: mapping,
     }),
 

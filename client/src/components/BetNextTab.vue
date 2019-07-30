@@ -398,11 +398,17 @@
       },
       multiplier: function(){
         let winChance = this.winChance;
-        return (0.95 * 100 / winChance).toFixed(3);
+        let multiplier = (0.95 * 100 / winChance).toFixed(3);
+
+        if(multiplier == Infinity) return 0;
+        else return multiplier;
       },
       potentialWin: function(){
         let multiplier = this.multiplier;
-        return (this.betAmount * multiplier).toFixed(3) + ' TRX';
+        let win = (this.betAmount * multiplier).toFixed(3);
+
+        if(win == Infinity) return 0 + " TRX";
+        else return win + " TRX";
       },
       currentCountry: {
         get() {
