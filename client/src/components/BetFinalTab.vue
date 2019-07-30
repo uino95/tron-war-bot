@@ -27,7 +27,7 @@
             <v-form ref="form" v-model="valid" lazy-validation>
 
               <v-layout row align-center justify-center wrap>
-                <v-flex md9>
+                <v-flex md12>
                   <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
                     :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
                     placeholder="Type in or pick from map"></v-autocomplete>
@@ -42,18 +42,24 @@
                     <span>If the run was to end today and you win, this is how much you would win! </span>
                   </v-tooltip>
                 </v-flex>
-                <v-flex md3>
-                  <core-balance-button />
-                </v-flex>
+
                 <v-flex md3>
                   <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
                     label="Current Jackpot" outline readonly=""></v-text-field>
                 </v-flex>
+
+                <v-flex md3>
+                  <core-current-turn />
+                </v-flex>
+
+                <v-flex md3>
+                  <core-balance-button />
+                </v-flex>
               </v-layout>
 
-              <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
-              <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...</v-btn>
-              <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...</v-btn>
+              <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+              <v-btn v-else-if="info.serverStatus == 300" dark color="primary_final_tab" @click="battleInProgress">Battle in progress...</v-btn>
+              <v-btn v-else-if="info.serverStatus == 400" dark color="primary_final_tab" @click="payoutInProgress">Payout in progress...</v-btn>
 
               <!-- <v-flex md4>
                 <v-btn color="warning">Cannot bet at the moment</v-btn>
