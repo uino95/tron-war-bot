@@ -314,9 +314,9 @@
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
-
+          let txId
           try {
-            let txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry, this.info.turn).send({
+            txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry, this.info.turn).send({
               callValue: window.tronWeb.toSun(this.info.minBet)
             })
           } catch {
@@ -389,10 +389,10 @@
     },
     computed: {
       myBets: function () {
-        return this.bets.filter(bet => bet.from === this.account && bet.gameType == 0).reverse()
+        return this.bets.filter(bet => bet.from === this.account && bet.gameType == this.info.gameType).reverse()
       },
       latestBets: function () {
-        return this.bets.filter(bet => bet.gameType == 0).reverse().slice(0,20)
+        return this.bets.filter(bet => bet.gameType == this.info.gameType).reverse().slice(0,20)
       },
       winChance: function (){
         let country = this.currentCountry

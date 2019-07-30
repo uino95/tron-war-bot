@@ -164,7 +164,7 @@ module.exports.availableJackpot = async function (gameType, gameRound) {
   if (parseInt(gameRound) > current.round.toNumber()) throw "Inexisting round for given game type";
   if (parseInt(gameRound) == current.round.toNumber()) return current;
   let roundFunds = await this.twb.roundFunds(gameType, gameRound).call()
-  let houseReserves = await this.houseReserves().call();
+  let houseReserves = await this.twb.houseReserves().call();
   roundFunds.houseReserves = houseReserves;
   return roundFunds;
 }
