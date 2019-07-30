@@ -1,19 +1,19 @@
 <template>
-  <v-container grid-list-md text-xs-center class="outerTabContainer">
+  <v-container grid-list-md text-xs-center style="background-color: white" class="outerTabContainer">
 
     <!-- Place a bet -->
     <v-layout row wrap>
       <v-flex>
         <v-card>
 
-          <v-toolbar color="primary" dark>
+          <v-toolbar color="primary_final_tab" dark>
             <v-toolbar-title>
               <v-layout align-center justify-space-between row>
                 <v-flex> Bet on World Conqueror </v-flex>
                 <v-flex>
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                      <v-icon color="secondary" dark v-on="on">info</v-icon>
+                      <v-icon color="secondary_final_tab" dark v-on="on">info</v-icon>
                     </template>
                     <span>Bet on the final winner of the World War! Each bet goes into the jackpot. At the end of the run (45 days on average) 80% of the jackpot is given to the winners, and 20% is given to WAR token holders. As the time goes it will be more expensive to bet on countries, also depending on how good they are doing. The first you bet, the better!</span>
                   </v-tooltip>
@@ -72,12 +72,11 @@
     </v-layout>
 
     <v-layout row wrap>
-      <!-- My latest bets -->
       <v-flex md6 column wrap>
-
+        <!-- My latest bets -->
         <v-flex>
           <v-card>
-            <v-toolbar color="primary" dark>
+            <v-toolbar color="primary_final_tab" dark>
               <v-toolbar-title>My Latest Bets</v-toolbar-title>
               <v-spacer></v-spacer>
             </v-toolbar>
@@ -106,7 +105,7 @@
                 <v-divider class="gameTabDivider"></v-divider>
 
                 <v-container class="gameTabContent">
-                  <v-layout row wrap v-for="bet in myBets" :key="bet.time">
+                  <v-layout row wrap v-for="bet in myBets.slice(10 * currentMyBetPagination - 10, 10 * currentMyBetPagination)" :key="bet.time">
                     <v-flex xs5 class="subheading">
                       {{universalMap(bet.userChoice)}}
                     </v-flex>
@@ -117,6 +116,14 @@
                       {{bet.turn}}
                     </v-flex>
                   </v-layout>
+
+                  <v-container v-if="myBets.length > 10">
+                    <v-pagination
+                      v-model="currentMyBetPagination"
+                      :length="Math.ceil(myBets.length/10)"
+                      color="primary_final_tab"
+                    ></v-pagination>
+                  </v-container>
                 </v-container>
 
               </v-layout>
@@ -124,10 +131,11 @@
             </v-container>
           </v-card>
         </v-flex>
+
         <!-- Latest bets -->
         <v-flex>
           <v-card>
-            <v-toolbar color="primary" dark>
+            <v-toolbar color="primary_final_tab" dark>
               <v-toolbar-title>Latest Bets</v-toolbar-title>
               <v-spacer></v-spacer>
             </v-toolbar>
@@ -150,7 +158,7 @@
               <v-divider class="gameTabDivider"></v-divider>
               <v-container class="gameTabContent" text-xs-center>
 
-                <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
+                <v-layout row wrap v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)" :key="bet.time">
                   <v-flex xs6 class="subheading">
                     <span>{{universalMap(bet.userChoice)}}</span>
                   </v-flex>
@@ -162,6 +170,15 @@
                   </v-flex>
                 </v-layout>
 
+              </v-container>
+
+              <v-container v-if="latestBets.length > 10">
+                <v-pagination
+                  v-model="currentLatestBetPagination"
+                  :length="Math.ceil(latestBets.length/10)"
+                  color="primary_final_tab"
+                >
+                </v-pagination>
               </v-container>
             </v-container>
 
@@ -185,7 +202,7 @@
               <v-divider class="gameTabDivider"></v-divider>
 
               <v-container class="gameTabContent" text-xs-center>
-                <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
+                <v-layout row wrap v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)" :key="bet.time">
 
                   <v-flex xs3 class="subheading text-truncate">
                     <v-tooltip bottom>
@@ -210,6 +227,14 @@
 
                 </v-layout>
               </v-container>
+
+              <v-container v-if="latestBets.length > 10">
+                <v-pagination
+                  v-model="currentLatestBetPagination"
+                  :length="Math.ceil(latestBets.length/10)"
+                  color="primary_final_tab"
+                ></v-pagination>
+              </v-container>
             </v-container>
 
           </v-card>
@@ -219,7 +244,7 @@
       <!-- Number of bets per country -->
       <v-flex xs12 md6>
         <v-card>
-          <v-toolbar color="primary" dark>
+          <v-toolbar color="primary_final_tab" dark>
             <v-toolbar-title>Number of bets per country</v-toolbar-title>
           </v-toolbar>
 
@@ -251,6 +276,7 @@
                 <v-pagination
                   v-model="currentRunPagination"
                   :length="25"
+                  color="primary_final_tab"
                 >
                 </v-pagination>
               </v-layout>
@@ -286,8 +312,11 @@
     components: {
       VLazyImage
     },
+
     data: () => ({
       currentRunPagination:1,
+      currentLatestBetPagination: 1,
+      currentMyBetPagination: 1,
       isLoading: false,
       isWaitingForConfirm: false,
       valid: false,
@@ -333,6 +362,7 @@
           .replaceAll("í", "i") + ".svg"
         return str;
       },
+
       placeBet: async function() {
         this.isWaitingForConfirm = true
         const _this = this

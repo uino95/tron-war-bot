@@ -1,11 +1,11 @@
 <template>
-<v-container grid-list-md text-xs-center class="outerTabContainer">
+<v-container grid-list-md text-xs-center style="background-color: white" class="outerTabContainer">
   <v-layout row wrap>
 
     <!-- Countries -->
     <v-flex sm12 md4 shrink>
       <v-card>
-        <v-toolbar color="primary" dark>
+        <v-toolbar color="primary_stats_tab" dark>
           <v-toolbar-title>Current Run Stats</v-toolbar-title>
         </v-toolbar>
 
@@ -35,6 +35,7 @@
             </v-layout>
 
             <v-pagination
+              color="primary_stats_tab"
               v-model="currentRunPagination"
               :length="25"
             >
@@ -50,7 +51,7 @@
     <v-flex sm12 md8 grow>
       <v-card>
 
-        <v-toolbar color="primary" dark>
+        <v-toolbar color="primary_stats_tab" dark>
           <v-toolbar-title>History</v-toolbar-title>
           <v-spacer></v-spacer>
         </v-toolbar>
@@ -117,8 +118,10 @@
             </v-layout>
 
           </v-container>
+          
           <v-pagination
             v-model="currentHistoryPagination"
+            color="primary_stats_tab"
             :length="Math.ceil(history.length/10)">
           </v-pagination>
 

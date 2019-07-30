@@ -1,43 +1,73 @@
 <template>
+  <!--
   <v-flex v-if="!showBetNextTab">
     <v-card >
       <v-card-text >
         <div class="text-xs-center display-1 text-capitalize">It will be available as next run starts</div>
       </v-card-text>
     </v-card>
-  </v-flex>
-  <v-container v-else grid-list-md text-xs-center class="outerTabContainer">
+  </v-flex> -->
+  <v-container grid-list-md text-xs-center style="background-color: white" class="outerTabContainer">
     <v-layout row wrap>
       <!-- Place a bet -->
       <v-flex>
         <v-card>
-          <v-toolbar color="primary" dark>
+
+
+          <v-toolbar color="primary_next_tab" dark>
             <v-toolbar-title>Bet on Next Conqueror
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                  <v-icon color="secondary" dark v-on="on">info</v-icon>
+                  <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
                 </template>
                 <span>Here you can bet on the next conqueror</span>
               </v-tooltip>
             </v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
+
+
           <v-card-title primary-title class="justify-center">
             <v-form ref="form" v-model="valid" lazy-validation>
+
               <v-layout row wrap>
-                <v-flex md4>
+                <v-flex md8>
                   <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
                     :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
                     placeholder="Type in or pick from map"></v-autocomplete>
                 </v-flex>
+
                 <v-flex md4>
-                  <v-text-field :value="calculatePotentialWin" label="Potential win" outline disabled></v-text-field>
+                  <v-text-field :value="potentialWin" label="Potential win" outline disabled></v-text-field>
                 </v-flex>
+              </v-layout>
+
+              <v-layout row wrap>
+                <v-flex md6>
+                  <v-text-field :value="winChance" label="Win Chance" outline disabled></v-text-field>
+                </v-flex>
+
+                <v-flex md6>
+                  <v-text-field :value="multiplier" label="Multiplier" outline disabled></v-text-field>
+                </v-flex>
+              </v-layout>
+
+              <v-layout row wrap>
+                <v-flex xs12>
+                  <v-slider
+                    thumb-label
+                    v-model="betAmount"
+                    min="50"
+                    max="500"
+                    label="Bet Amount"
+                  ></v-slider>
+                </v-flex>
+              </v-layout>
+              <!-- <v-layout row wrap>
                 <v-flex md4>
                   <core-timer isTurnTimer />
                 </v-flex>
-              </v-layout>
-              <v-layout row wrap>
+
                 <v-flex md4>
                   <core-balance-button />
                 </v-flex>
@@ -45,21 +75,10 @@
                   <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
                     label="Current Jackpot" outline disabled></v-text-field>
                 </v-flex>
-                <v-flex md4>
-                  <!--<v-select
-                                                      v-model="currency"
-                                                      :items="currencies"
-                                                      :rules="currencyRule"
-                                                      label="Currency"
-                                                      required
-                                                      outline
-                                              ></v-select>-->
-                  <v-text-field v-model="currency" label="Currency" outline disabled></v-text-field>
-                </v-flex>
-              </v-layout>
-              <b>Spain conqured the world! <br>Next run will start soon. Stay tuned!</b>
-              <br>
-              <v-btn v-if="info.serverStatus == 200" color="success" @click="placeBet">Bet {{info.minBet}}
+              </v-layout> -->
+
+
+              <v-btn v-if="info.serverStatus == 200" color="primary_next_tab" dark @click="placeBet">Bet {{betAmount}}
                 {{currency}}
                 {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
               <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...
@@ -69,6 +88,7 @@
               <!--<v-btn color="warning">Cannot bet at the moment</v-btn>-->
             </v-form>
           </v-card-title>
+
           <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
             <span class="title">{{snackbarText}}</span>
             <v-btn dark flat @click="snackbar = false">
@@ -78,15 +98,26 @@
         </v-card>
       </v-flex>
     </v-layout>
+
+
     <v-layout row wrap>
+
       <!-- My latest bets -->
-      <v-flex>
+      <v-flex xs12 md6>
         <v-card>
-          <v-toolbar color="primary" dark>
+          <v-toolbar color="primary_next_tab" dark>
             <v-toolbar-title>My Latest Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
-          <v-container grid-list-md text-xs-centerm class="gameTab">
+
+          <!-- if the user has already placed at least one bet -->
+          <v-layout v-if="myBets.length === 0">
+            <v-flex class="subheading">
+              <v-chip label outline color="red">No bets yet...</v-chip>
+            </v-flex>
+          </v-layout>
+
+          <v-container v-else grid-list-md text-xs-centerm class="gameTab">
             <v-layout row wrap class="gameTabHeader">
               <v-flex xs3 class="title">
                 Country
@@ -121,14 +152,23 @@
           </v-container>
         </v-card>
       </v-flex>
+
       <!-- Latest bets -->
-      <v-flex>
+      <v-flex xs12 md6>
         <v-card>
-          <v-toolbar color="primary" dark>
+          <v-toolbar color="primary_next_tab" dark>
             <v-toolbar-title>Latest Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
-          <v-container grid-list-md text-xs-center class="gameTab">
+
+          <!-- if there are no bets -->
+          <v-layout v-if="latestBets.length === 0">
+            <v-flex class="subheading">
+              <v-chip label outline color="red">No bets yet...</v-chip>
+            </v-flex>
+          </v-layout>
+
+          <v-container v-else grid-list-md text-xs-center class="gameTab">
             <v-layout row wrap class="gameTabHeader">
               <v-flex xs2 class="title">
                 <span>Address</span>
@@ -174,6 +214,7 @@
           </v-container>
         </v-card>
       </v-flex>
+
     </v-layout>
   </v-container>
 </template>
@@ -188,7 +229,8 @@
 
   export default {
     data: () => ({
-      showBetNextTab: true,
+      betAmount: 50,
+      showBetNextTab: false,
       isLoading: false,
       valid: false,
       snackbar: false,
@@ -196,7 +238,6 @@
       snackbarColor: "",
       info: {},
       snackbarTimeout: 6000,
-      potentialWin: 0,
       currencies: ["TRX", "WAR"],
       currency: "TRX",
       currencyRule: [v => !!v || 'Select a currency',
@@ -208,7 +249,6 @@
       mapping: mapping,
       intervalId: null
     }),
-
 
     firebase: {
       history: db.ref('history').orderByChild('turn'),
@@ -304,6 +344,10 @@
         sec = sec < 10 ? `0${sec}` : sec;
         min = min < 10 ? `0${min}` : min;
         return hours + ':' + min + ':' + sec
+      },
+      getProbability: function (idCountry){
+        let p = Math.random()
+        return (p * idCountry) % 1 * 100
       }
     },
     computed: {
@@ -346,11 +390,31 @@
         if (this.currentCountry == null) return 0;
         let nextTurn = this.info.nextTurn;
         let country = this.currentCountry;
-        let betsOnThatCountry = this.latestBets.filter(function (bet) {
-          return bet.turn == nextTurn && bet.country == country;
-        }).length + 1
+
+        let betsOnThatCountry;
+        if(this.latestBets.length > 0){
+          betsOnThatCountry = this.latestBets.filter(function (bet) {
+            return bet.turn == nextTurn && bet.country == country;
+          }).length + 1
+        } else {
+          betsOnThatCountry = 1
+        }
+
         return ((parseFloat(this.info.jackpot) + this.info.minBet) * (1 - this.info.houseEdge - 0.1) /
           betsOnThatCountry).toFixed(3) + ' TRX';
+      },
+      winChance: function (){
+        let country = this.currentCountry
+        if( country == null ) return 0;
+        return this.getProbability(country).toFixed(3);
+      },
+      multiplier: function(){
+        let winChance = this.winChance;
+        return (0.95 * 100 / winChance).toFixed(3);
+      },
+      potentialWin: function(){
+        let multiplier = this.multiplier;
+        return (this.betAmount * multiplier).toFixed(3) + ' TRX';
       },
       currentCountry: {
         get() {
