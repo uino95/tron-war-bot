@@ -16,7 +16,7 @@ Vue.use(Vuetify, {
     secondary_final_tab: "white",
     primary_next_tab: "#2980b9",
     secondary_next_tab: "white",
-    primary_stats_tab: "#16a085",
+    primary_stats_tab: "#e67e22",
     secondary_stats_tab: "white",
   }
 });

@@ -62,6 +62,7 @@ const init = async (restart) => {
     }
   });
   if (!restart) countriesMap = await loadSavedState();
+  if (!restart) turn = await loadSavedTurn();
   // the neighborCountries is an array of (CountryIndex => [CountryIndexes])
   // neighborCountries = new Array(COUNTRIES).fill(0).map(()=>[]);
   // for (var c=0; c<COUNTRIES; c++){
@@ -86,12 +87,12 @@ const getRandom = (odds) => {
   return Math.floor(Math.random() * odds);
 }
 
+const loadSavedTurn = async () => {
+  return dataRef.once('value').then(r=>r.val()["turn"]);
+};
+
 const loadSavedState = async () => {
-  return new Promise(function(resolve, reject) {
-    countriesMapRef.once('value', function(snapshot) {
-      return resolve(snapshot.val())
-    })
-  })
+  return countriesMapRef.once('value').then(r=>r.val());
 };
 
 const saveCurrentState = async () => {
