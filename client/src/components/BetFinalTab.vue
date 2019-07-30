@@ -1,5 +1,5 @@
 <template>
-  <v-container grid-list-md text-xs-center style="background-color: white" class="outerTabContainer">
+  <v-container grid-list-md text-xs-center class="outerTabContainer">
 
     <!-- Place a bet -->
     <v-layout row wrap>
@@ -381,10 +381,19 @@
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
-          let txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry, this.info.currentTurn).send({
-            callValue: window.tronWeb.toSun(this.info.minBet)
-          })
+
+          try {
+            let txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry, this.info.currentTurn).send({
+              callValue: window.tronWeb.toSun(this.info.minBet)
+            })
+          } catch {
+            this.isWaitingForConfirm = false;
+            this.snackbarColor = "error";
+            this.snackbar = true;
+            this.snackbarText = "Failed to sign transaction: Confirmation declined by user"
+          }
           setTimeout(function () {
+            console.log("ENTRO NEL TIMEOUT")
             window.tronWeb.trx.getTransaction(txId).then((tx) => {
               console.log(tx)
               if (tx.ret[0].contractRet == "SUCCESS") {
@@ -506,7 +515,7 @@
         return betsPerCountryList
       },
       latestBets: function () {
-        return this.bets.filter(bet => bet.gameType == this.info.gameType).reverse()
+        return this.bets.filter(bet => bet.gameType == this.info.gameType).reverse().slice(0,20)
       },
       calculatePotentialWin: function () {
         if (this.currentCountry == null) return 0;

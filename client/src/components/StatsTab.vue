@@ -1,5 +1,5 @@
 <template>
-<v-container grid-list-md text-xs-center style="background-color: white" class="outerTabContainer">
+<v-container grid-list-md text-xs-center class="outerTabContainer">
   <v-layout row wrap>
 
     <!-- Countries -->
@@ -58,29 +58,31 @@
 
         <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
 
-          <v-layout align-center justify-space-between row wrap class="gameTabHeader">
-            <v-flex style="text-align: start;" xs3 class="title">
-              Turn
+          <v-container v-if="history.length <= 1" class="gameTabContent">
+            <v-flex class="subheading">
+              <v-chip label outline color="red">Run has not started yet...</v-chip>
             </v-flex>
-            <v-flex xs6 class="title" style="text-align: center;">
-              Conquest
-            </v-flex>
-            <v-flex xs3 class="title" style="text-align: end;">
-              Prev. owner
-            </v-flex>
-          </v-layout>
+          </v-container>
 
-          <v-divider class="gameTabDivider"></v-divider>
+          <v-container v-else class="gameTabContent">
 
-          <v-container class="gameTabContent">
+            <v-layout align-center justify-space-between row wrap class="gameTabHeader">
+              <v-flex style="text-align: start;" xs3 class="title">
+                Turn
+              </v-flex>
 
-            <v-layout v-if="history.length <= 1">
-              <v-flex class="subheading">
-                <v-chip label outline color="red">Run has not started yet...</v-chip>
+              <v-flex xs6 class="title" style="text-align: center;">
+                Conquest
+              </v-flex>
+
+              <v-flex xs3 class="title" style="text-align: end;">
+                Prev. owner
               </v-flex>
             </v-layout>
 
-            <v-layout v-else align-center justify-space-between row wrap v-for="conquest in history.slice().reverse().slice(10 * currentHistoryPagination - 10, 10 * currentHistoryPagination)" :key="conquest.turn">
+            <v-divider class="gameTabDivider"></v-divider>
+
+            <v-layout align-center justify-space-between row wrap v-for="conquest in history.slice().reverse().slice(10 * currentHistoryPagination - 10, 10 * currentHistoryPagination)" :key="conquest.turn">
               <v-flex xs2 style="text-align: start" class="subheading">
                 {{conquest.turn}}
               </v-flex>
@@ -118,8 +120,9 @@
             </v-layout>
 
           </v-container>
-          
+
           <v-pagination
+            v-if="history.length > 1"
             v-model="currentHistoryPagination"
             color="primary_stats_tab"
             :length="Math.ceil(history.length/10)">

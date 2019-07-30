@@ -7,12 +7,11 @@
       </v-card-text>
     </v-card>
   </v-flex> -->
-  <v-container grid-list-md text-xs-center style="background-color: white" class="outerTabContainer">
+  <v-container grid-list-md text-xs-center class="outerTabContainer">
     <v-layout row wrap>
       <!-- Place a bet -->
       <v-flex>
         <v-card>
-
 
           <v-toolbar color="primary_next_tab" dark>
             <v-toolbar-title>Bet on Next Conqueror
@@ -43,12 +42,16 @@
               </v-layout>
 
               <v-layout row wrap>
-                <v-flex md6>
+                <v-flex md4>
                   <v-text-field :value="winChance" label="Win Chance" outline disabled></v-text-field>
                 </v-flex>
 
-                <v-flex md6>
+                <v-flex md4>
                   <v-text-field :value="multiplier" label="Multiplier" outline disabled></v-text-field>
+                </v-flex>
+
+                <v-flex md4>
+                  <core-timer isTurnTimer />
                 </v-flex>
               </v-layout>
 
@@ -110,7 +113,7 @@
             <v-spacer></v-spacer>
           </v-toolbar>
 
-          <!-- if the user has already placed at least one bet -->
+          <!-- if the user hasn't already placed at least one bet -->
           <v-layout v-if="myBets.length === 0">
             <v-flex class="subheading">
               <v-chip label outline color="red">No bets yet...</v-chip>
@@ -132,7 +135,9 @@
                 Result
               </v-flex>
             </v-layout>
+
             <v-divider class="gameTabDivider"></v-divider>
+
             <v-container class="gameTabContent">
               <v-layout row wrap v-for="bet in myBets" :key="bet.time">
                 <v-flex xs3 class="subheading">
@@ -149,6 +154,15 @@
                 </v-flex>
               </v-layout>
             </v-container>
+
+            <v-container v-if="myBets.length > 10">
+              <v-pagination
+                v-model="currentMyBetPagination"
+                :length="Math.ceil(myBets.length/10)"
+                color="primary_next_tab"
+              ></v-pagination>
+            </v-container>
+
           </v-container>
         </v-card>
       </v-flex>
@@ -168,6 +182,7 @@
             </v-flex>
           </v-layout>
 
+          <!-- if there is at least one bet -->
           <v-container v-else grid-list-md text-xs-center class="gameTab">
             <v-layout row wrap class="gameTabHeader">
               <v-flex xs2 class="title">
@@ -186,7 +201,9 @@
                 Result
               </v-flex>
             </v-layout>
+
             <v-divider class="gameTabDivider"></v-divider>
+
             <v-container class="gameTabContent" text-xs-center>
               <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
                 <v-flex xs2 class="subheading">
@@ -211,6 +228,16 @@
                 </v-flex>
               </v-layout>
             </v-container>
+
+            <v-container v-if="latestBets.length > 10">
+              <v-pagination
+                v-model="currentLatestBetPagination"
+                :length="Math.ceil(latestBets.length/10)"
+                color="primary_next_tab"
+              >
+              </v-pagination>
+            </v-container>
+
           </v-container>
         </v-card>
       </v-flex>
@@ -229,6 +256,8 @@
 
   export default {
     data: () => ({
+      currentMyBetPagination: 1,
+      currentLatestBetPagination: 1,
       betAmount: 50,
       showBetNextTab: false,
       isLoading: false,
@@ -384,7 +413,7 @@
         return this.bets.filter(bet => bet.address === this.account && bet.gameType == 0).reverse()
       },
       latestBets: function () {
-        return this.bets.filter(bet => bet.gameType == 0).reverse
+        return this.bets.filter(bet => bet.gameType == 0).reverse().slice(0,20)
       },
       calculatePotentialWin: function () {
         if (this.currentCountry == null) return 0;
