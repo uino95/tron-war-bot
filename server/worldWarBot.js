@@ -260,7 +260,7 @@ const nextTurn = async (exitScam=()=>{}) => {
   await updateExternalData(conquerer, conquered, conquererTerritory, conqueredTerritory);
 
   if (!simulation) await saveCurrentState();
-  printStatus();
+  // printStatus();
   return !!countriesOnTheBorders().length;
 }
 
@@ -271,7 +271,7 @@ const printStatus = ()=>{
 }
 
 const currentTurn = () => turn;
-const mapState = () => countriesMap;
+const mapState = () => JSON.parse(JSON.stringify(countriesMap));
 
 init();
 

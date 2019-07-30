@@ -41,7 +41,11 @@ const config = {
   heroku: {
     apiKey: 'bfbc8a87-fa94-4885-bb7f-e18ca83ec1d8'
   },
-  test: JSON.parse(process.env.TEST_MODE || true)
+  test: JSON.parse(process.env.TEST_MODE || true),
+  telegram:{
+    token: process.env.TELEGRAM_TOKEN,
+    group: process.env.TELEGRAM_GROUP || -331523835,
+  }
 }
 
 if (config.test) config.tron = config.tronTest;

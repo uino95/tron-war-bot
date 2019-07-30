@@ -35,25 +35,28 @@ async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function toPercent(n){ return (n*100).toFixed(2) + "%"}
 
 async function checkBetOnDb(txId) {
   return betsRef.once('value').then((r)=>r.child(txId).exists());
 }
 
-async function notifyTelegramBot(d) {
+async function notifyTelegramBot(d, j) {
   if (config.test) return;
-  return await rp({
-    method: "POST",
-    uri: "https://masfik.net/TronWarBot/webhook.php",
-    body: {
-      "auth_token": "QbdPS%I%62Bv2Sizf4*!$4iB%zz@!9",
-      "turn": d.turn,
-      "conquered": utils.universalMap(d.dt),
-      "conqueror": utils.universalMap(d.o),
-      "prev_owner": utils.universalMap(d.d)
-    },
-    json: true
-  }).catch(console.error);
+  if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
+  let s = "🌎♟ <b>BATTLE "+d.turn+"</b>♟🌎\n"
+  if (!d.civilWar){
+    s += "<b>⚔️💣 "+utils.universalMap(d.o) + " ("+ toPercent(d.cohesion.o) + ")</b> conquered <b>"+utils.universalMap(d.dt)+" ("+ toPercent(d.cohesion.dt) + ")</b> 💣⚔️\n";
+    s += "<i>Previously owned by "+utils.universalMap(d.d)+" ("+ toPercent(d.cohesion.d) + ")</i>\n\n"
+  } else s += "⚒<b>"+ utils.universalMap(d.o) +" ("+ toPercent(d.cohesion.d) + ")</b> rebelled on the oppressor <b>" + utils.universalMap(d.d) + " ("+ toPercent(d.cohesion.d) + ")</b>⚒"
+  s += "Current jackpot on the full run: <b>" + j + " TRX</b>\n";
+  let m = {'inline_keyboard' : [[{'text' : '🌎 Place a bet now', 'url' : 'https://tronwarbot.com'}]]};
+  let uri = "https://api.telegram.org/bot" + config.telegram.token + "/";
+  uri += "sendMessage?chat_id=" + config.telegram.group;
+  uri += "&parse_mode=HTML&reply_markup=" + encodeURIComponent(JSON.stringify(m));
+  uri += "&disable_web_page_preview=true&text=" + encodeURIComponent(s);
+
+  return await rp.get(uri).catch(console.error);
 }
 
 async function stopGame(){
@@ -75,6 +78,8 @@ async function gameOver(){
   console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
 }
 
+
+
 module.exports.launchNextTurn = async function() {
   if (wwb.winner()) return;
   console.log("[SCHEDULER]: Launching next turn!")
@@ -82,7 +87,7 @@ module.exports.launchNextTurn = async function() {
   // GET CURRENT TURN
   var turn = wwb.currentTurn();
   // GET CURRENT BET RATES AND MAP
-  var cMap = await countriesMapRef.once('value').then(r=>r.val());
+  var cMap = wwb.mapState();
 
   // STOP BET BUTTON
   dataRef.update({ serverStatus: 300 })
@@ -106,8 +111,10 @@ module.exports.launchNextTurn = async function() {
                   civilWar: data.civilWar
                 });
 
+  var j = await twb.twb.jackpot(0).call();
   // COMMUNICATE WINNER
-  notifyTelegramBot(data);
+  notifyTelegramBot(data, twb.tronWeb.fromSun(j.toString()));
+
   // PAYOUT IN PROGESS
   dataRef.update({ serverStatus: 400 });
 
@@ -120,7 +127,6 @@ module.exports.launchNextTurn = async function() {
   var _bets = await betsRef.orderByChild("gameType").equalTo(1).once("value").then(r=>(r.val() || []).filter(e=>(e.round.toString()==cr.round.toString() && e.betReference.toString() == turn.toString())));
   // PAYOUT
   await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
-
   // PAYOUT FINAL
   if (go) await gameOver();
 
