@@ -8,13 +8,14 @@
     Button,
     Sprite,
     useTheme,
+    FontWeight
   } from "@amcharts/amcharts4/core";
   import {
     MapChart,
     projections,
     MapPolygonSeries,
     SmallMap,
-    ZoomControl
+    ZoomControl,
   } from "@amcharts/amcharts4/maps";
   import am4themes_spiritedaway from "@amcharts/amcharts4/themes/spiritedaway.js";
   import am4geodata_worldLow from "../assets/worldLow.js"
@@ -260,9 +261,8 @@
         polygonSeries.tooltip.background.fill = chart.colors.getIndex(4);
         polygonTemplate.applyOnClones = true;
         polygonTemplate.togglable = true;
-        polygonTemplate.tooltipText = "{name}" +
-          "\nControlled by: {occupiedBy} \n Cohesion: {cohesion} \n Controller cohesion {controllerCohesion}";
 
+        polygonTemplate.tooltipText = "[bold]{name}[/] ({cohesion}) \nOccupied by: [bold]{occupiedBy}[/] ({controllerCohesion})";
         polygonTemplate.nonScalingStroke = true;
         polygonTemplate.strokeOpacity = 0.5;
 

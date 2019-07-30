@@ -83,7 +83,6 @@ module.exports.launchNextTurn = async function() {
 
   // STOP BET BUTTON
   dataRef.update({ serverStatus: 300 })
-  betFinalRef.update({ serverStatus: 300 })
   // AWAIT FOR DATA PROPAGATION AND BET HALT
   await sleep(config.test ? 3000 : 29000);
   var go = !(await wwb.nextTurn());
@@ -110,7 +109,6 @@ module.exports.launchNextTurn = async function() {
 
   // PAYOUT IN PROGESS
   dataRef.update({ serverStatus: 400 });
-  betFinalRef.update({ serverStatus: 400 })
 
   // **** PAYOUT FOR GAME 1 AGAINST DEALER **** //
   // GET CHAIN ROUND
@@ -124,7 +122,6 @@ module.exports.launchNextTurn = async function() {
 
   // CAN PLACE BETS
   dataRef.update({ serverStatus: 200 });
-  betFinalRef.update({ serverStatus: 200 });
 
   // PAYOUT
   await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
@@ -167,7 +164,7 @@ module.exports.watchBet = function() {
       referral.updateReferral(betObj)
       if(bet.gameType == 0){
         let jackpot = await twb.availableJackpot(0, bet.round);
-        jackpot = twb.tronWeb.fromSun(jackpot.toString())
+        jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
         betFinalRef.update({jackpot})
         console.info("Jackpot is: ", jackpot)
       }

@@ -59,6 +59,9 @@ export default {
       var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
+      minutes = minutes < 10 ? `0${minutes}` : minutes
+      seconds = seconds < 10 ? `0${seconds}` : seconds
+
       // If the count down is finished, write some text
       if (distance < 0) {
         this.timerValue = '#' + (this.info.turn + 1 || ' loading...') + ` in 00:00`
