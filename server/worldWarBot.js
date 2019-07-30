@@ -38,6 +38,7 @@ const neighborCountries = neighborCountriesRaw.map((e,idx)=>{
 })
 
 const COUNTRIES = neighborCountries.length;
+var ROUND = 0;
 
 var countriesMap;
 var turn = 0;
@@ -63,6 +64,7 @@ const init = async (restart) => {
   });
   if (!restart) countriesMap = await loadSavedState();
   if (!restart) turn = await loadSavedTurn();
+  ROUND = await t.getCurrentRound(0).then(r=>r.round);
   // the neighborCountries is an array of (CountryIndex => [CountryIndexes])
   // neighborCountries = new Array(COUNTRIES).fill(0).map(()=>[]);
   // for (var c=0; c<COUNTRIES; c++){
@@ -79,7 +81,7 @@ const init = async (restart) => {
   //   }
   // }
   // neighborCountries = neighborCountries.map((e)=>{return [...new Set(e)]});
-  if (!simulation && restart) return await saveCurrentState()
+  if (!simulation && restart) return await saveCurrentState();
 };
 
 
@@ -96,7 +98,8 @@ const loadSavedState = async () => {
 };
 
 const saveCurrentState = async () => {
-  countriesMapRef.set(countriesMap)
+  countriesMapRef.set(countriesMap);
+  dataRef.update({turn, turnTime: (new Date()).valueOf()});
 };
 
 // Returns array of countryIndexes
@@ -165,9 +168,8 @@ const updateExternalData = async (conquerer, conquered, conquererTerritory, conq
   countriesMap[conquered].territories = countriesMap[conquered].territories - 1;
 
   // GET JACKPOT
-  let r = await t.getCurrentRound(0);
   let jackpot = await dataRef.once("value").then(r=>r.val()['jackpot']);
-  let bets = await betsRef.orderByChild("gameType").equalTo(0).once("value").then(r=>(r.val() || []).filter(e=>e.round==r.round));
+  let bets = await betsRef.orderByChild("gameType").equalTo(0).once("value").then(r=>(r.val() || []).filter(e=>e.round==ROUND));
   let betsPerCountry = new Array(COUNTRIES).fill(0);
   bets.forEach((e,i)=>betsPerCountry[e.userChoice]+=1);
 
