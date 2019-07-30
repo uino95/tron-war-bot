@@ -9,9 +9,8 @@ var countriesMapRef = db.ref('countriesMap');
 var turn, cMap;
 
 const validateFullRunWinner = async (b) => {
-  // @TODO: Add bet price formula
   if (!b || !b.amount) return false;
-  if (!cMap ||turn!=wwb.currentTurn()) cMap = await countriesMapRef.once('value').then(r=>r.val());
+  cMap = wwb.mapState();
   turn = wwb.currentTurn();
   var fixedAmount = config.test ? "1" : cMap[parseInt(b.userChoice)].finalQuote;
   return b.amount.toString() == tronWeb.toSun(fixedAmount);
