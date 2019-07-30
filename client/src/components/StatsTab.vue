@@ -20,17 +20,17 @@
 
           <v-container>
             <v-layout column>
-            <v-layout row wrap v-for="(country) in sortedArray.slice(10 * currentRunPagination - 10, 10 * currentRunPagination )" :key="country.id">
+            <v-layout row wrap v-for="(country) in mapStatus.slice().reverse().slice(10 * currentRunPagination - 10, 10 * currentRunPagination )" :key="country['.key']">
               <v-flex xs2>
                 <v-avatar size="90%">
-                  <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag" :src="getFlagString(universalMap(country.id))" :alt="universalMap(country.id)" />
+                  <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag" :src="getFlagString(universalMap(country['.key']))" :alt="universalMap(country['.key'])" />
                 </v-avatar>
               </v-flex>
               <v-flex xs6 style="text-align:start; margin-top:5px;" class="subheading">
-                {{universalMap(country.id)}}
+                {{universalMap(country['.key'])}}
               </v-flex>
               <v-flex xs4 class="title" style="text-align: end">
-                {{country.occupied}}
+                {{country.territories}}
               </v-flex>
             </v-layout>
 
@@ -158,33 +158,18 @@ export default {
   data: () => ({
     currentRunPagination:1,
     currentHistoryPagination:1,
-    isLoading: false,
-    valid: false,
+    reversed: false,
     placeholderFlag: "/img/flags/placeholder.svg",
     snackbar: false,
-    turnTimer: "00:01",
     snackbarText: "",
     snackbarColor: "",
-    info: {},
     snackbarTimeout: 6000,
-    potentialWin: 0,
-    currencies: ["TRX", "WAR"],
-    currency: "TRX",
-    currencyRule: [v => !!v || 'Select a currency',
-      //v => v < 50 || 'You don\'t have enough money'
-    ],
-    balance: null,
-    account: null,
     history: [],
-    bets: [],
-    mapStatus: [],
-    mapping: mapping,
-    intervalId: null
+    mapStatus: []
   }),
   firebase: {
     history: db.ref('history').orderByChild('turn'),
-    info: db.ref('data'),
-    mapStatus: db.ref('countriesMap')
+    mapStatus: db.ref('countriesMap').orderByChild('territories')
   },
   methods: {
     getFlagString(str) {
@@ -199,22 +184,14 @@ export default {
         .replaceAll("í", "i") + ".svg";
     },
   },
-  computed: {
-    countryStatus: function(){
-      this.mapStatus.map((el,index) => el.id = index )
-      return this.mapStatus
-    },
-    sortedArray: function() {
-      function compare(a, b) {
-        if (a.occupied > b.occupied)
-          return -1;
-        if (a.occupied < b.occupied)
-          return 1;
-        return 0;
-      }
-      let arr = this.countryStatus;
-      return arr.sort(compare);
-    }
-  }
+  // computed: {
+  //   countryStatus: function () {
+  //     if(this.reversed){
+  //       this.reversed = true
+  //       return this.mapStatus.reverse()
+  //     }
+  //     return this.mapStatus
+  //   }
+  // }
 }
 </script>

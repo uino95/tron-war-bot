@@ -12,14 +12,6 @@ var betsRef = db.ref('bets')
 
 // ///////////////////////////////////////////// DB USAGE /////////////////////////////////////////////
 
-// async function isPremiumAddress(referrer_addr){
-//   return new Promise(async function(resolve, reject) {
-//     referralRef.child('premium_addrs').once('value', function(snapshot){
-//       resolve(snapshot.child(referrer_addr).exists())
-//     })
-//   })
-// }
-
 const getReferralPercentage = async (referrer_addr) => {
   let snapshot = await referralRef.child('percentages').orderByKey().equalTo(referrer_addr).once('value')
   if(snapshot.val() !== null){

@@ -11,16 +11,6 @@ const db = firebase.db
 
 const utils = require('./utils')
 
-// const options = {
-//     method: "DELETE",
-//     uri: 'https://api.heroku.com/apps/tronwarbot/dynos/web',
-//     headers: {
-//         'content-type': 'application/json',
-//         'accept': 'application/vnd.heroku+json; version=3',
-//         'Authorization': 'Bearer ' + config.heroku.apiKey
-//     }
-// };
-
 //////////////////////////////////// DB USAGE //////////////////////////////////////////
 
 var historyRef = db.ref('history')
@@ -30,6 +20,7 @@ var dataRef = db.ref('data')
 var betFinalRef = db.ref('betFinalData')
 var countriesMapRef = db.ref('countriesMap')
 
+var turnTime = 30000 
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -86,6 +77,7 @@ module.exports.launchNextTurn = async function() {
 
   // STOP BET BUTTON
   dataRef.update({ serverStatus: 300 })
+  betFinalRef.update({ serverStatus: 300 })
   // AWAIT FOR DATA PROPAGATION AND BET HALT
   await sleep(config.test ? 3000 : 29000);
   var go = !(await wwb.nextTurn());
@@ -98,7 +90,7 @@ module.exports.launchNextTurn = async function() {
 
   // UPDATE HISTORY
   dataRef.update({ turn: data.turn })
-  dataRef.update({ turnTime: (new Date()).valueOf() })
+  dataRef.update({ turnTime: (new Date()).valueOf() + turnTime })
   historyRef.push().set({
                   conquest: [data.o, data.dt],
                   prev: data.d,
@@ -110,6 +102,7 @@ module.exports.launchNextTurn = async function() {
   notifyTelegramBot(data);
   // PAYOUT IN PROGESS
   dataRef.update({ serverStatus: 400 });
+  betFinalRef.update({ serverStatus: 400 })
 
   // **** PAYOUT FOR GAME 1 AGAINST DEALER **** //
   // GET CHAIN ROUND
@@ -123,6 +116,10 @@ module.exports.launchNextTurn = async function() {
 
   // PAYOUT FINAL
   if (go) await gameOver();
+
+  // UPDATE DB INFO
+  dataRef.update({ serverStatus: 200 });
+  betFinalRef.update({ serverStatus: 200 })
 
   console.log("[SCHEDULER]: Next turn complete!");
 }

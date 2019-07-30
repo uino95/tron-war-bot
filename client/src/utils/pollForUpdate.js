@@ -16,7 +16,7 @@ import store from '../store'
 let pollForUpdate = async function () {
   let tronWeb = window.tronWeb
   console.log(tronWeb)
-  if(tronWeb !== undefined){
+  if(tronWeb !== undefined && tronWeb.ready){
     store.commit('setTronWebInstance', tronWeb)
     await store.dispatch('registerContractsInstance')
   }
@@ -86,7 +86,7 @@ let pollForUpdate = async function () {
       console.log('store.state.tronWeb not instanciated yet. retrying in 1 second...')
       tronWeb = window.tronWeb
       console.log(tronWeb)
-      if(tronWeb !== undefined){
+      if(tronWeb !== undefined && tronWeb.ready){
         store.commit('setTronWebInstance', tronWeb)
         await store.dispatch('registerContractsInstance')
       }
