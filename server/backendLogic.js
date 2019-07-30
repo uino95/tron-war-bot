@@ -119,14 +119,15 @@ module.exports.launchNextTurn = async function() {
   var _winner = cMap[data.o];
   // GET WINNING BETS
   var _bets = await betsRef.orderByChild("gameType").equalTo(1).once("value").then(r=>(r.val() || []).filter(e=>(e.round.toString()==cr.round.toString() && e.betReference.toString() == turn.toString())));
-  // PAYOUT
-  await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
   // PAYOUT FINAL
   if (go) await gameOver();
 
-  // NOW BET IS AVAILABLE
+  // CAN PLACE BETS
   dataRef.update({ serverStatus: 200 });
-  betFinalRef.update({ serverStatus: 200 })
+  betFinalRef.update({ serverStatus: 200 });
+
+  // PAYOUT
+  await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
 
   console.log("[SCHEDULER]: Next turn complete!");
 }
