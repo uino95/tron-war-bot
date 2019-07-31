@@ -403,7 +403,10 @@
       },
       potentialWin: function(){
         let multiplier = this.multiplier;
-        return (this.betAmount * multiplier).toFixed(3) + ' TRX';
+        let win = (this.betAmount * multiplier).toFixed(3);
+
+        if(win == Infinity) return 0 + " TRX";
+        else return win + " TRX";
       },
       currentCountry: {
         get() {
