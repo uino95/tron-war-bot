@@ -5,6 +5,7 @@ const SIMULATIONS = 10;
 // DB interface
 const firebase = require('./firebase')
 const t = require('./tronWarBot')
+const fairness = require('./fairness')
 const db = firebase.db
 // db ref
 var countriesMapRef = db.ref('countriesMap')
@@ -45,10 +46,14 @@ var turn = 0;
 var turnData = {};
 var simulation = false;
 
+// Returns array of countryIndexes
+const conquerableTerritoriesOf = (c) => fairness.conquerableTerritoriesOf(countriesMap, c);
+const conqueredTerritoriesOf = (c) => fairness.conqueredTerritoriesOf(countriesMap, c);
+const countriesOnTheBorders = () => fairness.countriesOnTheBorders(countriesMap);
+const pdf = () => fairness.pdf(countriesMap);
+const cumulatedPdf = () => fairness.cumulatedPdf(countriesMap);
+const winner = () => fairness.winner(countriesMap);
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 const init = async (restart) => {
   turn = 0;
@@ -65,29 +70,9 @@ const init = async (restart) => {
   if (!restart) countriesMap = await loadSavedState();
   if (!restart) turn = await loadSavedTurn();
   ROUND = await t.getCurrentRound(0).then(r=>r.round);
-  // the neighborCountries is an array of (CountryIndex => [CountryIndexes])
-  // neighborCountries = new Array(COUNTRIES).fill(0).map(()=>[]);
-  // for (var c=0; c<COUNTRIES; c++){
-  //   let t = getRandom(COUNTRIES);
-  //   while (t == c) t = getRandom(COUNTRIES);
-  //   neighborCountries[c].push(t);
-  //   neighborCountries[t].push(c);
-  //
-  //   if (Math.random()>0.4) {
-  //     t = getRandom(COUNTRIES);
-  //     while (t == c) t = getRandom(COUNTRIES);
-  //     neighborCountries[c].push(t);
-  //     neighborCountries[t].push(c);
-  //   }
-  // }
-  // neighborCountries = neighborCountries.map((e)=>{return [...new Set(e)]});
   if (!simulation && restart) return await saveCurrentState();
 };
 
-
-const getRandom = (odds) => {
-  return Math.floor(Math.random() * odds);
-}
 
 const loadSavedTurn = async () => {
   return dataRef.once('value').then(r=>r.val()["turn"]);
@@ -102,43 +87,13 @@ const saveCurrentState = async () => {
   dataRef.update({turn, turnTime: (new Date()).valueOf()});
 };
 
-// Returns array of countryIndexes
-const conquerableTerritoriesOf = (c) => {
-  return neighborCountries[c].filter((t)=>{
-    return countriesMap[t].occupiedBy != countriesMap[c].occupiedBy;
-  })
-}
 
-const conqueredTerritoriesOf = (c) => {
-  return Object.keys(countriesMap).filter((t)=>countriesMap[t].occupiedBy==c);
-}
-
-// Returns array of countryIndexes
-const countriesOnTheBorders = () => {
-  return Object.keys(countriesMap).filter((c)=>{
-    return conquerableTerritoriesOf(c).length;
-  })
-}
 
 // Returns array of countryIndexes
 const countriesStillAlive = () => {
   return [...new Set(
     countriesMap.map((c)=>{return c.occupiedBy;})
   )];
-}
-
-const rawPdf = () => {
-  return countriesMap.map((c,idx)=>{
-    let pOfConquest = Math.min(conquerableTerritoriesOf(idx).length,1) * countriesMap[c.occupiedBy].cohesion;
-    let pOfCivilWar =  (c.occupiedBy != idx ? 1 : 0) * c.cohesion * CIVIL_WAR_LIKELIHOOD;
-    return [pOfConquest,  pOfCivilWar];
-  })
-}
-
-const pdf = () => {
-  let r = rawPdf();
-  let total = r.reduce((acc, c) => acc + c[0] + c[1], 0);
-  return r.map(c=>[c[0]/total, c[1]/total]);
 }
 
 const realPdf = () => {
@@ -150,17 +105,7 @@ const realPdf = () => {
   return p;
 }
 
-const cumulatedPdf = () => {
-  let cumulated = 0;
-  return pdf().map(c=>{
-    return [cumulated += c[0], cumulated += c[1]]
-  });
-}
 
-const winner = () => {
-  if (!countriesOnTheBorders().length) return countriesMap[0].occupiedBy;
-  return false;
-}
 
 const updateExternalData = async (conquerer, conquered, conquererTerritory, conqueredTerritory) => {
   // UPDATE TERRITORIES
@@ -183,81 +128,24 @@ const updateExternalData = async (conquerer, conquered, conquererTerritory, conq
 }
 
 
-const updateCohesion = (o, d, ot, dt) => {
-  let o_amp = conqueredTerritoriesOf(o).length / COUNTRIES;
-  let d_amp = conqueredTerritoriesOf(d).length / COUNTRIES;
-  let rnd = COHESION_BIAS - Math.random();
-  let c_o = countriesMap[o].cohesion - 0.5;
-  let c_d = countriesMap[d].cohesion - 0.5;
-  let c_ot = countriesMap[ot].cohesion - 0.5;
-  let c_dt = countriesMap[dt].cohesion - 0.5;
-  let delta_o = (rnd - c_ot - c_d - c_dt) * o_amp;
-  let delta_d = (rnd + c_ot - c_o - c_dt) * d_amp;
-  let delta_ot = (rnd - c_o + c_d + c_dt) * o_amp;
-  let delta_dt = (rnd - c_o + c_d + c_ot) * d_amp;
-  let new_o = countriesMap[o].cohesion + delta_o;
-  let new_d = countriesMap[d].cohesion + delta_d;
-  let new_ot = countriesMap[ot].cohesion + delta_ot;
-  let new_dt = countriesMap[dt].cohesion + delta_dt;
-  countriesMap[dt].cohesion = Math.max(0, Math.min(1, new_dt));
-  countriesMap[ot].cohesion =  Math.max(0, Math.min(1, new_ot));
-  countriesMap[d].cohesion = Math.max(0.001, Math.min(1, new_d));
-  countriesMap[o].cohesion =  Math.max(0.001, Math.min(1, new_o));
-  turnData.cohesion = {
-    o :countriesMap[o].cohesion,
-    d :countriesMap[d].cohesion,
-    ot :countriesMap[ot].cohesion,
-    dt :countriesMap[dt].cohesion,
-    delta_o,
-    delta_d,
-    delta_ot,
-    delta_dt,
-  }
-}
-
-
-
 // Returns is game on?
-const nextTurn = async (exitScam=()=>{}) => {
+const nextTurn = async () => {
   if (!countriesMap) await init();
-  // Calculate countries on the borders
-  let availableTerritories = countriesOnTheBorders();
-  if (!availableTerritories.length) return false;
+
+  // GAME IS ALREADY OVER
+  if (fairness.winner(countriesMap)!=null) return false;
 
   // COMPUTE NEW TURN
   turn += 1;
+  let entropy = Math.random();
+  [countriesMap, turnData] = fairness.computeNextState(countriesMap, entropy, entropy);
 
-  let cpdf = cumulatedPdf().reduce((acc, val) => acc.concat(val), []);
-  let rand = Math.random();
-  if (!simulation) console.log("[WWB]:Random is: " + rand)
-  let scenario = cpdf.length - 1;
-  for (var i in cpdf) {
-    if (rand > cpdf[i]) continue;
-    scenario = i;
-    break;
-  }
-  let conquererTerritory = Math.floor(scenario / 2);
-  let civilWar = scenario % 2;
-  let conquerer = civilWar ? conquererTerritory : countriesMap[conquererTerritory].occupiedBy;
-  let cts = conquerableTerritoriesOf(conquererTerritory);
-  let conqueredTerritory = civilWar ? conquerer : cts[getRandom(cts.length)];
-  let conquered = civilWar ? countriesMap[conquererTerritory].occupiedBy : countriesMap[conqueredTerritory].occupiedBy;
-
-  if (!simulation && civilWar) console.log("[WWB]:KABOOM! There was a civil war: " + conquerer + " rebelled on " + conquered);
-  if (!simulation) console.log("[WWB]:Conquerer is: " + conquerer + "  on: " + conquered + "   from country: " + conquererTerritory);
-
-  turnData = {
-    turn,
-    civilWar,
-    o: conquerer,
-    ot: conquererTerritory,
-    d: conquered,
-    dt: conqueredTerritory,
+  if (!simulation) {
+    console.log("[WWB]:Random is: " + entropy);
+    if (turnData.civilWar) console.log("[WWB]:KABOOM! There was a civil war: " + turnData.o + " rebelled on " + turnData.d);
+    console.log("[WWB]:Conquerer is: " + turnData.o + "  on: " + turnData.d + "   from country: " + turnData.ot);
   }
 
-  // UPDATE CORE DATA
-  updateCohesion(conquerer, conquered, conquererTerritory, conqueredTerritory);
-  countriesMap[conqueredTerritory].occupiedBy = conquerer;
   // UPDATE EXTERNAL DATA
   await updateExternalData(conquerer, conquered, conquererTerritory, conqueredTerritory);
 
