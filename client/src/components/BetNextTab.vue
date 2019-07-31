@@ -37,17 +37,17 @@
                 </v-flex>
 
                 <v-flex md4>
-                  <v-text-field :value="potentialWin" label="Potential win" outline disabled></v-text-field>
+                  <v-text-field :value="potentialWin" label="Potential win" outline readonly></v-text-field>
                 </v-flex>
               </v-layout>
 
               <v-layout row wrap>
                 <v-flex md4>
-                  <v-text-field :value="winChance | probability " label="Win Chance" outline disabled></v-text-field>
+                  <v-text-field :value="winChance | probability " label="Win Chance" outline readonly></v-text-field>
                 </v-flex>
 
                 <v-flex md4>
-                  <v-text-field :value="multiplier" label="Multiplier" outline disabled></v-text-field>
+                  <v-text-field :value="multiplier" label="Multiplier" outline readonly></v-text-field>
                 </v-flex>
 
                 <v-flex md4>
@@ -76,7 +76,7 @@
                 </v-flex>
                 <v-flex md4>
                   <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
-                    label="Current Jackpot" outline disabled></v-text-field>
+                    label="Current Jackpot" outline readonly></v-text-field>
                 </v-flex>
               </v-layout> -->
 
@@ -397,8 +397,9 @@
         return p
       },
       multiplier: function(){
-        let winChance = this.winChance;
-        return (0.95 * 100 / winChance).toFixed(3);
+        let country = this.currentCountry
+        if(country == null) return 0;
+        return this.mapStatus[country].nextQuote
       },
       potentialWin: function(){
         let multiplier = this.multiplier;

@@ -137,9 +137,10 @@
           }
         })
         data.map(el => {
-          el['controllerCohesion'] = data[el['occupiedBy']]['cohesion'];
+          el['controllerCohesion'] = (data[el['occupiedBy']]['cohesion'] * 100).toFixed(2);
           el['color'] = data[el['occupiedBy']]['color'];
           el['occupiedBy'] = this.universalMap(el['occupiedBy'])
+          el['cohesion'] = (el['cohesion'] * 100).toFixed(2);
         })
         this.countriesData = data
         //this.polygonSeries.invalidateData()
@@ -262,7 +263,7 @@
         polygonTemplate.applyOnClones = true;
         polygonTemplate.togglable = true;
 
-        polygonTemplate.tooltipText = "[bold]{name}[/] ({cohesion}) \nOccupied by: [bold]{occupiedBy}[/] ({controllerCohesion})";
+        polygonTemplate.tooltipText = "[bold]{name}[/] ({cohesion} %) \nOccupied by: [bold]{occupiedBy}[/] ({controllerCohesion} %)";
         polygonTemplate.nonScalingStroke = true;
         polygonTemplate.strokeOpacity = 0.5;
 
