@@ -116,18 +116,6 @@ export default {
         divider: true
       },
       {
-        heading: 'Fairness'
-      },
-      {
-        icon: 'visibility',
-        text: 'Fairness',
-        link: false,
-        body: 'WIP'
-      },
-      {
-        divider: true
-      },
-      {
         heading: 'Help'
       },
       {

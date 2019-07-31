@@ -69,7 +69,14 @@ async function gameOver(){
   console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
 }
 
+function updateResultsOnDB(betsToBeUpdated, winningBets){
+  
+  console.log("BETS to be updated " ,betsToBeUpdated)
 
+  // check if is a winning bets
+  // if yes put the amount else put 0 
+
+}
 
 module.exports.launchNextTurn = async function() {
   if (wwb.winner()) return;
@@ -93,6 +100,7 @@ module.exports.launchNextTurn = async function() {
   // GET WINNER AND UPDATES
   var data = wwb.currentTurnData();
 
+
   // UPDATE HISTORY
   dataRef.update({ turn: data.turn })
   dataRef.update({ turnTime: time})
@@ -115,8 +123,9 @@ module.exports.launchNextTurn = async function() {
   var cr = await twb.getCurrentRound(1);
   // GET WINNER AND RATE
   var _winner = cMap[data.o];
-  // GET WINNING BETS
+  // GET CURRENT TURN BETS
   var _bets = await betsRef.orderByChild("gameType").equalTo(1).once("value").then(r=>(r.val() || []).filter(e=>(e.round.toString()==cr.round.toString() && e.betReference.toString() == turn.toString())));
+  
   // PAYOUT FINAL
   if (go) await gameOver();
 
@@ -124,7 +133,10 @@ module.exports.launchNextTurn = async function() {
   dataRef.update({ serverStatus: 200 });
 
   // PAYOUT
-  await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
+  const winningBets = await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
+  
+  // UPDATE RESULTS BET ON DB
+  updateResultsOnDB(_bets, winningBets)
 
   console.log("[SCHEDULER]: Next turn complete!");
 }

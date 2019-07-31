@@ -81,7 +81,7 @@
               </v-layout> -->
 
 
-              <v-btn v-if="info.serverStatus == 200" color="primary_next_tab" dark @click="placeBet">Bet {{betAmount}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+              <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark @click="placeBet">Bet {{betAmount}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
               <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">Battle in progress...</v-btn>
               <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">Payout in progress...</v-btn>
               <!--<v-btn color="warning">Cannot bet at the moment</v-btn>-->
@@ -272,7 +272,8 @@
       bets: [],
       mapStatus: [],
       mapping: mapping,
-      isWaitingForConfirm: false
+      isWaitingForConfirm: false,
+      currentTxId: null
     }),
 
     firebase: {
@@ -292,6 +293,7 @@
     },
 
     methods: {
+
       async placeBet() {
         const _this = this
         this.isWaitingForConfirm = true
@@ -310,36 +312,18 @@
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
-          let txId
           try {
-            txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry, this.info.turn).send({
+            console.log(this.currentTxId)
+            this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry, this.info.turn).send({
               callValue: window.tronWeb.toSun(this.info.minBet)
             })
+            console.log(this.currentTxId)
           } catch {
             this.isWaitingForConfirm = false;
             this.snackbarColor = "error";
             this.snackbar = true;
             this.snackbarText = "Failed to sign transaction: Confirmation declined by user"
           }
-          setTimeout(function () {
-            console.log("ENTRO NEL TIMEOUT")
-            window.tronWeb.trx.getTransaction(txId).then((tx) => {
-              console.log(tx)
-              if (tx.ret[0].contractRet == "SUCCESS") {
-                _this.snackbarColor = "success";
-                _this.snackbarText =
-                  `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
-                if (window.location.pathname.startsWith('/ref')) {
-                  _this.postReferral(txId)
-                }
-              } else {
-                _this.snackbarText = tx.ret[0].contractRet;
-                _this.snackbarColor = "error";
-              }
-              _this.snackbar = true
-              _this.isWaitingForConfirm = false
-            })
-          }, 10000)
         }
       },
       async postReferral(txId) {
@@ -390,6 +374,30 @@
         //let p = Math.random()
         console.log(p.val()[idCountry].probability)
         return p.val()[idCountry].probability
+      }
+    },
+    watch:{
+      bets: function() {
+        let _this = this
+        console.log("ENTRO NEL TIMEOUT")
+        if(this.currentTxId !== null){
+          window.tronWeb.trx.getTransaction(this.currentTxId).then((tx) => {
+            console.log(tx)
+            if (tx.ret[0].contractRet == "SUCCESS") {
+              _this.snackbarColor = "success";
+              _this.snackbarText =
+                `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
+              if (window.location.pathname.startsWith('/ref')) {
+                _this.postReferral(this.currentTxId)
+              }
+            } else {
+              _this.snackbarText = tx.ret[0].contractRet;
+              _this.snackbarColor = "error";
+            }
+            _this.snackbar = true
+            _this.isWaitingForConfirm = false
+          })
+        }
       }
     },
     computed: {
