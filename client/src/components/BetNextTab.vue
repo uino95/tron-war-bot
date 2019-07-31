@@ -27,65 +27,67 @@
 
 
           <v-card-title primary-title class="justify-center">
-            <v-form ref="form" v-model="valid" lazy-validation>
+            <v-flex md10>
+              <v-form ref="form" v-model="valid" lazy-validation>
 
-              <v-layout row wrap>
-                <v-flex md8>
-                  <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
-                    :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
-                    placeholder="Type in or pick from map"></v-autocomplete>
-                </v-flex>
+                <v-layout row wrap align-center justify-center>
+                  <v-flex md8>
+                    <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
+                      :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
+                      placeholder="Type in or pick from map"></v-autocomplete>
+                  </v-flex>
 
-                <v-flex md4>
-                  <v-text-field :value="potentialWin" label="Potential win" outline readonly></v-text-field>
-                </v-flex>
-              </v-layout>
+                  <v-flex md4>
+                    <v-text-field :value="potentialWin" label="Potential win" outline readonly></v-text-field>
+                  </v-flex>
+                </v-layout>
 
-              <v-layout row wrap>
-                <v-flex md4>
-                  <v-text-field :value="winChance | probability " label="Win Chance" outline readonly></v-text-field>
-                </v-flex>
+                <v-layout align-center justify-center row wrap>
+                  <v-flex md4>
+                    <v-text-field :value="winChance | probability " label="Win Chance" outline readonly></v-text-field>
+                  </v-flex>
 
-                <v-flex md4>
-                  <v-text-field :value="multiplier" label="Multiplier" outline readonly></v-text-field>
-                </v-flex>
+                  <v-flex md4>
+                    <v-text-field :value="multiplier" label="Multiplier" outline readonly></v-text-field>
+                  </v-flex>
 
-                <v-flex md4>
-                  <core-timer isTurnTimer />
-                </v-flex>
-              </v-layout>
+                  <v-flex md4>
+                    <core-timer isTurnTimer />
+                  </v-flex>
+                </v-layout>
 
-              <v-layout row wrap>
-                <v-flex xs12>
-                  <v-slider
-                    thumb-label
-                    v-model="betAmount"
-                    min="50"
-                    max="500"
-                    label="Bet Amount"
-                  ></v-slider>
-                </v-flex>
-              </v-layout>
-              <!-- <v-layout row wrap>
-                <v-flex md4>
-                  <core-timer isTurnTimer />
-                </v-flex>
+                <v-layout row wrap>
+                  <v-flex xs12>
+                    <v-slider
+                      thumb-label
+                      v-model="betAmount"
+                      min="50"
+                      max="500"
+                      label="Bet Amount"
+                    ></v-slider>
+                  </v-flex>
+                </v-layout>
+                <!-- <v-layout row wrap>
+                  <v-flex md4>
+                    <core-timer isTurnTimer />
+                  </v-flex>
 
-                <v-flex md4>
-                  <core-balance-button />
-                </v-flex>
-                <v-flex md4>
-                  <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
-                    label="Current Jackpot" outline readonly></v-text-field>
-                </v-flex>
-              </v-layout> -->
+                  <v-flex md4>
+                    <core-balance-button />
+                  </v-flex>
+                  <v-flex md4>
+                    <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
+                      label="Current Jackpot" outline readonly></v-text-field>
+                  </v-flex>
+                </v-layout> -->
 
 
-              <v-btn v-if="info.serverStatus == 200" color="primary_next_tab" dark @click="placeBet">Bet {{betAmount}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
-              <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">Battle in progress...</v-btn>
-              <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">Payout in progress...</v-btn>
-              <!--<v-btn color="warning">Cannot bet at the moment</v-btn>-->
-            </v-form>
+                <v-btn v-if="info.serverStatus == 200" color="primary_next_tab" dark @click="placeBet">Bet {{betAmount}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+                <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">Battle in progress...</v-btn>
+                <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">Payout in progress...</v-btn>
+                <!--<v-btn color="warning">Cannot bet at the moment</v-btn>-->
+              </v-form>
+            </v-flex>
           </v-card-title>
 
           <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
@@ -306,7 +308,7 @@
           this.snackbar = true;
           this.isWaitingForConfirm = false
         } else {
-          console.log("instance ",this.$store.state.contracts.TronWarBotInstance)
+          //console.log("instance ",this.$store.state.contracts.TronWarBotInstance)
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
@@ -322,9 +324,8 @@
             this.snackbarText = "Failed to sign transaction: Confirmation declined by user"
           }
           setTimeout(function () {
-            console.log("ENTRO NEL TIMEOUT")
             window.tronWeb.trx.getTransaction(txId).then((tx) => {
-              console.log(tx)
+              //console.log(tx)
               if (tx.ret[0].contractRet == "SUCCESS") {
                 _this.snackbarColor = "success";
                 _this.snackbarText =
@@ -379,7 +380,7 @@
       getProbability: async function (idCountry){
         let p = await db.ref('countriesMap').orderByKey().equalTo(idCountry.toString()).once('value')
         //let p = Math.random()
-        console.log(p.val()[idCountry].probability)
+        //console.log(p.val()[idCountry].probability)
         return p.val()[idCountry].probability
       }
     },

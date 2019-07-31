@@ -1,5 +1,5 @@
 <template>
-  <v-text-field :value="timerValue" label="Current Turn" outline disabled></v-text-field>
+  <v-text-field :value="timerValue" label="Current Turn" outline readonly></v-text-field>
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 <template>
-<v-text-field v-if="isTurnTimer" :value="timerValue" label="Next Turn" outline disabled></v-text-field>
+<v-text-field v-if="isTurnTimer" :value="timerValue" label="Next Turn" outline readonly></v-text-field>
 <v-chip disabled dark v-else-if="isRunTimer">{{this.timerValue}}</v-chip>
 <div v-else>{{this.timerValue}} </div>
 

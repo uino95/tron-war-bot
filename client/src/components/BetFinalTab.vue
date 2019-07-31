@@ -1,6 +1,5 @@
 <template>
   <v-container grid-list-md text-xs-center class="outerTabContainer">
-
     <!-- Place a bet -->
     <v-layout row wrap>
       <v-flex>
@@ -24,48 +23,50 @@
           </v-toolbar>
 
           <v-card-title primary-title class="justify-center">
+            <v-flex md10>
             <v-form ref="form" v-model="valid" lazy-validation>
 
               <v-layout row align-center justify-center wrap>
                 <v-flex md12>
-                  <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
-                    :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
-                    placeholder="Type in or pick from map"></v-autocomplete>
-                </v-flex>
-              </v-layout>
+                    <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
+                      :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
+                      placeholder="Type in or pick from map"></v-autocomplete>
+                  </v-flex>
+                </v-layout>
 
-              <v-layout align-center justify-center row wrap>
-                <v-flex md3>
-                  <v-tooltip slot="append" top>
-                    <v-text-field slot="activator" :value="calculatePotentialWin" label="Potential win" outline disabled>
-                    </v-text-field>
-                    <span>If the run was to end today and you win, this is how much you would win! </span>
-                  </v-tooltip>
-                </v-flex>
+                <v-layout align-center justify-center row wrap>
+                  <v-flex md3>
+                    <v-tooltip slot="append" top>
+                      <v-text-field slot="activator" :value="calculatePotentialWin" label="Potential win" outline readonly>
+                      </v-text-field>
+                      <span>If the run was to end today and you win, this is how much you would win! </span>
+                    </v-tooltip>
+                  </v-flex>
 
-                <v-flex md3>
-                  <v-text-field :value="betFinal.jackpot?(parseFloat(betFinal.jackpot).toFixed(3) + ' TRX'):'loading...'"
-                    label="Current Jackpot" outline disabled readonly=""></v-text-field>
-                </v-flex>
+                  <v-flex md3>
+                    <v-text-field :value="betFinal.jackpot?(parseFloat(betFinal.jackpot).toFixed(3) + ' TRX'):'loading...'"
+                      label="Current Jackpot" outline readonly readonly=""></v-text-field>
+                  </v-flex>
 
-                <v-flex md3>
-                  <core-current-turn />
-                </v-flex>
+                  <v-flex md3>
+                    <core-current-turn />
+                  </v-flex>
 
-                <v-flex md3>
-                  <core-balance-button />
-                </v-flex>
-              </v-layout>
+                  <v-flex md3>
+                    <core-balance-button />
+                  </v-flex>
+                </v-layout>
 
-              <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{betFinal.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
-              <v-btn v-else-if="data.serverStatus == 300" dark color="primary_final_tab" @click="battleInProgress">Battle in progress...</v-btn>
-              <v-btn v-else-if="data.serverStatus == 400" dark color="primary_final_tab" @click="payoutInProgress">Payout in progress...</v-btn>
+                <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{betFinal.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+                <v-btn v-else-if="data.serverStatus == 300" dark color="primary_final_tab" @click="battleInProgress">Battle in progress...</v-btn>
+                <v-btn v-else-if="data.serverStatus == 400" dark color="primary_final_tab" @click="payoutInProgress">Payout in progress...</v-btn>
 
-              <!-- <v-flex md4>
-                <v-btn color="warning">Cannot bet at the moment</v-btn>
-              </v-flex> -->
+                <!-- <v-flex md4>
+                  <v-btn color="warning">Cannot bet at the moment</v-btn>
+                </v-flex> -->
 
-            </v-form>
+              </v-form>
+            </v-flex>
           </v-card-title>
           <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
             <span class="title">{{snackbarText}}</span>
@@ -507,7 +508,6 @@
         finalBets.forEach(bet =>{
           countries.push(bet.userChoice)
         })
-        console.log(countries)
         var betsPerCountryList = [];
         for (const x of Array(241).keys()) {
           betsPerCountryList.push({countryId: x, numberOfBets: 0})

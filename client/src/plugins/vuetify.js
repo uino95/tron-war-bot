@@ -13,10 +13,10 @@ Vue.use(Vuetify, {
     info: '#0090f9',
     success: '#4caf50',
     primary_final_tab: "#27ae60",
-    secondary_final_tab: "white",
+    secondary_final_tab: "#FFFFFF",
     primary_next_tab: "#2980b9",
-    secondary_next_tab: "white",
+    secondary_next_tab: "#FFFFFF",
     primary_stats_tab: "#e67e22",
-    secondary_stats_tab: "white",
+    secondary_stats_tab: "#FFFFFF",
   }
 });
