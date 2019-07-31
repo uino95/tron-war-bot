@@ -11,16 +11,6 @@ const db = firebase.db
 
 const utils = require('./utils')
 
-// const options = {
-//     method: "DELETE",
-//     uri: 'https://api.heroku.com/apps/tronwarbot/dynos/web',
-//     headers: {
-//         'content-type': 'application/json',
-//         'accept': 'application/vnd.heroku+json; version=3',
-//         'Authorization': 'Bearer ' + config.heroku.apiKey
-//     }
-// };
-
 //////////////////////////////////// DB USAGE //////////////////////////////////////////
 
 var historyRef = db.ref('history')
@@ -30,6 +20,7 @@ var dataRef = db.ref('data')
 var betFinalRef = db.ref('betFinalData')
 var countriesMapRef = db.ref('countriesMap')
 
+var turnTime = 60000 
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -83,6 +74,7 @@ async function gameOver(){
 module.exports.launchNextTurn = async function() {
   if (wwb.winner()) return;
   console.log("[SCHEDULER]: Launching next turn!")
+  let time = (new Date()).valueOf() + turnTime 
 
   // GET CURRENT TURN
   var turn = wwb.currentTurn();
@@ -102,6 +94,8 @@ module.exports.launchNextTurn = async function() {
   var data = wwb.currentTurnData();
 
   // UPDATE HISTORY
+  dataRef.update({ turn: data.turn })
+  dataRef.update({ turnTime: time})
   historyRef.push().set({
                   conquest: [data.o, data.dt],
                   prev: data.d,
@@ -126,6 +120,7 @@ module.exports.launchNextTurn = async function() {
   // PAYOUT FINAL
   if (go) await gameOver();
 
+  // CAN PLACE BETS
   dataRef.update({ serverStatus: 200 });
 
   // PAYOUT
@@ -143,6 +138,7 @@ module.exports.watchBet = function() {
   console.log("[LOGIC]: Watching user bets...")
   return twb.watchEvents('Bet', async function(r) {
       let bet = r.result
+      console.log(wwb.currentTurn())
       if (!(await betValidator.validate(bet)))
         return console.error("[INVALID_BET]: Received an invalid bet for gameType: " + bet.gameType.toString()
                             + "\n\tof amount: " + twb.tronWeb.fromSun(bet.amount.toString())
@@ -166,10 +162,12 @@ module.exports.watchBet = function() {
       }
       betsRef.child(r.transaction).set(betObj)
       referral.updateReferral(betObj)
-      let jackpot = await twb.availableJackpot(0, bet.round);
-      jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
-      betFinalRef.update({jackpot})
+      if(bet.gameType == 0){
+        let jackpot = await twb.availableJackpot(0, bet.round);
+        jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
+        betFinalRef.update({jackpot})
+        console.info("Jackpot is: ", jackpot)
+      }
       console.info("Successfully registered bet in tx " + r.transaction + " at " + betTime )
-      console.info("Jackpot is: ", jackpot)
   });
 }

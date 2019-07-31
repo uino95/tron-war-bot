@@ -28,7 +28,7 @@ export default {
       var now = new Date().getTime();
 
       // Find the distance between now and the count down date
-      var distance = this.info.nextTurnTime - now;
+      var distance = this.info.turnTime - now;
 
       // Time calculations for days, hours, minutes and seconds
       var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -54,16 +54,19 @@ export default {
       var now = new Date().getTime();
 
       // Find the distance between now and the count down date
-      var distance = this.info.nextTurnTime - now;
+      var distance = this.info.turnTime - now;
 
       var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
+      minutes = minutes < 10 ? `0${minutes}` : minutes
+      seconds = seconds < 10 ? `0${seconds}` : seconds
+
       // If the count down is finished, write some text
       if (distance < 0) {
-        this.timerValue = '#' + (this.info.nextTurn || ' loading...') + ` in 00:00`
+        this.timerValue = '#' + (this.info.turn + 1 || ' loading...') + ` in 00:00`
       } else {
-        this.timerValue = '#' + (this.info.nextTurn || ' loading...') + ` in ${minutes}:${seconds}`
+        this.timerValue = '#' + (this.info.turn + 1 || ' loading...') + ` in ${minutes}:${seconds}`
       }
       setTimeout(() => {
         this.updateTurnTimer();

@@ -8,13 +8,14 @@
     Button,
     Sprite,
     useTheme,
+    FontWeight
   } from "@amcharts/amcharts4/core";
   import {
     MapChart,
     projections,
     MapPolygonSeries,
     SmallMap,
-    ZoomControl
+    ZoomControl,
   } from "@amcharts/amcharts4/maps";
   import am4themes_spiritedaway from "@amcharts/amcharts4/themes/spiritedaway.js";
   import am4geodata_worldLow from "../assets/worldLow.js"
@@ -78,20 +79,47 @@
 
     }),
     mounted() {
-      db.ref('countriesMap').on('child_changed', (snapshot) => {
-        let id = snapshot.key;
-        db.ref('countriesMap').orderByKey().equalTo(id).once('value', (snapshotChild) => {
-          let id1 = Object.keys(snapshotChild.val())[0]
-          var result = this.hexToHsl(this.polygonSeries.data[id1]['color'])
-          var h = result[0] / 360
-          var s = result[1] / 100
-          var l = 0.2 + snapshotChild.val()[id1]['cohesion'] * 0.7
-          this.polygonSeries.data[id]['color'] = this.rgbToHex(this.hslToRgb(h, s, l))
-          //this.polygonSeries.data[id]['color'] = '#FFFFFF'
-          this.polygonSeries.invalidateData()
-          //this.chart.smallMap.series.push(this.polygonSeries);
-        })
+      db.ref().on('child_changed', (snapshot) => {
+        let j = this.colors.length
+        let data = snapshot.val();
+        if (data.length == 241) {
+          console.log(data)
+          data.map((el, index) => {
+            // var h = Math.floor(Math.floor((index / 10)) * (360 / 25)) / 360
+            // var s = (20 + (index % 10) * (80 / 10)) / 100
+            // var l = 0.2 + el['cohesion'] * 0.7
+            // el['color'] = this.rgbToHex(this.hslToRgb(h, s, l))
+            el['color'] = this.colors[j]
+            el['id'] = this.universalMap(index, 'charId')
+            j--;
+            if (j < 0) {
+              j = this.colors.length - 1
+            }
+          })
+          data.map(el => {
+            el['controllerCohesion'] = data[el['occupiedBy']]['cohesion'];
+            el['color'] = data[el['occupiedBy']]['color'];
+            el['occupiedBy'] = this.universalMap(el['occupiedBy'])
+          })
+          this.polygonSeries.data = data
+          //this.polygonSeries.invalidateData()
+        }
+
+        // db.ref('countriesMap').orderByKey().equalTo(id).once('value', (snapshotChild) => {
+        //   let id1 = Object.keys(snapshotChild.val())[0]
+        //   var result = this.hexToHsl(this.polygonSeries.data[id1]['color'])
+        //   var h = result[0] 
+        //   var s = result[1] 
+        //   var l = 0.2 + snapshotChild.val()[id1]['cohesion'] * 0.7
+        //   this.polygonSeries.data[id]['color'] = this.rgbToHex(this.hslToRgb(h, s, l))
+        //   //this.polygonSeries.data[id]['color'] = '#FFFFFF'
+        //   this.polygonSeries.invalidateData()
+        //   //this.chart.smallMap.series.push(this.polygonSeries);
+        // })
       })
+
+
+
 
       db.ref('countriesMap').once('value', (snapshot) => {
         let j = this.colors.length
@@ -99,8 +127,8 @@
         data.map((el, index) => {
           // var h = Math.floor(Math.floor((index / 10)) * (360 / 25)) / 360
           // var s = (20 + (index % 10) * (80 / 10)) / 100
-          // var l = el['cohesion']
-          // el['color'] = this.rgbToHex(this.hslToRgb(h, s, l))
+          // var l = 0.2 + el['cohesion'] * 0.7
+          //el['color'] = this.rgbToHex(this.hslToRgb(h, s, l))
           el['color'] = this.colors[j]
           el['id'] = this.universalMap(index, 'charId')
           j--;
@@ -109,7 +137,7 @@
           }
         })
         data.map(el => {
-          el['cohesion'] = data[el['occupiedBy']]['cohesion'];
+          el['controllerCohesion'] = data[el['occupiedBy']]['cohesion'];
           el['color'] = data[el['occupiedBy']]['color'];
           el['occupiedBy'] = this.universalMap(el['occupiedBy'])
         })
@@ -130,7 +158,8 @@
       },
 
       rgbToHex(color) {
-        return "#" + this.componentToHex(color[0]) + this.componentToHex(color[1]) + this.componentToHex(color[2]);
+        return "#" + this.componentToHex(color[0]) + this.componentToHex(color[1]) + this.componentToHex(color[
+          2]);
       },
 
       hexToRgb(hex) {
@@ -232,8 +261,8 @@
         polygonSeries.tooltip.background.fill = chart.colors.getIndex(4);
         polygonTemplate.applyOnClones = true;
         polygonTemplate.togglable = true;
-        polygonTemplate.tooltipText = "'{name}' controlled by '{occupiedBy}' with a cohesion of {cohesion}";
 
+        polygonTemplate.tooltipText = "[bold]{name}[/] ({cohesion}) \nOccupied by: [bold]{occupiedBy}[/] ({controllerCohesion})";
         polygonTemplate.nonScalingStroke = true;
         polygonTemplate.strokeOpacity = 0.5;
 

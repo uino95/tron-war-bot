@@ -27,7 +27,7 @@
             <v-form ref="form" v-model="valid" lazy-validation>
 
               <v-layout row align-center justify-center wrap>
-                <v-flex md9>
+                <v-flex md12>
                   <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
                     :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
                     placeholder="Type in or pick from map"></v-autocomplete>
@@ -42,18 +42,24 @@
                     <span>If the run was to end today and you win, this is how much you would win! </span>
                   </v-tooltip>
                 </v-flex>
+
+                <v-flex md3>
+                  <v-text-field :value="betFinal.jackpot?(parseFloat(betFinal.jackpot).toFixed(3) + ' TRX'):'loading...'"
+                    label="Current Jackpot" outline disabled readonly=""></v-text-field>
+                </v-flex>
+
+                <v-flex md3>
+                  <core-current-turn />
+                </v-flex>
+
                 <v-flex md3>
                   <core-balance-button />
                 </v-flex>
-                <v-flex md3>
-                  <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
-                    label="Current Jackpot" outline disabled></v-text-field>
-                </v-flex>
               </v-layout>
 
-              <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
-              <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...</v-btn>
-              <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...</v-btn>
+              <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{betFinal.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+              <v-btn v-else-if="data.serverStatus == 300" dark color="primary_final_tab" @click="battleInProgress">Battle in progress...</v-btn>
+              <v-btn v-else-if="data.serverStatus == 400" dark color="primary_final_tab" @click="payoutInProgress">Payout in progress...</v-btn>
 
               <!-- <v-flex md4>
                 <v-btn color="warning">Cannot bet at the moment</v-btn>
@@ -330,17 +336,19 @@
       currency: "TRX",
       unsortedBetsPerCountry: [],
 
-      info: {},
+      betFinal: {},
       history: [],
       bets: [],
       mapStatus: [],
+      data:{},
       mapping: mapping,
     }),
 
     firebase: {
       history: db.ref('history').orderByChild('turn'),
       bets: db.ref('bets').orderByChild('time'),
-      info: db.ref('betFinalData')
+      betFinal: db.ref('betFinalData'),
+      data: db.ref('data')
     },
 
     filters: {
@@ -377,16 +385,16 @@
           this.snackbar = true;
           this.isWaitingForConfirm = false
         } else {
-          console.log("instance ",this.$store.state.contracts.TronWarBotInstance)
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
-
+          let txId
           try {
-            let txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry, this.info.currentTurn).send({
-              callValue: window.tronWeb.toSun(this.info.minBet)
+            txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.betFinal.gameType, this.currentCountry, this.data.turn).send({
+              callValue: window.tronWeb.toSun(this.betFinal.minBet)
             })
-          } catch {
+          } catch(err) {
+            console.log(err)
             this.isWaitingForConfirm = false;
             this.snackbarColor = "error";
             this.snackbar = true;
@@ -489,13 +497,14 @@
         return arr.sort(compare);
       },
       myBets: function () {
-        return this.bets.filter(bet => (bet.from) === this.account && bet.gameType == this.info.gameType).reverse()
+        return this.bets.filter(bet => (bet.from) === this.account && bet.gameType == this.betFinal.gameType).reverse()
       },
       //returns an array of objects [{countryId: "id", numberOfBets: x}, ...]
       betsPerCountry: function () {
         // it will contain all the countries for which there is at least one bet
         let countries = []
-        this.bets.forEach(bet =>{
+        let finalBets = this.bets.filter(bet => bet.gameType == this.betFinal.gameType)
+        finalBets.forEach(bet =>{
           countries.push(bet.userChoice)
         })
         console.log(countries)
@@ -515,14 +524,14 @@
         return betsPerCountryList
       },
       latestBets: function () {
-        return this.bets.filter(bet => bet.gameType == this.info.gameType).reverse().slice(0,20)
+        return this.bets.filter(bet => bet.gameType == this.betFinal.gameType).reverse().slice(0,20)
       },
       calculatePotentialWin: function () {
         if (this.currentCountry == null) return 0;
-        let nextTurn = this.info.nextTurn;
+        let nextTurn = this.betFinal.nextTurn;
         let bets = this.betsPerCountry
         let betsOnThatCountry = bets.find(el => (el.countryId === this.currentCountry))
-        return ((parseFloat(this.info.jackpot) + this.info.minBet) * (1 - this.info.houseEdge) /
+        return ((parseFloat(this.betFinal.jackpot) + this.betFinal.minBet) * (1 - this.betFinal.houseEdge) /
           Math.max(betsOnThatCountry.numberOfBets + 1, 1)).toFixed(3) + ' TRX';
       },
       currentCountry: {

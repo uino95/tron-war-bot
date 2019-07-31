@@ -84,7 +84,6 @@ const loadSavedState = async () => {
 
 const saveCurrentState = async () => {
   countriesMapRef.set(countriesMap);
-  dataRef.update({turn, turnTime: (new Date()).valueOf()});
 };
 
 
