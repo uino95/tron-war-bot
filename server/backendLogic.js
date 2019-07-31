@@ -30,6 +30,24 @@ function toPercent(n) {
   return (n * 100).toFixed(2) + "%"
 }
 
+async function getCurrentTurnBets(currentRound, currentTurn){
+  var bets = []
+  await betsRef.orderByChild("gameType").equalTo('1').once("value")
+    .then(r => {
+      snapshot = r.val()
+      return Object.keys(snapshot)
+    })
+    .then(r => 
+      r.map(key => {
+        if (snapshot[key].round.toString() == currentRound && snapshot[key].betReference.toString() == currentTurn) {
+          snapshot[key].txId = key
+          bets.push(snapshot[key])
+        }
+      })
+    )
+  return bets
+}
+
 async function checkBetOnDb(txId) {
   return betsRef.once('value').then((r) => r.child(txId).exists());
 }
@@ -86,11 +104,16 @@ async function gameOver() {
 
 function updateResultsOnDB(betsToBeUpdated, winningBets) {
 
-  console.log("BETS to be updated ", betsToBeUpdated)
+  // update the winning bets
+  winningBets.map(wb =>  {
+    betsRef.child(wb.txId).update({result: wb.win})
+    betsToBeUpdated = betsToBeUpdated.filter(b => b.txId !== wb.txId)
+  })
 
-  // check if is a winning bets
-  // if yes put the amount else put 0 
-
+  // Update the loser bets left
+  betsToBeUpdated.map(b =>{
+    betsRef.child(b.txId).update({result: 0})
+  })
 }
 
 module.exports.launchNextTurn = async function () {
@@ -139,13 +162,7 @@ module.exports.launchNextTurn = async function () {
   var _winner = cMap[data.o];
 
   // GET CURRENT TURN BETS
-  var _bets = await betsRef.orderByChild("gameType").equalTo(1).once("value")
-    .then(r => {
-      console.log(r)
-      return r.val() || []
-    })
-    .filter(e => (e.round.toString() == cr.round.toString() && e.betReference.toString() == turn.toString())));
-
+  var _bets = await getCurrentTurnBets(cr.round.toString(), turn.toString())
 
   // COMMUNICATE WINNER
   notifyTelegramBot(data);

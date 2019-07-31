@@ -146,7 +146,7 @@
                   {{bet.turn}}
                 </v-flex>
                 <v-flex xs3 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                  {{convertResultBet(bet.result)}}
+                  {{bet.result | RESULT}}
                 </v-flex>
               </v-layout>
             </v-container>
@@ -220,7 +220,7 @@
                   <span>{{bet.turn}}</span>
                 </v-flex>
                 <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                  {{convertResultBet(bet.result)}}
+                  {{bet.result | RESULT}}
                 </v-flex>
               </v-layout>
             </v-container>
@@ -284,6 +284,13 @@
     },
 
     filters: {
+      RESULT: (result) =>{
+        if (result < 0) {
+          return '-'
+        } else {
+          return window.tronWeb.fromSun(result)
+        }
+      },
       TRX: (amount) => {
         return window.tronWeb.fromSun(amount) + 'TRX'
       },
@@ -337,13 +344,13 @@
         } catch (e) {
           console.log(e)
           try{
-            this.snackbarText = e.response.data.message
+            this.snackbarText = "[REFERRAL] " + e.response.data.message
             this.snackbarColor = "error";
             this.snackbarTimeout = 10000;
             this.snackbar = true;
           } catch(err){
             console.log(err)
-            this.snackbarText = "connection error. Referral not done"
+            this.snackbarText = "[REFERRAL] Connection error. Referral not done"
             this.snackbarColor = "error";
             this.snackbarTimeout = 10000;
             this.snackbar = true;
@@ -362,13 +369,6 @@
         this.snackbarTimeout = 2000;
         this.snackbar = true;
       },
-      convertResultBet: function (betResult) {
-        if (betResult < 0) {
-          return '-'
-        } else {
-          return betResult
-        }
-      },
       getProbability: async function (idCountry){
         let p = await db.ref('countriesMap').orderByKey().equalTo(idCountry.toString()).once('value')
         //let p = Math.random()
@@ -377,18 +377,18 @@
       }
     },
     watch:{
-      bets: function() {
+      myBets: function() {
         let _this = this
         console.log("ENTRO NEL TIMEOUT")
         if(this.currentTxId !== null){
-          window.tronWeb.trx.getTransaction(this.currentTxId).then((tx) => {
-            console.log(tx)
+          const txId = this.currentTxId
+          window.tronWeb.trx.getTransaction(txId).then((tx) => {
             if (tx.ret[0].contractRet == "SUCCESS") {
               _this.snackbarColor = "success";
               _this.snackbarText =
                 `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
               if (window.location.pathname.startsWith('/ref')) {
-                _this.postReferral(this.currentTxId)
+                _this.postReferral(txId)
               }
             } else {
               _this.snackbarText = tx.ret[0].contractRet;
@@ -397,6 +397,7 @@
             _this.snackbar = true
             _this.isWaitingForConfirm = false
           })
+          this.currentTxId = null
         }
       }
     },

@@ -398,25 +398,6 @@
             this.snackbar = true;
             this.snackbarText = "Failed to sign transaction: Confirmation declined by user"
           }
-          setTimeout(function () {
-            console.log("ENTRO NEL TIMEOUT")
-            window.tronWeb.trx.getTransaction(txId).then((tx) => {
-              console.log(tx)
-              if (tx.ret[0].contractRet == "SUCCESS") {
-                _this.snackbarColor = "success";
-                _this.snackbarText =
-                  `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
-                if (window.location.pathname.startsWith('/ref')) {
-                  _this.postReferral(txId)
-                }
-              } else {
-                _this.snackbarText = tx.ret[0].contractRet;
-                _this.snackbarColor = "error";
-              }
-              _this.snackbar = true
-              _this.isWaitingForConfirm = false
-            })
-          }, 10000)
         }
       },
       async postReferral(txId) {
@@ -471,6 +452,31 @@
         sec = sec < 10 ? `0${sec}` : sec;
         min = min < 10 ? `0${min}` : min;
         return hours + ':' + min + ':' + sec
+      }
+    },
+    watch:{
+      myBets: function() {
+        let _this = this
+        console.log("ENTRO NEL TIMEOUT")
+        if(this.currentTxId !== null){
+          window.tronWeb.trx.getTransaction(this.currentTxId).then((tx) => {
+            console.log(tx)
+            if (tx.ret[0].contractRet == "SUCCESS") {
+              _this.snackbarColor = "success";
+              _this.snackbarText =
+                `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
+              if (window.location.pathname.startsWith('/ref')) {
+                _this.postReferral(this.currentTxId)
+              }
+            } else {
+              _this.snackbarText = tx.ret[0].contractRet;
+              _this.snackbarColor = "error";
+            }
+            _this.snackbar = true
+            _this.isWaitingForConfirm = false
+          })
+          this.currentTxId = null
+        }
       }
     },
     computed: {
