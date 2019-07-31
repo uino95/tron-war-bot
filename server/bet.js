@@ -17,8 +17,6 @@ const validateFullRunWinner = async (b) => {
 }
 
 const validateNextConquerer = async (b) => {
-  console.log(wwb.currentTurn().toString())
-  console.log(b.betReference.toString())
   if (b.betReference.toString() != wwb.currentTurn().toString() ) return false;
   return true
 }
