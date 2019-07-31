@@ -16,6 +16,7 @@
     <v-spacer></v-spacer>
   </v-toolbar>
   <v-card style="background-color:rgb(158, 158, 158);">
+    <core-info-new-turn></core-info-new-turn>
     <transition name="fade" mode="out-in">
       <router-view></router-view>
     </transition>
@@ -25,7 +26,7 @@
 
 <script>
 export default {
-
+  components: {}
 }
 </script>
 

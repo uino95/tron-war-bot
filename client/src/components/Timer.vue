@@ -64,9 +64,9 @@ export default {
 
       // If the count down is finished, write some text
       if (distance < 0) {
-        this.timerValue = '#' + (this.info.turn + 1 || ' loading...') + ` in 00:00`
+        this.timerValue = '#' + (this.info.turn || ' loading...') + ` in 00:00`
       } else {
-        this.timerValue = '#' + (this.info.turn + 1 || ' loading...') + ` in ${minutes}:${seconds}`
+        this.timerValue = '#' + (this.info.turn || ' loading...') + ` in ${minutes}:${seconds}`
       }
       setTimeout(() => {
         this.updateTurnTimer();
