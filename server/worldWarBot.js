@@ -29,6 +29,7 @@ var countriesMap;
 var turn = 0;
 var turnData = {};
 var simulation = false;
+var paused = false;
 
 const currentTurn = () => turn;
 const mapState = () => JSON.parse(JSON.stringify(countriesMap));
@@ -48,7 +49,7 @@ const winner = () => fairness.winner(countriesMap);
 
 
 const init = async (restart) => {
-  turn = 0;
+  turn = 1;
   countriesMap = new Array(COUNTRIES).fill(0).map((e,idx)=>{
     return {
       occupiedBy: idx,
@@ -76,7 +77,7 @@ const loadSavedState = async () => {
 
 const saveCurrentState = async () => {
   countriesMapRef.set(countriesMap);
-  dataRef.update({ turn })
+  return dataRef.update({ turn });
 };
 
 
@@ -106,27 +107,38 @@ const updateExternalData = async (conquerer, conquered, conquererTerritory, conq
 }
 
 
-// Returns is game on?
-const nextTurn = async () => {
+const updateTurn = () => {
+  if (paused) throw "Turn needs to be resumed before updating turn.";
+  turn += 1;
+  paused = true;
+}
+
+
+// Returns is game over?
+const launchNextTurn = async () => {
+  if (!paused) throw "Turn needs to be paused before computing next state.";
+  paused = false;
+
   if (!countriesMap) await init();
 
   // GAME IS ALREADY OVER
-  if (fairness.winner(countriesMap)!=null) return false;
+  if (fairness.winner(countriesMap)!=null) return true;
 
   // COMPUTE NEW TURN
-  turn += 1;
   let entropy = Math.random();
   [countriesMap, turnData] = fairness.computeNextState(countriesMap, entropy, entropy);
+  turnData.turn = turn - 1;
 
   // UPDATE EXTERNAL DATA
   await updateExternalData(turnData.o, turnData.d, turnData.ot, turnData.dt);
 
-  if (!simulation) {
-    await saveCurrentState();
-    console.log("[WWB]:Random is: " + entropy);
-    if (turnData.civilWar) console.log("[WWB]:KABOOM! There was a civil war: " + turnData.o + " rebelled on " + turnData.d);
-    console.log("[WWB]:Conquerer is: " + turnData.o + "  on: " + turnData.d + "   from country: " + turnData.ot);
-  }
+  if (simulation) return turnData.winner != null;
+
+  await saveCurrentState();
+  console.log("[WWB]:Random is: " + entropy);
+  if (turnData.civilWar) console.log("[WWB]:KABOOM! There was a civil war: " + turnData.o + " rebelled on " + turnData.d);
+  console.log("[WWB]:Conquerer is: " + turnData.o + "  on: " + turnData.d + "   from country: " + turnData.ot);
+
   return turnData.winner != null;
 }
 
@@ -144,7 +156,7 @@ const simulate = async () => {
   simulation = true;
   for (var i=0; i<SIMULATIONS; i++){
     init(true);
-    while (!!(await nextTurn())) {
+    while (!!(await launchNextTurn())) {
       let d = currentTurnData()
       civilWars += d.civilWar;
       conquest[d.o] += 1;
@@ -173,7 +185,8 @@ module.exports = {
   currentTurn,
   currentTurnData,
   mapState,
-  nextTurn,
+  updateTurn,
+  launchNextTurn,
   conquerableTerritoriesOf,
   conqueredTerritoriesOf,
   countriesOnTheBorders,
