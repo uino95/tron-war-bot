@@ -1,5 +1,5 @@
 <template>
-<v-text-field v-if="isTurnTimer" :value="timerValue" label="Next Turn" outline disabled></v-text-field>
+<v-text-field v-if="isTurnTimer" :value="timerValue" label="Next Turn" outline readonly></v-text-field>
 <v-chip disabled dark v-else-if="isRunTimer">{{this.timerValue}}</v-chip>
 <div v-else>{{this.timerValue}} </div>
 
@@ -64,7 +64,7 @@ export default {
 
       // If the count down is finished, write some text
       if (distance < 0) {
-        this.timerValue = '#' + (this.info.turn + 1 || ' loading...') + ` in 00:00`
+        this.timerValue = '#' + (this.info.turn + 1|| ' loading...') + ` in 00:00`
       } else {
         this.timerValue = '#' + (this.info.turn + 1|| ' loading...') + ` in ${minutes}:${seconds}`
       }

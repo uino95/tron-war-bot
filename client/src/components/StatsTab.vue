@@ -3,7 +3,7 @@
     <v-layout row wrap>
 
       <!-- Countries -->
-      <v-flex sm12 md5 lg4 shrink>
+      <v-flex sm12 md6 lg5 shrink>
         <v-card>
           <v-toolbar color="primary_stats_tab" dark>
             <v-toolbar-title>Current Run Stats</v-toolbar-title>
@@ -67,7 +67,7 @@
       </v-flex>
 
       <!-- History -->
-      <v-flex sm12 md7 lg8 grow>
+      <v-flex sm12 md6 lg7 grow>
         <v-card>
 
           <v-toolbar color="primary_stats_tab" dark>

@@ -1,5 +1,5 @@
 <template>
-  <v-text-field :value="timerValue" label="Current Turn" outline disabled></v-text-field>
+  <v-text-field :value="timerValue" label="Current Turn" outline readonly></v-text-field>
 </template>
 
 <script>
@@ -15,7 +15,10 @@
     computed:{
       timerValue: function() {
         if(this.info.turn == null) return "loading..."
-        else return "# " + this.info.turn;
+        else{
+          let turn = this.info.turn - 1
+          return "# " + turn;
+        }
       }
     }
   }

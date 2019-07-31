@@ -1,5 +1,5 @@
 <template>
-  <v-text-field :value="balance" label="Your Balance" :background-color="borderColor" outline disabled></v-text-field>
+  <v-text-field :value="balance" label="Your Balance" :background-color="borderColor" outline readonly></v-text-field>
 </template>
 
 <script>
