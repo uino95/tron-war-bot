@@ -83,7 +83,7 @@
         let j = this.colors.length
         let data = snapshot.val();
         if (data.length == 241) {
-          console.log(data)
+          // console.log(data)
           data.map((el, index) => {
             // var h = Math.floor(Math.floor((index / 10)) * (360 / 25)) / 360
             // var s = (20 + (index % 10) * (80 / 10)) / 100

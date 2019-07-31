@@ -381,7 +381,7 @@
     watch:{
       myBets: function() {
         let _this = this
-        console.log("ENTRO NEL TIMEOUT")
+        // console.log("ENTRO NEL TIMEOUT")
         if(this.currentTxId !== null){
           const txId = this.currentTxId
           window.tronWeb.trx.getTransaction(txId).then((tx) => {
