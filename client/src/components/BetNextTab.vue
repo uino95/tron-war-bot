@@ -345,17 +345,26 @@
       },
       async postReferral(txId) {
         try {
-          await axios.post(this.$store.state.test ? `https://localhost:3000/referral` :
+          await axios.post(this.$store.state.test ? `http://localhost:3000/referral` :
             `https://api.tronwarbot.com/referral`, {
               user_addr: this.account,
               txId: txId,
               referrer_addr: window.location.pathname.slice(5)
             })
         } catch (e) {
-          this.snackbarText = "Something went wrong with the referral"
-          this.snackbarColor = "error";
-          this.snackbarTimeout = 2000;
-          this.snackbar = true;
+          console.log(e)
+          try{
+            this.snackbarText = e.response.data.message
+            this.snackbarColor = "error";
+            this.snackbarTimeout = 10000;
+            this.snackbar = true;
+          } catch(err){
+            console.log(err)
+            this.snackbarText = "connection error. Referral not done"
+            this.snackbarColor = "error";
+            this.snackbarTimeout = 10000;
+            this.snackbar = true;
+          }
         }
       },
       battleInProgress() {

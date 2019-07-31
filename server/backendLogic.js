@@ -20,7 +20,7 @@ var dataRef = db.ref('data')
 var betFinalRef = db.ref('betFinalData')
 var countriesMapRef = db.ref('countriesMap')
 
-var turnTime = 60000 
+var turnTime = 60000
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -32,9 +32,13 @@ async function checkBetOnDb(txId) {
   return betsRef.once('value').then((r)=>r.child(txId).exists());
 }
 
-async function notifyTelegramBot(d, j) {
+async function notifyTelegramBot(d) {
   if (config.test) return;
   if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
+
+  var j = await twb.twb.jackpot(0).call();
+  j = twb.tronWeb.fromSun(j.toString())
+
   let s = "🌎♟ <b>BATTLE "+d.turn+"</b>♟🌎\n"
   if (!d.civilWar){
     s += "<b>⚔️💣 "+utils.universalMap(d.o) + " ("+ toPercent(d.cohesion.o) + ")</b> conquered <b>"+utils.universalMap(d.dt)+" ("+ toPercent(d.cohesion.dt) + ")</b> 💣⚔️\n";
@@ -57,7 +61,7 @@ async function stopGame(){
 
 async function gameOver(){
   dataRef.update({ serverStatus: 500 });
-  var cr = await twb.getCurrentRound(0);
+  var cr = await twb.cachedCurrentRound(0);
   var winner = wwb.winner();
   console.log("[LOGIC]: Sleeping one minute before automatic jackpot payout...");
   await sleep(60000);
@@ -74,7 +78,7 @@ async function gameOver(){
 module.exports.launchNextTurn = async function() {
   if (wwb.winner()) return;
   console.log("[SCHEDULER]: Launching next turn!")
-  let time = (new Date()).valueOf() + turnTime 
+  let time = (new Date()).valueOf() + turnTime
 
   // GET CURRENT TURN
   var turn = wwb.currentTurn();
@@ -84,18 +88,16 @@ module.exports.launchNextTurn = async function() {
   // STOP BET BUTTON
   dataRef.update({ serverStatus: 300 })
   // AWAIT FOR DATA PROPAGATION AND BET HALT
+  wwb.updateTurn();
   await sleep(config.test ? 3000 : 29000);
-  var go = !(await wwb.nextTurn());
+  var go = await wwb.launchNextTurn();
 
   // STOP GAME BETS
   if (go) await stopGame();
 
   // GET WINNER AND UPDATES
   var data = wwb.currentTurnData();
-
   // UPDATE HISTORY
-  dataRef.update({ turn: data.turn })
-  dataRef.update({ turnTime: time})
   historyRef.push().set({
                   conquest: [data.o, data.dt],
                   prev: data.d,
@@ -103,20 +105,22 @@ module.exports.launchNextTurn = async function() {
                   civilWar: data.civilWar
                 });
 
-  var j = await twb.twb.jackpot(0).call();
-  // COMMUNICATE WINNER
-  notifyTelegramBot(data, twb.tronWeb.fromSun(j.toString()));
+
 
   // PAYOUT IN PROGESS
   dataRef.update({ serverStatus: 400 });
 
   // **** PAYOUT FOR GAME 1 AGAINST DEALER **** //
   // GET CHAIN ROUND
-  var cr = await twb.getCurrentRound(1);
+  var cr = await twb.cachedCurrentRound(1);
   // GET WINNER AND RATE
   var _winner = cMap[data.o];
   // GET WINNING BETS
   var _bets = await betsRef.orderByChild("gameType").equalTo(1).once("value").then(r=>(r.val() || []).filter(e=>(e.round.toString()==cr.round.toString() && e.betReference.toString() == turn.toString())));
+
+
+  // COMMUNICATE WINNER
+  notifyTelegramBot(data);
   // PAYOUT FINAL
   if (go) await gameOver();
 
@@ -138,7 +142,6 @@ module.exports.watchBet = function() {
   console.log("[LOGIC]: Watching user bets...")
   return twb.watchEvents('Bet', async function(r) {
       let bet = r.result
-      console.log(wwb.currentTurn())
       if (!(await betValidator.validate(bet)))
         return console.error("[INVALID_BET]: Received an invalid bet for gameType: " + bet.gameType.toString()
                             + "\n\tof amount: " + twb.tronWeb.fromSun(bet.amount.toString())

@@ -18,6 +18,8 @@ module.exports.tronWeb = tronWeb;
 
 var twb, war;
 var ready = false;
+const cacheRounds = {};
+
 const isReady = async ()=>{
   if (ready) return;
   while (!ready) {console.log("[TWB]: Not ready yet...");await sleep(1000);}
@@ -321,6 +323,14 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
   }
   return winningBets;
 
+}
+
+
+module.exports.cachedCurrentRound = async (gameType) => {
+  let g = gameType.toString();
+  if (cacheRounds[g]) return cacheRounds[g]
+  cacheRounds[g] = await this.getCurrentRound(gameType);
+  return cacheRounds[g];
 }
 
 module.exports.launchGame = async function(gameType, playAgainstDealer){

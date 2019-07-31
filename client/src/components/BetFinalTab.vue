@@ -57,13 +57,12 @@
                   </v-flex>
                 </v-layout>
 
-                <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{betFinal.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
-                <v-btn v-else-if="data.serverStatus == 300" dark color="primary_final_tab" @click="battleInProgress">Battle in progress...</v-btn>
-                <v-btn v-else-if="data.serverStatus == 400" dark color="primary_final_tab" @click="payoutInProgress">Payout in progress...</v-btn>
-
-                <!-- <v-flex md4>
-                  <v-btn color="warning">Cannot bet at the moment</v-btn>
-                </v-flex> -->
+              <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{betFinal.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+              <v-btn v-else-if="data.serverStatus == 300" dark color="primary_final_tab" @click="battleInProgress">Battle in progress...</v-btn>
+              <v-btn v-else-if="data.serverStatus == 400" dark color="primary_final_tab" @click="payoutInProgress">Payout in progress...</v-btn>
+              <!-- <v-flex md4>
+                <v-btn color="warning">Cannot bet at the moment</v-btn>
+              </v-flex> -->
 
               </v-form>
             </v-flex>
@@ -371,7 +370,6 @@
           .replaceAll("í", "i") + ".svg"
         return str;
       },
-
       placeBet: async function() {
         this.isWaitingForConfirm = true
         const _this = this
@@ -424,17 +422,26 @@
       },
       async postReferral(txId) {
         try {
-          await axios.post(this.$store.state.test ? `https://localhost:3000/referral` :
+          await axios.post(this.$store.state.test ? `http://localhost:3000/referral` :
             `https://api.tronwarbot.com/referral`, {
               user_addr: this.account,
               txId: txId,
               referrer_addr: window.location.pathname.slice(5)
             })
         } catch (e) {
-          this.snackbarText = "Something went wrong with the referral"
-          this.snackbarColor = "error";
-          this.snackbarTimeout = 2000;
-          this.snackbar = true;
+          console.log(e)
+          try{
+            this.snackbarText = e.response.data.message
+            this.snackbarColor = "error";
+            this.snackbarTimeout = 10000;
+            this.snackbar = true;
+          } catch(err){
+            console.log(err)
+            this.snackbarText = "connection error. Referral not done"
+            this.snackbarColor = "error";
+            this.snackbarTimeout = 10000;
+            this.snackbar = true;
+          }
         }
       },
       battleInProgress() {
