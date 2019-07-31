@@ -67,11 +67,81 @@
                 </v-layout>
               </v-container>
             </v-container>
-            
+
             <v-container v-else class="text-md-center">
               <v-chip label outline color="red">Still no one played with your link... :(</v-chip>
             </v-container>
           </v-container>
+        </v-card-text>
+
+        <v-card-text v-if="headerTile === 'Fairness'">
+          We want to be provably fair. That's why here we will give you a way to check or fairness.
+          <br />
+          <v-divider mt-3 />
+          <br />
+
+          <span class="title">Previous Turn: {{data.turn}} </span>
+          <br />
+          <v-flex>
+            <v-text-field ref='blockHash' :append-icon="'content_copy'"
+              @click:append="copyToClipBoard(fairness.blockHash, 'blockHash')" :value="fairness.blockHash"
+              :label="'Block Hash of block number ' + fairness.blockNumber" outline readonly>
+            </v-text-field>
+          </v-flex>
+
+          <v-layout row wrap>
+            <v-flex xs12 sm3>
+              <v-text-field :value="fairness.previousMagicNumber" label="Magic Number" outline readonly />
+            </v-flex>
+            <v-spacer />
+            <v-flex xs12 sm8>
+              <v-text-field ref='previousMagicNumberHash' :append-icon="'content_copy'"
+                @click:append="copyToClipBoard(fairness.previousMagicNumberHash, 'previousMagicNumberHash')"
+                :value="fairness.previousMagicNumberHash" label="Magic Number Hash" outline readonly />
+            </v-flex>
+          </v-layout>
+
+          <v-flex>
+            <v-text-field ref='previousCountriesMap' :append-icon="'content_copy'"
+              @click:append="copyToClipBoard(fairness.previousCountriesMap, 'previousCountriesMap')"
+              :value="fairness.previousCountriesMap" label="Map Status Encoded" outline readonly>
+            </v-text-field>
+          </v-flex>
+
+          <v-divider />
+          <br />
+          <span class="title">Next Turn: {{data.turn + 1}} </span>
+          <br />
+          <v-flex>
+            <v-text-field :value="fairness.nextBlock" label="Block at which the next turn will end"
+              outline readonly>
+            </v-text-field>
+          </v-flex>
+
+          <v-flex>
+            <v-text-field ref='nextMagicNumberHash' :append-icon="'content_copy'"
+              @click:append="copyToClipBoard(fairness.nextMagicNumberHash, 'nextMagicNumberHash')"
+              :value="fairness.nextMagicNumberHash" label="Magic Number Hash " outline readonly />
+          </v-flex>
+
+          <v-flex>
+            <v-text-field ref='nextCountriesMap' :append-icon="'content_copy'"
+              @click:append="copyToClipBoard(fairness.nextCountriesMap, 'nextCountriesMap')" :value="fairness.nextCountriesMap"
+              label="Map Status Encoded" outline readonly>
+            </v-text-field>
+          </v-flex>
+
+          <v-card mt-3>
+            <v-card-text style="text-align:center;">
+              You will be able to check all this data at the following link
+            </v-card-text>
+            <v-chip label outline color="primary" style="margin-left:4.5em;">
+              <a href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a>
+            </v-chip>
+          </v-card>
+
+          <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
+          (end of the run)-->
         </v-card-text>
 
         <v-card-text v-if="headerTile === 'Dividends' && account !== null">
@@ -272,6 +342,12 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-snackbar v-model="snackbar" :color="'info'" :timeout="3000" vertical bottom>
+      <span class="title"> Copied to clipboard</span>
+      <v-btn dark flat @click="snackbar = false">
+        Close
+      </v-btn>
+    </v-snackbar>
   </v-layout>
 </template>
 
@@ -289,11 +365,11 @@
       bodyTile: String
     },
 
-    filters:{
+    filters: {
       TRX: (amount) => {
         return tronweb.fromSun(amount).toFixed(3) + ' TRX'
       },
-      WAR: (amount) =>{
+      WAR: (amount) => {
         return amount.div("1000000000000000000").toString() + ' WAR'
       }
     },
@@ -348,8 +424,23 @@
     firebase: {
       referrals: db.ref("referral"),
       betFinalData: db.ref("betFinalData"),
+      data: db.ref("data"),
+      fairness: db.ref("fairness")
+    },
+    methods: {
+      copyToClipBoard(value, ref) {
+        const input = this.$refs[ref];
+        input.focus();
+        document.execCommand('selectAll');
+        this.copied = document.execCommand('copy');
+        this.snackbar = true
+      },
     },
     data: () => ({
+      snackbar: false,
+      snackbarText: "",
+      snackbarColor: "",
+      snackbarTimeout: 6000,
       faq: [{
           question: "What even is TronWarBot?",
           answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +

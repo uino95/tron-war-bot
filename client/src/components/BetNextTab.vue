@@ -37,17 +37,17 @@
                 </v-flex>
 
                 <v-flex md4>
-                  <v-text-field :value="potentialWin" label="Potential win" outline disabled></v-text-field>
+                  <v-text-field :value="potentialWin" label="Potential win" outline readonly></v-text-field>
                 </v-flex>
               </v-layout>
 
               <v-layout row wrap>
                 <v-flex md4>
-                  <v-text-field :value="winChance | probability " label="Win Chance" outline disabled></v-text-field>
+                  <v-text-field :value="winChance | probability " label="Win Chance" outline readonly></v-text-field>
                 </v-flex>
 
                 <v-flex md4>
-                  <v-text-field :value="multiplier" label="Multiplier" outline disabled></v-text-field>
+                  <v-text-field :value="multiplier" label="Multiplier" outline readonly></v-text-field>
                 </v-flex>
 
                 <v-flex md4>
@@ -76,7 +76,7 @@
                 </v-flex>
                 <v-flex md4>
                   <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
-                    label="Current Jackpot" outline disabled></v-text-field>
+                    label="Current Jackpot" outline readonly></v-text-field>
                 </v-flex>
               </v-layout> -->
 
@@ -344,17 +344,26 @@
       },
       async postReferral(txId) {
         try {
-          await axios.post(this.$store.state.test ? `https://localhost:3000/referral` :
+          await axios.post(this.$store.state.test ? `http://localhost:3000/referral` :
             `https://api.tronwarbot.com/referral`, {
               user_addr: this.account,
               txId: txId,
               referrer_addr: window.location.pathname.slice(5)
             })
         } catch (e) {
-          this.snackbarText = "Something went wrong with the referral"
-          this.snackbarColor = "error";
-          this.snackbarTimeout = 2000;
-          this.snackbar = true;
+          console.log(e)
+          try{
+            this.snackbarText = e.response.data.message
+            this.snackbarColor = "error";
+            this.snackbarTimeout = 10000;
+            this.snackbar = true;
+          } catch(err){
+            console.log(err)
+            this.snackbarText = "connection error. Referral not done"
+            this.snackbarColor = "error";
+            this.snackbarTimeout = 10000;
+            this.snackbar = true;
+          }
         }
       },
       battleInProgress() {
@@ -397,11 +406,9 @@
         return p
       },
       multiplier: function(){
-        let winChance = this.winChance;
-        let multiplier = (0.95 * 100 / winChance).toFixed(3);
-
-        if(multiplier == Infinity) return 0;
-        else return multiplier;
+        let country = this.currentCountry
+        if(country == null) return 0;
+        return this.mapStatus[country].nextQuote
       },
       potentialWin: function(){
         let multiplier = this.multiplier;

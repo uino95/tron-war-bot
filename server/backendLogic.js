@@ -142,7 +142,6 @@ module.exports.watchBet = function() {
   console.log("[LOGIC]: Watching user bets...")
   return twb.watchEvents('Bet', async function(r) {
       let bet = r.result
-      console.log(wwb.currentTurn())
       if (!(await betValidator.validate(bet)))
         return console.error("[INVALID_BET]: Received an invalid bet for gameType: " + bet.gameType.toString()
                             + "\n\tof amount: " + twb.tronWeb.fromSun(bet.amount.toString())
