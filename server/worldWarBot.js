@@ -12,46 +12,38 @@ var countriesMapRef = db.ref('countriesMap')
 var betsRef = db.ref('bets')
 var dataRef = db.ref('data')
 
-const neighborCountriesRaw = require('./map-utilities/neighborCountries').map((e,idx)=>{
-  if (!e[idx.toString()]) throw "[COUNTRIES_VALIDATION]: Invalid ordering of neighborCountries file! Check that all countries are correctly orderd from 0 to 240";
-  return e[idx.toString()];
-});
-
-// the countriesMap is an array of (CountryIndex => CountryStatus) where CountryStatus is:
-// {
-//   occupiedBy: CountryIndex,
-//   cohesion: [0-1], Index representing the unity of the country that impacting on civil rebelions probability
-  // finalQuote: 0, // PRICE OF FINAL BET
-  // nextQuote: 0, // MULTIPLIER FOR BET ON NEXT CONQUERER
-  // territories: 1,
-  // probability: 0
-// }
-
-
-// the neighborCountries is an array of (CountryIndex => [CountryIndexes])
-// var neighborCountries;
-const neighborCountries = neighborCountriesRaw.map((e,idx)=>{
-  for (var c of e) {
-    if (!neighborCountriesRaw[parseInt(c)].includes(idx.toString()))
-      throw "[COUNTRIES_VALIDATION]: Invalid relationships in neighborCountries file! Check that all countries are correctly linked to each other";
-  }
-  return e.map(c=>parseInt(c));
-})
-
+const neighborCountries = require('./map-utilities/neighborCountries');
 const COUNTRIES = neighborCountries.length;
 var ROUND = 0;
 
 var countriesMap;
+// the countriesMap is an array of (CountryIndex => CountryStatus) where CountryStatus is:
+// {
+  //   occupiedBy: CountryIndex,
+  //   cohesion: [0-1], Index representing the unity of the country that impacting on civil rebelions probability
+  // finalQuote: 0, // PRICE OF FINAL BET
+  // nextQuote: 0, // MULTIPLIER FOR BET ON NEXT CONQUERER
+  // territories: 1,
+  // probability: 0
+  // }
 var turn = 0;
 var turnData = {};
 var simulation = false;
+
+const currentTurn = () => turn;
+const mapState = () => JSON.parse(JSON.stringify(countriesMap));
+const currentTurnData = () => turnData;
 
 // Returns array of countryIndexes
 const conquerableTerritoriesOf = (c) => fairness.conquerableTerritoriesOf(countriesMap, c);
 const conqueredTerritoriesOf = (c) => fairness.conqueredTerritoriesOf(countriesMap, c);
 const countriesOnTheBorders = () => fairness.countriesOnTheBorders(countriesMap);
+const countriesStillAlive = () => fairness.countriesStillAlive(countriesMap);
+
 const pdf = () => fairness.pdf(countriesMap);
 const cumulatedPdf = () => fairness.cumulatedPdf(countriesMap);
+const realPdf = () => fairness.realPdf(countriesMap);
+
 const winner = () => fairness.winner(countriesMap);
 
 
@@ -84,26 +76,13 @@ const loadSavedState = async () => {
 
 const saveCurrentState = async () => {
   countriesMapRef.set(countriesMap);
+  dataRef.update({ turn })
 };
 
 
-
-// Returns array of countryIndexes
-const countriesStillAlive = () => {
-  return [...new Set(
-    countriesMap.map((c)=>{return c.occupiedBy;})
-  )];
+const printStatus = ()=>{
+  countriesMap.forEach((c,idx)=>console.log(idx + " => " + c.occupiedBy + "  cohesion:" + c.cohesion.toFixed(4)));
 }
-
-const realPdf = () => {
-  var p = new Array(COUNTRIES).fill(0);
-  pdf().forEach((e,i)=>{
-    p[countriesMap[i].occupiedBy] += e[0];
-    p[i] += e[1];
-  })
-  return p;
-}
-
 
 
 const updateExternalData = async (conquerer, conquered, conquererTerritory, conqueredTerritory) => {
@@ -139,28 +118,18 @@ const nextTurn = async () => {
   let entropy = Math.random();
   [countriesMap, turnData] = fairness.computeNextState(countriesMap, entropy, entropy);
 
+  // UPDATE EXTERNAL DATA
+  await updateExternalData(turnData.o, turnData.d, turnData.ot, turnData.dt);
+
   if (!simulation) {
+    await saveCurrentState();
     console.log("[WWB]:Random is: " + entropy);
     if (turnData.civilWar) console.log("[WWB]:KABOOM! There was a civil war: " + turnData.o + " rebelled on " + turnData.d);
     console.log("[WWB]:Conquerer is: " + turnData.o + "  on: " + turnData.d + "   from country: " + turnData.ot);
   }
-
-  // UPDATE EXTERNAL DATA
-  await updateExternalData(conquerer, conquered, conquererTerritory, conqueredTerritory);
-
-  if (!simulation) await saveCurrentState();
-  // printStatus();
-  return !!countriesOnTheBorders().length;
+  return turnData.winner != null;
 }
 
-const currentTurnData = () => turnData;
-
-const printStatus = ()=>{
-  if (!simulation) countriesMap.forEach((c,idx)=>console.log(idx + " => " + c.occupiedBy + "  cohesion:" + c.cohesion.toFixed(4)));
-}
-
-const currentTurn = () => turn;
-const mapState = () => JSON.parse(JSON.stringify(countriesMap));
 
 init();
 

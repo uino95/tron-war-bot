@@ -1,7 +1,6 @@
 const COHESION_BIAS = 0.3;
 const CIVIL_WAR_LIKELIHOOD = 0.2;
-const neighborCountries = ...;
-const COUNTRIES = neighborCountries.length;
+const neighborCountries = require('./map-utilities/neighborCountries');
 
 const initTurnData = () => {
   return {
@@ -24,21 +23,27 @@ const initTurnData = () => {
   };
 }
 
-
-const conqueredTerritoriesOf = (countriesMap, c) => {
-  return Object.keys(countriesMap).filter((t)=>countriesMap[t].occupiedBy==c);
-}
-
 const conquerableTerritoriesOf = (countriesMap, c) => {
   return neighborCountries[c].filter((t)=>{
     return countriesMap[t].occupiedBy != countriesMap[c].occupiedBy;
   })
 }
 
+const conqueredTerritoriesOf = (countriesMap, c) => {
+  return Object.keys(countriesMap).filter((t)=>countriesMap[t].occupiedBy==c);
+}
+
+
 const countriesOnTheBorders = (countriesMap) => {
   return Object.keys(countriesMap).filter((c)=>{
     return conquerableTerritoriesOf(countriesMap, c).length;
   })
+}
+
+const countriesStillAlive = (countriesMap) => {
+  return [...new Set(
+    countriesMap.map((c)=>{return c.occupiedBy;})
+  )];
 }
 
 const rawPdf = (countriesMap) => {
@@ -62,13 +67,23 @@ const cumulatedPdf = (countriesMap) => {
   });
 }
 
+// Returns array of countryIndexes
+const realPdf = (countriesMap) => {
+  var p = new Array(countriesMap.length).fill(0);
+  pdf(countriesMap).forEach((e,i)=>{
+    p[countriesMap[i].occupiedBy] += e[0];
+    p[i] += e[1];
+  })
+  return p;
+}
+
 const winner = (countriesMap) => {
   if (!countriesOnTheBorders(countriesMap).length) return countriesMap[0].occupiedBy;
   return null;
 }
 
-const computeRandom(firstEntropy, secondEntropy, thirdEntropy) => {
-
+const computeRandom = (firstEntropy, secondEntropy, thirdEntropy) => {
+  return firstEntropy
 }
 
 const getIntegerFrom = (random, odds) => {
@@ -81,8 +96,8 @@ const updateCohesion = (countriesMap, turnData, random) => {
   let d = turnData.d;
   let ot = turnData.ot;
   let dt = turnData.dt;
-  let o_amp = conqueredTerritoriesOf(countriesMap, o).length / COUNTRIES;
-  let d_amp = conqueredTerritoriesOf(countriesMap, d).length / COUNTRIES;
+  let o_amp = conqueredTerritoriesOf(countriesMap, o).length / countriesMap.length;
+  let d_amp = conqueredTerritoriesOf(countriesMap, d).length / countriesMap.length;
   let rnd = COHESION_BIAS - random;
   let c_o = countriesMap[o].cohesion - 0.5;
   let c_d = countriesMap[d].cohesion - 0.5;
@@ -156,11 +171,13 @@ const computeNextState = (countriesMap, firstEntropy, secondEntropy) => {
 
 
 module.exports = {
+  countriesStillAlive,
   conquerableTerritoriesOf,
   conqueredTerritoriesOf,
   countriesOnTheBorders,
   cumulatedPdf,
   pdf,
+  realPdf,
   computeNextState,
   winner
 }

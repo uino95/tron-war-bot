@@ -20,7 +20,7 @@ var dataRef = db.ref('data')
 var betFinalRef = db.ref('betFinalData')
 var countriesMapRef = db.ref('countriesMap')
 
-var turnTime = 60000 
+var turnTime = 60000
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -74,7 +74,7 @@ async function gameOver(){
 module.exports.launchNextTurn = async function() {
   if (wwb.winner()) return;
   console.log("[SCHEDULER]: Launching next turn!")
-  let time = (new Date()).valueOf() + turnTime 
+  let time = (new Date()).valueOf() + turnTime
 
   // GET CURRENT TURN
   var turn = wwb.currentTurn();
@@ -94,8 +94,6 @@ module.exports.launchNextTurn = async function() {
   var data = wwb.currentTurnData();
 
   // UPDATE HISTORY
-  dataRef.update({ turn: data.turn })
-  dataRef.update({ turnTime: time})
   historyRef.push().set({
                   conquest: [data.o, data.dt],
                   prev: data.d,
