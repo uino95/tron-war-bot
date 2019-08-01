@@ -111,8 +111,15 @@
             <v-spacer></v-spacer>
           </v-toolbar>
 
+          <!-- if the user is not logged in -->
+          <v-layout v-if="account == null" >
+            <v-flex class="subheading">
+              <v-chip label outline color="red">Login First</v-chip>
+            </v-flex>
+          </v-layout>
+
           <!-- if the user hasn't already placed at least one bet -->
-          <v-layout v-if="myBets.length === 0">
+          <v-layout v-else-if="myBets.length === 0">
             <v-flex class="subheading">
               <v-chip label outline color="red">No bets yet...</v-chip>
             </v-flex>

@@ -45,8 +45,12 @@
                 </v-card>
               </v-flex>
             </v-layout>
+            
+            <v-container v-if="this.$store.state.loggedInAccount == null" class="text-md-center">
+              <v-chip label outline color="red">Login First</v-chip>
+            </v-container>
 
-            <v-container v-if="myReferrals.length > 0">
+            <v-container v-else-if="myReferrals.length > 0">
               <v-layout row wrap style="padding: 16px 16px 0 16px;">
                 <v-flex xs6 class="title">Address</v-flex>
                 <v-flex xs6 class="title" style="text-align: end;">Amount</v-flex>
@@ -157,7 +161,7 @@
           <br />
           <v-layout row wrap>
             <v-flex xs12 sm5>
-              <v-text-field :value="'0 TRX'" outline readonly>
+              <v-text-field :value="availableTRX | TRX" label="Available Dividends" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" />
@@ -169,7 +173,7 @@
             <v-spacer />
 
             <v-flex xs12 sm5>
-              <v-text-field :value="'0 WAR' " label="Total WAR mined" outline readonly>
+              <v-text-field :value="'0 WAR'" label="Total WAR mined" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="/img/logo.png" />
@@ -182,7 +186,7 @@
           <v-layout>
             <v-spacer />
             <v-flex xs12 sm5>
-              <v-text-field :value="'0 WAR'" label="You have mined" outline readonly>
+              <v-text-field :value="'Login First'" background-color="red" label="You have mined" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="/img/logo.png" />
@@ -373,7 +377,7 @@
         return tronweb.fromSun(amount).toFixed(3) + ' TRX'
       },
       WAR: (amount) => {
-        return amount.div("1000000000000000000").toString() + ' WAR'
+        return amount.div("1000000000000000000").toFixed(3) + ' WAR'
       }
     },
 

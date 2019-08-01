@@ -39,7 +39,7 @@
                     <v-tooltip slot="append" top>
                       <v-text-field slot="activator" :value="calculatePotentialWin" label="Potential win" outline readonly>
                       </v-text-field>
-                      <span>If the run was to end today and you win, this is how much you would win! </span>
+                      <span>This is how much you would win, if you would bet on the selected country and the run would finish now </span>
                     </v-tooltip>
                   </v-flex>
 
@@ -89,8 +89,15 @@
 
             <v-container grid-list-md text-xs-centerm class="gameTab">
 
+              <!-- if the user is not logged in -->
+              <v-layout v-if="account == null" >
+                <v-flex class="subheading">
+                  <v-chip label outline color="red">Login First</v-chip>
+                </v-flex>
+              </v-layout>
+
               <!-- if the user has already placed at least one bet -->
-              <v-layout v-if="myBets.length === 0">
+              <v-layout v-else-if="myBets.length === 0" >
                 <v-flex class="subheading">
                   <v-chip label outline color="red">No bets yet...</v-chip>
                 </v-flex>
@@ -412,13 +419,13 @@
         } catch (e) {
           console.log(e)
           try{
-            this.snackbarText = e.response.data.message
+            this.snackbarText = e.response.data.message + " \nSorry for the inconvinient. Please copy the error and Reach us on Telegram "
             this.snackbarColor = "error";
             this.snackbarTimeout = 10000;
             this.snackbar = true;
           } catch(err){
             console.log(err)
-            this.snackbarText = "connection error. Referral not done"
+            this.snackbarText = "Connection error. Referral not done. \n Sorry for the inconvinient. Please copy the error and Reach us on Telegram"
             this.snackbarColor = "error";
             this.snackbarTimeout = 10000;
             this.snackbar = true;
@@ -470,7 +477,7 @@
                 _this.postReferral(this.currentTxId)
               }
             } else {
-              _this.snackbarText = tx.ret[0].contractRet;
+              _this.snackbarText = tx.ret[0].contractRet + "\n Sorry for the inconvinient. Please copy the error and Reach us on Telegram";
               _this.snackbarColor = "error";
             }
             _this.snackbar = true
@@ -557,7 +564,7 @@
       },
       account() {
         return this.$store.state.loggedInAccount
-      }
+      },
     },
     mounted() {
     }
