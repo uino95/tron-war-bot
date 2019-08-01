@@ -7,6 +7,8 @@ const config = require("./config");
 const referral = require('./referral');
 const backendLogic = require('./backendLogic');
 
+// console.log("[SCHEDULER]: Stop bets!")
+// cron.schedule(config.test ? "*/30 * * * * *" : "0 */5 * * * *", backendLogic.stopBets);
 console.log("[SCHEDULER]: Launch next turn!")
 cron.schedule(config.test ? "*/30 * * * * *" : "0 */5 * * * *", backendLogic.launchNextTurn);
 

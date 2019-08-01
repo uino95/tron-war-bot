@@ -7,50 +7,12 @@ const twb = require('./tronWarBot')
 const referral = require('./referral')
 const betValidator = require('./bet')
 const config = require('./config')
-const db = firebase.db
-
 const utils = require('./utils')
 
-//////////////////////////////////// DB USAGE //////////////////////////////////////////
+const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-var historyRef = db.ref('history')
-var betsRef = db.ref('bets')
-var countriesRef = db.ref('countries')
-var dataRef = db.ref('data')
-var betFinalRef = db.ref('betFinalData')
-var countriesMapRef = db.ref('countriesMap')
+const toPercent = (n) =>(n * 100).toFixed(2) + "%"
 
-var turnTime = 60000
-
-async function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function toPercent(n) {
-  return (n * 100).toFixed(2) + "%"
-}
-
-async function getCurrentTurnBets(currentRound, currentTurn){
-  var bets = []
-  await betsRef.orderByChild("gameType").equalTo('1').once("value")
-    .then(r => {
-      snapshot = r.val()
-      return Object.keys(snapshot)
-    })
-    .then(r => 
-      r.map(key => {
-        if (snapshot[key].round.toString() == currentRound && snapshot[key].betReference.toString() == currentTurn) {
-          snapshot[key].txId = key
-          bets.push(snapshot[key])
-        }
-      })
-    )
-  return bets
-}
-
-async function checkBetOnDb(txId) {
-  return betsRef.once('value').then((r) => r.child(txId).exists());
-}
 
 async function notifyTelegramBot(d) {
   if (config.test) return;
@@ -65,14 +27,7 @@ async function notifyTelegramBot(d) {
     s += "<i>Previously owned by " + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</i>\n\n"
   } else s += "⚒<b>" + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.d) + ")</b> rebelled on the oppressor <b>" + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</b>⚒"
   s += "Current jackpot on the full run: <b>" + j + " TRX</b>\n";
-  let m = {
-    'inline_keyboard': [
-      [{
-        'text': '🌎 Place a bet now',
-        'url': 'https://tronwarbot.com'
-      }]
-    ]
-  };
+  let m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};
   let uri = "https://api.telegram.org/bot" + config.telegram.token + "/";
   uri += "sendMessage?chat_id=" + config.telegram.group;
   uri += "&parse_mode=HTML&reply_markup=" + encodeURIComponent(JSON.stringify(m));
@@ -81,58 +36,51 @@ async function notifyTelegramBot(d) {
   return await rp.get(uri).catch(console.error);
 }
 
-async function stopGame() {
+const stopGame = async ()=>{
+  await firebase.data.update({ serverStatus: 500 });
   await twb.endGame(0);
   await twb.endGame(1);
 }
 
-async function gameOver() {
-  dataRef.update({
-    serverStatus: 500
-  });
+const gameOver = async () => {
+
   var cr = await twb.cachedCurrentRound(0);
   var winner = wwb.winner();
   console.log("[LOGIC]: Sleeping one minute before automatic jackpot payout...");
   await sleep(60000);
 
   // GET WINNING BETS
-  var _bets = await betsRef.orderByChild("gameType").equalTo(0).once("value").then(r => (r.val() || []).filter(e => (e.round == cr.round && e.betReference.toString() == turn.toString())));
+  var _bets = await firebase.bets.getCurrentTurnBets(0, cr.round);
 
   await twb.jackpotPayout(0, cr.round, winner, _bets);
   console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
 }
 
-function updateResultsOnDB(betsToBeUpdated, winningBets) {
-
-  // update the winning bets
-  winningBets.map(wb =>  {
-    betsRef.child(wb.txId).update({result: wb.win})
-    betsToBeUpdated = betsToBeUpdated.filter(b => b.txId !== wb.txId)
-  })
-
+const updateResultsOnDB = (_b, _wb) => {
+  _wb = _wb.reduce((o,el)=>{o[el.txId]=el; return o;}, {})
   // Update the loser bets left
-  betsToBeUpdated.map(b =>{
-    betsRef.child(b.txId).update({result: 0})
-  })
+  _b.forEach(b =>{firebase.bets.child(b.txId).update({result: (_wb[b.txId] ? _wb[b.txId].win : 0)})})
 }
 
-module.exports.launchNextTurn = async function () {
+const stopBets = async () => {
+  if (wwb.winner()) return;
+  // STOP BET BUTTON
+  await firebase.data.update({serverStatus: 300})
+  // AWAIT FOR DATA PROPAGATION AND BET HALT
+  await sleep(10000);
+  //UPDATE TURN CURRENT WHICH PREVENTS BET SLIPPAGE
+  wwb.updateTurn();
+}
+
+
+module.exports.launchNextTurn = async () =>{
   if (wwb.winner()) return;
   console.log("[SCHEDULER]: Launching next turn!")
-  let time = (new Date()).valueOf() + turnTime
 
-  // GET CURRENT TURN
-  var turn = wwb.currentTurn();
+  await stopBets();
+
   // GET CURRENT BET RATES AND MAP
   var cMap = wwb.mapState();
-
-  // STOP BET BUTTON
-  dataRef.update({
-    serverStatus: 300
-  })
-  // AWAIT FOR DATA PROPAGATION AND BET HALT
-  wwb.updateTurn();
-  await sleep(config.test ? 3000 : 29000);
   var go = await wwb.launchNextTurn();
 
   // STOP GAME BETS
@@ -140,8 +88,13 @@ module.exports.launchNextTurn = async function () {
 
   // GET WINNER AND UPDATES
   var data = wwb.currentTurnData();
+  // GET WINNER AND RATE
+  var _winner = cMap[data.o];
+  // GET CHAIN ROUND
+  var cr = await twb.cachedCurrentRound(1);
+
   // UPDATE HISTORY
-  historyRef.push().set({
+  firebase.history.push().set({
     conquest: [data.o, data.dt],
     prev: data.d,
     turn: data.turn,
@@ -149,36 +102,26 @@ module.exports.launchNextTurn = async function () {
   });
 
 
-
-  // PAYOUT IN PROGESS
-  dataRef.update({
-    serverStatus: 400
-  });
-
   // **** PAYOUT FOR GAME 1 AGAINST DEALER **** //
-  // GET CHAIN ROUND
-  var cr = await twb.cachedCurrentRound(1);
-  // GET WINNER AND RATE
-  var _winner = cMap[data.o];
 
   // GET CURRENT TURN BETS
-  var _bets = await getCurrentTurnBets(cr.round.toString(), turn.toString())
+  var _bets = await firebase.bets.getCurrentTurnBets(1, cr.round, data.turn);
 
   // COMMUNICATE WINNER
   notifyTelegramBot(data);
-  // PAYOUT FINAL
-  if (go) await gameOver();
+
 
   // CAN PLACE BETS
-  dataRef.update({
-    serverStatus: 200
-  });
+  await firebase.data.update({ serverStatus: 200 });
 
   // PAYOUT
   const winningBets = await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
 
   // UPDATE RESULTS BET ON DB
-  updateResultsOnDB(_bets, winningBets)
+  await updateResultsOnDB(_bets, winningBets);
+
+  // PAYOUT FINAL
+  if (go) gameOver();
 
   console.log("[SCHEDULER]: Next turn complete!");
 }
@@ -198,7 +141,7 @@ module.exports.watchBet = function () {
         "\n\tby: " + bet.from.toString() +
         "\n\twith user choice: " + bet.userChoice.toString() +
         "\n\tbetReference: " + bet.betReference.toString());
-    let isBetAlreadyOnDb = await checkBetOnDb(r.transaction);
+    let isBetAlreadyOnDb = await firebase.bets.checkBetOnDb(r.transaction);
     if (!!isBetAlreadyOnDb) return console.error("[GENERIC]: Bet " + r.transaction + " is already on DB");
     let turn = wwb.currentTurn();
     let betTime = new Date().getTime()
@@ -213,14 +156,12 @@ module.exports.watchBet = function () {
       gameType: bet.gameType,
       turn: turn
     }
-    betsRef.child(r.transaction).set(betObj)
+    firebase.bets.child(r.transaction).set(betObj)
     referral.updateReferral(betObj)
-    if (bet.gameType == 0) {
+    if (bet.gameType.toString() == "0") {
       let jackpot = await twb.availableJackpot(0, bet.round);
       jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
-      betFinalRef.update({
-        jackpot
-      })
+      firebase.data.update({ jackpot })
       console.info("Jackpot is: ", jackpot)
     }
     console.info("Successfully registered bet in tx " + r.transaction + " at " + betTime)

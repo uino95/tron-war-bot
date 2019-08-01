@@ -61,7 +61,7 @@ const createWatchEvents = function(c){
     }, 2500);
 
     return {
-      stop: ()=>{
+      stop: () => {
         clearInterval(intervalId);
       }
     }
@@ -239,7 +239,7 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
       console.info("[PAYOUT SUCCESSFUL]" +
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
         "\n\tWinning Choice => " +  winningChoice.toString() +
-        "\n\tBet txId => " + b.transaction +
+        "\n\tBet txId => " + b.txId +
         "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
         "\n\tWin => " + win.toString() + " SUN" +
         "\n\tPayout txId => " + txId)
@@ -250,7 +250,7 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
         "\n\tWinning Choice => " +  winningChoice.toString() +
         "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
         "\n\tExpectedWin => " + win.toString() + " SUN" +
-        "\n\tTxId => " + b.transaction);
+        "\n\tTxId => " + b.txId);
   }
   return winningBets;
 
@@ -308,7 +308,7 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
       console.info("[PAYOUT SUCCESSFUL]" +
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
         "\n\tWinning Choice => " +  winningChoice.toString() +
-        "\n\tBet txId => " + b.transaction +
+        "\n\tBet txId => " + b.txId +
         "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
         "\n\tWin => " + win.toString() + " SUN" +
         "\n\tPayout txId => " + txId)
@@ -319,7 +319,7 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
         "\n\tWinning Choice => " +  winningChoice.toString() +
         "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
         "\n\tExpectedWin => " + win.toString() + " SUN" +
-        "\n\tTxId => " + b.transaction);
+        "\n\tTxId => " + b.txId);
   }
   return winningBets;
 
