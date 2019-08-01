@@ -1,14 +1,14 @@
 <template>
-  <v-layout style="background-color:rgb(158, 158, 158);">
+  <v-container v-if="infoNewTurn != null && showAlert==true">
     <v-alert
       v-model="showAlert"
       dismissible
       transition="scale-transition"
-      color="#2c3e50"
+      color="primary_next_tab"
     >
-      New conquest: {{"Turn " + infoNewTurn.turn + " - " + universalMap(infoNewTurn.conquest[0]) + " has conquered " + universalMap(infoNewTurn.conquest[1])}}
+      {{"New conquest: Turn " + infoNewTurn.turn + " - " + universalMap(infoNewTurn.conquest[0]) + " has conquered " + universalMap(infoNewTurn.conquest[1]) + " previuously owned by " + universalMap(infoNewTurn.prev)}}
     </v-alert>
-  </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -16,12 +16,10 @@
     db
   }
     from '../plugins/firebase';
-  import VContent from "vuetify/lib/components/VGrid/VContent";
 
   export default {
-    components: {VContent},
     data: () => ({
-      showAlert: true,
+      showAlert: false,
       history: []
     }),
     firebase: {
@@ -29,15 +27,16 @@
     },
     computed: {
       infoNewTurn: function () {
-        this.showAlert = false
         let infoTurn = this.history.slice().reverse()[0]
-        this.showAlert = true
-        return infoTurn
-      },
+        if(infoTurn != null){
+          this.showAlert = true
+          return infoTurn
+        }
+      }
     }
   }
 </script>
 
 <style scoped>
-  
+
 </style>

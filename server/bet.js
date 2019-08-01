@@ -1,10 +1,6 @@
 const config = require('./config')
 const wwb = require('./worldWarBot')
 const tronWeb = require('tronweb')
-const firebase = require('./firebase')
-const db = firebase.db
-
-var countriesMapRef = db.ref('countriesMap');
 
 var turn, cMap;
 

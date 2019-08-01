@@ -157,7 +157,14 @@
             <!-- if the user is using a mobile device -->
             <v-container v-if="this.$store.state.isMobile" grid-list-md text-xs-center class="gameTab">
 
-              <v-layout row wrap class="gameTabHeader">
+              <!-- if the user has already placed at least one bet -->
+              <v-layout v-if="latestBets.length === 0" >
+                <v-flex class="subheading">
+                  <v-chip label outline color="red">No bets yet...</v-chip>
+                </v-flex>
+              </v-layout>
+
+              <v-layout v-else row wrap class="gameTabHeader">
                 <v-flex xs6 class="title">
                   <span>Country</span>
                 </v-flex>
@@ -167,38 +174,48 @@
                 <v-flex xs3 class="title">
                   <span>Turn</span>
                 </v-flex>
+
+
+                <v-divider class="gameTabDivider"></v-divider>
+                <v-container class="gameTabContent" text-xs-center>
+
+                  <v-layout row wrap v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)" :key="bet.time">
+                    <v-flex xs6 class="subheading">
+                      <span>{{universalMap(bet.userChoice)}}</span>
+                    </v-flex>
+                    <v-flex xs3 class="subheading">
+                      <span>{{bet.amount | TRX}}</span>
+                    </v-flex>
+                    <v-flex xs3 class="subheading">
+                      <span>{{bet.turn}}</span>
+                    </v-flex>
+                  </v-layout>
+
+                </v-container>
+
+                <v-container v-if="latestBets.length > 10">
+                  <v-pagination
+                    v-model="currentLatestBetPagination"
+                    :length="Math.ceil(latestBets.length/10)"
+                    color="primary_final_tab"
+                  >
+                  </v-pagination>
+                </v-container>
+
               </v-layout>
-
-              <v-divider class="gameTabDivider"></v-divider>
-              <v-container class="gameTabContent" text-xs-center>
-
-                <v-layout row wrap v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)" :key="bet.time">
-                  <v-flex xs6 class="subheading">
-                    <span>{{universalMap(bet.userChoice)}}</span>
-                  </v-flex>
-                  <v-flex xs3 class="subheading">
-                    <span>{{bet.amount | TRX}}</span>
-                  </v-flex>
-                  <v-flex xs3 class="subheading">
-                    <span>{{bet.turn}}</span>
-                  </v-flex>
-                </v-layout>
-
-              </v-container>
-
-              <v-container v-if="latestBets.length > 10">
-                <v-pagination
-                  v-model="currentLatestBetPagination"
-                  :length="Math.ceil(latestBets.length/10)"
-                  color="primary_final_tab"
-                >
-                </v-pagination>
-              </v-container>
             </v-container>
 
             <!-- else, the user is on pc -->
             <v-container v-else grid-list-md text-xs-center class="gameTab">
-              <v-layout row wrap class="gameTabHeader">
+
+              <!-- if the user has already placed at least one bet -->
+              <v-layout v-if="latestBets.length === 0" >
+                <v-flex class="subheading">
+                  <v-chip label outline color="red">No bets yet...</v-chip>
+                </v-flex>
+              </v-layout>
+
+              <v-layout v-else row wrap class="gameTabHeader">
                 <v-flex xs3 class="title">
                   <span>Address</span>
                 </v-flex>
@@ -211,36 +228,36 @@
                 <v-flex xs2 class="title">
                   <span>Turn</span>
                 </v-flex>
+
+                <v-divider class="gameTabDivider"></v-divider>
+
+                <v-container class="gameTabContent" text-xs-center>
+                  <v-layout row wrap v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)" :key="bet.time">
+
+                    <v-flex xs3 class="subheading text-truncate">
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <span v-on="on" v-text="(bet.from)" v-bind:alt="(bet.from)"></span>
+                        </template>
+                        <span>{{bet.from}}</span>
+                      </v-tooltip>
+                    </v-flex>
+
+                    <v-flex xs5 class="subheading">
+                      <span>{{universalMap(bet.userChoice)}}</span>
+                    </v-flex>
+
+                    <v-flex xs2 class="subheading">
+                      <span>{{bet.amount | TRX}}</span>
+                    </v-flex>
+
+                    <v-flex xs2 class="subheading">
+                      <span>{{bet.turn}}</span>
+                    </v-flex>
+
+                  </v-layout>
+                </v-container>
               </v-layout>
-
-              <v-divider class="gameTabDivider"></v-divider>
-
-              <v-container class="gameTabContent" text-xs-center>
-                <v-layout row wrap v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)" :key="bet.time">
-
-                  <v-flex xs3 class="subheading text-truncate">
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on" v-text="(bet.from)" v-bind:alt="(bet.from)"></span>
-                      </template>
-                      <span>{{bet.from}}</span>
-                    </v-tooltip>
-                  </v-flex>
-
-                  <v-flex xs5 class="subheading">
-                    <span>{{universalMap(bet.userChoice)}}</span>
-                  </v-flex>
-
-                  <v-flex xs2 class="subheading">
-                    <span>{{bet.amount | TRX}}</span>
-                  </v-flex>
-
-                  <v-flex xs2 class="subheading">
-                    <span>{{bet.turn}}</span>
-                  </v-flex>
-
-                </v-layout>
-              </v-container>
 
               <v-container v-if="latestBets.length > 10">
                 <v-pagination

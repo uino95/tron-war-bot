@@ -2,6 +2,8 @@
 const TronWeb = require('tronweb');
 const TronGrid = require('trongrid');
 const config = require('./config');
+const BLOCK_CONFIRMATION = config.test ? 2 : 6;
+
 
 const tronWeb = new TronWeb({
   fullHost: config.tron.fullHost,
@@ -40,13 +42,13 @@ const createWatchEvents = function(c){
     if(typeof opts == "string") opts = { eventName : opts};
     if(!fn || (typeof fn != "function")) throw "Invalid callback function";
     let b = await tronWeb.trx.getCurrentBlock();
-    var bn = b.block_header.raw_data.number;
+    var bn = b.block_header.raw_data.number - BLOCK_CONFIRMATION;
 
     var intervalId = setInterval(async ()=>{
       var events;
       try {
         let b = await tronWeb.trx.getCurrentBlock();
-        let currentBlock = b.block_header.raw_data.number;
+        let currentBlock = b.block_header.raw_data.number - BLOCK_CONFIRMATION;
         if (currentBlock<bn) return; //Skip this interval
         opts.onlyConfirmed=false;
         opts.orderBy="timestamp,desc";
@@ -61,7 +63,7 @@ const createWatchEvents = function(c){
     }, 2500);
 
     return {
-      stop: ()=>{
+      stop: () => {
         clearInterval(intervalId);
       }
     }
@@ -239,7 +241,7 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
       console.info("[PAYOUT SUCCESSFUL]" +
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
         "\n\tWinning Choice => " +  winningChoice.toString() +
-        "\n\tBet txId => " + b.transaction +
+        "\n\tBet txId => " + b.txId +
         "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
         "\n\tWin => " + win.toString() + " SUN" +
         "\n\tPayout txId => " + txId)
@@ -250,7 +252,7 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
         "\n\tWinning Choice => " +  winningChoice.toString() +
         "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
         "\n\tExpectedWin => " + win.toString() + " SUN" +
-        "\n\tTxId => " + b.transaction);
+        "\n\tTxId => " + b.txId);
   }
   return winningBets;
 
@@ -308,7 +310,7 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
       console.info("[PAYOUT SUCCESSFUL]" +
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
         "\n\tWinning Choice => " +  winningChoice.toString() +
-        "\n\tBet txId => " + b.transaction +
+        "\n\tBet txId => " + b.txId +
         "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
         "\n\tWin => " + win.toString() + " SUN" +
         "\n\tPayout txId => " + txId)
@@ -319,7 +321,7 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
         "\n\tWinning Choice => " +  winningChoice.toString() +
         "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
         "\n\tExpectedWin => " + win.toString() + " SUN" +
-        "\n\tTxId => " + b.transaction);
+        "\n\tTxId => " + b.txId);
   }
   return winningBets;
 

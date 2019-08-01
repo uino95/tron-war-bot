@@ -1,17 +1,9 @@
 // SIMULATION PARAMS
-const COHESION_BIAS = 0.3;
-const CIVIL_WAR_LIKELIHOOD = 0.2;
 const SIMULATIONS = 10;
 // DB interface
 const firebase = require('./firebase')
 const t = require('./tronWarBot')
 const fairness = require('./fairness')
-const db = firebase.db
-// db ref
-var countriesMapRef = db.ref('countriesMap')
-var betsRef = db.ref('bets')
-var dataRef = db.ref('data')
-
 const neighborCountries = require('./map-utilities/neighborCountries');
 const COUNTRIES = neighborCountries.length;
 var ROUND = 0;
@@ -68,16 +60,16 @@ const init = async (restart) => {
 
 
 const loadSavedTurn = async () => {
-  return dataRef.once('value').then(r=>r.val()["turn"]);
+  return firebase.data.once('value').then(r=>r.val()["turn"]);
 };
 
 const loadSavedState = async () => {
-  return countriesMapRef.once('value').then(r=>r.val());
+  return firebase.countriesMap.once('value').then(r=>r.val());
 };
 
 const saveCurrentState = async () => {
-  countriesMapRef.set(countriesMap);
-  return dataRef.update({ turn });
+  firebase.countriesMap.set(countriesMap);
+  return firebase.data.update({ turn });
 };
 
 
@@ -92,8 +84,8 @@ const updateExternalData = async (conquerer, conquered, conquererTerritory, conq
   countriesMap[conquered].territories = countriesMap[conquered].territories - 1;
 
   // GET JACKPOT
-  let jackpot = await dataRef.once("value").then(r=>r.val()['jackpot']);
-  let bets = await betsRef.orderByChild("gameType").equalTo(0).once("value").then(r=>(r.val() || []).filter(e=>e.round==ROUND));
+  let jackpot = await firebase.data.once("value").then(r=>r.val()['jackpot']);
+  let bets = await firebase.bets.getCurrentTurnBets(0, ROUND);
   let betsPerCountry = new Array(COUNTRIES).fill(0);
   bets.forEach((e,i)=>betsPerCountry[e.userChoice]+=1);
 
@@ -115,7 +107,7 @@ const updateTurn = () => {
 
 
 // Returns is game over?
-const launchNextTurn = async () => {
+const launchNextTurn = async (rand) => {
   if (!paused) throw "Turn needs to be paused before computing next state.";
   paused = false;
 
@@ -125,7 +117,7 @@ const launchNextTurn = async () => {
   if (fairness.winner(countriesMap)!=null) return true;
 
   // COMPUTE NEW TURN
-  let entropy = Math.random();
+  let entropy = rand || Math.random();
   [countriesMap, turnData] = fairness.computeNextState(countriesMap, entropy, entropy);
   turnData.turn = turn - 1;
 
