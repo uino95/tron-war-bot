@@ -1,14 +1,14 @@
 <template>
-  <v-layout v-if="infoNewTurn != null" style="background-color:rgb(158, 158, 158);">
+  <v-container v-if="infoNewTurn != null && showAlert==true">
     <v-alert
       v-model="showAlert"
       dismissible
       transition="scale-transition"
-      color="#2c3e50"
+      color="primary_next_tab"
     >
-      {{"New conquest: Turn " + infoNewTurn.turn + " - " + universalMap(infoNewTurn.conquest[0]) + " has conquered " + universalMap(infoNewTurn.conquest[1])}}
+      {{"New conquest: Turn " + infoNewTurn.turn + " - " + universalMap(infoNewTurn.conquest[0]) + " has conquered " + universalMap(infoNewTurn.conquest[1]) + " previuously owned by " + universalMap(infoNewTurn.prev)}}
     </v-alert>
-  </v-layout>
+  </v-container>
 </template>
 
 <script>
