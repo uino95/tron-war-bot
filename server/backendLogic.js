@@ -2,6 +2,7 @@ const rp = require('request-promise')
 const cron = require("node-cron");
 
 const firebase = require('./firebase')
+const fairness = require('./fairness')
 const wwb = require('./worldWarBot')
 const twb = require('./tronWarBot')
 const referral = require('./referral')
@@ -67,11 +68,32 @@ const stopBets = async () => {
   // STOP BET BUTTON
   await firebase.data.update({serverStatus: 300})
   // AWAIT FOR DATA PROPAGATION AND BET HALT
-  await sleep(10000);
+  await sleep(config.test ? 5000 : 30000);
   //UPDATE TURN CURRENT WHICH PREVENTS BET SLIPPAGE
   wwb.updateTurn();
 }
 
+const simulateNextTurn = async () => {
+  if (wwb.winner()) return;
+  // CALCULATE MAGIC NUMBER AND SEED
+  var magic = Math.random();
+  var seed = utils.randomHex();
+  // SAVE MAGIC NUMBER AND SEED
+  await firebase.fairness.update({magic, seed});
+  // SIMULATE TURN
+  [ , turnData] = fairness.computeNextState(wwb.mapState(), magic, magic);
+  // EVALUATE WINNER
+  console.log("[SIMULATE]: Winner on next round is: " + turnData.o + " => " + utils.universalMap(turnData.o));
+  // COMPUTE SHA256 (WINNER + SEED)
+  console.log("Computing SHA256 of " + utils.universalMap(turnData.o) + seed);
+  let magicHash = utils.sha256(utils.universalMap(turnData.o) + seed);
+  // SAVE SHA256
+  await firebase.data.update({magicHash});
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////
 
 module.exports.launchNextTurn = async () =>{
   if (wwb.winner()) return;
@@ -106,26 +128,20 @@ module.exports.launchNextTurn = async () =>{
 
   // GET CURRENT TURN BETS
   var _bets = await firebase.bets.getCurrentTurnBets(1, cr.round, data.turn);
-
   // COMMUNICATE WINNER
   notifyTelegramBot(data);
 
-
   // CAN PLACE BETS
   await firebase.data.update({ serverStatus: 200 });
-
   // PAYOUT
   const winningBets = await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
-
   // UPDATE RESULTS BET ON DB
   await updateResultsOnDB(_bets, winningBets);
-
   // PAYOUT FINAL
   if (go) gameOver();
 
   console.log("[SCHEDULER]: Next turn complete!");
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////////////

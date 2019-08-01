@@ -20,6 +20,7 @@ const out = {
   history : db.ref('history'),
   bets : db.ref('bets'),
   data : db.ref('data'),
+  fairness : db.ref('fairness'),
   referral: db.ref('referral'),
   countriesMap : db.ref('countriesMap')
 }

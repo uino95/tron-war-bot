@@ -107,7 +107,7 @@ const updateTurn = () => {
 
 
 // Returns is game over?
-const launchNextTurn = async () => {
+const launchNextTurn = async (rand) => {
   if (!paused) throw "Turn needs to be paused before computing next state.";
   paused = false;
 
@@ -117,7 +117,7 @@ const launchNextTurn = async () => {
   if (fairness.winner(countriesMap)!=null) return true;
 
   // COMPUTE NEW TURN
-  let entropy = Math.random();
+  let entropy = rand || Math.random();
   [countriesMap, turnData] = fairness.computeNextState(countriesMap, entropy, entropy);
   turnData.turn = turn - 1;
 

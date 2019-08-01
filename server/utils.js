@@ -17,7 +17,14 @@ module.exports = {
 				return mapping[id]['name'];
 		}
 	},
-	sleep(ms) {
-    	return new Promise(resolve => setTimeout(resolve, ms));
-	}
+	sleep: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
+  sha256: (e) =>{
+    return e;
+  },
+  randomFromSHA: (e)=> {
+    return e;
+  },
+  randomHex: ()=>{
+    return Math.random();
+  }
 }

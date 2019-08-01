@@ -2,8 +2,7 @@
 const TronWeb = require('tronweb');
 const TronGrid = require('trongrid');
 const config = require('./config');
-
-const BLOCK_CONFIRMATION = 6;
+const BLOCK_CONFIRMATION = config.test ? 2 : 6;
 
 
 const tronWeb = new TronWeb({
