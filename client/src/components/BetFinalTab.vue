@@ -15,7 +15,10 @@
                     <template v-slot:activator="{ on }">
                       <v-icon color="secondary" dark v-on="on">info</v-icon>
                     </template>
-                    <span>Bet on the final winner of the World War! Each bet goes into the jackpot. At the end of the run (45 days on average) 80% of the jackpot is given to the winners, and 20% is given to WAR token holders. As the time goes it will be more expensive to bet on countries, also depending on how good they are doing. The first you bet, the better!</span>
+                    <span>Bet on the final winner of the World War! Each bet goes into the jackpot. At the end of the
+                      run (45 days on average) 80% of the jackpot is given to the winners, and 20% is given to WAR token
+                      holders. As the time goes it will be more expensive to bet on countries, also depending on how
+                      good they are doing. The first you bet, the better!</span>
                   </v-tooltip>
                 </v-flex>
               </v-layout>
@@ -37,7 +40,8 @@
               <v-layout align-center justify-center row wrap>
                 <v-flex md3>
                   <v-tooltip slot="append" top>
-                    <v-text-field slot="activator" :value="calculatePotentialWin" label="Potential win" outline disabled>
+                    <v-text-field slot="activator" :value="calculatePotentialWin" label="Potential win" outline
+                      disabled>
                     </v-text-field>
                     <span>If the run was to end today and you win, this is how much you would win! </span>
                   </v-tooltip>
@@ -51,9 +55,13 @@
                 </v-flex>
               </v-layout>
 
-              <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="success" @click="placeBet">Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
-              <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...</v-btn>
-              <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...</v-btn>
+              <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="success" @click="placeBet">
+                Bet {{info.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}
+              </v-btn>
+              <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...
+              </v-btn>
+              <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...
+              </v-btn>
 
               <!-- <v-flex md4>
                 <v-btn color="warning">Cannot bet at the moment</v-btn>
@@ -233,11 +241,14 @@
 
             <v-container>
               <v-layout column>
-                <v-layout row wrap v-for="country in betsPerCountry.slice(10 * currentRunPagination - 10, 10 * currentRunPagination )" :key="country.countryId">
+                <v-layout row wrap
+                  v-for="country in betsPerCountry.slice(10 * currentRunPagination - 10, 10 * currentRunPagination )"
+                  :key="country.countryId">
 
                   <v-flex xs2>
                     <v-avatar>
-                      <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag" :src="getFlagString(universalMap(country.countryId))" :alt="country.countryId" />
+                      <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                        :src="getFlagString(universalMap(country.countryId))" :alt="country.countryId" />
                     </v-avatar>
                   </v-flex>
                   <v-flex xs6 style="text-align:start; margin-top:5px;" class="subheading">
@@ -248,10 +259,7 @@
                   </v-flex>
                 </v-layout>
 
-                <v-pagination
-                  v-model="currentRunPagination"
-                  :length="25"
-                >
+                <v-pagination v-model="currentRunPagination" :length="25">
                 </v-pagination>
               </v-layout>
             </v-container>
@@ -275,7 +283,7 @@
   import VLazyImage from "v-lazy-image";
   import tronweb from 'tronweb'
 
-  String.prototype.replaceAll = function(search, replace) {
+  String.prototype.replaceAll = function (search, replace) {
     if (replace === undefined) {
       return this.toString();
     }
@@ -287,7 +295,7 @@
       VLazyImage
     },
     data: () => ({
-      currentRunPagination:1,
+      currentRunPagination: 1,
       isLoading: false,
       isWaitingForConfirm: false,
       valid: false,
@@ -333,7 +341,7 @@
           .replaceAll("í", "i") + ".svg"
         return str;
       },
-      placeBet: async function() {
+      placeBet: async function () {
         this.isWaitingForConfirm = true
         const _this = this
         if (this.$store.state.loggedInAccount == null) {
@@ -347,31 +355,47 @@
           this.snackbar = true;
           this.isWaitingForConfirm = false
         } else {
-          console.log("instance ",this.$store.state.contracts.TronWarBotInstance)
+          console.log("instance ", this.$store.state.contracts.TronWarBotInstance)
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
-          let txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry, this.info.currentTurn).send({
-            callValue: window.tronWeb.toSun(this.info.minBet)
-          })
-          setTimeout(function () {
-            window.tronWeb.trx.getTransaction(txId).then((tx) => {
-              console.log(tx)
-              if (tx.ret[0].contractRet == "SUCCESS") {
-                _this.snackbarColor = "success";
-                _this.snackbarText =
-                  `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
-                if (window.location.pathname.startsWith('/ref')) {
-                  _this.postReferral(txId)
-                }
-              } else {
-                _this.snackbarText = tx.ret[0].contractRet;
-                _this.snackbarColor = "error";
-              }
-              _this.snackbar = true
-              _this.isWaitingForConfirm = false
+          console.log("tronWarBotInstance: ", this.$store.state.contracts.TronWarBotInstance)
+          console.log('gameType: ', this.info.gameType)
+          console.log('currentCountry ', this.currentCountry)
+          console.log('currentTurn ', this.info.currentTurn)
+          let txId
+          try {
+            txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry,
+              this.info.currentTurn).send({
+              callValue: window.tronWeb.toSun(this.info.minBet)
             })
-          }, 10000)
+            console.log('txId: ', txId)
+            setTimeout(function () {
+              window.tronWeb.trx.getTransaction(txId).then((tx) => {
+                console.log('return of getTransaction', tx)
+                if (tx.ret[0].contractRet == "SUCCESS") {
+                  _this.snackbarColor = "success";
+                  _this.snackbarText =
+                    `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
+                  if (window.location.pathname.startsWith('/ref')) {
+                    _this.postReferral(txId)
+                  }
+                } else {
+                  _this.snackbarText = tx.ret[0].contractRet;
+                  _this.snackbarColor = "error";
+                }
+                _this.snackbar = true
+                _this.isWaitingForConfirm = false
+              })
+            }, 10000)
+          } catch (error) {
+            console.log(error)
+            _this.isWaitingForConfirm = false
+            _this.snackbarTimeout = 30000
+            _this.snackbar = true
+            _this.snackbarText = "Error: " + error + " ... Sorry :( Please copy the error and reach us on Telegram"
+            _this.snackbarColor = 'error'
+          }
         }
       },
       async postReferral(txId) {
@@ -456,21 +480,24 @@
       betsPerCountry: function () {
         // it will contain all the countries for which there is at least one bet
         let countries = []
-        this.bets.forEach(bet =>{
+        this.bets.forEach(bet => {
           countries.push(bet.userChoice)
         })
         console.log(countries)
         var betsPerCountryList = [];
         for (const x of Array(241).keys()) {
-          betsPerCountryList.push({countryId: x, numberOfBets: 0})
+          betsPerCountryList.push({
+            countryId: x,
+            numberOfBets: 0
+          })
         }
 
-        for(var element of countries){
-            betsPerCountryList[element].numberOfBets += 1;
+        for (var element of countries) {
+          betsPerCountryList[element].numberOfBets += 1;
         }
 
-        betsPerCountryList.sort((a,b) => {
-          return  b.numberOfBets - a.numberOfBets
+        betsPerCountryList.sort((a, b) => {
+          return b.numberOfBets - a.numberOfBets
         })
 
         return betsPerCountryList
@@ -498,7 +525,6 @@
         return this.$store.state.loggedInAccount
       }
     },
-    mounted() {
-    }
+    mounted() {}
   }
 </script>
