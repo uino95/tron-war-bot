@@ -417,7 +417,7 @@
           let txId
           try {
             this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.gameType, this.currentCountry, this.data.turn).send({
-              callValue: window.tronWeb.toSun(this.minBet)
+              callValue: window.tronWeb.toSun(this.countriesMap[this.currentCountry].finalQuote)
             })
           } catch(err) {
             console.log(err)
