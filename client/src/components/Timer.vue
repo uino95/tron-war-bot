@@ -74,15 +74,15 @@ export default {
     },
 
     startTimer: function() {
-      if (this.isTurnTimer) {
-        this.intervalId = setTimeout(() => {
-          this.updateTurnTimer();
-        }, 1000);
-      } else {
-        this.intervalId = setTimeout(() => {
-          this.updateRunTimer();
-        }, 1000);
-      }
+        if (this.isTurnTimer) {
+          this.intervalId = setTimeout(() => {
+            this.updateTurnTimer();
+          }, 1000);
+        } else {
+          this.intervalId = setTimeout(() => {
+            this.updateRunTimer();
+          }, 1000);
+        }
     },
   },
   mounted(){

@@ -85,7 +85,7 @@
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark @click="placeBet">Bet {{betAmount}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
                 <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">Battle in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">Payout in progress...</v-btn>
-                <!--<v-btn color="warning">Cannot bet at the moment</v-btn>-->
+                <v-btn v-else-if="data.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over</v-btn>
               </v-form>
             </v-flex>
           </v-card-title>
@@ -263,7 +263,7 @@
     data: () => ({
       currentMyBetPagination: 1,
       currentLatestBetPagination: 1,
-      betAmount: 50,
+      betAmount: 1,
       showBetNextTab: false,
       isLoading: false,
       valid: false,
@@ -277,6 +277,9 @@
       currencyRule: [v => !!v || 'Select a currency',
         //v => v < 50 || 'You don\'t have enough money'
       ],
+
+      gameType: 1,
+      minBet: 50,
       history: [],
       bets: [],
       mapStatus: [],
@@ -329,11 +332,9 @@
           this.snackbarColor = "info";
           this.snackbar = true;
           try {
-            console.log(this.currentTxId)
-            this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.info.gameType, this.currentCountry, this.info.turn).send({
-              callValue: window.tronWeb.toSun(this.info.minBet)
+            this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.gameType, this.currentCountry, this.info.turn).send({
+              callValue: window.tronWeb.toSun(this.betAmount)
             })
-            console.log(this.currentTxId)
           } catch {
             this.isWaitingForConfirm = false;
             this.snackbarColor = "error";
@@ -378,6 +379,12 @@
         this.snackbarTimeout = 2000;
         this.snackbar = true;
       },
+      gameOver(){
+        this.snackbarText = "Game over. Be ready for the next run";
+        this.snackbarColor = "info";
+        this.snackbarTimeout = 2000;
+        this.snackbar = true;
+      },
       getProbability: async function (idCountry){
         let p = await db.ref('countriesMap').orderByKey().equalTo(idCountry.toString()).once('value')
         //let p = Math.random()
@@ -412,10 +419,10 @@
     },
     computed: {
       myBets: function () {
-        return this.bets.filter(bet => bet.from === this.account && bet.gameType == this.info.gameType).reverse()
+        return this.bets.filter(bet => bet.from === this.account && bet.gameType == this.gameType).reverse()
       },
       latestBets: function () {
-        return this.bets.filter(bet => bet.gameType == this.info.gameType).reverse().slice(0,20)
+        return this.bets.filter(bet => bet.gameType == this.gameType).reverse().slice(0,20)
       },
       winChance: function (){
         let country = this.currentCountry

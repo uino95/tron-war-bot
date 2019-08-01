@@ -416,7 +416,7 @@
         return this.$store.state.loggedInAccount;
       },
       availableTRX() {
-        return tronweb.BigNumber(tronweb.toSun(this.betFinalData.jackpot * 0.2));
+        return tronweb.BigNumber(tronweb.toSun(this.data.jackpot * 0.2));
       },
       myWAR() {
         return this.$store.state.currentAddressWarBalance;
@@ -430,7 +430,6 @@
     },
     firebase: {
       referrals: db.ref("referral"),
-      betFinalData: db.ref("betFinalData"),
       data: db.ref("data"),
       fairness: db.ref("fairness")
     },

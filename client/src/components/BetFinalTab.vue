@@ -44,7 +44,7 @@
                   </v-flex>
 
                   <v-flex md3>
-                    <v-text-field :value="betFinal.jackpot?(parseFloat(betFinal.jackpot).toFixed(3) + ' TRX'):'loading...'"
+                    <v-text-field :value="data.jackpot?(parseFloat(data.jackpot).toFixed(3) + ' TRX'):'loading...'"
                       label="Current Jackpot" outline readonly readonly=""></v-text-field>
                   </v-flex>
 
@@ -57,9 +57,10 @@
                   </v-flex>
                 </v-layout>
 
-              <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{betFinal.minBet}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+              <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{this.countriesMap[this.currentCountry].finalQuote}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
               <v-btn v-else-if="data.serverStatus == 300" dark color="primary_final_tab" @click="battleInProgress">Battle in progress...</v-btn>
               <v-btn v-else-if="data.serverStatus == 400" dark color="primary_final_tab" @click="payoutInProgress">Payout in progress...</v-btn>
+              <v-btn v-else-if="data.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over</v-btn>
               <!-- <v-flex md4>
                 <v-btn color="warning">Cannot bet at the moment</v-btn>
               </v-flex> -->
@@ -342,8 +343,10 @@
       currencies: ["TRX", "WAR"],
       currency: "TRX",
       unsortedBetsPerCountry: [],
+      currentTxId: null,
 
-      betFinal: {},
+      minBet: 1,
+      gameType: 0,
       history: [],
       bets: [],
       mapStatus: [],
@@ -354,8 +357,8 @@
     firebase: {
       history: db.ref('history').orderByChild('turn'),
       bets: db.ref('bets').orderByChild('time'),
-      betFinal: db.ref('betFinalData'),
-      data: db.ref('data')
+      data: db.ref('data'),
+      countriesMap: db.ref('countriesMap')
     },
 
     filters: {
@@ -396,8 +399,8 @@
           this.snackbar = true;
           let txId
           try {
-            txId = await this.$store.state.contracts.TronWarBotInstance.bet(this.betFinal.gameType, this.currentCountry, this.data.turn).send({
-              callValue: window.tronWeb.toSun(this.betFinal.minBet)
+            this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.gameType, this.currentCountry, this.data.turn).send({
+              callValue: window.tronWeb.toSun(this.minBet)
             })
           } catch(err) {
             console.log(err)
@@ -444,6 +447,12 @@
         this.snackbarTimeout = 2000;
         this.snackbar = true;
       },
+      gameOver(){
+        this.snackbarText = "Game over. Be ready for the next run";
+        this.snackbarColor = "info";
+        this.snackbarTimeout = 2000;
+        this.snackbar = true;
+      },
       convertResultBet: function (betResult) {
         if (betResult < 0) {
           return '-'
@@ -465,16 +474,16 @@
     watch:{
       myBets: function() {
         let _this = this
-        console.log("ENTRO NEL TIMEOUT")
         if(this.currentTxId !== null){
-          window.tronWeb.trx.getTransaction(this.currentTxId).then((tx) => {
+          const txId = this.currentTxId
+          window.tronWeb.trx.getTransaction(txId).then((tx) => {
             console.log(tx)
             if (tx.ret[0].contractRet == "SUCCESS") {
               _this.snackbarColor = "success";
               _this.snackbarText =
                 `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
               if (window.location.pathname.startsWith('/ref')) {
-                _this.postReferral(this.currentTxId)
+                _this.postReferral(txId)
               }
             } else {
               _this.snackbarText = tx.ret[0].contractRet + "\n Sorry for the inconvinient. Please copy the error and Reach us on Telegram";
@@ -518,13 +527,13 @@
         return arr.sort(compare);
       },
       myBets: function () {
-        return this.bets.filter(bet => (bet.from) === this.account && bet.gameType == this.betFinal.gameType).reverse()
+        return this.bets.filter(bet => (bet.from) === this.account && bet.gameType == this.gameType).reverse()
       },
       //returns an array of objects [{countryId: "id", numberOfBets: x}, ...]
       betsPerCountry: function () {
         // it will contain all the countries for which there is at least one bet
         let countries = []
-        let finalBets = this.bets.filter(bet => bet.gameType == this.betFinal.gameType)
+        let finalBets = this.bets.filter(bet => bet.gameType == this.gameType)
         finalBets.forEach(bet =>{
           countries.push(bet.userChoice)
         })
@@ -544,14 +553,13 @@
         return betsPerCountryList
       },
       latestBets: function () {
-        return this.bets.filter(bet => bet.gameType == this.betFinal.gameType).reverse().slice(0,20)
+        return this.bets.filter(bet => bet.gameType == this.gameType).reverse().slice(0,20)
       },
       calculatePotentialWin: function () {
         if (this.currentCountry == null) return 0;
-        let nextTurn = this.betFinal.nextTurn;
         let bets = this.betsPerCountry
         let betsOnThatCountry = bets.find(el => (el.countryId === this.currentCountry))
-        return ((parseFloat(this.betFinal.jackpot) + this.betFinal.minBet) * (1 - this.betFinal.houseEdge) /
+        return ((parseFloat(this.data.jackpot) + this.minBet) * (1 - this.data.houseEdge) /
           Math.max(betsOnThatCountry.numberOfBets + 1, 1)).toFixed(3) + ' TRX';
       },
       currentCountry: {
