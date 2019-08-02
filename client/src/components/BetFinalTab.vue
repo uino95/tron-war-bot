@@ -45,7 +45,7 @@
 
                   <v-flex md3>
                     <v-text-field :value="data.jackpot?(parseFloat(data.jackpot).toFixed(3) + ' TRX'):'loading...'"
-                      label="Current Jackpot" outline readonly readonly=""></v-text-field>
+                      label="Current Jackpot" outline readonly></v-text-field>
                   </v-flex>
 
                   <v-flex md3>
@@ -399,7 +399,6 @@
       },
       placeBet: async function() {
         this.isWaitingForConfirm = true
-        const _this = this
         if (this.$store.state.loggedInAccount == null) {
           this.snackbarText = "Login First";
           this.snackbarColor = "error";
@@ -414,7 +413,6 @@
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
-          let txId
           try {
             this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.gameType, this.currentCountry, this.data.turn).send({
               callValue: window.tronWeb.toSun(this.countriesMap[this.currentCountry].finalQuote)
