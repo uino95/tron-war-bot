@@ -1,6 +1,7 @@
 const COHESION_BIAS = 0.3;
 const CIVIL_WAR_LIKELIHOOD = 0.2;
 const neighborCountries = require('./map-utilities/neighborCountries');
+const utils = require("./utils");
 
 const initTurnData = () => {
   return {
@@ -83,7 +84,7 @@ const winner = (countriesMap) => {
 }
 
 const computeRandom = (firstEntropy, secondEntropy, thirdEntropy) => {
-  return firstEntropy
+  return utils.randomFromHex(utils.sha256(firstEntropy + secondEntropy + thirdEntropy));
 }
 
 const getIntegerFrom = (random, odds) => {
@@ -165,7 +166,7 @@ const computeNextState = (countriesMap, firstEntropy, secondEntropy) => {
 
   turnData.winner = winner(countriesMap);
 
-  return [countriesMap, turnData]
+  return [countriesMap, turnData, [rand0, rand1, rand2]]
 }
 
 

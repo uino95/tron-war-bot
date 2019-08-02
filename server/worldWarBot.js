@@ -24,8 +24,8 @@ var simulation = false;
 var paused = false;
 
 const currentTurn = () => turn;
-const mapState = () => JSON.parse(JSON.stringify(countriesMap));
 const currentTurnData = () => turnData;
+const mapState = async () => {if (!countriesMap) await init(); return JSON.parse(JSON.stringify(countriesMap));}
 
 // Returns array of countryIndexes
 const conquerableTerritoriesOf = (c) => fairness.conquerableTerritoriesOf(countriesMap, c);
@@ -107,7 +107,7 @@ const updateTurn = () => {
 
 
 // Returns is game over?
-const launchNextTurn = async (rand) => {
+const launchNextTurn = async (_entropy1, _entropy2) => {
   if (!paused) throw "Turn needs to be paused before computing next state.";
   paused = false;
 
@@ -117,8 +117,7 @@ const launchNextTurn = async (rand) => {
   if (fairness.winner(countriesMap)!=null) return true;
 
   // COMPUTE NEW TURN
-  let entropy = rand || Math.random();
-  [countriesMap, turnData] = fairness.computeNextState(countriesMap, entropy, entropy);
+  [countriesMap, turnData, computedRandom] = fairness.computeNextState(countriesMap, (_entropy1 || Math.random()), (_entropy2 || Math.random()));
   turnData.turn = turn - 1;
 
   // UPDATE EXTERNAL DATA
@@ -127,7 +126,6 @@ const launchNextTurn = async (rand) => {
   if (simulation) return turnData.winner != null;
 
   await saveCurrentState();
-  console.log("[WWB]:Random is: " + entropy);
   if (turnData.civilWar) console.log("[WWB]:KABOOM! There was a civil war: " + turnData.o + " rebelled on " + turnData.d);
   console.log("[WWB]:Conquerer is: " + turnData.o + "  on: " + turnData.d + "   from country: " + turnData.ot);
 

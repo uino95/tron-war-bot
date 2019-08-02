@@ -2,7 +2,7 @@
 const TronWeb = require('tronweb');
 const TronGrid = require('trongrid');
 const config = require('./config');
-const BLOCK_CONFIRMATION = config.test ? 2 : 6;
+const BLOCK_CONFIRMATION = config.timing.blockConfirmation;
 
 
 const tronWeb = new TronWeb({
@@ -219,7 +219,7 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
     }
     console.info("[PAYOUT EMPTY]" +
       "\n\tNo winners at this turn. Funds were returned to the jackpot." +
-      "\n\tFunds returned => " +   a.finalJackpot.toString() + " SUN" +
+      "\n\tFunds returned => " +   tronWeb.fromSun(a.finalJackpot.toString()) + " TRX" +
       "\n\tPayout txId => " + txId  );
     return winningBets;
   }
@@ -242,16 +242,16 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
         "\n\tWinning Choice => " +  winningChoice.toString() +
         "\n\tBet txId => " + b.txId +
-        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
-        "\n\tWin => " + win.toString() + " SUN" +
+        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
+        "\n\tWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
         "\n\tPayout txId => " + txId)
     }
     if (skip || tx.ret[0].contractRet!="SUCCESS")
       console.error("[PAYOUT ERROR] - PAYMENT TO USER HAS NOT GONE THROUGH!" +
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
         "\n\tWinning Choice => " +  winningChoice.toString() +
-        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
-        "\n\tExpectedWin => " + win.toString() + " SUN" +
+        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
+        "\n\tExpectedWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
         "\n\tTxId => " + b.txId);
   }
   return winningBets;
@@ -289,8 +289,8 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
   if (!winningBets.length) {
     console.info("[PAYOUT EMPTY]" +
       "\n\tNo winners at this turn." +
-      "\n\tTotal collected funds for this turn => " + a.finalJackpot.toString() + " SUN" +
-      "\n\tCurrent house reserves => " +   a.houseReserves.toString() + " SUN" );
+      "\n\tTotal collected funds for this turn => " + tronWeb.fromSun(a.finalJackpot.toString()) + " TRX" +
+      "\n\tCurrent house reserves => " +    tronWeb.fromSun(a.houseReserves.toString()) + " TRX" );
     return winningBets;
   }
   for (var b of winningBets) {
@@ -311,16 +311,16 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
         "\n\tWinning Choice => " +  winningChoice.toString() +
         "\n\tBet txId => " + b.txId +
-        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
-        "\n\tWin => " + win.toString() + " SUN" +
+        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
+        "\n\tWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
         "\n\tPayout txId => " + txId)
     }
     if (skip || tx.ret[0].contractRet!="SUCCESS")
       console.error("[PAYOUT ERROR] - PAYMENT TO USER HAS NOT GONE THROUGH!" +
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
         "\n\tWinning Choice => " +  winningChoice.toString() +
-        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + b.amount.toString() + " SUN" +
-        "\n\tExpectedWin => " + win.toString() + " SUN" +
+        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
+        "\n\tExpectedWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
         "\n\tTxId => " + b.txId);
   }
   return winningBets;
