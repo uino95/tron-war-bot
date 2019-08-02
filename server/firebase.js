@@ -25,6 +25,7 @@ const out = {
   countriesMap : db.ref('public/countriesMap')
 }
 
+
 out.bets.checkBetOnDb = async (txId) => out.bets.once('value').then((r) => r.child(txId).exists());
 
 out.bets.getCurrentTurnBets = async (gameType, round, turn) => {
@@ -40,6 +41,22 @@ out.bets.getCurrentTurnBets = async (gameType, round, turn) => {
         bets.push(snapshot[key])
       })
     })
+  return bets;
+}
+
+out.bets.getCurrentRoundBets = async (gameType, round) => {
+  var snapshot, bets = []
+  await out.bets.orderByChild("gameType").equalTo(gameType.toString()).once("value")
+    .then(r => {
+      snapshot = r.val()
+      r = Object.keys(snapshot);
+      return r.forEach(key => {
+        if (round && snapshot[key].round.toString() != round.toString()) return;
+        snapshot[key].txId = key
+        bets.push(snapshot[key])
+      })
+    })
+  console.log(bets)
   return bets;
 }
 

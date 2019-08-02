@@ -51,7 +51,7 @@ const gameOver = async () => {
   await sleep(60000);
 
   // GET WINNING BETS
-  var _bets = await firebase.bets.getCurrentTurnBets(0, cr.round);
+  var _bets = await firebase.bets.getCurrentRoundBets(0, cr.round);
 
   await twb.jackpotPayout(0, cr.round, winner, _bets);
   console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
