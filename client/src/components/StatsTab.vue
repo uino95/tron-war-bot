@@ -210,8 +210,8 @@
       mapStatus: []
     }),
     firebase: {
-      history: db.ref('history').orderByChild('turn'),
-      mapStatus: db.ref('countriesMap').orderByChild('territories')
+      history: db.ref('public/history').orderByChild('turn'),
+      mapStatus: db.ref('public/countriesMap').orderByChild('territories')
     },
     methods: {
       getFlagString(str) {

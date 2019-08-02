@@ -17,7 +17,7 @@ export default {
     info: {},
   }),
   firebase: {
-    info: db.ref('data')
+    info: db.ref('public/data')
   },
   props: {
     isTurnTimer: Boolean,

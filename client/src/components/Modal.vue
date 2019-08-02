@@ -266,28 +266,16 @@
                   <span class="title">Previous Turn: {{data.turn}} </span>
                   <br />
                   <v-flex>
-                    <v-text-field ref='blockHash' :append-icon="'content_copy'"
-                      @click:append="copyToClipBoard(fairness.blockHash, 'blockHash')" :value="fairness.blockHash"
-                      :label="'Block Hash of block number ' + fairness.blockNumber" outline readonly>
+                    <v-text-field ref='previousMagicHash' :append-icon="'content_copy'"
+                      @click:append="copyToClipBoard(fairness.previousMagicHash, 'previousMagicHash')" :value="fairness.previousMagicHash"
+                      :label="'Hash of WINNER + SEED '" outline readonly>
                     </v-text-field>
                   </v-flex>
 
-                  <v-layout row wrap>
-                    <v-flex xs12 sm3>
-                      <v-text-field :value="fairness.previousMagicNumber" label="Magic Number" outline readonly />
-                    </v-flex>
-                    <v-spacer />
-                    <v-flex xs12 sm8>
-                      <v-text-field ref='previousMagicNumberHash' :append-icon="'content_copy'"
-                        @click:append="copyToClipBoard(fairness.previousMagicNumberHash, 'previousMagicNumberHash')"
-                        :value="fairness.previousMagicNumberHash" label="Magic Number Hash" outline readonly />
-                    </v-flex>
-                  </v-layout>
-
                   <v-flex>
-                    <v-text-field ref='previousCountriesMap' :append-icon="'content_copy'"
-                      @click:append="copyToClipBoard(fairness.previousCountriesMap, 'previousCountriesMap')"
-                      :value="fairness.previousCountriesMap" label="Map Status Encoded" outline readonly>
+                    <v-text-field ref='magicHashRevealed' :append-icon="'content_copy'"
+                      @click:append="copyToClipBoard(fairness.magicHashRevealed, 'magicHashRevealed')" :value="fairness.magicHashRevealed"
+                      :label="'WINNER + SEED '" outline readonly>
                     </v-text-field>
                   </v-flex>
 
@@ -296,21 +284,9 @@
                   <span class="title">Next Turn: {{data.turn + 1}} </span>
                   <br />
                   <v-flex>
-                    <v-text-field :value="fairness.nextBlock" label="Block at which the next turn will end" outline
-                      readonly>
-                    </v-text-field>
-                  </v-flex>
-
-                  <v-flex>
-                    <v-text-field ref='nextMagicNumberHash' :append-icon="'content_copy'"
-                      @click:append="copyToClipBoard(fairness.nextMagicNumberHash, 'nextMagicNumberHash')"
-                      :value="fairness.nextMagicNumberHash" label="Magic Number Hash " outline readonly />
-                  </v-flex>
-
-                  <v-flex>
-                    <v-text-field ref='nextCountriesMap' :append-icon="'content_copy'"
-                      @click:append="copyToClipBoard(fairness.nextCountriesMap, 'nextCountriesMap')"
-                      :value="fairness.nextCountriesMap" label="Map Status Encoded" outline readonly>
+                    <v-text-field ref='nextMagicHash' :append-icon="'content_copy'"
+                      @click:append="copyToClipBoard(fairness.nextMagicHash, 'nextMagicHash')" :value="fairness.nextMagicHash"
+                      :label="'Hash of WINNER + SEED '" outline readonly>
                     </v-text-field>
                   </v-flex>
 
@@ -429,9 +405,9 @@
       }
     },
     firebase: {
-      referrals: db.ref("referral"),
-      data: db.ref("data"),
-      fairness: db.ref("fairness")
+      referrals: db.ref("public/referral"),
+      data: db.ref("public/data"),
+      fairness: db.ref("public/fairness"),
     },
     methods: {
       copyToClipBoard(value, ref) {

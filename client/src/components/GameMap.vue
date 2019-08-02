@@ -79,7 +79,7 @@
 
     }),
     mounted() {
-      db.ref().on('child_changed', (snapshot) => {
+      db.ref('public').on('child_changed', (snapshot) => {
         let j = this.colors.length
         let data = snapshot.val();
         if (data.length == 241) {
@@ -105,7 +105,7 @@
           //this.polygonSeries.invalidateData()
         }
 
-        // db.ref('countriesMap').orderByKey().equalTo(id).once('value', (snapshotChild) => {
+        // db.ref('public/countriesMap').orderByKey().equalTo(id).once('value', (snapshotChild) => {
         //   let id1 = Object.keys(snapshotChild.val())[0]
         //   var result = this.hexToHsl(this.polygonSeries.data[id1]['color'])
         //   var h = result[0] 
@@ -121,7 +121,7 @@
 
 
 
-      db.ref('countriesMap').once('value', (snapshot) => {
+      db.ref('public/countriesMap').once('value', (snapshot) => {
         let j = this.colors.length
         let data = snapshot.val();
         data.map((el, index) => {

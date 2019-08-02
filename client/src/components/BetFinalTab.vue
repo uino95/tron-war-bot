@@ -57,7 +57,7 @@
                   </v-flex>
                 </v-layout>
 
-              <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{this.countriesMap[this.currentCountry].finalQuote}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+              <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{currentCountry != null ? this.countriesMap[this.currentCountry].finalQuote : ''}} {{currentCountry != null ? currency : ''}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
               <v-btn v-else-if="data.serverStatus == 300" dark color="primary_final_tab" @click="battleInProgress">Battle in progress...</v-btn>
               <v-btn v-else-if="data.serverStatus == 400" dark color="primary_final_tab" @click="payoutInProgress">Payout in progress...</v-btn>
               <v-btn v-else-if="data.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over</v-btn>
@@ -366,16 +366,16 @@
       gameType: 0,
       history: [],
       bets: [],
-      mapStatus: [],
       data:{},
+      countriesMap:[],
       mapping: mapping,
     }),
 
     firebase: {
-      history: db.ref('history').orderByChild('turn'),
-      bets: db.ref('bets').orderByChild('time'),
-      data: db.ref('data'),
-      countriesMap: db.ref('countriesMap')
+      history: db.ref('public/history').orderByChild('turn'),
+      bets: db.ref('public/bets').orderByChild('time'),
+      data: db.ref('public/data'),
+      countriesMap: db.ref('public/countriesMap')
     },
 
     filters: {
@@ -514,35 +514,6 @@
       }
     },
     computed: {
-      countryStatus: function () {
-        let result = [];
-        let arr = [];
-        let tmp = [];
-        for (var i = this.mapStatus.length - 1; i >= 0; i--) {
-          arr.push(this.universalMap(i));
-          for (var j = this.mapStatus.length - 1; j >= 0; j--) {
-            if (this.mapStatus[j]['controlledBy'] === i) {
-              tmp.push(j)
-            }
-          }
-          arr.push(tmp);
-          tmp = [];
-          result.push(arr);
-          arr = []
-        }
-        return result
-      },
-      sortedArray: function () {
-        function compare(a, b) {
-          if (a[1].length > b[1].length)
-            return -1;
-          if (a[1].length < b[1].length)
-            return 1;
-          return 0;
-        }
-        let arr = this.countryStatus;
-        return arr.sort(compare);
-      },
       myBets: function () {
         return this.bets.filter(bet => (bet.from) === this.account && bet.gameType == this.gameType).reverse()
       },

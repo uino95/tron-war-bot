@@ -334,10 +334,10 @@
     }),
 
     firebase: {
-      history: db.ref('history').orderByChild('turn'),
-      bets: db.ref('bets').orderByChild('time'),
-      info: db.ref('data'),
-      mapStatus: db.ref('countriesMap')
+      history: db.ref('public/history').orderByChild('turn'),
+      bets: db.ref('public/bets').orderByChild('time'),
+      info: db.ref('public/data'),
+      mapStatus: db.ref('public/countriesMap')
     },
 
     filters: {
@@ -431,7 +431,7 @@
         this.snackbar = true;
       },
       getProbability: async function (idCountry){
-        let p = await db.ref('countriesMap').orderByKey().equalTo(idCountry.toString()).once('value')
+        let p = await db.ref('public/countriesMap').orderByKey().equalTo(idCountry.toString()).once('value')
         //let p = Math.random()
         //console.log(p.val()[idCountry].probability)
         return p.val()[idCountry].probability

@@ -23,7 +23,7 @@
       history: []
     }),
     firebase: {
-      history: db.ref('history').orderByChild('turn')
+      history: db.ref('public/history').orderByChild('turn')
     },
     computed: {
       infoNewTurn: function () {

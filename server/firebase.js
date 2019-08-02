@@ -17,12 +17,12 @@ const db = admin.database();
 
 const out = {
 	db: db,
-  history : db.ref('history'),
-  bets : db.ref('bets'),
-  data : db.ref('data'),
-  fairness : db.ref('fairness'),
-  referral: db.ref('referral'),
-  countriesMap : db.ref('countriesMap')
+  history : db.ref('public/history'),
+  bets : db.ref('public/bets'),
+  data : db.ref('public/data'),
+  fairness : db.ref('public/fairness'),
+  referral: db.ref('public/referral'),
+  countriesMap : db.ref('public/countriesMap')
 }
 
 out.bets.checkBetOnDb = async (txId) => out.bets.once('value').then((r) => r.child(txId).exists());

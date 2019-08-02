@@ -10,7 +10,7 @@
       info: {},
     }),
     firebase: {
-      info: db.ref('data')
+      info: db.ref('public/data')
     },
     computed:{
       timerValue: function() {
