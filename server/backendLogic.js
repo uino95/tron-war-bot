@@ -11,9 +11,15 @@ const config = require('./config')
 const utils = require('./utils')
 
 const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
 const toPercent = (n) =>(n * 100).toFixed(2) + "%"
 
+const PROCESSING_TIME = config.test ? 5 : 10;
+const STOP_BET_MARGIN = config.test ? 5 : 10;
+const NET_TURN_DURATION = (config.timing.turn - (config.timing.blockConfirmation * 3) - PROCESSING_TIME - STOP_BET_MARGIN) * 1000;
+const STOP_BET_DURATION = ((config.timing.blockConfirmation * 3) + STOP_BET_MARGIN)  * 1000;
+
+console.log("[TIMING]: Net turn duration is: " + (NET_TURN_DURATION/1000) + "s");
+console.log("[TIMING]: Stop bet duration is: " + (STOP_BET_DURATION/1000) + "s");
 
 async function notifyTelegramBot(d) {
   if (config.test) return;
@@ -63,12 +69,12 @@ const updateResultsOnDB = (_b, _wb) => {
   _b.forEach(b =>{firebase.bets.child(b.txId).update({result: (_wb[b.txId] ? _wb[b.txId].win : 0)})})
 }
 
-const stopBets = async () => {
+const stopBets = async (waitTime) => {
   if (wwb.winner()) return;
   // STOP BET BUTTON
   await firebase.data.update({serverStatus: 300})
   // AWAIT FOR DATA PROPAGATION AND BET HALT
-  await sleep(config.test ? 5000 : 30000);
+  await sleep(waitTime || 0);
   //UPDATE TURN CURRENT WHICH PREVENTS BET SLIPPAGE
   wwb.updateTurn();
 }
@@ -76,19 +82,47 @@ const stopBets = async () => {
 const simulateNextTurn = async () => {
   if (wwb.winner()) return;
   // CALCULATE MAGIC NUMBER AND SEED
-  var magic = Math.random();
+  let turn = wwb.currentTurn();
+  let currentSecret = await firebase.secret.once('value').then(r=>r.val());
+  var magic = utils.randomHex();
   var seed = utils.randomHex();
+  if (turn == currentSecret.turn) {
+    magic = currentSecret.magic;
+    seed = currentSecret.seed;
+  }
   // SAVE MAGIC NUMBER AND SEED
-  await firebase.fairness.update({magic, seed});
+  else await firebase.secret.update({turn, magic, seed});
   // SIMULATE TURN
-  [ , turnData] = fairness.computeNextState(wwb.mapState(), magic, magic);
+  var cMap = await wwb.mapState();
+  [ cMap , turnData, computedRandom] = fairness.computeNextState(cMap, magic, seed);
   // EVALUATE WINNER
-  console.log("[SIMULATE]: Winner on next round is: " + turnData.o + " => " + utils.universalMap(turnData.o));
+  var stringToHash = utils.universalMap(turnData.o) + "(" + turnData.o + "):"  + seed;
+  console.log("[SIMULATE]: Winner on turn " + turn + " is => " + utils.universalMap(turnData.o) + "("+ turnData.o +") with computed randoms: " + JSON.stringify(computedRandom));
   // COMPUTE SHA256 (WINNER + SEED)
-  console.log("Computing SHA256 of " + utils.universalMap(turnData.o) + seed);
-  let magicHash = utils.sha256(utils.universalMap(turnData.o) + seed);
+  // console.log("Computing SHA256 of:     " + stringToHash);
+  let nextMagicHash = utils.sha256(stringToHash);
+  // console.log("SHA256 is " + nextMagicHash);
   // SAVE SHA256
-  await firebase.data.update({magicHash});
+  await firebase.fairness.update({nextMagicHash});
+  return [magic, seed];
+}
+
+const revealFairWinner = async () => {
+  let turnData = wwb.currentTurnData();
+  let currentSecret = await firebase.secret.once('value').then(r=>r.val());
+
+  if (turnData.turn != currentSecret.turn) return console.error("[LOGIC]: We have overlapping turns. Make sure to reveal winner prior to launch next turn!");
+
+  let currentFairness = await firebase.fairness.once('value').then(r=>r.val());
+
+  console.log("[LOGIC]: Winner on current turn is: " + turnData.o + " => " + utils.universalMap(turnData.o));
+  let seed = currentSecret.seed;
+  let magicHashRevealed = utils.universalMap(turnData.o) + "(" + turnData.o + "):"  + seed;
+  console.log("Computing SHA256 of:    " + magicHashRevealed);
+  let previousMagicHash = utils.sha256(magicHashRevealed);
+  if (previousMagicHash != currentFairness.nextMagicHash) console.error("[FAIRNESS]: I don't think that is a really fair game... Hope noone notices that... Shh!!");
+  console.log("SHA256 is " + previousMagicHash);
+  await firebase.fairness.update({previousMagicHash, magicHashRevealed});
 }
 
 
@@ -97,16 +131,26 @@ const simulateNextTurn = async () => {
 
 module.exports.launchNextTurn = async () =>{
   if (wwb.winner()) return;
-  console.log("[SCHEDULER]: Launching next turn!")
+  console.log("\n[SCHEDULER]: ******** Launching next turn! **********");
 
-  await stopBets();
+  // CAN PLACE BETS
+  let nextTurnTime = (new Date()).valueOf() + NET_TURN_DURATION;
+  await firebase.data.update({ serverStatus: 200, nextTurnTime });
+
+  [magic, seed] = await simulateNextTurn();
+
+  await sleep(NET_TURN_DURATION);
+
+  console.log("!!!!!! Declaring winner in seconds! DO NOT STOP SERVER NOW (please) !!!!!!!")
+  // READY TO LAUNCH TURN
+  await stopBets(STOP_BET_DURATION);
+
 
   // GET CURRENT BET RATES AND MAP
-  var cMap = wwb.mapState();
-  var go = await wwb.launchNextTurn();
+  var cMap = await wwb.mapState();
+  var go = await wwb.launchNextTurn(magic, seed);
 
-  // STOP GAME BETS
-  if (go) await stopGame();
+
 
   // GET WINNER AND UPDATES
   var data = wwb.currentTurnData();
@@ -123,16 +167,23 @@ module.exports.launchNextTurn = async () =>{
     civilWar: data.civilWar
   });
 
+  // REVEAL FAIRNESS
+  await revealFairWinner();
 
   // **** PAYOUT FOR GAME 1 AGAINST DEALER **** //
+  console.log("[SCHEDULER]: ########### Critical turn operations completed! ###########\n");
 
-  // GET CURRENT TURN BETS
-  var _bets = await firebase.bets.getCurrentTurnBets(1, cr.round, data.turn);
+  // STOP GAME BETS
+  if (go) await stopGame();
+
   // COMMUNICATE WINNER
   notifyTelegramBot(data);
 
-  // CAN PLACE BETS
-  await firebase.data.update({ serverStatus: 200 });
+  console.log("\n[SCHEDULER]: ----- Running payouts! ------");
+  // GET CURRENT TURN BETS
+  var _bets = await firebase.bets.getCurrentTurnBets(1, cr.round, data.turn);
+
+
   // PAYOUT
   const winningBets = await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
   // UPDATE RESULTS BET ON DB
@@ -140,7 +191,7 @@ module.exports.launchNextTurn = async () =>{
   // PAYOUT FINAL
   if (go) gameOver();
 
-  console.log("[SCHEDULER]: Next turn complete!");
+  console.log("[SCHEDULER]: ----- Payout finished! ------\n");
 }
 
 

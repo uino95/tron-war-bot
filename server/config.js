@@ -45,9 +45,18 @@ const config = {
   telegram:{
     token: process.env.TELEGRAM_TOKEN,
     group: process.env.TELEGRAM_GROUP || -331523835,
-  }
+  },
+  timing: {
+    turn: 300,
+    blockConfirmation: 6
+  },
+  timingTest: {
+    turn: 30,
+    blockConfirmation: 2
+  },
 }
 
 if (config.test) config.tron = config.tronTest;
+if (config.test) config.timing = config.timingTest;
 
 module.exports = config;

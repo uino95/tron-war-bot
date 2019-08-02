@@ -17,6 +17,7 @@ const db = admin.database();
 
 const out = {
 	db: db,
+  secret: db.ref('secret'),
   history : db.ref('public/history'),
   bets : db.ref('public/bets'),
   data : db.ref('public/data'),

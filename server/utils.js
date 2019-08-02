@@ -1,4 +1,5 @@
-const mapping = require( './map-utilities/mapping')
+const mapping = require( './map-utilities/mapping');
+const crypto = require('crypto');
 
 module.exports = {
     universalMap: function(id,to){
@@ -19,12 +20,15 @@ module.exports = {
 	},
 	sleep: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
   sha256: (e) =>{
-    return e;
+    return crypto.createHmac('sha256', "").update(e).digest('hex');
   },
-  randomFromSHA: (e)=> {
-    return e;
+  randomFromHex: (e)=> {
+    return parseFloat("0."+ parseInt(e.substr(0,16),16).toString());
   },
-  randomHex: ()=>{
-    return Math.random();
+  randomHex: (len = 12) => {
+    return crypto
+      .randomBytes(Math.ceil(len / 2))
+      .toString('hex') // convert to hexadecimal format
+      .slice(0, len) // return required number of characters
   }
 }
