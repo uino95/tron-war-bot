@@ -1,8 +1,10 @@
 // SIMULATION PARAMS
-const SIMULATIONS = 10;
+const SIMULATIONS = 100;
+const EXPECTED_TURN_DURATION = 300;
 // DB interface
 const firebase = require('./firebase')
 const t = require('./tronWarBot')
+const utils = require('./utils')
 const fairness = require('./fairness')
 const neighborCountries = require('./map-utilities/neighborCountries');
 const COUNTRIES = neighborCountries.length;
@@ -54,7 +56,7 @@ const init = async (restart) => {
   });
   if (!restart) countriesMap = await loadSavedState();
   if (!restart) turn = await loadSavedTurn();
-  ROUND = await t.getCurrentRound(0).then(r=>r.round);
+  if (!simulation) ROUND = await t.getCurrentRound(0).then(r=>r.round);
   if (!simulation && restart) return await saveCurrentState();
 };
 
@@ -117,13 +119,14 @@ const launchNextTurn = async (_entropy1, _entropy2) => {
   if (fairness.winner(countriesMap)!=null) return true;
 
   // COMPUTE NEW TURN
-  [countriesMap, turnData, computedRandom] = fairness.computeNextState(countriesMap, (_entropy1 || Math.random()), (_entropy2 || Math.random()));
+  [countriesMap, turnData, computedRandom] = fairness.computeNextState(countriesMap, (_entropy1 || utils.randomHex()), (_entropy2 || utils.randomHex()));
   turnData.turn = turn - 1;
+
+  if (simulation) return turnData.winner != null;
 
   // UPDATE EXTERNAL DATA
   await updateExternalData(turnData.o, turnData.d, turnData.ot, turnData.dt);
 
-  if (simulation) return turnData.winner != null;
 
   await saveCurrentState();
   if (turnData.civilWar) console.log("[WWB]:KABOOM! There was a civil war: " + turnData.o + " rebelled on " + turnData.d);
@@ -142,19 +145,24 @@ const simulate = async () => {
   var cohesion = new Array(COUNTRIES).fill(0);
   var rounds = 0;
   var maxRounds = 0;
+  var minRounds = 99999999;
   var civilWars = 0;
   simulation = true;
   for (var i=0; i<SIMULATIONS; i++){
     init(true);
-    while (!!(await launchNextTurn())) {
+    let go
+    do {
+      updateTurn();
+      go = await launchNextTurn()
       let d = currentTurnData()
       civilWars += d.civilWar;
       conquest[d.o] += 1;
       cohesion = cohesion.map((e,idx)=> e + countriesMap[idx].cohesion);
-    };
+    } while (!go);
     let c_tot = countriesMap.reduce((acc, c) => acc + c.cohesion, 0);
     console.log("[WWB]:Winner is:  " + winner() + " in turns: " + turn + "  g_cohesion: " + (c_tot/COUNTRIES).toFixed(4));
-    if (turn> maxRounds) maxRounds = turn;
+    if (turn > maxRounds) maxRounds = turn;
+    if (turn < minRounds) minRounds = turn;
     wins[winner()]+=1;
     rounds += turn;
   }
@@ -162,12 +170,12 @@ const simulate = async () => {
   cohesion = cohesion.map((e,idx)=> e / rounds);
   conquest = conquest.map((e,idx)=> e / SIMULATIONS);
   console.log("[WWB]:###########  Results ###########")
-  console.log("[WWB]:Average turns: " + rounds/SIMULATIONS);
-  console.log("[WWB]:Max turn: " + maxRounds);
+  console.log("[WWB]: Wins:   Conquest:   \tAvg.Cohesion: ")
+  wins.forEach((c,idx)=>{if (c) console.log(idx + " => \t" + c + "    \t" + (conquest[idx]).toFixed(2) + "    \t" + (cohesion[idx]).toFixed(5))});
+  console.log("\n\n[WWB]: Turns => min: " + minRounds + "  avg: " + rounds/SIMULATIONS + "  max:" + maxRounds);
   console.log("[WWB]:Average civil wars: " + civilWars/SIMULATIONS);
   console.log("[WWB]:Civil wars a posteriori likelihood: " + (civilWars/rounds).toFixed(3));
-  console.log("[WWB]: Wins:   Conquest:   \tCohesion: ")
-  wins.forEach((c,idx)=>console.log(idx + " => \t" + c + "    \t" + (conquest[idx]).toFixed(2) + "    \t" + (cohesion[idx]).toFixed(5)));
+  console.log("\n[WWB]: Expected full run duration: " + ((EXPECTED_TURN_DURATION * rounds/SIMULATIONS)/86400).toFixed(2) + " days");
 }
 
 module.exports = {

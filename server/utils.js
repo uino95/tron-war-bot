@@ -20,7 +20,7 @@ module.exports = {
 	},
 	sleep: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
   sha256: (e) =>{
-    return crypto.createHmac('sha256', "").update(e).digest('hex');
+    return crypto.createHmac('sha256', "").update(e.toString()).digest('hex');
   },
   randomFromHex: (e)=> {
     return parseFloat("0."+ parseInt(e.substr(0,16),16).toString());
