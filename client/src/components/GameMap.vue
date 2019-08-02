@@ -7,8 +7,7 @@
     create,
     Button,
     Sprite,
-    useTheme,
-    FontWeight
+    useTheme
   } from "@amcharts/amcharts4/core";
   import {
     MapChart,

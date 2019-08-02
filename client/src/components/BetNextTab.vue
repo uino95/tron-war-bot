@@ -359,7 +359,6 @@
     methods: {
 
       async placeBet() {
-        const _this = this
         this.isWaitingForConfirm = true
         if (this.$store.state.loggedInAccount == null) {
           this.snackbarText = "Login First";

@@ -2,7 +2,6 @@
   <v-container v-if="infoNewTurn != null && showAlert==true">
     <v-alert
       v-model="showAlert"
-      dismissible
       transition="scale-transition"
       color="primary_next_tab"
     >
@@ -28,10 +27,12 @@
     computed: {
       infoNewTurn: function () {
         let infoTurn = this.history.slice().reverse()[0]
-        if(infoTurn != null){
-          this.showAlert = true
-          return infoTurn
-        }
+        return infoTurn
+      }
+    },
+    watch:{
+      history: function() {
+        this.showAlert = true
       }
     }
   }

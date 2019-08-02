@@ -6,7 +6,7 @@
       <v-flex sm12 md6 lg5 shrink>
         <v-card>
           <v-toolbar color="primary_stats_tab" dark>
-            <v-toolbar-title>Current Run Stats</v-toolbar-title>
+            <v-toolbar-title>Current Run Status</v-toolbar-title>
           </v-toolbar>
 
           <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
@@ -71,7 +71,7 @@
         <v-card>
 
           <v-toolbar color="primary_stats_tab" dark>
-            <v-toolbar-title>History</v-toolbar-title>
+            <v-toolbar-title>Current Run History</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
 
