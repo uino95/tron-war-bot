@@ -5,6 +5,7 @@ const EXPECTED_TURN_DURATION = 300;
 const firebase = require('./firebase')
 const t = require('./tronWarBot')
 const utils = require('./utils')
+const config = require('./config')
 const fairness = require('./fairness')
 const neighborCountries = require('./map-utilities/neighborCountries');
 const COUNTRIES = neighborCountries.length;
@@ -172,10 +173,11 @@ const simulate = async () => {
   console.log("[WWB]:###########  Results ###########")
   console.log("[WWB]: Wins:   Conquest:   \tAvg.Cohesion: ")
   wins.forEach((c,idx)=>{if (c) console.log(idx + " => \t" + c + "    \t" + (conquest[idx]).toFixed(2) + "    \t" + (cohesion[idx]).toFixed(5))});
-  console.log("\n\n[WWB]: Turns => min: " + minRounds + "  avg: " + rounds/SIMULATIONS + "  max:" + maxRounds);
+  console.log("\n[WWB]: Using Cohesion Bias: " + config.wwb.cohesionBias + " and civil War Likelihood: " + config.wwb.civilWarLikelihood);
+  console.log("\n[WWB]: Turns => min: " + minRounds + "  avg: " + rounds/SIMULATIONS + "  max:" + maxRounds);
   console.log("[WWB]:Average civil wars: " + civilWars/SIMULATIONS);
-  console.log("[WWB]:Civil wars a posteriori likelihood: " + (civilWars/rounds).toFixed(3));
-  console.log("\n[WWB]: Expected full run duration: " + ((EXPECTED_TURN_DURATION * rounds/SIMULATIONS)/86400).toFixed(2) + " days");
+  console.log("[WWB]:Civil wars a posteriori likelihood: " + (civilWars*100/rounds).toFixed(2) + "%");
+  console.log("\n[WWB]: Expected full run duration: (" + ((EXPECTED_TURN_DURATION * minRounds)/86400).toFixed(2) + ") => " + ((EXPECTED_TURN_DURATION * rounds/SIMULATIONS)/86400).toFixed(2) + " => (" + ((EXPECTED_TURN_DURATION * maxRounds)/86400).toFixed(2) +")  days\n\n");
 }
 
 module.exports = {

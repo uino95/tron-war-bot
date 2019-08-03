@@ -1,5 +1,6 @@
-const COHESION_BIAS = 0.3;
-const CIVIL_WAR_LIKELIHOOD = 0.2;
+const config = require("./config");
+const COHESION_BIAS = config.wwb.cohesionBias;
+const CIVIL_WAR_LIKELIHOOD = config.wwb.civilWarLikelihood;
 const neighborCountries = require('./map-utilities/neighborCountries');
 const utils = require("./utils");
 
@@ -84,7 +85,7 @@ const winner = (countriesMap) => {
 }
 
 const computeRandom = (firstEntropy, secondEntropy, thirdEntropy) => {
-  return utils.randomFromHex(utils.sha256(firstEntropy + secondEntropy + thirdEntropy));
+  return utils.randomFromHex(firstEntropy.toString(16) + secondEntropy.toString(16) + thirdEntropy.toString(16));
 }
 
 const getIntegerFrom = (random, odds) => {
