@@ -131,7 +131,7 @@ const revealFairWinner = async () => {
 
 module.exports.launchNextTurn = async () =>{
   if (wwb.winner()) return;
-  console.log("\n[SCHEDULER]: ******** Launching next turn! **********");
+  console.log("\n[SCHEDULER]: ********* Launching next turn! *********");
 
   // CAN PLACE BETS
   let nextTurnTime = (new Date()).valueOf() + NET_TURN_DURATION;
@@ -171,7 +171,7 @@ module.exports.launchNextTurn = async () =>{
   await revealFairWinner();
 
   // **** PAYOUT FOR GAME 1 AGAINST DEALER **** //
-  console.log("[SCHEDULER]: ########### Critical turn operations completed! ###########\n");
+  console.log("[SCHEDULER]: ********* Critical turn operations completed! *********\n");
 
   // STOP GAME BETS
   if (go) await stopGame();

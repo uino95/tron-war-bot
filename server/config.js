@@ -54,6 +54,10 @@ const config = {
     turn: 30,
     blockConfirmation: 2
   },
+  wwb:{
+    cohesionBias: 0.51,
+    civilWarLikelihood: 0.35
+  }
 }
 
 if (config.test) config.tron = config.tronTest;

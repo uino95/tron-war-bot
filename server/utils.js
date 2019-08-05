@@ -1,7 +1,7 @@
 const mapping = require( './map-utilities/mapping');
 const crypto = require('crypto');
 
-module.exports = {
+const utils = {
     universalMap: function(id,to){
 		switch(to){
 			case 'name':
@@ -20,15 +20,20 @@ module.exports = {
 	},
 	sleep: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
   sha256: (e) =>{
-    return crypto.createHmac('sha256', "").update(e).digest('hex');
+    return crypto.createHash("sha256").update(e.toString()).digest('hex');
+  },
+  randomFromSHA: (e)=> {
+    return parseInt(e, 16) / Math.pow(2, 256)
   },
   randomFromHex: (e)=> {
-    return parseFloat("0."+ parseInt(e.substr(0,16),16).toString());
+    return utils.randomFromSHA(utils.sha256(e));
   },
-  randomHex: (len = 12) => {
+  randomHex: (len = 16) => {
     return crypto
       .randomBytes(Math.ceil(len / 2))
       .toString('hex') // convert to hexadecimal format
       .slice(0, len) // return required number of characters
   }
 }
+
+module.exports = utils;
