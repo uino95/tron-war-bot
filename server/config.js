@@ -55,8 +55,8 @@ const config = {
     blockConfirmation: 2
   },
   wwb:{
-    cohesionBias: 0.51,
-    civilWarLikelihood: 0.35
+    cohesionBias: 0.41,
+    civilWarLikelihood: 0.25
   }
 }
 
