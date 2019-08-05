@@ -50,7 +50,7 @@ const countriesStillAlive = (countriesMap) => {
 
 const rawPdf = (countriesMap) => {
   return countriesMap.map((c,idx)=>{
-    let pOfConquest = Math.min(conquerableTerritoriesOf(countriesMap, idx).length,1) * countriesMap[c.occupiedBy].cohesion;
+    let pOfConquest = Math.min(conquerableTerritoriesOf(countriesMap, idx).length,1) * countriesMap[c.occupiedBy].cohesion * (1 - CIVIL_WAR_LIKELIHOOD);
     let pOfCivilWar =  (c.occupiedBy != idx ? 1 : 0) * c.cohesion * CIVIL_WAR_LIKELIHOOD;
     return [pOfConquest,  pOfCivilWar];
   })
@@ -105,10 +105,10 @@ const updateCohesion = (countriesMap, turnData, random) => {
   let c_d = countriesMap[d].cohesion - 0.5;
   let c_ot = countriesMap[ot].cohesion - 0.5;
   let c_dt = countriesMap[dt].cohesion - 0.5;
-  let delta_o = (rnd - c_ot - c_d - c_dt) * o_amp;
-  let delta_d = (rnd + c_ot - c_o - c_dt) * d_amp;
-  let delta_ot = (rnd - c_o + c_d + c_dt) * o_amp;
-  let delta_dt = (rnd - c_o + c_d + c_ot) * d_amp;
+  let delta_o =  (rnd + (-c_ot - c_d - c_dt)/3) * o_amp;
+  let delta_d =  (rnd + (c_ot - c_o - c_dt)/3) * d_amp;
+  let delta_ot = (rnd + (-c_o + c_d + c_dt)/3) * o_amp;
+  let delta_dt = (rnd + (-c_o + c_d + c_ot)/3) * d_amp; 
   let new_o = countriesMap[o].cohesion + delta_o;
   let new_d = countriesMap[d].cohesion + delta_d;
   let new_ot = countriesMap[ot].cohesion + delta_ot;
