@@ -196,19 +196,16 @@
           <v-expansion-panel>
             <v-expansion-panel-content>
               <template v-slot:header>
-                <div>How are we provably fair?</div>
+                <div>How are we PROVABLY FAIR?</div>
               </template>
               <v-card>
                 <v-card-text>
-                  We are crystal clear. We care about making things right. Here is we provide the details to check that we are PROVABLY FAIR.
-                  <br />
-                  Below you can find 3 box. The first one contains the sha256 hash of the content of the second box, 
-                  which is a string containing the name of the of the previous turn winner with its identifier, followed by 
-                  a random salt.
-                  The third box contains the hash of the next turn winner (formatted in the same manner of the second box).
-                  <br />
-                  Basically at the end of each turn we simulate the winner of the next turn and then we hash it and publish it
-                  here. so you can easily verify that we are fair with you.
+                  We are crystal clear. We care about making things right. Here is how we provide the details to check that we are <a href="https://en.wikipedia.org/wiki/Provably_fair" targte="_blank">provably fair</a>.
+                  <br /><br />
+                  At the very beginning of a turn the Bot decides which country will conquer next. The Bot will hash (sha256) the name of the winner + a random string (called seed or salt in cryptography). You can find that hash in the box under Next Turn.<br>
+                  Once the timer runs out, the battle takes place and the conqueror is revelead alogside that seed used to compute the hash. You will then find the initial hash and the Conqueror + its seed under Previus Turn.
+                  <br/><br/>
+                  This way we prove the Bot truly picks the countries in a random manner and doesn't "change its mind" on the way! And this is done in a way you can easily check, that is use any sha256 online tool like the one suggested below.
                   <br />
                   <v-divider mt-3 />
                   <br />
@@ -245,7 +242,7 @@
                       If you want to check the correcteness of the hash, we suggest you to use the following sha256 online calculator, but you can whatever tool you prefer.
                     </v-card-text>
                     <v-chip label outline color="primary" style="margin-left:4.5em;">
-                      <a href="https://emn178.github.io/online-tools/sha256.html">https://emn178.github.io/online-tools/sha256.html</a>
+                      <a href="https://emn178.github.io/online-tools/sha256.html" target="_blank">https://emn178.github.io/online-tools/sha256.html</a>
                     </v-chip>
                   </v-card>
                 </v-card-text>
@@ -436,7 +433,11 @@
                             select Energy instead of Bandwidth. If you are not going to be executing smart contracts,
                             there is no reason why you should select Energy. Those who are just TRX investors or users
                             should always select Bandwidth and not Energy when freezing their tokens.`
-        }
+        },
+        {
+          question: "Couldn't find your answer?",
+          answer: "Please reach us out on the telegram group (please find the link on the bottom side of the menu)! We would be very happy to answer your questions :)"
+        },
       ]
     })
   };
