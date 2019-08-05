@@ -14,13 +14,13 @@
             <v-data-table :headers="headers" :items="mapStatus" class="elevation-1" :pagination.sync="pagination" :rows-per-page-items="[5,10]">
               <template v-slot:items="props" >
                 <td class="text-xs-right">
-                  <v-avatar>
-                      <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                  <v-avatar >
+                      <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
                         :src="getFlagString(universalMap(props.item['.key']))"
                         :alt="universalMap(props.item['.key'])" />
                     </v-avatar>
                 </td>  
-                <td class="text-xs-right">{{ universalMap(props.item['.key'])}}</td>
+                <td class="text-xs-right && font-weight-bold">{{ universalMap(props.item['.key'])}}</td>
                 <td class="text-xs-right">{{ props.item.territories }}</td>
                 <td class="text-xs-right">{{ (props.item.cohesion * 100).toFixed(2) + ' %'}}</td>
                 <td class="text-xs-right">{{ (props.item.probability * 100).toFixed(2) + ' %'}}</td>
@@ -185,20 +185,28 @@
       {
         text: 'Country',
         value: 'country',
-        sortable: false
+        sortable: false,
+        align:'right',
+        class: 'title'
       }, {
         text: 'Territories',
         value: 'territories',
         sortable: true,
+        align:'right',
+        class: 'title'
       }, {
         text: 'Cohesion',
         value: 'cohesion',
-        sortable: true
+        sortable: true,
+        align:'right',
+        class: 'title'
       },
       {
-        text: 'Probability',
+        text: 'Next Conquer %',
         value: 'probability',
-        sortable: true 
+        sortable: true ,
+        align:'right',
+        class: 'title'
       }],
       pagination:{
         sortBy: 'territories',
@@ -213,7 +221,7 @@
       snackbarColor: "",
       snackbarTimeout: 6000,
       history: [],
-      mapStatus: []
+      mapStatus: [],
     }),
     firebase: {
       history: db.ref('public/history').orderByChild('turn'),
