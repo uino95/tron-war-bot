@@ -26,14 +26,26 @@ async function notifyTelegramBot(d) {
   if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
 
   var j = await twb.twb.jackpot(0).call();
-  j = twb.tronWeb.fromSun(j.toString())
+  j = twb.tronWeb.fromSun(j.toString());
+
+  let leaderboard = wwb.leaderboard();
+  let countriesStillAlive = wwb.countriesStillAlive();
 
   let s = "🌎♟ <b>BATTLE " + d.turn + "</b>♟🌎\n"
   if (!d.civilWar) {
     s += "<b>⚔️💣 " + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.o) + ")</b> conquered <b>" + utils.universalMap(d.dt) + " (" + toPercent(d.cohesion.dt) + ")</b> 💣⚔️\n";
     s += "<i>Previously owned by " + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</i>\n\n"
-  } else s += "⚒<b>" + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.d) + ")</b> rebelled on the oppressor <b>" + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</b>⚒"
-  s += "Current jackpot on the full run: <b>" + j + " TRX</b>\n";
+  } else {
+    s += "⚒<b>" + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.d) + ")</b> rebelled on the oppressor <b>" + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</b>⚒\n"
+    s += "✨🍀 <b>Long live " + utils.universalMap(d.o) + "!! </b> 🍀✨\n\n"
+  }
+  s += "There are still <b>" + countriesStillAlive.length + "</b> countries alive!\n\n"
+  s += "<b>" + utils.universalMap(leaderboard[0].idx) + " </b> is dominating with <b>" +leaderboard[0].territories + "</b>/241 controlled territories and it will conquer the world with the <b>~ " + (leaderboard[0].probability * 100).toFixed(2) +"%</b> chance\n";
+  s += "Current jackpot on the full run: <b>" + j + " TRX</b>\n\n";
+  s += "Who will conquer the world for you?? <b>Do not miss out!</b>\n";
+  s += "👇👇👇 Place your bet to <b>WIN</b> the full pot! 👇👇👇 ";
+
+
   let m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};
   let uri = "https://api.telegram.org/bot" + config.telegram.token + "/";
   uri += "sendMessage?chat_id=" + config.telegram.group;
@@ -234,3 +246,5 @@ module.exports.watchBet = function () {
     console.info("Successfully registered bet in tx " + r.transaction + " at " + betTime)
   });
 }
+
+module.exports.notifyTelegramBot = notifyTelegramBot;

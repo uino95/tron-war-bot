@@ -80,6 +80,14 @@ const printStatus = ()=>{
   countriesMap.forEach((c,idx)=>console.log(idx + " => " + c.occupiedBy + "  cohesion:" + c.cohesion.toFixed(4)));
 }
 
+const leaderboard = ()=>{
+  return countriesMap.map((e,idx)=>{
+    e.idx = idx;
+    return e;
+  }).sort((a, b)=>{
+    return b.territories - a.territories;
+  });
+}
 
 const updateExternalData = async (conquerer, conquered, conquererTerritory, conqueredTerritory) => {
   // UPDATE TERRITORIES
@@ -185,8 +193,10 @@ module.exports = {
   currentTurn,
   currentTurnData,
   mapState,
+  leaderboard,
   updateTurn,
   launchNextTurn,
+  countriesStillAlive,
   conquerableTerritoriesOf,
   conqueredTerritoriesOf,
   countriesOnTheBorders,
