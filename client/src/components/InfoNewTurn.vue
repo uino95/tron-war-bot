@@ -1,10 +1,11 @@
 <template>
-    <v-alert class="mt-0" v-if="infoNewTurn != null && showAlert==true"
+    <v-alert class="mt-0 card-rounded" v-if="infoNewTurn != null && showAlert==true"
       v-model="showAlert"
       transition="scale-transition"
       color="primary_next_tab"
     >
-      New conquest: Turn  <b>{{infoNewTurn.turn}}</b>  - <b>{{universalMap(infoNewTurn.conquest[0])}}</b> has conquered  <b>{{universalMap(infoNewTurn.conquest[1])}}</b> previously owned by <b>{{universalMap(infoNewTurn.prev)}}</b>
+      <div class="text-xs-center"> Latest conquest: Turn  {{infoNewTurn.turn}}  - <b>{{universalMap(infoNewTurn.conquest[0])}}</b> has conquered  <b>{{universalMap(infoNewTurn.conquest[1])}}</b> previously owned by <b>{{universalMap(infoNewTurn.prev)}}</b>
+      </div>
     </v-alert>
 </template>
 
@@ -37,5 +38,10 @@
 </script>
 
 <style scoped>
-
+  .card-rounded {
+    height: 40%;
+    width: 95%;
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+  }
 </style>
