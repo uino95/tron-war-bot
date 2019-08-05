@@ -92,7 +92,7 @@ export default {
     tronLinkStatus: null,
     selected_country: null,
     menuItems: [{
-        heading: 'Wallet Login'
+        heading: 'My Info'
       },
       {
         icon: 'fa-paper-plane',

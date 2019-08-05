@@ -545,7 +545,7 @@
         if (this.currentCountry == null) return 0;
         let bets = this.betsPerCountry
         let betsOnThatCountry = bets.find(el => (el.countryId === this.currentCountry))
-        return ((parseFloat(this.data.jackpot) + this.minBet) * (1 - this.data.houseEdge) /
+        return ((parseFloat(this.data.jackpot) + this.minBet) * (1 - this.data.houseEdge) * 1 /
           Math.max(betsOnThatCountry.numberOfBets + 1, 1)).toFixed(3) + ' TRX';
       },
       currentCountry: {

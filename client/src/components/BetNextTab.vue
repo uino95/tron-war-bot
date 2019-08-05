@@ -19,7 +19,7 @@
                 <template v-slot:activator="{ on }">
                   <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
                 </template>
-                <span>Here you can bet on the next conqueror</span>
+                <span>If you feel like who the next Conqueror is going to be, you came to the right place. Every 5 mins the Bot spits out one new Battle. Bet on who will make the conquer next in this tab.</span>
               </v-tooltip>
             </v-toolbar-title>
             <v-spacer></v-spacer>
