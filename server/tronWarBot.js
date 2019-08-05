@@ -179,7 +179,7 @@ module.exports.availableJackpot = async function (gameType, gameRound) {
 //4. FOR EACH WINNING BET DIVIDE THE BET AMOUNT FOR THE WINNING AMOUNT
 //5. MULTIPLIES FOR THE AVAILABLE JACKPOT
 //6. PAYOUT LOOP
-module.exports.jackpotPayout = async function (gameType, gameRound, winningChoice, _bets=[]) {
+module.exports.jackpotPayout = async function (gameType, gameRound, winningChoice, _bets=[], jackpot) {
   if (!twb || !war) await isReady();
   let bets = _bets;
   // let bets = await twb.getEvents({
@@ -226,8 +226,9 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
   for (var b of winningBets) {
     let txId, tx;
     let skip = false;
+    let j = jackpot ? tronWeb.toSun(jackpot) : a.finalJackpot;
     // let winAmount = tronWeb.toBigNumber(b.amount).div(winningAmount).times(a.finalJackpot).integerValue(1); // IF bet is weighted based on the bet amount
-    let win = tronWeb.toBigNumber(1).div(winners).times(a.finalJackpot).integerValue(1);         // If 1 bet weights 1 regardless of bet amount
+    let win = tronWeb.toBigNumber(1).div(winners).times(j).integerValue(1);         // If 1 bet weights 1 regardless of bet amount
     b.win = win;
     let ca = await this.availableJackpot(gameType, gameRound);
     if (win.gt(ca.availableFunds)) {

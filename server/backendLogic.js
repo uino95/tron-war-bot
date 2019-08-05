@@ -22,11 +22,10 @@ console.log("[TIMING]: Net turn duration is: " + (NET_TURN_DURATION/1000) + "s")
 console.log("[TIMING]: Stop bet duration is: " + (STOP_BET_DURATION/1000) + "s");
 
 async function notifyTelegramBot(d) {
-  if (config.test) return;
+  // if (config.test) return;
   if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
 
-  var j = await twb.twb.jackpot(0).call();
-  j = twb.tronWeb.fromSun(j.toString());
+  let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
 
   let leaderboard = wwb.leaderboard();
   let countriesStillAlive = wwb.countriesStillAlive();
@@ -40,9 +39,9 @@ async function notifyTelegramBot(d) {
     s += "✨🍀 <b>Long live " + utils.universalMap(d.o) + "!! </b> 🍀✨\n\n"
   }
   s += "There are still <b>" + countriesStillAlive.length + "</b> countries alive!\n\n"
-  s += "<b>" + utils.universalMap(leaderboard[0].idx) + " </b> is dominating with <b>" +leaderboard[0].territories + "</b>/241 controlled territories and it will conquer the world with the <b>~ " + (leaderboard[0].probability * 100).toFixed(2) +"%</b> chance\n";
-  s += "Current jackpot on the full run: <b>" + j + " TRX</b>\n\n";
-  s += "Who will conquer the world for you?? <b>Do not miss out!</b>\n";
+  s += "<b>" + utils.universalMap(leaderboard[0].idx) + " </b> is dominating with <b>" +leaderboard[0].territories + "</b>/241 controlled territories and it has <b>~ " + (leaderboard[0].probability * 100).toFixed(2) +"%</b> chance to seize the world!\n";
+  s += "Current jackpot: <b>" + j + " TRX</b>\n\n";
+  s += "Who will conquer the world?? <b>Do not miss out!</b>\n";
   s += "👇👇👇 Place your bet to <b>WIN</b> the full pot! 👇👇👇 ";
 
 
@@ -69,9 +68,10 @@ const gameOver = async () => {
   await sleep(60000);
 
   // GET WINNING BETS
-  var _bets = await firebase.bets.getCurrentTurnBets(0, cr.round);
+  let _bets = await firebase.bets.getCurrentTurnBets(0, cr.round);
+  let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
 
-  await twb.jackpotPayout(0, cr.round, winner, _bets);
+  await twb.jackpotPayout(0, cr.round, winner, _bets, j);
   console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
 }
 
