@@ -1,13 +1,11 @@
 <template>
-  <v-container v-if="infoNewTurn != null && showAlert==true">
-    <v-alert
+    <v-alert class="mt-0" v-if="infoNewTurn != null && showAlert==true"
       v-model="showAlert"
       transition="scale-transition"
       color="primary_next_tab"
     >
-      {{"New conquest: Turn " + infoNewTurn.turn + " - " + universalMap(infoNewTurn.conquest[0]) + " has conquered " + universalMap(infoNewTurn.conquest[1]) + " previuously owned by " + universalMap(infoNewTurn.prev)}}
+      New conquest: Turn  <b>{{infoNewTurn.turn}}</b>  - <b>{{universalMap(infoNewTurn.conquest[0])}}</b> has conquered  <b>{{universalMap(infoNewTurn.conquest[1])}}</b> previously owned by <b>{{universalMap(infoNewTurn.prev)}}</b>
     </v-alert>
-  </v-container>
 </template>
 
 <script>

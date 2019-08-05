@@ -202,11 +202,19 @@
                 <v-card-text>
                   We are crystal clear. We care about making things right. Here is we provide the details to check that we are PROVABLY FAIR.
                   <br />
+                  Below you can find 3 box. The first one contains the sha256 hash of the content of the second box, 
+                  which is a string containing the name of the of the previous turn winner with its identifier, followed by 
+                  a random salt.
+                  The third box contains the hash of the next turn winner (formatted in the same manner of the second box).
+                  <br />
+                  Basically at the end of each turn we simulate the winner of the next turn and then we hash it and publish it
+                  here. so you can easily verify that we are fair with you.
+                  <br />
                   <v-divider mt-3 />
                   <br />
-
                   <span class="title">Previous Turn: {{data.turn}} </span>
                   <br />
+                  
                   <v-flex>
                     <v-text-field ref='previousMagicHash' :append-icon="'content_copy'"
                       @click:append="copyToClipBoard(fairness.previousMagicHash, 'previousMagicHash')" :value="fairness.previousMagicHash"
@@ -234,10 +242,10 @@
 
                   <v-card mt-3>
                     <v-card-text style="text-align:center;">
-                      You will be able to check all this data at the following link
+                      If you want to check the correcteness of the hash, we suggest you to use the following sha256 online calculator, but you can whatever tool you prefer.
                     </v-card-text>
                     <v-chip label outline color="primary" style="margin-left:4.5em;">
-                      <a href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a>
+                      <a href="https://emn178.github.io/online-tools/sha256.html">https://emn178.github.io/online-tools/sha256.html</a>
                     </v-chip>
                   </v-card>
                 </v-card-text>

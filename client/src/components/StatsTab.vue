@@ -3,7 +3,7 @@
     <v-layout row wrap>
 
       <!-- Countries -->
-      <v-flex sm12 md6 lg5 shrink>
+      <v-flex sm12 md12 lg12 shrink>
         <v-card>
           <v-toolbar color="primary_stats_tab" dark>
             <v-toolbar-title>Current Run Status</v-toolbar-title>
@@ -22,7 +22,8 @@
                 </td>  
                 <td class="text-xs-right">{{ universalMap(props.item['.key'])}}</td>
                 <td class="text-xs-right">{{ props.item.territories }}</td>
-                <td class="text-xs-right">{{ props.item.cohesion.toFixed(2) }}</td>
+                <td class="text-xs-right">{{ (props.item.cohesion * 100).toFixed(2) + ' %'}}</td>
+                <td class="text-xs-right">{{ (props.item.probability * 100).toFixed(2) + ' %'}}</td>
               </template>
             </v-data-table>
 
@@ -67,7 +68,7 @@
       </v-flex>
 
       <!-- History -->
-      <v-flex sm12 md6 lg7 grow>
+      <v-flex sm12 md12 lg12 grow>
         <v-card>
 
           <v-toolbar color="primary_stats_tab" dark>
@@ -193,6 +194,11 @@
         text: 'Cohesion',
         value: 'cohesion',
         sortable: true
+      },
+      {
+        text: 'Probability',
+        value: 'probability',
+        sortable: true 
       }],
       pagination:{
         sortBy: 'territories',
