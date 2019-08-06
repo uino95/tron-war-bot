@@ -12,12 +12,15 @@ const getReferralPercentage = async (referrer_addr) => {
   return snapshot.val().default
 }
 
-const checkBetOnDb = async (txId) => {
+const checkBetOnDb = async (txId, user_addr) => {
   console.log("[REFERRAL]: Checking tx with id: " + txId);
   return new Promise(async function (resolve, reject) {
     firebase.bets.once('value', function (snapshot) {
-      if (!snapshot.child(txId).exists()) return resolve(false);
-      return resolve(snapshot.child(txId).val().amount);
+      if (!snapshot.child(txId).exists()) return resolve({result: false, payload:"no bet found on db with the given txId"});
+      if (snapshot.child(txId).val().from != user_addr) return resolve({result:false, payload:"user_addr different from the better"});
+      if (snapshot.child(txId).val().alreadyUsed) return resolve({result:false, payload: "bet already used for referral"});
+      firebase.bets.child(txId).update({alreadyUsed:true})
+      return resolve({result:true, payload:snapshot.child(txId).val().amount});
     })
   })
 }
@@ -37,10 +40,14 @@ const createReferral = async function (user_addr, referrer_addr, amount) {
       amount: newAmount
     })
     console.log("[REFERRAL]: Created new referral for referrer: " + referrer_addr)
+    return {result:true, payload:"Created new referral for referrer: " + referrer_addr}
+  } else if(snapshot.child(user_addr).val().referrer_addr != referrer_addr){
+    console.log("[REFERRAL]: Cannot change referral association")
+    return {result:false, payload:"Cannot change referral association"}
   } else {
-    console.log("[REFERRAL]: Referral already created")
+    console.log("[REFERRAL]: Referral already created, it will be updated")
+    return {result:true, payload: "Referral already created, it will be updated"}
   }
-
 }
 
 
@@ -65,15 +72,21 @@ module.exports.registerReferral = async (req, res) => {
     var txId = req.body.txId
     var user_addr = req.body.user_addr
     var referrer_addr = req.body.referrer_addr
-    var betOnDb = await checkBetOnDb(txId)
-    if (!betOnDb) return res.status(400).send({
+    var betOnDb = await checkBetOnDb(txId, user_addr)
+    if (!betOnDb.result) return res.status(400).send({
       success: 'false',
-      message: 'A bet is required in order to receive the referral, scammer'
+      message: betOnDb.payload
     });
-    await createReferral(user_addr, referrer_addr, twb.tronWeb.fromSun(betOnDb));
+    const r = await createReferral(user_addr, referrer_addr, twb.tronWeb.fromSun(betOnDb.payload));
+    if (!r.result){
+      return res.status(400).send({
+        success: 'false',
+        message: r.payload
+      })
+    }
     return res.status(200).send({
       success: 'true',
-      message: 'referral associated'
+      message: r.payload
     })
   } catch (err) {
     console.log(err);

@@ -233,7 +233,8 @@ module.exports.watchBet = function () {
       result: -1,
       time: betTime,
       gameType: bet.gameType,
-      turn: turn
+      turn: turn,
+      alreadyUsed: false,
     }
     firebase.bets.child(r.transaction).set(betObj)
     referral.updateReferral(betObj)

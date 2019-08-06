@@ -2,7 +2,7 @@
     <v-alert class="mt-0 card-rounded" v-if="infoNewTurn != null && showAlert==true"
       v-model="showAlert"
       transition="scale-transition"
-      color="primary_next_tab"
+      color="#2c3e50"
     >
       <div class="text-xs-center"> Latest conquest: Turn  {{infoNewTurn.turn}}  - <b>{{universalMap(infoNewTurn.conquest[0])}}</b> has conquered  <b>{{universalMap(infoNewTurn.conquest[1])}}</b> previously owned by <b>{{universalMap(infoNewTurn.prev)}}</b>
       </div>
