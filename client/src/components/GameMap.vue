@@ -7,14 +7,14 @@
     create,
     Button,
     Sprite,
-    useTheme,
+    useTheme
   } from "@amcharts/amcharts4/core";
   import {
     MapChart,
     projections,
     MapPolygonSeries,
     SmallMap,
-    ZoomControl
+    ZoomControl,
   } from "@amcharts/amcharts4/maps";
   import am4themes_spiritedaway from "@amcharts/amcharts4/themes/spiritedaway.js";
   import am4geodata_worldLow from "../assets/worldLow.js"
@@ -31,86 +31,57 @@
       polygonSeries: null,
       countriesData: null,
       chart: null,
-      colorsgg: ["#eceff1", "#cfd8dc", "#b0bec5", "#90a4ae", "#78909c", "#607d8b", "#546e7a", "#455a64", "#37474f",
-        "#263238", "#fafafa", "#f5f5f5", "#eeeeee", "#e0e0e0", "#bdbdbd", "#9e9e9e", "#757575", "#616161",
-        "#424242", "#212121"
-      ],
-      colorsg: ["#e8f5e9", "#c8e6c9", "#a5d6a7", "#81c784", "#66bb6a", "#4caf50", "#43a047", "#388e3c", "#2e7d32",
-        "#1b5e20", "#b9f6ca", "#69f0ae", "#00e676", "#00c853", "#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac",
-        "#26a69a", "#009688",
-        "#00897b", "#00796b", "#00695c", "#004d40", "#a7ffeb", "#64ffda", "#1de9b6", "#00bfa5"
-      ],
-      colorsY: ["#fffde7", "#fff9c4", "#fff59d", "#fff176", "#ffee58", "#ffeb3b", "#fdd835", "#fbc02d", "#f9a825",
-        "#f57f17", "#ffff8d", "#ffff00", "#ffea00", "#ffd600", "#f9fbe7", "#f0f4c3", "#e6ee9c", "#dce775",
-        "#d4e157", "#cddc39",
-        "#c0ca33", "#afb42b", "#9e9d24", "#827717", "#f4ff81", "#eeff41", "#c6ff00", "#aeea00"
-      ],
-      colorsR: ["#fbe9e7", "#ffccbc", "#ffab91", "#ff8a65", "#ff7043", "#ff5722", "#f4511e", "#e64a19", "#d84315",
-        "#bf360c", "#ff9e80", "#ff6e40", "#ff3d00", "#dd2c00", "#fff3e0", "#ffe0b2", "#ffcc80", "#ffb74d",
-        "#ffa726", "#ff9800", "#fb8c00",
-        "#f57c00", "#ef6c00", "#e65100", "#ffd180", "#ffab40", "#ff9100", "#ff6d00"
-      ],
-      colorsBlue: ["#e3f2fd", "#bbdefb", "#90caf9", "#64b5f6", "#42a5f5", "#2196f3", "#1e88e5", "#1976d2",
-        "#1565c0", "#0d47a1", "#82b1ff", "#448aff", "#2979ff", "#2962ff]", "#e1f5fe", "#b3e5fc", "#81d4fa",
-        "#4fc3f7", "#29b6f6", "#03a9f4",
-        "#039be5", "#0288d1", "#0277bd", "#01579b", "#80d8ff", "#40c4ff", "#00b0ff", "#0091ea"
-      ],
-      colors1: ["#58b5e1", "#812050", "#05cfc0", "#374475", "#99c66d", "#7244b9", "#4cf185", "#eb1138", "#158a2c",
-        "#ee88d9", "#385a3a", "#f1bb99", "#744822", "#bcaff9", "#c20da6", "#f1c039", "#6108e8", "#fe8f06",
-        "#8a1b07", "#ff8889"
-      ],
-      colors2: ["#01c472", "#7c225f", "#ace1b7", "#432ab7", "#c0e15c", "#c00018", "#2cf52b", "#c052e4", "#056e12",
-        "#ff6b97", "#4bd6fd", "#294d46", "#a8b8e6", "#304f9b", "#c697f4", "#683c00", "#dbb18b", "#42908c",
-        "#ff743c", "#f8d147"
-      ],
-
-      colors4: ["#0D3BE2", "#11FFE4", "#3CE73C", "#5E3000", "#F408F4", "#FFF31B", "#E60000", "#E3E7E5", "#003F0C",
-        "#000000", "#0FC0FF", "#FFC7F5", "#F98821", "#570098", "#E16A48"
-      ],
-
-      colors5: ["#ff1744", "#ff3d00", "#ffc400", "#ffea00", "#c6ff00", "#76ff03", "#00e676", "#1de9b6", "#00e5ff",
-        "#00b0ff", "#2979ff", "#3d5afe", "#651fff", "#ff9100", "#d500f9", "#f50057"
-      ],
-
+      colorsDefault: [],
       colors: ["#f44336", "#E91E63", "#9C27B0", "#3F51B5", "#2196F3", "#03A9F4", "#00BCD4", "#009688", "#4CAF50",
         "#8BC34A", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#9E9E9E", "#607D8B"
       ]
 
     }),
     mounted() {
-      db.ref('countriesMap').on('child_changed', (snapshot) => {
-        let id = snapshot.key;
-        db.ref('countriesMap').orderByKey().equalTo(id).once('value', (snapshotChild) => {
-          let id1 = Object.keys(snapshotChild.val())[0]
-          var result = this.hexToHsl(this.polygonSeries.data[id1]['color'])
-          var h = result[0] / 360
-          var s = result[1] / 100
-          var l = 0.2 + snapshotChild.val()[id1]['cohesion'] * 0.7
-          this.polygonSeries.data[id]['color'] = this.rgbToHex(this.hslToRgb(h, s, l))
-          //this.polygonSeries.data[id]['color'] = '#FFFFFF'
-          this.polygonSeries.invalidateData()
-          //this.chart.smallMap.series.push(this.polygonSeries);
-        })
+      db.ref('public').on('child_changed', (snapshot) => {
+        let data = snapshot.val();
+        if (data.length == 241) {
+          // console.log(data)
+          data.map((el, index) => {
+            // var h = Math.floor(Math.floor((index / 10)) * (360 / 25)) / 360
+            // var s = (20 + (index % 10) * (80 / 10)) / 100
+            // var l = 0.2 + el['cohesion'] * 0.7
+            // el['color'] = this.rgbToHex(this.hslToRgb(h, s, l))
+            el['id'] = this.universalMap(index, 'charId')
+            el['cohesion'] = (el['cohesion'] * 100).toFixed(2);
+          })
+          data.map(el => {
+            el['controllerCohesion'] = (data[el['occupiedBy']]['cohesion']);
+            el['color'] = this.colorsDefault[el['occupiedBy']];
+            el['occupiedBy'] = this.universalMap(el['occupiedBy'])
+          })
+          this.polygonSeries.data = data
+          //this.polygonSeries.invalidateData()
+        }
       })
 
-      db.ref('countriesMap').once('value', (snapshot) => {
+
+
+
+      db.ref('public/countriesMap').once('value', (snapshot) => {
         let j = this.colors.length
         let data = snapshot.val();
         data.map((el, index) => {
           // var h = Math.floor(Math.floor((index / 10)) * (360 / 25)) / 360
           // var s = (20 + (index % 10) * (80 / 10)) / 100
-          // var l = el['cohesion']
-          // el['color'] = this.rgbToHex(this.hslToRgb(h, s, l))
-          el['color'] = this.colors[j]
+          // var l = 0.2 + el['cohesion'] * 0.7
+          //el['color'] = this.rgbToHex(this.hslToRgb(h, s, l))
+          this.colorsDefault.push(this.colors[j])
           el['id'] = this.universalMap(index, 'charId')
+          el['cohesion'] = (el['cohesion'] * 100).toFixed(2);
           j--;
           if (j < 0) {
             j = this.colors.length - 1
           }
         })
         data.map(el => {
-          el['cohesion'] = data[el['occupiedBy']]['cohesion'];
-          el['color'] = data[el['occupiedBy']]['color'];
+          el['controllerCohesion'] = (data[el['occupiedBy']]['cohesion']);
+          el['color'] = this.colorsDefault[el['occupiedBy']];
           el['occupiedBy'] = this.universalMap(el['occupiedBy'])
         })
         this.countriesData = data
@@ -130,7 +101,8 @@
       },
 
       rgbToHex(color) {
-        return "#" + this.componentToHex(color[0]) + this.componentToHex(color[1]) + this.componentToHex(color[2]);
+        return "#" + this.componentToHex(color[0]) + this.componentToHex(color[1]) + this.componentToHex(color[
+          2]);
       },
 
       hexToRgb(hex) {
@@ -223,7 +195,6 @@
 
         polygonSeries.data = this.countriesData
         this.polygonSeries = polygonSeries
-        this.polygonSeries = polygonSeries
 
         /* Configure series */
         var polygonTemplate = polygonSeries.mapPolygons.template;
@@ -232,8 +203,8 @@
         polygonSeries.tooltip.background.fill = chart.colors.getIndex(4);
         polygonTemplate.applyOnClones = true;
         polygonTemplate.togglable = true;
-        polygonTemplate.tooltipText = "'{name}' controlled by '{occupiedBy}' with a cohesion of {cohesion}";
 
+        polygonTemplate.tooltipText = "[bold]{name}[/] ({cohesion} %) \nOccupied by: [bold]{occupiedBy}[/] ({controllerCohesion} %)";
         polygonTemplate.nonScalingStroke = true;
         polygonTemplate.strokeOpacity = 0.5;
 
@@ -278,11 +249,11 @@
 
 
         // Small map
-        chart.smallMap = new SmallMap();
-        // Re-position to top right (it defaults to bottom left)
-        chart.smallMap.align = "right";
-        chart.smallMap.valign = "top";
-        chart.smallMap.series.push(polygonSeries);
+        // chart.smallMap = new SmallMap();
+        // // Re-position to top right (it defaults to bottom left)
+        // chart.smallMap.align = "right";
+        // chart.smallMap.valign = "top";
+        // chart.smallMap.series.push(polygonSeries);
 
         // Zoom control
         chart.zoomControl = new ZoomControl();

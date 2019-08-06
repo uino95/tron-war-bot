@@ -2,20 +2,20 @@ const config = require('./config')
 const wwb = require('./worldWarBot')
 const tronWeb = require('tronweb')
 
+var turn, cMap;
 
-const validateFullRunWinner = (b) => {
-  // @TODO: Add bet price formula
+const validateFullRunWinner = async (b) => {
   if (!b || !b.amount) return false;
-  var fixedAmount = config.test ? "1" : "50";
+  cMap = wwb.mapState();
+  turn = wwb.currentTurn();
+  var fixedAmount = config.test ? "1" : cMap[parseInt(b.userChoice)].finalQuote;
   return b.amount.toString() == tronWeb.toSun(fixedAmount);
 }
 
-const validateNextConquerer = (b) => {
-  if (b.betReference.toString() != wwb.currentTurn.toString() ) return false;
+const validateNextConquerer = async (b) => {
+  if (b.betReference.toString() != wwb.currentTurn().toString() ) return false;
   return true
 }
-
-
 
 
 

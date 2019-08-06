@@ -4,18 +4,19 @@
     <v-spacer></v-spacer>
     <v-toolbar-items>
       <v-btn flat replace to="/betfinal">
-        <v-icon>public</v-icon> Bet Final
+        <v-icon color="primary_final_tab">public</v-icon> Bet Final
       </v-btn>
       <v-btn flat replace to="/betnext">
-        <v-icon>attach_money</v-icon> Bet Next
+        <v-icon color="primary_next_tab">attach_money</v-icon> Bet Next
       </v-btn>
       <v-btn flat replace to="/stats">
-        <v-icon>poll</v-icon> Stats
+        <v-icon color="primary_stats_tab">poll</v-icon> Stats
       </v-btn>
     </v-toolbar-items>
     <v-spacer></v-spacer>
   </v-toolbar>
   <v-card style="background-color:rgb(158, 158, 158);">
+    <core-info-new-turn></core-info-new-turn>
     <transition name="fade" mode="out-in">
       <router-view></router-view>
     </transition>
@@ -25,7 +26,7 @@
 
 <script>
 export default {
-
+  components: {}
 }
 </script>
 

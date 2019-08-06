@@ -2,260 +2,250 @@ const rp = require('request-promise')
 const cron = require("node-cron");
 
 const firebase = require('./firebase')
-const wwb = require('./worldWarBotApi')
-const theRealWwb = require('./worldWarBot')
+const fairness = require('./fairness')
+const wwb = require('./worldWarBot')
 const twb = require('./tronWarBot')
-const utils = require('./utils')
 const referral = require('./referral')
 const betValidator = require('./bet')
 const config = require('./config')
-const db = firebase.db
+const utils = require('./utils')
 
-const options = {
-    method: "DELETE",
-    uri: 'https://api.heroku.com/apps/tronwarbot/dynos/web',
-    headers: {
-        'content-type': 'application/json',
-        'accept': 'application/vnd.heroku+json; version=3',
-        'Authorization': 'Bearer ' + config.heroku.apiKey
-    }
-};
+const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const toPercent = (n) =>(n * 100).toFixed(2) + "%"
 
-//////////////////////////////////// DB USAGE //////////////////////////////////////////
+const PROCESSING_TIME = config.test ? 5 : 10;
+const STOP_BET_MARGIN = config.test ? 5 : 10;
+const NET_TURN_DURATION = (config.timing.turn - (config.timing.blockConfirmation * 3) - PROCESSING_TIME - STOP_BET_MARGIN) * 1000;
+const STOP_BET_DURATION = ((config.timing.blockConfirmation * 3) + STOP_BET_MARGIN)  * 1000;
 
-var historyRef = db.ref('history')
-var betsRef = db.ref('bets')
-var countriesRef = db.ref('countries')
-var dataRef = db.ref('data')
-var betFinalRef = db.ref('betFinalData')
+console.log("[TIMING]: Net turn duration is: " + (NET_TURN_DURATION/1000) + "s");
+console.log("[TIMING]: Stop bet duration is: " + (STOP_BET_DURATION/1000) + "s");
 
-//fetch current snapshot from db
-async function fetchLatestTurnOnDb() {
-    return new Promise(async function(resolve, reject) {
-        historyRef.orderByChild('turn').limitToLast(1).once('value', function(snapshot) {
-            let key = Object.keys(snapshot.val())
-            resolve(snapshot.child(key).val().turn)
-        })
-    })
+async function notifyTelegramBot(d) {
+  if (config.test) return;
+  if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
+
+  let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
+
+  let leaderboard = wwb.leaderboard();
+  let countriesStillAlive = wwb.countriesStillAlive();
+
+  let s = "🌎♟ <b>BATTLE " + d.turn + "</b>♟🌎\n"
+  if (!d.civilWar) {
+    s += "<b>⚔️💣 " + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.o) + ")</b> conquered <b>" + utils.universalMap(d.dt) + " (" + toPercent(d.cohesion.dt) + ")</b> 💣⚔️\n";
+    s += "<i>Previously owned by " + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</i>\n\n"
+  } else {
+    s += "⚒<b>" + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.d) + ")</b> rebelled on the oppressor <b>" + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</b>⚒\n"
+    s += "✨🍀 <b>Long live " + utils.universalMap(d.o) + "!! </b> 🍀✨\n\n"
+  }
+  s += "There are still <b>" + countriesStillAlive.length + "</b> countries alive!\n\n"
+  s += "<b>" + utils.universalMap(leaderboard[0].idx) + " </b> is dominating with <b>" +leaderboard[0].territories + "</b>/241 controlled territories and it has <b>~ " + (leaderboard[0].probability * 100).toFixed(2) +"%</b> chance to seize the world!\n";
+  s += "Current jackpot: <b>" + j + " TRX</b>\n\n";
+  s += "Who will conquer the world?? <b>Do not miss out!</b>\n";
+  s += "👇👇👇 Place your bet to <b>WIN</b> the full pot! 👇👇👇 ";
+
+
+  let m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};
+  let uri = "https://api.telegram.org/bot" + config.telegram.token + "/";
+  uri += "sendMessage?chat_id=" + config.telegram.group;
+  uri += "&parse_mode=HTML&reply_markup=" + encodeURIComponent(JSON.stringify(m));
+  uri += "&disable_web_page_preview=true&text=" + encodeURIComponent(s);
+
+  return await rp.get(uri).catch(console.error);
 }
 
-async function checkBetOnDb(txId) {
-    return new Promise(async function(resolve, reject) {
-        betsRef.once('value', function(snapshot) {
-            return resolve(snapshot.child(txId).exists())
-        })
-    })
+const stopGame = async ()=>{
+  await firebase.data.update({ serverStatus: 500 });
+  await twb.endGame(0);
+  await twb.endGame(1);
 }
 
-var latestTurn = -1
-var currentTurn = -1
+const gameOver = async () => {
 
-//sync
-module.exports.syncServer = async function(updateCurrentTurn) {
-    let lastTurnOnDb = await fetchLatestTurnOnDb();
-    let turn = await wwb.getTurnFromAPI('last');
-    let lastTurnOnApi = turn.turn
-    turn = turn.turn
-    let conqueredId
-    let prevOwnerId
-    while (lastTurnOnDb != lastTurnOnApi) {
-        lastTurnOnDb++
-        turn = await wwb.getTurnFromAPI(lastTurnOnDb)
-        console.log("TURN: ", turn)
-        conqueredId = turn.conquest[1]
-        realConquerId = await wwb.computeCountryFromId(turn.conquest[0], turn.turn - 1)
-        prevOwnerId = await wwb.computeCountryFromId(turn.conquest[1], turn.turn - 1)
-        historyRef.push().set({
-            conquest: [realConquerId, conqueredId],
-            prev: prevOwnerId,
-            turn: turn.turn
-        })
-        countriesRef.orderByKey().equalTo(conqueredId.toString()).once('value', function(snapshot) {
-            let key = Object.keys(snapshot.val())[0]
-            countriesRef.child(key).update({
-                controlledBy: realConquerId
-            })
-        })
-        if (updateCurrentTurn) {
-            currentTurn++
-        }
-    }
+  var cr = await twb.cachedCurrentRound(0);
+  var winner = wwb.winner();
+  console.log("[LOGIC]: Sleeping one minute before automatic jackpot payout...");
+  await sleep(60000);
 
-    let nextTurn = lastTurnOnDb
-    let d1 = new Date()
-    let nextTurnTime = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate(), d1.getHours(), 13, 0, 0).getTime();
+  // GET WINNING BETS
+  let _bets = await firebase.bets.getCurrentRoundBets(0, cr.round);
+  let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
 
-    dataRef.update({ nextTurn })
-    dataRef.update({ nextTurnTime })
+  await twb.jackpotPayout(0, cr.round, winner, _bets, j);
+  console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
+}
 
-    dataRef.update({ serverStatus: 200 })
-    console.log("server synced with API server")
-    // retrieve last bet on db
-    // retriebve last bet on smart contract
-    // check difference and retrieve lost bets
+const updateResultsOnDB = (_b, _wb) => {
+  _wb = _wb.reduce((o,el)=>{o[el.txId]=el; return o;}, {})
+  // Update the loser bets left
+  _b.forEach(b =>{firebase.bets.child(b.txId).update({result: (_wb[b.txId] ? _wb[b.txId].win : 0)})})
+}
+
+const stopBets = async (waitTime) => {
+  if (wwb.winner()) return;
+  // STOP BET BUTTON
+  await firebase.data.update({serverStatus: 300})
+  // AWAIT FOR DATA PROPAGATION AND BET HALT
+  await sleep(waitTime || 0);
+  //UPDATE TURN CURRENT WHICH PREVENTS BET SLIPPAGE
+  wwb.updateTurn();
+}
+
+const simulateNextTurn = async () => {
+  if (wwb.winner()) return;
+  // CALCULATE MAGIC NUMBER AND SEED
+  let turn = wwb.currentTurn();
+  let currentSecret = await firebase.secret.once('value').then(r=>r.val());
+  var magic = utils.randomHex();
+  var seed = utils.randomHex();
+  if (turn == currentSecret.turn) {
+    magic = currentSecret.magic;
+    seed = currentSecret.seed;
+  }
+  // SAVE MAGIC NUMBER AND SEED
+  else await firebase.secret.update({turn, magic, seed});
+  // SIMULATE TURN
+  var cMap = await wwb.mapState();
+  [ cMap , turnData, computedRandom] = fairness.computeNextState(cMap, magic, seed);
+  // EVALUATE WINNER
+  var stringToHash = utils.universalMap(turnData.o) + "(" + turnData.o + "):"  + seed;
+  // console.log("[SIMULATE]: Winner on turn " + turn + " is => " + utils.universalMap(turnData.o) + "("+ turnData.o +") with computed randoms: " + JSON.stringify(computedRandom));
+  // COMPUTE SHA256 (WINNER + SEED)
+  // console.log("Computing SHA256 of:     " + stringToHash);
+  let nextMagicHash = utils.sha256(stringToHash);
+  // console.log("SHA256 is " + nextMagicHash);
+  // SAVE SHA256
+  await firebase.fairness.update({nextMagicHash});
+  return [magic, seed];
+}
+
+const revealFairWinner = async () => {
+  let turnData = wwb.currentTurnData();
+  let currentSecret = await firebase.secret.once('value').then(r=>r.val());
+
+  if (turnData.turn != currentSecret.turn) return console.error("[LOGIC]: We have overlapping turns. Make sure to reveal winner prior to launch next turn!");
+
+  let currentFairness = await firebase.fairness.once('value').then(r=>r.val());
+
+  console.log("[LOGIC]: Winner on current turn is: " + turnData.o + " => " + utils.universalMap(turnData.o));
+  let seed = currentSecret.seed;
+  let magicHashRevealed = utils.universalMap(turnData.o) + "(" + turnData.o + "):"  + seed;
+  console.log("Computing SHA256 of:    " + magicHashRevealed);
+  let previousMagicHash = utils.sha256(magicHashRevealed);
+  if (previousMagicHash != currentFairness.nextMagicHash) console.error("[FAIRNESS]: I don't think that is a really fair game... Hope noone notices that... Shh!!");
+  console.log("SHA256 is " + previousMagicHash);
+  await firebase.fairness.update({previousMagicHash, magicHashRevealed});
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+module.exports.launchNextTurn = async () =>{
+  if (wwb.winner()) return;
+  console.log("\n[SCHEDULER]: ********* Launching next turn! *********");
+
+  // CAN PLACE BETS
+  let nextTurnTime = (new Date()).valueOf() + NET_TURN_DURATION;
+  await firebase.data.update({ serverStatus: 200, turnTime: nextTurnTime });
+
+  [magic, seed] = await simulateNextTurn();
+
+  await sleep(NET_TURN_DURATION);
+
+  console.log("!!!!!! Declaring winner in seconds! DO NOT STOP SERVER NOW (please) !!!!!!!")
+  // READY TO LAUNCH TURN
+  await stopBets(STOP_BET_DURATION);
+
+
+  // GET CURRENT BET RATES AND MAP
+  var cMap = await wwb.mapState();
+  var go = await wwb.launchNextTurn(magic, seed);
+
+
+
+  // GET WINNER AND UPDATES
+  var data = wwb.currentTurnData();
+  // GET WINNER AND RATE
+  var _winner = cMap[data.o];
+  // GET CHAIN ROUND
+  var cr = await twb.cachedCurrentRound(1);
+
+  // UPDATE HISTORY
+  firebase.history.push().set({
+    conquest: [data.o, data.dt],
+    prev: data.d,
+    turn: data.turn,
+    civilWar: data.civilWar
+  });
+
+  // REVEAL FAIRNESS
+  await revealFairWinner();
+
+  // **** PAYOUT FOR GAME 1 AGAINST DEALER **** //
+  console.log("[SCHEDULER]: ********* Critical turn operations completed! *********\n");
+
+  // STOP GAME BETS
+  if (go) await stopGame();
+
+  // COMMUNICATE WINNER
+  notifyTelegramBot(data);
+
+  console.log("\n[SCHEDULER]: ----- Running payouts! ------");
+  // GET CURRENT TURN BETS
+  var _bets = await firebase.bets.getCurrentTurnBets(1, cr.round, data.turn);
+
+
+  // PAYOUT
+  const winningBets = await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
+  // UPDATE RESULTS BET ON DB
+  await updateResultsOnDB(_bets, winningBets);
+  // PAYOUT FINAL
+  if (go) gameOver();
+
+  console.log("[SCHEDULER]: ----- Payout finished! ------\n");
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////// Start Working ///////////////////////////////////
 
-async function pollForNewTurn() {
-    try {
-        var turn = await wwb.getTurnFromAPI('last')
-        console.log(turn);
-        console.log(turn.turn)
-        if (turn.turn > currentTurn + 1) {
-            console.log("lost some turns... resyncing")
-            syncServer(true)
-        } else if (turn.turn < currentTurn) throw "E' un cazzo di casino moh...";
-        else if (turn.turn == currentTurn + 1) {
-            let conqueredId = turn.conquest[1];
-            let conquerId = turn.conquest[0]
-            let prevOwnerId = await wwb.computeCountryFromId(conqueredId, turn.turn - 1);
-            let realConquerId = await wwb.computeCountryFromId(conquerId, turn.turn - 1);
-            // in case of resurrection
-            if (realConquerId === prevOwnerId) {
-                realConquerId = conquerId
-            }
-            historyRef.push().set({
-                conquest: [realConquerId, conqueredId],
-                prev: prevOwnerId,
-                turn: turn.turn
-            })
-            countriesRef.orderByKey().equalTo(conqueredId.toString()).once('value', function(snapshot) {
-                let key = Object.keys(snapshot.val())[0]
-                countriesRef.child(key).update({
-                    controlledBy: realConquerId
-                })
-            })
-
-            var r = await twb.startGame(0);
-            console.log("game started")
-
-            currentTurn++
-            utils.consoleLog("new Turn - " + currentTurn)
-
-            let d1 = new Date()
-            let nextTurnTime = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate(), d1.getHours(), 13, 0, 0).getTime();
-            let nextTurn = turn.turn + 1
-
-            dataRef.update({ nextTurnTime })
-            dataRef.update({ nextTurn })
-
-
-            console.log("WINNER: ", utils.universalMap(realConquerId))
-            return realConquerId
-        } else {
-            console.log("turn not changed")
-        }
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-let count = 0
-//start polling the api server at every :13 of each hour (edit second star with 13)
-module.exports.watchNewTurn = function() {
-    cron.schedule("1 13 * * * *", async function() {
-        count++
-        utils.consoleLog("start polling WWB server for new turn")
-        dataRef.update({ serverStatus: 300 })
-        latestTurn = await fetchLatestTurnOnDb()
-        currentTurn = currentTurn === -1 ? latestTurn : currentTurn //TODO fetch from db
-
-        var r = await twb.endGame(0);
-        //start polling every 15 seconds. The function then quits as the turn changes
-        while (currentTurn === latestTurn) {
-            await utils.sleep(30000);
-            var winner = await pollForNewTurn();
-        }
-        dataRef.update({ serverStatus: 400 })
-        let winningBets = await twb.payout(0, r, winner);
-
-        let currentRound = await twb.getCurrentRound(0)
-        console.log(currentRound)
-        let jackpot = currentRound.availableJackpot
-        jackpot = twb.tronWeb.fromSun(jackpot.toString())
-        dataRef.update({ jackpot })
-
-        console.log("winningBets ", winningBets)
-
-        betsRef.orderByKey().once('value', function(snapshot) {
-            let betKeys = Object.keys(snapshot.val())
-            for (var i = betKeys.length - 1; i >= 0; i--) {
-                let skip = false
-                currentBetKey = betKeys[i]
-                if (winningBets.length > 0) {
-                    for (var j = winningBets.length - 1; j >= 0; j--) {
-                        let winningBet = winningBets[j]
-                        if (currentBetKey === winningBet.transaction) {
-                            skip = true
-                            console.log("updated Winner bet ", currentBetKey)
-                            let result = parseFloat(twb.tronWeb.fromSun(winningBet.win.toString())).toFixed(3)
-                            betsRef.child(winningBet.transaction).update({
-                                result: result
-                            })
-                        }
-                    }
-                    if (!skip && snapshot.child(currentBetKey).val().result < 0) {
-                        console.log("updated loser bet ", currentBetKey)
-                        betsRef.child(currentBetKey).update({
-                            result: 0
-                        })
-                    }
-                } else if (snapshot.child(currentBetKey).val().result < 0) {
-                    console.log("updated loser bet ", currentBetKey)
-                    betsRef.child(currentBetKey).update({
-                        result: 0
-                    })
-                }
-            }
-        })
-        //in order to prevent heroku cycling at wrong time
-        if (count >= 23) {
-            var res = await rp(options)
-            count = 0
-        }
-
-        dataRef.update({ serverStatus: 200 })
-
-
-        console.log("turn updated ... waiting an hour now for new turn")
-    });
-}
-
-// watch for new bets
-module.exports.watchBet = function() {
+// Watch new bets
+module.exports.watchBet = function () {
   console.log("[LOGIC]: Watching user bets...")
-  return twb.watchEvents('Bet', async function(r) {
-      let bet = r.result
-      if (!betValidator.validate(bet))
-        return console.error("[INVALID_BET]: Received an invalid bet for gameType: " + bet.gameType.toString()
-                            + "\n\tof amount: " + twb.tronWeb.fromSun(bet.amount.toString())
-                            + "\n\tby: " + bet.from.toString()
-                            + "\n\twith user choice: " + bet.userChoice.toString()
-                            + "\n\tbetReference: " + bet.betReference.toString() );
-      let isBetAlreadyOnDb = await checkBetOnDb(r.transaction);
-      if (!!isBetAlreadyOnDb) return console.error("[GENERIC]: Bet " + r.transaction + " is already on DB");
-      let turn = theRealWwb.currentTurn();
-      let betTime = new Date().getTime()
-      let betObj = {
-          from: twb.tronWeb.address.fromHex(bet.from),
-          amount: bet.amount,
-          userChoice: bet.userChoice,
-          round: bet.round,
-          betReference : bet.betReference,
-          result: -1,
-          time: betTime,
-          gameType: bet.gameType,
-          turn: turn
-      }
-      betsRef.child(r.transaction).set(betObj)
-      referral.updateReferral(betObj)
+  return twb.watchEvents('Bet', async function (r) {
+    let bet = r.result
+    if (!(await betValidator.validate(bet)))
+      return console.error("[INVALID_BET]: Received an invalid bet for gameType: " + bet.gameType.toString() +
+        "\n\tof amount: " + twb.tronWeb.fromSun(bet.amount.toString()) +
+        "\n\tby: " + bet.from.toString() +
+        "\n\twith user choice: " + bet.userChoice.toString() +
+        "\n\tbetReference: " + bet.betReference.toString());
+    let isBetAlreadyOnDb = await firebase.bets.checkBetOnDb(r.transaction);
+    if (!!isBetAlreadyOnDb) return console.error("[GENERIC]: Bet " + r.transaction + " is already on DB");
+    let turn = wwb.currentTurn();
+    let betTime = new Date().getTime()
+    let betObj = {
+      from: twb.tronWeb.address.fromHex(bet.from),
+      amount: bet.amount,
+      userChoice: bet.userChoice,
+      round: bet.round,
+      betReference: bet.betReference,
+      result: -1,
+      time: betTime,
+      gameType: bet.gameType,
+      turn: turn,
+      alreadyUsed: false,
+    }
+    firebase.bets.child(r.transaction).set(betObj)
+    referral.updateReferral(betObj)
+    if (bet.gameType.toString() == "0") {
       let jackpot = await twb.availableJackpot(0, bet.round);
       jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
-      betFinalRef.update({jackpot})
-      console.info("Successfully registered bet in tx " + r.transaction + " at " + betTime )
+      firebase.data.update({ jackpot })
       console.info("Jackpot is: ", jackpot)
-  })
+    }
+    console.info("Successfully registered bet in tx " + r.transaction + " at " + betTime)
+  });
 }
+
+module.exports.notifyTelegramBot = notifyTelegramBot;

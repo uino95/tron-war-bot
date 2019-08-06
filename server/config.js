@@ -12,7 +12,7 @@ const config = {
     warCoinAddress: "TJ6kbSxQ8ctPGuHmRb3W92gUN42AooHeNt"
   },
   game: {
-    preservedJackpotRateForNextTurn: 0.1
+    preservedJackpotRateForNextTurn: 0
   },
   firebase: {
 	  "type": "service_account",
@@ -41,9 +41,26 @@ const config = {
   heroku: {
     apiKey: 'bfbc8a87-fa94-4885-bb7f-e18ca83ec1d8'
   },
-  test: JSON.parse(process.env.TEST_MODE || true)
+  test: JSON.parse(process.env.TEST_MODE || true),
+  telegram:{
+    token: process.env.TELEGRAM_TOKEN,
+    group: JSON.parse(process.env.TELEGRAM_GROUP || -331523835),
+  },
+  timing: {
+    turn: 300,
+    blockConfirmation: 6
+  },
+  timingTest: {
+    turn: 30,
+    blockConfirmation: 2
+  },
+  wwb:{
+    cohesionBias: 0.41,
+    civilWarLikelihood: 0.25
+  }
 }
 
 if (config.test) config.tron = config.tronTest;
+if (config.test) config.timing = config.timingTest;
 
 module.exports = config;

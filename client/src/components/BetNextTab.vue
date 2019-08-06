@@ -1,74 +1,95 @@
 <template>
+  <!--
   <v-flex v-if="!showBetNextTab">
     <v-card >
       <v-card-text >
         <div class="text-xs-center display-1 text-capitalize">It will be available as next run starts</div>
       </v-card-text>
     </v-card>
-  </v-flex>
-  <v-container v-else grid-list-md text-xs-center class="outerTabContainer">
+  </v-flex> -->
+  <v-container grid-list-md text-xs-center class="outerTabContainer">
     <v-layout row wrap>
       <!-- Place a bet -->
       <v-flex>
         <v-card>
-          <v-toolbar color="primary" dark>
+
+          <v-toolbar color="primary_next_tab" dark>
             <v-toolbar-title>Bet on Next Conqueror
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                  <v-icon color="secondary" dark v-on="on">info</v-icon>
+                  <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
                 </template>
-                <span>Here you can bet on the next conqueror</span>
+                <span>If you feel like who the next Conqueror is going to be, you came to the right place. Every 5 mins the Bot spits out one new Battle. Bet on who will make the conquer next in this tab.</span>
               </v-tooltip>
             </v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
+
+
           <v-card-title primary-title class="justify-center">
-            <v-form ref="form" v-model="valid" lazy-validation>
-              <v-layout row wrap>
-                <v-flex md4>
-                  <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
-                    :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
-                    placeholder="Type in or pick from map"></v-autocomplete>
-                </v-flex>
-                <v-flex md4>
-                  <v-text-field :value="calculatePotentialWin" label="Potential win" outline disabled></v-text-field>
-                </v-flex>
-                <v-flex md4>
-                  <core-timer isTurnTimer />
-                </v-flex>
-              </v-layout>
-              <v-layout row wrap>
-                <v-flex md4>
-                  <core-balance-button />
-                </v-flex>
-                <v-flex md4>
-                  <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
-                    label="Current Jackpot" outline disabled></v-text-field>
-                </v-flex>
-                <v-flex md4>
-                  <!--<v-select
-                                                      v-model="currency"
-                                                      :items="currencies"
-                                                      :rules="currencyRule"
-                                                      label="Currency"
-                                                      required
-                                                      outline
-                                              ></v-select>-->
-                  <v-text-field v-model="currency" label="Currency" outline disabled></v-text-field>
-                </v-flex>
-              </v-layout>
-              <b>Spain conqured the world! <br>Next run will start soon. Stay tuned!</b>
-              <br>
-              <v-btn v-if="info.serverStatus == 200" color="success" @click="placeBet">Bet {{info.minBet}}
-                {{currency}}
-                {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
-              <v-btn v-else-if="info.serverStatus == 300" color="info" @click="battleInProgress">Battle in progress...
-              </v-btn>
-              <v-btn v-else-if="info.serverStatus == 400" color="info" @click="payoutInProgress">Payout in progress...
-              </v-btn>
-              <!--<v-btn color="warning">Cannot bet at the moment</v-btn>-->
-            </v-form>
+            <v-flex md10>
+              <v-form ref="form" v-model="valid" lazy-validation>
+
+                <v-layout row wrap align-center justify-center>
+                  <v-flex md8>
+                    <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
+                      :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
+                      placeholder="Type in or pick from map"></v-autocomplete>
+                  </v-flex>
+
+                  <v-flex md4>
+                    <v-text-field :value="potentialWin" label="Potential win" outline readonly></v-text-field>
+                  </v-flex>
+                </v-layout>
+
+                <v-layout align-center justify-center row wrap>
+                  <v-flex md4>
+                    <v-text-field :value="winChance | probability " label="Win Chance" outline readonly></v-text-field>
+                  </v-flex>
+
+                  <v-flex md4>
+                    <v-text-field :value="multiplier" label="Multiplier" outline readonly></v-text-field>
+                  </v-flex>
+
+                  <v-flex md4>
+                    <core-timer isTurnTimer />
+                  </v-flex>
+                </v-layout>
+
+                <v-layout row wrap>
+                  <v-flex xs12>
+                    <v-slider
+                      thumb-label
+                      v-model="betAmount"
+                      min="50"
+                      max="500"
+                      label="Bet Amount"
+                    ></v-slider>
+                  </v-flex>
+                </v-layout>
+                <!-- <v-layout row wrap>
+                  <v-flex md4>
+                    <core-timer isTurnTimer />
+                  </v-flex>
+
+                  <v-flex md4>
+                    <core-balance-button />
+                  </v-flex>
+                  <v-flex md4>
+                    <v-text-field :value="info.jackpot?(parseFloat(info.jackpot).toFixed(3) + ' TRX'):'loading...'"
+                      label="Current Jackpot" outline readonly></v-text-field>
+                  </v-flex>
+                </v-layout> -->
+
+
+                <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark @click="placeBet">Bet {{betAmount}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+                <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">Battle in progress...</v-btn>
+                <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">Payout in progress...</v-btn>
+                <v-btn v-else-if="data.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over</v-btn>
+              </v-form>
+            </v-flex>
           </v-card-title>
+
           <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="snackbarTimeout" vertical bottom>
             <span class="title">{{snackbarText}}</span>
             <v-btn dark flat @click="snackbar = false">
@@ -78,102 +99,199 @@
         </v-card>
       </v-flex>
     </v-layout>
+
+
     <v-layout row wrap>
+
       <!-- My latest bets -->
-      <v-flex>
+      <v-flex xs12 md6>
         <v-card>
-          <v-toolbar color="primary" dark>
+          <v-toolbar color="primary_next_tab" dark>
             <v-toolbar-title>My Latest Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
+
           <v-container grid-list-md text-xs-centerm class="gameTab">
-            <v-layout row wrap class="gameTabHeader">
-              <v-flex xs3 class="title">
+
+            <!-- if the user is not logged in -->
+            <v-layout v-if="account == null" >
+              <v-flex class="subheading">
+                <v-chip label outline color="red">Login First</v-chip>
+              </v-flex>
+            </v-layout>
+
+            <!-- if the user has already placed at least one bet -->
+            <v-layout v-else-if="myBets.length === 0" >
+              <v-flex class="subheading">
+                <v-chip label outline color="red">No bets yet...</v-chip>
+              </v-flex>
+            </v-layout>
+
+            <!-- else show the bets -->
+            <v-layout v-else row wrap class="gameTabHeader">
+              <v-flex xs5 class="title">
                 Country
               </v-flex>
-              <v-flex xs3 class="title">
+              <v-flex xs4 class="title">
                 Bet
               </v-flex>
               <v-flex xs3 class="title">
                 Turn
               </v-flex>
-              <v-flex xs3 class="title">
-                Result
-              </v-flex>
+
+              <v-divider class="gameTabDivider"></v-divider>
+
+              <v-container class="gameTabContent">
+                <v-layout row wrap v-for="bet in myBets.slice(10 * currentMyBetPagination - 10, 10 * currentMyBetPagination)" :key="bet.time">
+                  <v-flex xs5 class="subheading">
+                    {{universalMap(bet.userChoice)}}
+                  </v-flex>
+                  <v-flex xs4 class="subheading">
+                    {{bet.amount | TRX}}
+                  </v-flex>
+                  <v-flex xs3 class="subheading">
+                    {{bet.turn}}
+                  </v-flex>
+                </v-layout>
+
+                <v-container v-if="myBets.length > 10">
+                  <v-pagination
+                    v-model="currentMyBetPagination"
+                    :length="Math.ceil(myBets.length/10)"
+                    color="primary_next_tab"
+                  ></v-pagination>
+                </v-container>
+              </v-container>
+
             </v-layout>
-            <v-divider class="gameTabDivider"></v-divider>
-            <v-container class="gameTabContent">
-              <v-layout row wrap v-for="bet in myBets" :key="bet.time">
-                <v-flex xs3 class="subheading">
-                  {{universalMap(bet.country)}}
-                </v-flex>
-                <v-flex xs3 class="subheading">
-                  {{bet.bet+"TRX"}}
-                </v-flex>
-                <v-flex xs3 class="subheading">
-                  {{bet.turn}}
-                </v-flex>
-                <v-flex xs3 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                  {{convertResultBet(bet.result)}}
-                </v-flex>
-              </v-layout>
-            </v-container>
+
           </v-container>
         </v-card>
       </v-flex>
+
       <!-- Latest bets -->
-      <v-flex>
+      <v-flex xs12 md6>
         <v-card>
-          <v-toolbar color="primary" dark>
+          <v-toolbar color="primary_next_tab" dark>
             <v-toolbar-title>Latest Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
-          <v-container grid-list-md text-xs-center class="gameTab">
-            <v-layout row wrap class="gameTabHeader">
-              <v-flex xs2 class="title">
-                <span>Address</span>
-              </v-flex>
-              <v-flex xs4 class="title">
-                <span>Country</span>
-              </v-flex>
-              <v-flex xs2 class="title" style="text-align: start;">
-                <span>Bet</span>
-              </v-flex>
-              <v-flex xs2 class="title" style="text-align: start;">
-                <span>Turn</span>
-              </v-flex>
-              <v-flex xs2 class="title" style="text-align: start;">
-                Result
+
+          <!-- if the user is using a mobile device -->
+          <v-container v-if="this.$store.state.isMobile" grid-list-md text-xs-center class="gameTab">
+
+            <!-- if there are no bets -->
+            <v-layout v-if="latestBets.length === 0">
+              <v-flex class="subheading">
+                <v-chip label outline color="red">No bets yet...</v-chip>
               </v-flex>
             </v-layout>
-            <v-divider class="gameTabDivider"></v-divider>
-            <v-container class="gameTabContent" text-xs-center>
-              <v-layout row wrap v-for="bet in latestBets" :key="bet.time">
-                <v-flex xs2 class="subheading">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <span v-on="on" v-text="bet.address.substring(0,5)+'..'" v-bind:alt="bet.address"></span>
-                    </template>
-                    <span>{{bet.address}}</span>
-                  </v-tooltip>
+
+            <v-layout v-else row wrap class="gameTabHeader">
+              <v-flex xs6 class="title">
+                <span>Country</span>
+              </v-flex>
+              <v-flex xs3 class="title">
+                <span>Bet</span>
+              </v-flex>
+              <v-flex xs3 class="title">
+                <span>Turn</span>
+              </v-flex>
+
+              <v-divider class="gameTabDivider"></v-divider>
+              <v-container class="gameTabContent" text-xs-center>
+
+              <v-layout row wrap v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)" :key="bet.time">
+                <v-flex xs6 class="subheading">
+                  <span>{{universalMap(bet.userChoice)}}</span>
                 </v-flex>
-                <v-flex xs4 class="subheading">
-                  <span>{{universalMap(bet.country)}}</span>
+                <v-flex xs3 class="subheading">
+                  <span>{{bet.amount | TRX}}</span>
                 </v-flex>
-                <v-flex xs2 class="subheading">
-                  <span>{{bet.bet+"TRX"}}</span>
-                </v-flex>
-                <v-flex xs2 class="subheading">
+                <v-flex xs3 class="subheading">
                   <span>{{bet.turn}}</span>
                 </v-flex>
-                <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                  {{convertResultBet(bet.result)}}
-                </v-flex>
               </v-layout>
+
             </v-container>
+              <v-container v-if="latestBets.length > 10">
+              <v-pagination
+                v-model="currentLatestBetPagination"
+                :length="Math.ceil(latestBets.length/10)"
+                color="primary_next_tab"
+              >
+              </v-pagination>
+            </v-container>
+            </v-layout>
           </v-container>
+
+          <!-- else, the user is on pc -->
+          <v-container v-else grid-list-md text-xs-center class="gameTab">
+
+            <!-- if there are no bets -->
+            <v-layout v-if="latestBets.length === 0">
+              <v-flex class="subheading">
+                <v-chip label outline color="red">No bets yet...</v-chip>
+              </v-flex>
+            </v-layout>
+
+            <v-layout v-else row wrap class="gameTabHeader">
+              <v-flex xs3 class="title">
+                <span>Address</span>
+              </v-flex>
+              <v-flex xs5 class="title">
+                <span>Country</span>
+              </v-flex>
+              <v-flex xs2 class="title">
+                <span>Bet</span>
+              </v-flex>
+              <v-flex xs2 class="title">
+                <span>Turn</span>
+              </v-flex>
+
+              <v-divider class="gameTabDivider"></v-divider>
+
+              <v-container class="gameTabContent" text-xs-center>
+                <v-layout row wrap v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)" :key="bet.time">
+
+                  <v-flex xs3 class="subheading text-truncate">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on }">
+                        <span v-on="on" v-text="(bet.from)" v-bind:alt="(bet.from)"></span>
+                      </template>
+                      <span>{{bet.from}}</span>
+                    </v-tooltip>
+                  </v-flex>
+
+                  <v-flex xs5 class="subheading">
+                    <span>{{universalMap(bet.userChoice)}}</span>
+                  </v-flex>
+
+                  <v-flex xs2 class="subheading">
+                    <span>{{bet.amount | TRX}}</span>
+                  </v-flex>
+
+                  <v-flex xs2 class="subheading">
+                    <span>{{bet.turn}}</span>
+                  </v-flex>
+
+                </v-layout>
+              </v-container>
+
+              <v-container v-if="latestBets.length > 10">
+                <v-pagination
+                  v-model="currentLatestBetPagination"
+                  :length="Math.ceil(latestBets.length/10)"
+                  color="primary_next_tab"
+                ></v-pagination>
+              </v-container>
+
+            </v-layout>
+          </v-container>
+
         </v-card>
       </v-flex>
+
     </v-layout>
   </v-container>
 </template>
@@ -188,6 +306,9 @@
 
   export default {
     data: () => ({
+      currentMyBetPagination: 1,
+      currentLatestBetPagination: 1,
+      betAmount: 1,
       showBetNextTab: false,
       isLoading: false,
       valid: false,
@@ -196,84 +317,98 @@
       snackbarColor: "",
       info: {},
       snackbarTimeout: 6000,
-      potentialWin: 0,
       currencies: ["TRX", "WAR"],
       currency: "TRX",
       currencyRule: [v => !!v || 'Select a currency',
         //v => v < 50 || 'You don\'t have enough money'
       ],
+
+      gameType: 1,
+      minBet: 50,
       history: [],
       bets: [],
       mapStatus: [],
       mapping: mapping,
-      intervalId: null
+      isWaitingForConfirm: false,
+      currentTxId: null
     }),
 
-
     firebase: {
-      history: db.ref('history').orderByChild('turn'),
-      bets: db.ref('bets').orderByChild('time'),
-      info: db.ref('data')
+      history: db.ref('public/history').orderByChild('turn'),
+      bets: db.ref('public/bets').orderByChild('time'),
+      info: db.ref('public/data'),
+      mapStatus: db.ref('public/countriesMap')
+    },
+
+    filters: {
+      RESULT: (result) =>{
+        if (result < 0) {
+          return '-'
+        } else {
+          return window.tronWeb.fromSun(result)
+        }
+      },
+      TRX: (amount) => {
+        return window.tronWeb.fromSun(amount) + 'TRX'
+      },
+      probability: (p) =>{
+        return (p <= 0.1 && p > 0) ? 'very low' : p.toFixed(2) + ' %'
+      }
     },
 
     methods: {
-      placeBet() {
-        let _this = this;
+
+      async placeBet() {
+        this.isWaitingForConfirm = true
         if (this.$store.state.loggedInAccount == null) {
           this.snackbarText = "Login First";
           this.snackbarColor = "error";
           this.snackbar = true;
+          this.isWaitingForConfirm = false
         } else if (this.currentCountry == null) {
-          this.snackbarText = "Select a country from map or search it";
+          this.snackbarText = "Select a country first";
           this.snackbarColor = "error";
           this.snackbar = true;
+          this.isWaitingForConfirm = false
         } else {
+          //console.log("instance ",this.$store.state.contracts.TronWarBotInstance)
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
-          let _txId;
-          let contract_address = this.$store.state.test ? "TPA9FDwukKbrYC4pyNjey7XKvMwKi5aj7e" :
-            "TQXiV4TeKS4zF54PiCsUyKTQ22yYY6KuzL";
-          window.tronWeb.contract().at(contract_address).then(contract => {
-            contract.bet(0, _this.currentCountry).send({
-              callValue: window.tronWeb.toSun(this.info.minBet)
-            }).then(
-              txId => _txId = txId)
-          });
-          setTimeout(function () {
-            window.tronWeb.trx.getTransaction(_txId).then(tx => {
-              if (tx.ret[0].contractRet == "SUCCESS") {
-                _this.snackbarColor = "success";
-                _this.snackbarText =
-                  `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
-                if (window.location.pathname.startsWith('/ref')) {
-                  _this.postReferral(_txId)
-                }
-                setTimeout(function () {
-                  _this.$store.dispatch('updateAccountBalance')
-                }, 2000)
-              } else {
-                _this.snackbarText = tx.ret[0].contractRet;
-                _this.snackbarColor = "error";
-              }
-              _this.snackbar = true
+          try {
+            this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.gameType, this.currentCountry, this.info.turn).send({
+              callValue: window.tronWeb.toSun(this.betAmount)
             })
-          }, 10000)
+          } catch {
+            this.isWaitingForConfirm = false;
+            this.snackbarColor = "error";
+            this.snackbar = true;
+            this.snackbarText = "Failed to sign transaction: Confirmation declined by user"
+          }
         }
       },
       async postReferral(txId) {
         try {
-          await axios.post(this.$store.state.test ? `https://localhost:3000/referral` :
+          await axios.post(this.$store.state.test ? `http://localhost:3000/referral` :
             `https://api.tronwarbot.com/referral`, {
               user_addr: this.account,
               txId: txId,
               referrer_addr: window.location.pathname.slice(5)
             })
         } catch (e) {
-          this.snackbarText = "Something went wrong with the referral"
-          this.snackbarColor = "error";
-          this.snackbarTimeout = 2000;
-          this.snackbar = true;
+          console.log(e)
+          try{
+            this.snackbarText = "[REFERRAL] " + e.response.data.message
+            this.snackbarColor = "error";
+            this.snackbarTimeout = 10000;
+            this.snackbar = true;
+          } catch(err){
+            console.log(err)
+            this.snackbarText = "[REFERRAL] Connection error. Referral not done"
+            this.snackbarColor = "error";
+            this.snackbarTimeout = 10000;
+            this.snackbar = true;
+          }
         }
       },
       battleInProgress() {
@@ -288,69 +423,68 @@
         this.snackbarTimeout = 2000;
         this.snackbar = true;
       },
-      convertResultBet: function (betResult) {
-        if (betResult < 0) {
-          return '-'
-        } else {
-          return betResult
-        }
+      gameOver(){
+        this.snackbarText = "Game over. Be ready for the next run";
+        this.snackbarColor = "info";
+        this.snackbarTimeout = 2000;
+        this.snackbar = true;
       },
-      formatTime: function (time) {
-        let date = new Date(time)
-        let hours = date.getHours()
-        let min = date.getMinutes()
-        let sec = date.getSeconds()
-        hours = hours < 10 ? `0${hours}` : hours;
-        sec = sec < 10 ? `0${sec}` : sec;
-        min = min < 10 ? `0${min}` : min;
-        return hours + ':' + min + ':' + sec
+      getProbability: async function (idCountry){
+        let p = await db.ref('public/countriesMap').orderByKey().equalTo(idCountry.toString()).once('value')
+        //let p = Math.random()
+        //console.log(p.val()[idCountry].probability)
+        return p.val()[idCountry].probability
+      }
+    },
+    watch:{
+      myBets: function() {
+        let _this = this
+        // console.log("ENTRO NEL TIMEOUT")
+        if(this.currentTxId !== null){
+          const txId = this.currentTxId
+          window.tronWeb.trx.getTransaction(txId).then((tx) => {
+            if (tx.ret[0].contractRet == "SUCCESS") {
+              _this.snackbarColor = "success";
+              _this.snackbarText =
+                `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
+              if (window.location.pathname.startsWith('/ref')) {
+                _this.postReferral(txId)
+              }
+            } else {
+              _this.snackbarText = tx.ret[0].contractRet;
+              _this.snackbarColor = "error";
+            }
+            _this.snackbar = true
+            _this.isWaitingForConfirm = false
+          })
+          this.currentTxId = null
+        }
       }
     },
     computed: {
-      countryStatus: function () {
-        let result = [];
-        let arr = [];
-        let tmp = [];
-        for (var i = this.mapStatus.length - 1; i >= 0; i--) {
-          arr.push(this.universalMap(i));
-          for (var j = this.mapStatus.length - 1; j >= 0; j--) {
-            if (this.mapStatus[j]['controlledBy'] === i) {
-              tmp.push(j)
-            }
-          }
-          arr.push(tmp);
-          tmp = [];
-          result.push(arr);
-          arr = []
-        }
-        return result
-      },
-      sortedArray: function () {
-        function compare(a, b) {
-          if (a[1].length > b[1].length)
-            return -1;
-          if (a[1].length < b[1].length)
-            return 1;
-          return 0;
-        }
-        let arr = this.countryStatus;
-        return arr.sort(compare);
-      },
       myBets: function () {
-        return this.bets.filter(bet => bet.address === this.account && bet.gameType == 0).reverse()
+        return this.bets.filter(bet => bet.from === this.account && bet.gameType == this.gameType).reverse()
       },
       latestBets: function () {
-        return this.bets.filter(bet => bet.gameType == 0).reverse
+        return this.bets.filter(bet => bet.gameType == this.gameType).reverse().slice(0,20)
       },
-      calculatePotentialWin: function () {
-        if (this.currentCountry == null) return 0;
-        let nextTurn = this.info.nextTurn;
-        let country = this.currentCountry;
-        let betsOnThatCountry = this.latestBets.filter(function (bet) {
-          return bet.turn == nextTurn && bet.country == country;
-        }).length + 1
-        return ((parseFloat(this.info.jackpot) + this.info.minBet) * (1 - this.info.houseEdge - 0.1) /
-          betsOnThatCountry).toFixed(3) + ' TRX';
+      winChance: function (){
+        let country = this.currentCountry
+        if( country == null ) return 0;
+        let p = this.mapStatus[country].probability * 100
+        return p
+      },
+      multiplier: function(){
+        let country = this.currentCountry
+        if(country == null) return 0;
+        return this.mapStatus[country].nextQuote
+      },
+      potentialWin: function(){
+        let multiplier = this.multiplier;
+        let win = (this.betAmount * multiplier).toFixed(3);
+
+        if(win == Infinity) return 0 + " TRX";
+        else return win + " TRX";
       },
       currentCountry: {
         get() {
@@ -363,9 +497,6 @@
       account() {
         return this.$store.state.loggedInAccount
       }
-    },
-    mounted() {
-      // this.fetchGameParam(0)
     }
   }
 </script>

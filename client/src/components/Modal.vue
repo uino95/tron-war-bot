@@ -45,8 +45,12 @@
                 </v-card>
               </v-flex>
             </v-layout>
+            
+            <v-container v-if="this.$store.state.loggedInAccount == null" class="text-md-center">
+              <v-chip label outline color="red">Login First</v-chip>
+            </v-container>
 
-            <v-container v-if="myReferrals.length > 0">
+            <v-container v-else-if="myReferrals.length > 0">
               <v-layout row wrap style="padding: 16px 16px 0 16px;">
                 <v-flex xs6 class="title">Address</v-flex>
                 <v-flex xs6 class="title" style="text-align: end;">Amount</v-flex>
@@ -67,14 +71,14 @@
                 </v-layout>
               </v-container>
             </v-container>
-            
+
             <v-container v-else class="text-md-center">
               <v-chip label outline color="red">Still no one played with your link... :(</v-chip>
             </v-container>
           </v-container>
         </v-card-text>
 
-        <v-card-text v-if="headerTile === 'Dividends' && account !== null">
+        <v-card-text v-if="headerTile === 'Dividends'">
           We want to build this game together with our users, and that's why 100% of TronWarBot profits are shared back
           to token holders! (..but yes we detain around 50% of the current
           token supply). After every stage you will need 50 more TRX to mine one WAR. Dividend payout will happen at the
@@ -88,7 +92,7 @@
           <br />
           <v-layout row wrap>
             <v-flex xs12 sm5>
-              <v-text-field :value="availableTRX | TRX" label="Available Dividends" outline readonly>
+              <v-text-field :value="availableTRX | TRX" label=" Estimate Available Dividends" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" />
@@ -113,7 +117,15 @@
           <v-layout>
             <v-spacer />
             <v-flex xs12 sm5>
-              <v-text-field :value="myWAR | WAR" label="You have mined" outline readonly>
+              <v-text-field v-if="account == null" :value="'Login First'" background-color="red" label="You have mined" outline readonly>
+                <template v-slot:append>
+                  <v-avatar class="pb-2" tile size="40">
+                    <img src="/img/logo.png" />
+                  </v-avatar>
+                </template>
+              </v-text-field>
+
+              <v-text-field v-else :value="myWAR | WAR" label="You have mined" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="/img/logo.png" />
@@ -133,7 +145,7 @@
               <br />Currently, for every
               <b>100 WAR you get {{availableTRX.div(totalWARSupply.div("1000000000000000000")).times('100') | TRX}}</b>
             </v-card-text>
-            <v-chip label outline color="primary" style="margin-left:4.5em;">
+            <v-chip v-if="account != null" label outline color="primary" style="margin-left:4.5em;">
               With your current WARs you will receive:
               {{availableTRX.times(myWAR.div(totalWARSupply).toString()) | TRX }}
             </v-chip>
@@ -143,83 +155,17 @@
           (end of the run)-->
         </v-card-text>
 
-        <v-card-text v-if="headerTile === 'Dividends' && account === null">
-          We want to build this game together with our users, and that's why 100% of TronWarBot profits are shared back
-          to token holders! (..but yes we detain around 50% of the current
-          token supply). After every stage you will need 50 more TRX to mine one WAR. Dividend payout will happen at the
-          end of the run.
-          <br />
-          <v-divider mt-3 />
-          <br />
-          <span class="headling">We are in stage 1 of 100. You need to play 500 TRX to mine 1 WAR</span>
-          <v-chip style="margin-left:14em" label outline color="red">Login First</v-chip>
-          <v-divider mt-8 />
-          <br />
-          <v-layout row wrap>
-            <v-flex xs12 sm5>
-              <v-text-field :value="'0 TRX'" outline readonly>
-                <template v-slot:append>
-                  <v-avatar class="pb-2" tile size="40">
-                    <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" />
-                  </v-avatar>
-                </template>
-              </v-text-field>
-            </v-flex>
-
-            <v-spacer />
-
-            <v-flex xs12 sm5>
-              <v-text-field :value="'0 WAR' " label="Total WAR mined" outline readonly>
-                <template v-slot:append>
-                  <v-avatar class="pb-2" tile size="40">
-                    <img src="/img/logo.png" />
-                  </v-avatar>
-                </template>
-              </v-text-field>
-            </v-flex>
-          </v-layout>
-
-          <v-layout>
-            <v-spacer />
-            <v-flex xs12 sm5>
-              <v-text-field :value="'0 WAR'" label="You have mined" outline readonly>
-                <template v-slot:append>
-                  <v-avatar class="pb-2" tile size="40">
-                    <img src="/img/logo.png" />
-                  </v-avatar>
-                </template>
-              </v-text-field>
-            </v-flex>
-            <v-spacer />
-          </v-layout>
-
-          <v-divider />
-
-          <v-card mt-3>
-            <v-card-text style="text-align:center;">
-              At the end of the run you will be eligible to get your share of dividends by clicking the button "Claim
-              your dividends".
-            </v-card-text>
-            <v-chip label outline color="primary" style="margin-left:4.5em;">
-              With your current WARs you will receive:
-              {{0}}
-            </v-chip>
-          </v-card>
-
-          <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
-          (end of the run)-->
-        </v-card-text>
 
 
 
         <v-card-text v-if="headerTile === 'How To Play'">
           The game is inspired from the popular WorldWarBot 2020
           <a href="https://www.facebook.com/worldwarbot/" target="_blank">Facebook Game</a>
-          <br />The bot simulates a world war: every turn, one every 30 minutes, a state (randomly chosen) conquers
+          <br />The bot simulates a world war: every turn, one every 5 minutes, a state (randomly chosen) conquers
           another country.
           The conquest probability is proportional to the number of conquered countries and the cohesion index of that
           country.
-          A World War run lasts on average 45 days.
+          A World War run lasts on average 40 days.
 
           <br />
           <br>
@@ -248,6 +194,60 @@
 
         <v-card-text v-if="headerTile === 'FAQ'">
           <v-expansion-panel>
+            <v-expansion-panel-content>
+              <template v-slot:header>
+                <div>How are we PROVABLY FAIR?</div>
+              </template>
+              <v-card>
+                <v-card-text>
+                  We are crystal clear. We care about making things right. Here is how we provide the details to check that we are <a href="https://en.wikipedia.org/wiki/Provably_fair" targte="_blank">provably fair</a>.
+                  <br /><br />
+                  At the very beginning of a turn the Bot decides which country will conquer next. The Bot will hash (sha256) the name of the winner + a random string (called seed or salt in cryptography). You can find that hash in the box under Next Turn.<br>
+                  Once the timer runs out, the battle takes place and the conqueror is revelead alogside that seed used to compute the hash. You will then find the initial hash and the Conqueror + its seed under Previus Turn.
+                  <br/><br/>
+                  This way we prove the Bot truly picks the countries in a random manner and doesn't "change its mind" on the way! And this is done in a way you can easily check, that is use any sha256 online tool like the one suggested below.
+                  <br />
+                  <v-divider mt-3 />
+                  <br />
+                  <span class="title">Previous Turn: {{data.turn}} </span>
+                  <br />
+                  
+                  <v-flex>
+                    <v-text-field ref='previousMagicHash' :append-icon="'content_copy'"
+                      @click:append="copyToClipBoard(fairness.previousMagicHash, 'previousMagicHash')" :value="fairness.previousMagicHash"
+                      :label="'Hash of WINNER + SEED '" outline readonly>
+                    </v-text-field>
+                  </v-flex>
+
+                  <v-flex>
+                    <v-text-field ref='magicHashRevealed' :append-icon="'content_copy'"
+                      @click:append="copyToClipBoard(fairness.magicHashRevealed, 'magicHashRevealed')" :value="fairness.magicHashRevealed"
+                      :label="'WINNER + SEED '" outline readonly>
+                    </v-text-field>
+                  </v-flex>
+
+                  <v-divider />
+                  <br />
+                  <span class="title">Next Turn: {{data.turn + 1}} </span>
+                  <br />
+                  <v-flex>
+                    <v-text-field ref='nextMagicHash' :append-icon="'content_copy'"
+                      @click:append="copyToClipBoard(fairness.nextMagicHash, 'nextMagicHash')" :value="fairness.nextMagicHash"
+                      :label="'Hash of WINNER + SEED '" outline readonly>
+                    </v-text-field>
+                  </v-flex>
+
+                  <v-card mt-3>
+                    <v-card-text style="text-align:center;">
+                      If you want to check the correcteness of the hash, we suggest you to use the following sha256 online calculator, but you can whatever tool you prefer.
+                    </v-card-text>
+                    <v-chip label outline color="primary" style="margin-left:4.5em;">
+                      <a href="https://emn178.github.io/online-tools/sha256.html" target="_blank">https://emn178.github.io/online-tools/sha256.html</a>
+                    </v-chip>
+                  </v-card>
+                </v-card-text>
+              </v-card>
+            </v-expansion-panel-content>
             <v-expansion-panel-content v-for="question in faq" :key="question.question">
               <template v-slot:header>
                 <div>{{question.question}}</div>
@@ -272,6 +272,12 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-snackbar v-model="snackbar" :color="'info'" :timeout="3000" vertical bottom>
+      <span class="title"> Copied to clipboard</span>
+      <v-btn dark flat @click="snackbar = false">
+        Close
+      </v-btn>
+    </v-snackbar>
   </v-layout>
 </template>
 
@@ -289,12 +295,12 @@
       bodyTile: String
     },
 
-    filters:{
+    filters: {
       TRX: (amount) => {
         return tronweb.fromSun(amount).toFixed(3) + ' TRX'
       },
-      WAR: (amount) =>{
-        return amount.div("1000000000000000000").toString() + ' WAR'
+      WAR: (amount) => {
+        return amount.div("1000000000000000000").toFixed(3) + ' WAR'
       }
     },
 
@@ -333,7 +339,8 @@
         return this.$store.state.loggedInAccount;
       },
       availableTRX() {
-        return tronweb.BigNumber(tronweb.toSun(this.betFinalData.jackpot * 0.2));
+        // max()
+        return tronweb.BigNumber.maximum(tronweb.BigNumber(tronweb.toSun(this.data.jackpot * 0.2)).plus(this.$store.state.availableDividends).minus(tronweb.toSun(this.data.deposit)),tronweb.BigNumber('0'));
       },
       myWAR() {
         return this.$store.state.currentAddressWarBalance;
@@ -342,14 +349,28 @@
         return this.$store.state.totalWARSupply;
       },
       dividendStage() {
-        return Math.floor((this.totalWARSupply % 10000) / 100);
+        return parseInt(this.totalWARSupply.div("1000000000000000000").mod(1000000).div(100).toString());
       }
     },
     firebase: {
-      referrals: db.ref("referral"),
-      betFinalData: db.ref("betFinalData"),
+      referrals: db.ref("public/referral"),
+      data: db.ref("public/data"),
+      fairness: db.ref("public/fairness"),
+    },
+    methods: {
+      copyToClipBoard(value, ref) {
+        const input = this.$refs[ref];
+        input.focus();
+        document.execCommand('selectAll');
+        this.copied = document.execCommand('copy');
+        this.snackbar = true
+      },
     },
     data: () => ({
+      snackbar: false,
+      snackbarText: "",
+      snackbarColor: "",
+      snackbarTimeout: 6000,
       faq: [{
           question: "What even is TronWarBot?",
           answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
@@ -390,7 +411,7 @@
         },
         {
           question: "How long is a World War?\n",
-          answer: "It has not a fixed deadline, it depends on the development of the war itself. On average it takes 45 days having one turn every 30 minutes.\n"
+          answer: "It has not a fixed deadline, it depends on the development of the war itself. On average it takes 40 days having one turn every 5 minutes.\n"
         },
         {
           question: "What do I do if I'm not able to place the bet?",
@@ -413,7 +434,11 @@
                             select Energy instead of Bandwidth. If you are not going to be executing smart contracts,
                             there is no reason why you should select Energy. Those who are just TRX investors or users
                             should always select Bandwidth and not Energy when freezing their tokens.`
-        }
+        },
+        {
+          question: "Couldn't find your answer?",
+          answer: "Please reach us out on the telegram group (please find the link on the bottom side of the menu)! We would be very happy to answer your questions :)"
+        },
       ]
     })
   };
