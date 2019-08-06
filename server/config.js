@@ -44,7 +44,7 @@ const config = {
   test: JSON.parse(process.env.TEST_MODE || true),
   telegram:{
     token: process.env.TELEGRAM_TOKEN,
-    group: process.env.TELEGRAM_GROUP || -331523835,
+    group: JSON.parse(process.env.TELEGRAM_GROUP || -331523835),
   },
   timing: {
     turn: 300,

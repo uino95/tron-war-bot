@@ -109,7 +109,7 @@ const simulateNextTurn = async () => {
   [ cMap , turnData, computedRandom] = fairness.computeNextState(cMap, magic, seed);
   // EVALUATE WINNER
   var stringToHash = utils.universalMap(turnData.o) + "(" + turnData.o + "):"  + seed;
-  console.log("[SIMULATE]: Winner on turn " + turn + " is => " + utils.universalMap(turnData.o) + "("+ turnData.o +") with computed randoms: " + JSON.stringify(computedRandom));
+  // console.log("[SIMULATE]: Winner on turn " + turn + " is => " + utils.universalMap(turnData.o) + "("+ turnData.o +") with computed randoms: " + JSON.stringify(computedRandom));
   // COMPUTE SHA256 (WINNER + SEED)
   // console.log("Computing SHA256 of:     " + stringToHash);
   let nextMagicHash = utils.sha256(stringToHash);

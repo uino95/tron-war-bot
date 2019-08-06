@@ -101,8 +101,9 @@ const updateExternalData = async (conquerer, conquered, conquererTerritory, conq
   realPdf().forEach((e,i)=>{
     countriesMap[i].probability = e;
     let next = e ? Math.min(1/e, 200) : 200;
+    let pf = countriesMap[i].territories/COUNTRIES;
     countriesMap[i].nextQuote = Math.floor(next*100)/100;
-    countriesMap[i].finalQuote = Math.round(((jackpot * e)/(betsPerCountry[i]+1)) + 50 + (turn/100));
+    countriesMap[i].finalQuote = Math.round(((jackpot * pf)/(betsPerCountry[i]+1)) + 50 + (turn/100));
   })
 }
 
