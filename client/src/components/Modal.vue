@@ -209,7 +209,7 @@
                   <br />
                   <v-divider mt-3 />
                   <br />
-                  <span class="title">Previous Turn: {{data.turn}} </span>
+                  <span class="title">Previous Turn: {{data.turn - 1}} </span>
                   <br />
                   
                   <v-flex>
@@ -228,7 +228,7 @@
 
                   <v-divider />
                   <br />
-                  <span class="title">Next Turn: {{data.turn + 1}} </span>
+                  <span class="title">Next Turn: {{data.turn }} </span>
                   <br />
                   <v-flex>
                     <v-text-field ref='nextMagicHash' :append-icon="'content_copy'"
