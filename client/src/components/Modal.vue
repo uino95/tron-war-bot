@@ -339,7 +339,8 @@
         return this.$store.state.loggedInAccount;
       },
       availableTRX() {
-        return tronweb.BigNumber(tronweb.toSun(this.data.jackpot * 0.15));
+        // max()
+        return tronweb.BigNumber.maximum(tronweb.BigNumber(tronweb.toSun(this.data.jackpot * 0.2)).plus(this.$store.state.availableDividends).minus(tronweb.toSun(this.data.deposit)),tronweb.BigNumber('0'));
       },
       myWAR() {
         return this.$store.state.currentAddressWarBalance;

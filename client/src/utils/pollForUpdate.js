@@ -1,6 +1,7 @@
 import store from '../store'
 import tronWeb from 'tronweb'
 
+const masterAddress = "TVUEuVpq2jWMTJDsgxHVyeFK78Qnddpmsx"
 
 async function pollTronWeb(interval){
 
@@ -72,11 +73,13 @@ async function pollDividends(interval){
   setInterval(async () => {
     try {
       // update available dividends
-      const dividendPoolAddres = await tronWarBotInstance.divPoolAddress().call()
-      const availableDividensInSun = await tronWebPublic.trx.getBalance(dividendPoolAddres);
-      const availableTRXToBigNumber = tronWebPublic.BigNumber(availableDividensInSun.toString()) //number
+      const availableDividensInSunFromHouseReserves = await tronWarBotInstance.houseReserves().call()
+      const availableDividensInSunFromMaster = await tronWebPublic.trx.getBalance(masterAddress);
+      const houseReserves = tronWebPublic.BigNumber(availableDividensInSunFromHouseReserves.toString())
+      const masterBalance = tronWebPublic.BigNumber(availableDividensInSunFromMaster.toString())
+      const availableDividensInSun = houseReserves.plus(masterBalance)
       store.commit('setAvailableDividends', {
-        availableDividends: availableTRXToBigNumber
+        availableDividends: availableDividensInSun
       })
     } catch (error) {
       console.log("error is here in dividends ", error)
