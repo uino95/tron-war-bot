@@ -1,5 +1,5 @@
 // SIMULATION PARAMS
-const SIMULATIONS = 100;
+const SIMULATIONS = 10;
 const EXPECTED_TURN_DURATION = 300;
 // DB interface
 const firebase = require('./firebase')
@@ -49,10 +49,10 @@ const init = async (restart) => {
     return {
       occupiedBy: idx,
       cohesion: 0.5,
-      finalQuote: 0, // PRICE OF FINAL BET
+      finalQuote: 50, // PRICE OF FINAL BET
       nextQuote: 0, // MULTIPLIER FOR BET ON NEXT CONQUERER
       territories: 1,
-      probability: 0
+      probability: (1/COUNTRIES)
     }
   });
   if (!restart) countriesMap = await loadSavedState();
@@ -90,9 +90,6 @@ const leaderboard = ()=>{
 }
 
 const updateExternalData = async (conquerer, conquered, conquererTerritory, conqueredTerritory) => {
-  // UPDATE TERRITORIES
-  countriesMap[conquerer].territories = countriesMap[conquerer].territories + 1;
-  countriesMap[conquered].territories = countriesMap[conquered].territories - 1;
 
   // GET JACKPOT
   let jackpot = await firebase.data.once("value").then(r=>r.val()['jackpot']);
@@ -131,11 +128,14 @@ const launchNextTurn = async (_entropy1, _entropy2) => {
   [countriesMap, turnData, computedRandom] = fairness.computeNextState(countriesMap, (_entropy1 || utils.randomHex()), (_entropy2 || utils.randomHex()));
   turnData.turn = turn - 1;
 
+  // UPDATE TERRITORIES
+  countriesMap[turnData.o].territories = countriesMap[turnData.o].territories + 1;
+  countriesMap[turnData.d].territories = countriesMap[turnData.d].territories - 1;
+
   if (simulation) return turnData.winner != null;
 
   // UPDATE EXTERNAL DATA
   await updateExternalData(turnData.o, turnData.d, turnData.ot, turnData.dt);
-
 
   await saveCurrentState();
   if (turnData.civilWar) console.log("[WWB]:KABOOM! There was a civil war: " + turnData.o + " rebelled on " + turnData.d);
@@ -160,8 +160,14 @@ const simulate = async () => {
   for (var i=0; i<SIMULATIONS; i++){
     init(true);
     let go
+    let leaders = {}
     do {
       updateTurn();
+      if (!(turn % 100)) {
+        let l = leaderboard();
+        leaders[l[0].idx] = l[0];
+        // console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion of: " + l[0].cohesion)
+      }
       go = await launchNextTurn()
       let d = currentTurnData()
       civilWars += d.civilWar;
@@ -169,7 +175,7 @@ const simulate = async () => {
       cohesion = cohesion.map((e,idx)=> e + countriesMap[idx].cohesion);
     } while (!go);
     let c_tot = countriesMap.reduce((acc, c) => acc + c.cohesion, 0);
-    console.log("[WWB]:Winner is:  " + winner() + " in turns: " + turn + "  g_cohesion: " + (c_tot/COUNTRIES).toFixed(4));
+    console.log("[WWB]:Winner is:  " + winner() + " in turns: " + turn + "  g_cohesion: " + (c_tot/COUNTRIES).toFixed(3) + " with: " + Object.keys(leaders).length + " different leaders!");
     if (turn > maxRounds) maxRounds = turn;
     if (turn < minRounds) minRounds = turn;
     wins[winner()]+=1;

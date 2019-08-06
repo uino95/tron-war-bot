@@ -14,7 +14,7 @@
                     <template v-slot:activator="{ on }">
                       <v-icon color="secondary_final_tab" dark v-on="on">info</v-icon>
                     </template>
-                    <span>Bet on the final winner of the World War! Each bet goes into the jackpot. At the end of the run (45 days on average) 80% of the jackpot is given to the winners, and 20% is given to WAR token holders. As the time goes it will be more expensive to bet on countries, also depending on how good they are doing. The first you bet, the better!</span>
+                    <span>Bet on the final winner of the World War! Each bet goes into the jackpot. At the end of the run (40 days on average) 80% of the jackpot is given to the winners, and 20% is given to WAR token holders. As the time goes it will be more expensive to bet on countries, also depending on how good they are doing. The first you bet, the better!</span>
                   </v-tooltip>
                 </v-flex>
               </v-layout>

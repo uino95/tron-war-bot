@@ -161,11 +161,11 @@
         <v-card-text v-if="headerTile === 'How To Play'">
           The game is inspired from the popular WorldWarBot 2020
           <a href="https://www.facebook.com/worldwarbot/" target="_blank">Facebook Game</a>
-          <br />The bot simulates a world war: every turn, one every 30 minutes, a state (randomly chosen) conquers
+          <br />The bot simulates a world war: every turn, one every 5 minutes, a state (randomly chosen) conquers
           another country.
           The conquest probability is proportional to the number of conquered countries and the cohesion index of that
           country.
-          A World War run lasts on average 45 days.
+          A World War run lasts on average 40 days.
 
           <br />
           <br>
@@ -410,7 +410,7 @@
         },
         {
           question: "How long is a World War?\n",
-          answer: "It has not a fixed deadline, it depends on the development of the war itself. On average it takes 45 days having one turn every 30 minutes.\n"
+          answer: "It has not a fixed deadline, it depends on the development of the war itself. On average it takes 40 days having one turn every 5 minutes.\n"
         },
         {
           question: "What do I do if I'm not able to place the bet?",
