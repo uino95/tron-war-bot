@@ -11,10 +11,10 @@ const config = require('./config')
 const utils = require('./utils')
 
 const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
-const toPercent = (n) =>(n * 100).toFixed(2) + "%"
+const toPercent = (n) =>(n * 100).toFixed(1) + "%"
 
 const PROCESSING_TIME = config.test ? 5 : 10;
-const STOP_BET_MARGIN = config.test ? 5 : 10;
+const STOP_BET_MARGIN = config.test ? 5 : 15;
 const NET_TURN_DURATION = (config.timing.turn - (config.timing.blockConfirmation * 3) - PROCESSING_TIME - STOP_BET_MARGIN) * 1000;
 const STOP_BET_DURATION = ((config.timing.blockConfirmation * 3) + STOP_BET_MARGIN)  * 1000;
 
@@ -25,27 +25,31 @@ async function notifyTelegramBot(d) {
   if (config.test) return;
   if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
 
-  let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
-
-  let leaderboard = wwb.leaderboard();
-  let countriesStillAlive = wwb.countriesStillAlive();
-
-  let s = "🌎♟ <b>BATTLE " + d.turn + "</b>♟🌎\n"
+  let s = "⚔️ <b>BATTLE " + d.turn + "</b>⚔️\n"
+  let m = {}
   if (!d.civilWar) {
-    s += "<b>⚔️💣 " + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.o) + ")</b> conquered <b>" + utils.universalMap(d.dt) + " (" + toPercent(d.cohesion.dt) + ")</b> 💣⚔️\n";
-    s += "<i>Previously owned by " + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</i>\n\n"
+    s += "<b>🌎 " + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.o) + ")</b> => <b>" + utils.universalMap(d.dt) + " (" + toPercent(d.cohesion.dt) + ")</b> 🌎\n";
+    s += "<i>Previously: " + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</i>"
   } else {
-    s += "⚒<b>" + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.d) + ")</b> rebelled on the oppressor <b>" + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</b>⚒\n"
-    s += "✨🍀 <b>Long live " + utils.universalMap(d.o) + "!! </b> 🍀✨\n\n"
+    s += "✨<b>" + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.d) + ")</b> rebelled on  <b>" + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</b>✨\n"
+    s += "🍀 <b>Long live " + utils.universalMap(d.o) + "!! </b> 🍀"
   }
-  s += "There are still <b>" + countriesStillAlive.length + "</b> countries alive!\n\n"
-  s += "<b>" + utils.universalMap(leaderboard[0].idx) + " </b> is dominating with <b>" +leaderboard[0].territories + "</b>/241 controlled territories and it has <b>~ " + (leaderboard[0].probability * 100).toFixed(2) +"%</b> chance to seize the world!\n";
-  s += "Current jackpot: <b>" + j + " TRX</b>\n\n";
-  s += "Who will conquer the world?? <b>Do not miss out!</b>\n";
-  s += "👇👇👇 Place your bet to <b>WIN</b> the full pot! 👇👇👇 ";
+  if (!(d.turn%10)){
+    let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
+    let leaderboard = wwb.leaderboard();
+    let countriesStillAlive = wwb.countriesStillAlive();
+    s += "\n\n<b>" + countriesStillAlive.length + "</b> countries alive!\n\n"
+    s +="<b>LEADERS</b>: \t(cohesion)\n"
+    s += "<b>" + leaderboard[0].territories + "</b>/241\t" + utils.universalMap(leaderboard[0].idx) + " ("+toPercent(leaderboard[0].cohesion)+")\t<b>=> " + toPercent(leaderboard[0].probability) +"</b>\n";
+    s += "<b>" + leaderboard[1].territories + "</b>/241\t" + utils.universalMap(leaderboard[1].idx) + " ("+toPercent(leaderboard[1].cohesion)+")\t<b>=> " + toPercent(leaderboard[1].probability) +"</b>\n";
+    s += "<b>" + leaderboard[2].territories + "</b>/241\t" + utils.universalMap(leaderboard[2].idx) + " ("+toPercent(leaderboard[2].cohesion)+")\t<b>=> " + toPercent(leaderboard[2].probability) +"</b>\n";
+    s += "\nJackpot: <b>" + j + " TRX</b>\n\n";
+    s += "Who will conquer the world?? <b>Do not miss out!</b>\n";
+    s += "👇👇👇👇👇👇 ";
 
+    m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};
+  }
 
-  let m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};
   let uri = "https://api.telegram.org/bot" + config.telegram.token + "/";
   uri += "sendMessage?chat_id=" + config.telegram.group;
   uri += "&parse_mode=HTML&reply_markup=" + encodeURIComponent(JSON.stringify(m));
