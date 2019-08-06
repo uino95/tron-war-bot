@@ -31,7 +31,9 @@
     },
     watch:{
       history: function() {
-        this.showAlert = true
+        this.showAlert = false
+        setTimeout(()=> this.showAlert = true,1000)
+        
       }
     }
   }

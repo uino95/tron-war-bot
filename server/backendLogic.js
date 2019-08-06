@@ -147,7 +147,7 @@ module.exports.launchNextTurn = async () =>{
 
   // CAN PLACE BETS
   let nextTurnTime = (new Date()).valueOf() + NET_TURN_DURATION;
-  await firebase.data.update({ serverStatus: 200, nextTurnTime });
+  await firebase.data.update({ serverStatus: 200, turnTime: nextTurnTime });
 
   [magic, seed] = await simulateNextTurn();
 

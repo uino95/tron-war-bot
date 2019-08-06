@@ -92,7 +92,7 @@
           <br />
           <v-layout row wrap>
             <v-flex xs12 sm5>
-              <v-text-field :value="availableTRX | TRX" label="Available Dividends" outline readonly>
+              <v-text-field :value="availableTRX | TRX" label=" Estimate Available Dividends" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" />
@@ -339,7 +339,7 @@
         return this.$store.state.loggedInAccount;
       },
       availableTRX() {
-        return tronweb.BigNumber(tronweb.toSun(this.data.jackpot * 0.2));
+        return tronweb.BigNumber(tronweb.toSun(this.data.jackpot * 0.15));
       },
       myWAR() {
         return this.$store.state.currentAddressWarBalance;
