@@ -7,23 +7,29 @@
         <v-card>
           <v-toolbar color="primary_stats_tab" dark>
             <v-toolbar-title>Current Run Status</v-toolbar-title>
+            <v-spacer/>
+            <v-text-field class="pa-2" v-model="searchStats" append-icon="search" label="Search" single-line hide-details></v-text-field>
           </v-toolbar>
 
           <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
-
-            <v-data-table :headers="headers" :items="mapStatus" class="elevation-1" :pagination.sync="pagination" :rows-per-page-items="[5,10]">
-              <template v-slot:items="props" >
+            <v-data-table :search="searchStats" :headers="headers" :items="countryStatus" :item-key="'idx'" class="elevation-1"
+              :pagination.sync="pagination" :rows-per-page-items="[5,10]">
+              <template v-slot:items="props">
                 <td class="text-xs-right">
-                  <v-avatar >
-                      <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                        :src="getFlagString(universalMap(props.item['.key']))"
-                        :alt="universalMap(props.item['.key'])" />
-                    </v-avatar>
-                </td>  
-                <td class="text-xs-right && font-weight-bold">{{ universalMap(props.item['.key'])}}</td>
+                  <v-avatar>
+                    <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                      :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
+                  </v-avatar>
+                </td>
+                <td class="text-xs-right && font-weight-bold">{{props.item.idx}}</td>
                 <td class="text-xs-right">{{ props.item.territories }}</td>
                 <td class="text-xs-right">{{ (props.item.cohesion * 100).toFixed(2) + ' %'}}</td>
                 <td class="text-xs-right">{{ (props.item.probability * 100).toFixed(2) + ' %'}}</td>
+              </template>
+              <template v-slot:no-results>
+                <v-alert :value="true" color="error" icon="warning">
+                  Your search for "{{ searchStats }}" found no results.
+                </v-alert>
               </template>
             </v-data-table>
 
@@ -175,43 +181,44 @@
       VLazyImage,
     },
     data: () => ({
-      headers: [
-      {
-        text: '',
-        value: '',
-        sortable: false,
-        align:'left'
-      },
-      {
-        text: 'Country',
-        value: 'country',
-        sortable: false,
-        align:'right',
-        class: 'title'
-      }, {
-        text: 'Territories',
-        value: 'territories',
-        sortable: true,
-        align:'right',
-        class: 'title'
-      }, {
-        text: 'Cohesion',
-        value: 'cohesion',
-        sortable: true,
-        align:'right',
-        class: 'title'
-      },
-      {
-        text: 'Next Conquer %',
-        value: 'probability',
-        sortable: true ,
-        align:'right',
-        class: 'title'
-      }],
-      pagination:{
+      headers: [{
+          text: '',
+          value: 'no-value',
+          sortable: false,
+          align: 'left'
+        },
+        {
+          text: 'Country',
+          value: 'idx',
+          sortable: false,
+          align: 'right',
+          class: 'title'
+        }, {
+          text: 'Territories',
+          value: 'territories',
+          sortable: true,
+          align: 'right',
+          class: 'title'
+        }, {
+          text: 'Cohesion',
+          value: 'cohesion',
+          sortable: true,
+          align: 'right',
+          class: 'title'
+        },
+        {
+          text: 'Next Conquer %',
+          value: 'probability',
+          sortable: true,
+          align: 'right',
+          class: 'title'
+        }
+      ],
+      pagination: {
         sortBy: 'territories',
         descending: true,
       },
+      searchStats: '',
       currentRunPagination: 1,
       currentHistoryPagination: 1,
       reversed: false,
@@ -240,14 +247,13 @@
           .replaceAll("í", "i") + ".svg";
       },
     },
-    // computed: {
-    //   countryStatus: function () {
-    //     if(this.reversed){
-    //       this.reversed = true
-    //       return this.mapStatus.reverse()
-    //     }
-    //     return this.mapStatus
-    //   }
-    // }
+    computed: {
+      countryStatus: function () {
+        return this.mapStatus.map(country => {
+          country.idx = this.universalMap(country.idx)
+          return country
+        })
+      }
+    }
   }
 </script>

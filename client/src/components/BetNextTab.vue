@@ -85,7 +85,7 @@
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark @click="placeBet">Bet {{betAmount}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
                 <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">Battle in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">Payout in progress...</v-btn>
-                <v-btn v-else-if="data.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over</v-btn>
+                <v-btn v-else-if="info.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over</v-btn>
               </v-form>
             </v-flex>
           </v-card-title>
@@ -129,7 +129,7 @@
 
             <!-- else show the bets -->
             <v-layout v-else row wrap class="gameTabHeader">
-              <v-flex xs5 class="title">
+              <v-flex xs3 class="title">
                 Country
               </v-flex>
               <v-flex xs4 class="title">
@@ -138,12 +138,15 @@
               <v-flex xs3 class="title">
                 Turn
               </v-flex>
+              <v-flex xs2 class="title">
+                <span>Result</span>
+              </v-flex>
 
               <v-divider class="gameTabDivider"></v-divider>
 
               <v-container class="gameTabContent">
                 <v-layout row wrap v-for="bet in myBets.slice(10 * currentMyBetPagination - 10, 10 * currentMyBetPagination)" :key="bet.time">
-                  <v-flex xs5 class="subheading">
+                  <v-flex xs3 class="subheading">
                     {{universalMap(bet.userChoice)}}
                   </v-flex>
                   <v-flex xs4 class="subheading">
@@ -151,6 +154,9 @@
                   </v-flex>
                   <v-flex xs3 class="subheading">
                     {{bet.turn}}
+                  </v-flex>
+                  <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
+                    <span>{{bet.result | RESULT}}</span>
                   </v-flex>
                 </v-layout>
 
@@ -197,6 +203,7 @@
               <v-flex xs3 class="title">
                 <span>Turn</span>
               </v-flex>
+              
 
               <v-divider class="gameTabDivider"></v-divider>
               <v-container class="gameTabContent" text-xs-center>
@@ -239,7 +246,7 @@
               <v-flex xs3 class="title">
                 <span>Address</span>
               </v-flex>
-              <v-flex xs5 class="title">
+              <v-flex xs3 class="title">
                 <span>Country</span>
               </v-flex>
               <v-flex xs2 class="title">
@@ -247,6 +254,9 @@
               </v-flex>
               <v-flex xs2 class="title">
                 <span>Turn</span>
+              </v-flex>
+              <v-flex xs2 class="title">
+                  <span>Result</span>
               </v-flex>
 
               <v-divider class="gameTabDivider"></v-divider>
@@ -263,7 +273,7 @@
                     </v-tooltip>
                   </v-flex>
 
-                  <v-flex xs5 class="subheading">
+                  <v-flex xs3 class="subheading">
                     <span>{{universalMap(bet.userChoice)}}</span>
                   </v-flex>
 
@@ -273,6 +283,10 @@
 
                   <v-flex xs2 class="subheading">
                     <span>{{bet.turn}}</span>
+                  </v-flex>
+
+                   <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
+                    <span>{{bet.result | RESULT}}</span>
                   </v-flex>
 
                 </v-layout>
@@ -308,7 +322,7 @@
     data: () => ({
       currentMyBetPagination: 1,
       currentLatestBetPagination: 1,
-      betAmount: 1,
+      betAmount: 50,
       showBetNextTab: false,
       isLoading: false,
       valid: false,

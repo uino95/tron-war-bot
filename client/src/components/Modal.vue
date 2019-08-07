@@ -209,7 +209,7 @@
                   <br />
                   <v-divider mt-3 />
                   <br />
-                  <span class="title">Previous Turn: {{data.turn}} </span>
+                  <span class="title">Previous Turn: {{data.turn - 1}} </span>
                   <br />
                   
                   <v-flex>
@@ -228,7 +228,7 @@
 
                   <v-divider />
                   <br />
-                  <span class="title">Next Turn: {{data.turn + 1}} </span>
+                  <span class="title">Next Turn: {{data.turn }} </span>
                   <br />
                   <v-flex>
                     <v-text-field ref='nextMagicHash' :append-icon="'content_copy'"
@@ -339,8 +339,11 @@
         return this.$store.state.loggedInAccount;
       },
       availableTRX() {
-        // max()
-        return tronweb.BigNumber.maximum(tronweb.BigNumber(tronweb.toSun(this.data.jackpot * 0.2)).plus(this.$store.state.availableDividends).minus(tronweb.toSun(this.data.deposit)),tronweb.BigNumber('0'));
+        // BetFinal Jackpot + max((BetNext - deposit),0)
+        const BetFinal = tronweb.BigNumber(tronweb.toSun(this.data.jackpot * 0.2))
+        const BetNext = this.$store.state.availableDividends
+        const deposit = tronweb.toSun(this.data.deposit)
+        return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit),tronweb.BigNumber('0')));
       },
       myWAR() {
         return this.$store.state.currentAddressWarBalance;
