@@ -47,7 +47,7 @@ const config = {
     group: JSON.parse(process.env.TELEGRAM_GROUP || -331523835),
   },
   timing: {
-    turn: 300,
+    turn: 600,
     blockConfirmation: 6
   },
   timingTest: {

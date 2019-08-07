@@ -22,7 +22,7 @@ console.log("[TIMING]: Net turn duration is: " + (NET_TURN_DURATION/1000) + "s")
 console.log("[TIMING]: Stop bet duration is: " + (STOP_BET_DURATION/1000) + "s");
 
 async function notifyTelegramBot(d) {
-  if (config.test) return;
+  // if (config.test) return;
   if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
 
   let s = "⚔️ <b>BATTLE " + d.turn + "</b>⚔️\n"
@@ -34,28 +34,30 @@ async function notifyTelegramBot(d) {
     s += "✨<b>" + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.d) + ")</b> rebelled on  <b>" + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</b>✨\n"
     s += "🍀 <b>Long live " + utils.universalMap(d.o) + "!! </b> 🍀"
   }
-  if (!(d.turn%10)){
-    let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
-    let leaderboard = wwb.leaderboard();
-    let countriesStillAlive = wwb.countriesStillAlive();
-    s += "\n\n<b>" + countriesStillAlive.length + "</b> countries alive!\n\n"
-    s +="<b>LEADERS</b>: \t(cohesion)\n"
-    s += "<b>" + leaderboard[0].territories + "</b>/241\t" + utils.universalMap(leaderboard[0].idx) + " ("+toPercent(leaderboard[0].cohesion)+")\t<b>=> " + toPercent(leaderboard[0].probability) +"</b>\n";
-    s += "<b>" + leaderboard[1].territories + "</b>/241\t" + utils.universalMap(leaderboard[1].idx) + " ("+toPercent(leaderboard[1].cohesion)+")\t<b>=> " + toPercent(leaderboard[1].probability) +"</b>\n";
-    s += "<b>" + leaderboard[2].territories + "</b>/241\t" + utils.universalMap(leaderboard[2].idx) + " ("+toPercent(leaderboard[2].cohesion)+")\t<b>=> " + toPercent(leaderboard[2].probability) +"</b>\n";
-    s += "\nJackpot: <b>" + j + " TRX</b>\n\n";
-    s += "Who will conquer the world?? <b>Do not miss out!</b>\n";
-    s += "👇👇👇👇👇👇 ";
+  let uri = "https://api.telegram.org/bot" + config.telegram.token + "/" + "sendMessage?chat_id=" + config.telegram.group + "&parse_mode=HTML&reply_markup=" + encodeURIComponent(JSON.stringify(m)) + "&disable_web_page_preview=true&text=" + encodeURIComponent(s);
 
-    m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};
-  }
+  await rp.get(uri).catch(console.error);
+  if (d.turn%10) return;
 
-  let uri = "https://api.telegram.org/bot" + config.telegram.token + "/";
-  uri += "sendMessage?chat_id=" + config.telegram.group;
-  uri += "&parse_mode=HTML&reply_markup=" + encodeURIComponent(JSON.stringify(m));
-  uri += "&disable_web_page_preview=true&text=" + encodeURIComponent(s);
+  let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
+  let leaderboard = wwb.leaderboard();
+  let countriesStillAlive = wwb.countriesStillAlive();
+  s = "⏱♟ <b>RUN UPDATE </b>♟⏱\n"
+  s += "\n🌎 <b>" + countriesStillAlive.length + "</b> countries alive!\n\n"
+  s +="🎖🎖 <b>TOP 3 ARMIES</b> 🎖🎖\n"
+  s += "🥇<b>" + leaderboard[0].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[0].idx) + "</b>\t C: "+toPercent(leaderboard[0].cohesion)+"\n";
+  s += "🥈<b>" + leaderboard[1].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[1].idx) + "</b>\t C: "+toPercent(leaderboard[1].cohesion)+"\n";
+  s += "🥉<b>" + leaderboard[2].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[2].idx) + "</b>\t C: "+toPercent(leaderboard[2].cohesion)+"\n";
+  s += "\nJackpot: <b>" + j + " TRX</b>\n\n";
+  s += "Who will conquer the world?? <b>Do not miss out!</b>\n";
+  s += "🎖👇👇👇👇👇👇👇🎖";
 
-  return await rp.get(uri).catch(console.error);
+  m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};
+
+
+  await sleep(20000);
+  uri = "https://api.telegram.org/bot" + config.telegram.token + "/" + "sendMessage?chat_id=" + config.telegram.group + "&parse_mode=HTML&reply_markup=" + encodeURIComponent(JSON.stringify(m)) + "&disable_web_page_preview=true&text=" + encodeURIComponent(s);
+  await rp.get(uri).catch(console.error);
 }
 
 const stopGame = async ()=>{
