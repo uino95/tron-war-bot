@@ -5,6 +5,7 @@ const config = require('./config');
 const BLOCK_CONFIRMATION = config.timing.blockConfirmation;
 
 
+
 const tronWeb = new TronWeb({
   fullHost: config.tron.fullHost,
   privateKey: config.tron.privateKey

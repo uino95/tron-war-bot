@@ -289,11 +289,14 @@
 
             <v-container>
               <v-layout column>
-                <v-layout row wrap v-for="country in betsPerCountry.slice(10 * currentRunPagination - 10, 10 * currentRunPagination )" :key="country.countryId">
+                <v-layout row wrap
+                  v-for="country in betsPerCountry.slice(10 * currentRunPagination - 10, 10 * currentRunPagination )"
+                  :key="country.countryId">
 
                   <v-flex xs2>
                     <v-avatar>
-                      <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag" :src="getFlagString(universalMap(country.countryId))" :alt="country.countryId" />
+                      <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                        :src="getFlagString(universalMap(country.countryId))" :alt="country.countryId" />
                     </v-avatar>
                   </v-flex>
                   <v-flex xs6 style="text-align:start; margin-top:5px;" class="subheading">
@@ -332,7 +335,7 @@
   import VLazyImage from "v-lazy-image";
   import tronweb from 'tronweb'
 
-  String.prototype.replaceAll = function(search, replace) {
+  String.prototype.replaceAll = function (search, replace) {
     if (replace === undefined) {
       return this.toString();
     }
@@ -397,7 +400,7 @@
           .replaceAll("í", "i") + ".svg"
         return str;
       },
-      placeBet: async function() {
+      placeBet: async function () {
         this.isWaitingForConfirm = true
         if (this.$store.state.loggedInAccount == null) {
           this.snackbarText = "Login First";
@@ -525,15 +528,18 @@
         })
         var betsPerCountryList = [];
         for (const x of Array(241).keys()) {
-          betsPerCountryList.push({countryId: x, numberOfBets: 0})
+          betsPerCountryList.push({
+            countryId: x,
+            numberOfBets: 0
+          })
         }
 
-        for(var element of countries){
-            betsPerCountryList[element].numberOfBets += 1;
+        for (var element of countries) {
+          betsPerCountryList[element].numberOfBets += 1;
         }
 
-        betsPerCountryList.sort((a,b) => {
-          return  b.numberOfBets - a.numberOfBets
+        betsPerCountryList.sort((a, b) => {
+          return b.numberOfBets - a.numberOfBets
         })
 
         return betsPerCountryList
@@ -560,7 +566,6 @@
         return this.$store.state.loggedInAccount
       },
     },
-    mounted() {
-    }
+    mounted() {}
   }
 </script>
