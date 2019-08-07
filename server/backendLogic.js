@@ -22,7 +22,7 @@ console.log("[TIMING]: Net turn duration is: " + (NET_TURN_DURATION/1000) + "s")
 console.log("[TIMING]: Stop bet duration is: " + (STOP_BET_DURATION/1000) + "s");
 
 async function notifyTelegramBot(d) {
-  // if (config.test) return;
+  if (config.test) return;
   if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
 
   let s = "⚔️ <b>BATTLE " + d.turn + "</b>⚔️\n"
