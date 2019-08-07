@@ -13,7 +13,7 @@
     <v-card class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text" v-else-if="infoNewTurn != null && data.serverStatus == 300"
       transition="scale-transition" color="error">
       <v-card-text class="pa-0 text-xs-center">
-        Battle in Progress
+        <b>Battle in Progress</b>
       </v-card-text>
     </v-card>
     <v-card class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text" v-else-if="infoNewTurn != null && data.serverStatus == 500"

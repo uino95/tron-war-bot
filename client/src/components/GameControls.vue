@@ -6,11 +6,11 @@
       <v-btn flat replace to="/betfinal">
         <v-icon color="primary_final_tab">public</v-icon> Bet Final
       </v-btn>
-      <v-btn flat replace to="/betnext">
-        <v-icon color="primary_next_tab">attach_money</v-icon> Bet Next
-      </v-btn>
       <v-btn flat replace to="/stats">
         <v-icon color="primary_stats_tab">poll</v-icon> Stats
+      </v-btn>
+      <v-btn flat replace to="/betnext">
+        <v-icon color="primary_next_tab">attach_money</v-icon> Bet Next
       </v-btn>
     </v-toolbar-items>
     <v-spacer></v-spacer>
