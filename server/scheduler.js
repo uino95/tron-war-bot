@@ -9,7 +9,7 @@ const backendLogic = require('./backendLogic');
 
 let m = Math.ceil(config.timing.turn / 60);
 let s = config.timing.turn - ((m-1)*60);
-const CRON_TURN_STRING = ((m-1) ? "0" : ("*/" + s) ) + " *"+ ((m-1) ? ("/"+m) : "") +" * * * *"
+const CRON_TURN_STRING = ((m-1) ? "15" : ("*/" + s) ) + " *"+ ((m-1) ? ("/"+m) : "") +" * * * *"
 
 console.log("[SCHEDULER]: Launch next turn as: " +  CRON_TURN_STRING)
 cron.schedule(CRON_TURN_STRING, backendLogic.launchNextTurn);
