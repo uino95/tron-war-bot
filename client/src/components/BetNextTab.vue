@@ -317,6 +317,7 @@
   from '../plugins/firebase';
   import mapping from '../assets/mapping';
   import axios from 'axios'
+  import tronweb from 'tronweb'
 
   export default {
     data: () => ({
@@ -359,11 +360,11 @@
         if (result < 0) {
           return '-'
         } else {
-          return window.tronWeb.fromSun(result)
+          return tronweb.fromSun(result)
         }
       },
       TRX: (amount) => {
-        return window.tronWeb.fromSun(amount) + 'TRX'
+        return tronweb.fromSun(amount) + 'TRX'
       },
       probability: (p) =>{
         return (p <= 0.1 && p > 0) ? 'very low' : p.toFixed(2) + ' %'

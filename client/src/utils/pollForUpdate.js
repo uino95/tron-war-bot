@@ -9,13 +9,17 @@ async function pollTronWeb(interval){
   
   let handle = setInterval(async () =>{
     tronWebPrivate = window.tronWeb
-    if(tronWebPrivate.ready){
-      clearInterval(handle)
-      store.commit('setTronWebInstance', tronWebPrivate)
-      await store.dispatch('registerContractsInstance')
-      pollAccount(2000)
-      pollBalance(2000)
-      pollMyWar(4000)
+    try {
+      if(tronWebPrivate.ready){
+        clearInterval(handle)
+        store.commit('setTronWebInstance', tronWebPrivate)
+        await store.dispatch('registerContractsInstance')
+        pollAccount(2000)
+        pollBalance(2000)
+        pollMyWar(4000)
+      }
+    } catch (error) {
+      console.log('tronweb not found')
     }
   }, interval)
 
