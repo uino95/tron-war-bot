@@ -391,13 +391,13 @@
           this.snackbar = true;
           try {
             this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.gameType, this.currentCountry, this.info.turn).send({
-              callValue: window.tronWeb.toSun(this.betAmount)
+              callValue: window.tronWeb.toSun(this.betAmount != null ? this.betAmount : this.betNextGameParam.minimumBet)
             })
-          } catch {
+          } catch (err){
             this.isWaitingForConfirm = false;
             this.snackbarColor = "error";
             this.snackbar = true;
-            this.snackbarText = "Failed to sign transaction: Confirmation declined by user"
+            this.snackbarText = "Failed to sign transaction: " + err
           }
         }
       },
