@@ -21,7 +21,11 @@ export default new Vuex.Store({
     currentAddressWarBalance: 0,
     availableDividends: 0,
     totalWARSupply: 0,
-    tronWeb: null
+    tronWeb: null,
+    gameParams:{
+      finalBetParams: null,
+      betNextParams: null
+    }
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -52,6 +56,10 @@ export default new Vuex.Store({
     setTronWebInstance(state, payload){
       console.log("tronweb set")
       state.tronWeb = payload
+    },
+    setGameParams(state,payload){
+      state.gameParams.finalBetParams = payload.finalBetParams
+      state.gameParams.betNextParams = payload.betNextParams
     }
   },
   actions: {

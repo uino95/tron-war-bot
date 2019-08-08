@@ -340,7 +340,7 @@
       },
       availableTRX() {
         // BetFinal Jackpot + max((BetNext - deposit),0)
-        const BetFinal = tronweb.BigNumber(tronweb.toSun(this.data.jackpot * 0.2))
+        const BetFinal = tronweb.BigNumber(tronweb.toSun(this.data.jackpot * this.$store.state.gameParams.finalBetParams.houseEdge))
         const BetNext = this.$store.state.availableDividends
         const deposit = tronweb.toSun(this.data.deposit)
         return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit),tronweb.BigNumber('0')));

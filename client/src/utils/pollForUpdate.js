@@ -2,6 +2,9 @@ import store from '../store'
 import tronWeb from 'tronweb'
 
 const masterAddress = "TVUEuVpq2jWMTJDsgxHVyeFK78Qnddpmsx"
+let tronWebPublic
+let tronWarBotInstance 
+let warCoinInstance
 
 async function pollTronWeb(interval){
 
@@ -67,12 +70,6 @@ function pollBalance(interval){
 }
 
 async function pollDividends(interval){
-  const tronWebPublic = new tronWeb({
-    fullHost: 'https://api.trongrid.io', 
-    privateKey: 'a548c2dda3cd5d0a5c8a484f9c0130aacd1c4fd185762caef13a45318647ca32',
-  })
-  const tronWarBotInstance = await tronWebPublic.contract().at(store.state.contracts.TronWarBotAddress)
-  const warCoinInstance = await tronWebPublic.contract().at(store.state.contracts.WarCoinAddress)
 
   setInterval(async () => {
     try {
@@ -120,9 +117,37 @@ function pollMyWar(interval){
   }, interval) 
 }
 
+async function getGameParams(){
+  try{
+    const finalBetParams = await tronWarBotInstance.gameParams(0).call()
+    const betNextParams = await tronWarBotInstance.gameParams(1).call()
+    store.commit('setGameParams', {
+      finalBetParams: {
+        houseEdge: tronWeb.fromSun(finalBetParams.houseEdge ),
+        minimumBet: tronWeb.fromSun(finalBetParams.minimumBet),
+        maximumBet: tronWeb.fromSun(finalBetParams.maximumBet) 
+      },
+      betNextParams: {
+        houseEdge: tronWeb.fromSun(betNextParams.houseEdge ),
+        minimumBet: tronWeb.fromSun(betNextParams.minimumBet),
+        maximumBet: tronWeb.fromSun(betNextParams.maximumBet) 
+      }
+    })
+  } catch{
+    console.log("something went wrong while retrieving game Params ", error)
+  }
+}
+
 
 const pollForUpdate = async function () {
+  tronWebPublic = new tronWeb({
+    fullHost: 'https://api.trongrid.io', 
+    privateKey: 'a548c2dda3cd5d0a5c8a484f9c0130aacd1c4fd185762caef13a45318647ca32',
+  })
+  tronWarBotInstance = await tronWebPublic.contract().at(store.state.contracts.TronWarBotAddress)
+  warCoinInstance = await tronWebPublic.contract().at(store.state.contracts.WarCoinAddress)
 
+  getGameParams()
   pollTronWeb(500)
   pollDividends(4000)
 }
