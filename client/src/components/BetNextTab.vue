@@ -61,8 +61,8 @@
                     <v-slider
                       thumb-label
                       v-model="betAmount"
-                      min="50"
-                      max="500"
+                      :min="betNextGameParam.minimumBet "
+                      :max="betNextGameParam.maximumBet "
                       label="Bet Amount"
                     ></v-slider>
                   </v-flex>
@@ -82,7 +82,7 @@
                 </v-layout> -->
 
 
-                <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark @click="placeBet">Bet {{betAmount}} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+                <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark @click="placeBet">Bet {{betAmount != null ? betAmount : betNextGameParam.minimumBet }} {{currency}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
                 <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">Battle in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">Payout in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over</v-btn>
@@ -317,12 +317,13 @@
   from '../plugins/firebase';
   import mapping from '../assets/mapping';
   import axios from 'axios'
+  import tronweb from 'tronweb'
 
   export default {
     data: () => ({
       currentMyBetPagination: 1,
       currentLatestBetPagination: 1,
-      betAmount: 50,
+      betAmount: null,
       showBetNextTab: false,
       isLoading: false,
       valid: false,
@@ -338,7 +339,6 @@
       ],
 
       gameType: 1,
-      minBet: 50,
       history: [],
       bets: [],
       mapStatus: [],
@@ -359,11 +359,11 @@
         if (result < 0) {
           return '-'
         } else {
-          return window.tronWeb.fromSun(result)
+          return tronweb.fromSun(result)
         }
       },
       TRX: (amount) => {
-        return window.tronWeb.fromSun(amount) + 'TRX'
+        return tronweb.fromSun(amount) + 'TRX'
       },
       probability: (p) =>{
         return (p <= 0.1 && p > 0) ? 'very low' : p.toFixed(2) + ' %'
@@ -391,13 +391,13 @@
           this.snackbar = true;
           try {
             this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.gameType, this.currentCountry, this.info.turn).send({
-              callValue: window.tronWeb.toSun(this.betAmount)
+              callValue: window.tronWeb.toSun(this.betAmount != null ? this.betAmount : this.betNextGameParam.minimumBet)
             })
-          } catch {
+          } catch (err){
             this.isWaitingForConfirm = false;
             this.snackbarColor = "error";
             this.snackbar = true;
-            this.snackbarText = "Failed to sign transaction: Confirmation declined by user"
+            this.snackbarText = "Failed to sign transaction: " + err
           }
         }
       },
@@ -510,7 +510,10 @@
       },
       account() {
         return this.$store.state.loggedInAccount
-      }
+      },
+      betNextGameParam() {
+        return this.$store.state.gameParams.betNextParams
+      },
     }
   }
 </script>

@@ -13,7 +13,7 @@
 
           <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
             <v-data-table :search="searchStats" :headers="headers" :items="countryStatus" :item-key="'idx'" class="elevation-1"
-              :pagination.sync="pagination" :rows-per-page-items="[5,10]">
+              :pagination.sync="pagination" :rows-per-page-items="[10,20,50]">
               <template v-slot:items="props">
                 <td class="text-xs-right">
                   <v-avatar>
@@ -24,7 +24,16 @@
                 <td class="text-xs-right && font-weight-bold">{{props.item.idx}}</td>
                 <td class="text-xs-right">{{ props.item.territories }}</td>
                 <td class="text-xs-right">{{ (props.item.cohesion * 100).toFixed(2) + ' %'}}</td>
-                <td class="text-xs-right">{{ (props.item.probability * 100).toFixed(2) + ' %'}}</td>
+                <td class="text-xs-right ">
+                  <v-btn class="white--text" color="primary_final_tab" v-on:click="goToBet('betfinal',universalMap(props.item.idx, 'numberId'))">
+                    {{ (props.item.finalQuote + ' TRX')}}
+                  </v-btn>
+                </td>
+                <td class="text-xs-right ">
+                  <v-btn class="white--text" color="primary_next_tab" v-on:click="goToBet('betnext',universalMap(props.item.idx, 'numberId'))">
+                    {{ (props.item.probability * 100).toFixed(2) + ' %'}}
+                  </v-btn>
+                </td>
               </template>
               <template v-slot:no-results>
                 <v-alert :value="true" color="error" icon="warning">
@@ -32,42 +41,6 @@
                 </v-alert>
               </template>
             </v-data-table>
-
-            <!-- <v-layout align-center justify-space-between row wrap class="gameTabHeader">
-            <v-flex xs3 sm5 md4 style="text-align: start;" class="title">Country</v-flex>
-            <v-flex xs4 sm3 md4 style="text-align: center;" class="title">Territories</v-flex>
-            <v-flex xs4 sm4 md4 style="text-align: end;" class="title">Cohesion</v-flex>
-          </v-layout>
-
-          <v-divider class="gameTabDivider"></v-divider>
-
-          <v-container>
-            <v-layout column>
-            <v-layout row wrap v-for="(country) in mapStatus.slice().reverse().slice(10 * currentRunPagination - 10, 10 * currentRunPagination )" :key="country['.key']">
-              <v-flex xs2>
-                <v-avatar size="90%">
-                  <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag" :src="getFlagString(universalMap(country['.key']))" :alt="universalMap(country['.key'])" />
-                </v-avatar>
-              </v-flex>
-              <v-flex xs4 style="text-align:start; margin-top:5px;" class="subheading">
-                {{universalMap(country['.key'])}}
-              </v-flex>
-              <v-flex xs2 class="title" style="text-align: end">
-                {{country.territories}}
-              </v-flex>
-              <v-flex xs3 class="title" style="text-align: end">
-                {{country.cohesion.toFixed(2)}}
-              </v-flex>
-            </v-layout>
-
-            <v-pagination
-              color="primary_stats_tab"
-              v-model="currentRunPagination"
-              :length="25"
-            >
-            </v-pagination>
-            </v-layout>
-          </v-container> -->
 
           </v-container>
         </v-card>
@@ -207,12 +180,19 @@
           class: 'title'
         },
         {
+          text: 'Final Conquer Quote',
+          value: 'finalQuote',
+          sortable: true,
+          align: 'right',
+          class: 'title'
+        },
+        {
           text: 'Next Conquer %',
           value: 'probability',
           sortable: true,
           align: 'right',
           class: 'title'
-        }
+        },
       ],
       pagination: {
         sortBy: 'territories',
@@ -246,6 +226,10 @@
           .replaceAll("é", "e")
           .replaceAll("í", "i") + ".svg";
       },
+      goToBet(path,country){
+        this.$store.commit('setSelectedCountry',country)
+        this.$router.push(path)
+      }
     },
     computed: {
       countryStatus: function () {

@@ -365,7 +365,6 @@
       unsortedBetsPerCountry: [],
       currentTxId: null,
 
-      minBet: 1,
       gameType: 0,
       history: [],
       bets: [],
@@ -551,7 +550,7 @@
         if (this.currentCountry == null) return 0;
         let bets = this.betsPerCountry
         let betsOnThatCountry = bets.find(el => (el.countryId === this.currentCountry))
-        return ((parseFloat(this.data.jackpot) + this.minBet) * (1 - this.data.houseEdge) * 1 /
+        return ((parseFloat(this.data.jackpot) + this.countriesMap[this.currentCountry].finalQuote) * (1 - this.$store.state.gameParams.finalBetParams.houseEdge) * 1 /
           Math.max(betsOnThatCountry.numberOfBets + 1, 1)).toFixed(3) + ' TRX';
       },
       currentCountry: {
