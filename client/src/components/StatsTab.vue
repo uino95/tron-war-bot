@@ -7,6 +7,12 @@
         <v-card>
           <v-toolbar color="primary_stats_tab" dark>
             <v-toolbar-title>Current Run Status</v-toolbar-title>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                  <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
+                </template>
+                <span> Here you can see some stats about how the run is going. In particular you have the number of territories that a country is occupying. The cohesion index of each country, the lower it is the higher the probability that one of its controlled coutry will insurrect. Then you have the price to bet on the final Conquer, it vary depending on: the turn, the number of bets on that country and the current jackpot. Finally you have the probability of that country to be the next conqueror. All you need to do now is choose a country and smash the bet button responsibly.</span>
+            </v-tooltip>
             <v-spacer/>
             <v-text-field class="pa-2" v-model="searchStats" append-icon="search" label="Search" single-line hide-details></v-text-field>
           </v-toolbar>

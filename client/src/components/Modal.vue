@@ -259,6 +259,12 @@
           </v-expansion-panel>
         </v-card-text>
 
+        <v-card-text class="display-1" v-if="headerTile === 'Whitepaper'">
+          <div>
+            We are updating it. It will be available in a few days
+          </div>
+        </v-card-text>
+
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-tooltip bottom>
@@ -270,6 +276,7 @@
           </v-tooltip>
           <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
         </v-card-actions>
+
       </v-card>
     </v-dialog>
     <v-snackbar v-model="snackbar" :color="'info'" :timeout="3000" vertical bottom>
