@@ -14,5 +14,5 @@ module.exports = async function(deployer) {
   await twb.setHouseMiningRate(tronWrap.toSun(1), {from: from});
   await twb.setDividendsToProfitsRate(tronWrap.toSun(0.5), {from: from});
   await twb.setGameParams(0, tronWrap.toSun(0.2), tronWrap.toSun(50), tronWrap.toSun(500000), {from: from});
-  await twb.setGameParams(1, tronWrap.toSun(0.05), tronWrap.toSun(50), tronWrap.toSun(500), {from: from});
+  await twb.setGameParams(1, tronWrap.toSun(0.05), tronWrap.toSun(10), tronWrap.toSun(500), {from: from});
 };
