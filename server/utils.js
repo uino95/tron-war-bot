@@ -33,7 +33,8 @@ const utils = {
       .randomBytes(Math.ceil(len / 2))
       .toString('hex') // convert to hexadecimal format
       .slice(0, len) // return required number of characters
-  }
+  },
+  toPercent : (n) =>(n * 100).toFixed(1) + "%",
 }
 
 module.exports = utils;

@@ -19,6 +19,7 @@
     "mongoose": "^5.5.9",
     "newrelic": "^5.9.1",
     "node-cron": "^2.0.3",
+    "node-telegram-bot-api": "^0.30.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "socket.io": "^2.2.0",
