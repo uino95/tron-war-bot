@@ -107,7 +107,7 @@ const revealFairWinner = async () => {
 ///////////////////////////////////////////////////////////////////////////////////////
 module.exports.simulateNextTurn = async () =>{
   if (wwb.winner()) return;
-  console.log("\n[SCHEDULER]: ********* Simulating next turn! *********");
+  console.log("[SCHEDULER]: ********* Simulating next turn! *********");
 
   let nextTurnTime = new Date()
   nextTurnTime.setSeconds(nextTurnTime.getSeconds() + config.timing.turn - config.timing.spread);
@@ -120,7 +120,7 @@ module.exports.simulateNextTurn = async () =>{
 
 module.exports.launchNextTurn = async () =>{
   if (wwb.winner()) return;
-  console.log("\n[SCHEDULER]: ********* Launch next turn! *********");
+  console.log("[SCHEDULER]: ********* Launch next turn! *********");
 
   // READY TO LAUNCH TURN
   let turn = wwb.currentTurn();
@@ -160,7 +160,7 @@ module.exports.launchNextTurn = async () =>{
   await revealFairWinner();
 
   // **** PAYOUT FOR GAME 1 AGAINST DEALER **** //
-  console.log("[SCHEDULER]: ********* Critical turn operations completed! *********\n");
+  console.log("[SCHEDULER]: ********* Critical turn operations completed! *********");
 
   // STOP GAME BETS
   if (go) await stopGame();
@@ -168,7 +168,7 @@ module.exports.launchNextTurn = async () =>{
   // COMMUNICATE WINNER
   telegram.notifyTelegramBot(data);
 
-  console.log("\n[SCHEDULER]: ----- Running payouts! ------");
+  console.log("[SCHEDULER]: ----- Running payouts! ------");
   // GET CURRENT TURN BETS
   var _bets = await firebase.bets.getCurrentTurnBets(1, cr.round, data.turn);
 
@@ -180,7 +180,7 @@ module.exports.launchNextTurn = async () =>{
   // PAYOUT FINAL
   if (go) gameOver();
 
-  console.log("[SCHEDULER]: ----- Payout finished! ------\n");
+  console.log("[SCHEDULER]: ----- Payout finished! ------");
 }
 
 

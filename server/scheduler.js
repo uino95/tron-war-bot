@@ -18,4 +18,4 @@ console.log("[SCHEDULER]: Scheduling referral payout at every hour...")
 cron.schedule("0 0 1 * * *", referral.payReferrals);
 
 console.log("[SCHEDULER]: Scheduling run updates...")
-cron.schedule(config.test ? "0 */2 * * * *" : "0 0 */8 * * *", telegram.runUpdate);
+cron.schedule(config.test ? "0 */2 * * * *" : "0 0 */6 * * *", telegram.runUpdate);

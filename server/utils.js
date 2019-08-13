@@ -35,6 +35,7 @@ const utils = {
       .slice(0, len) // return required number of characters
   },
   toPercent : (n) =>(n * 100).toFixed(1) + "%",
+  truncate: (s, n)=> (s.length > n) ? s.substr(0, n-2) + '..' : s
 }
 
 module.exports = utils;

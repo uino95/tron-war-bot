@@ -15,14 +15,15 @@ var _tMessage, _text = "";
 
 async function battleUpdate(d) {
   if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
+  if (!(d.turn % 6)) _tMessage = undefined;
 
-  let s = "<b> " + d.turn + "</b> ⚔️\t"
+  let s = "<b> " + d.turn + "</b>\t"
   if (!d.civilWar) {
-    s += "<b> " + utils.universalMap(d.o) + " " + utils.toPercent(d.cohesion.o) + "</b> => <b>" + utils.universalMap(d.dt) + " " + utils.toPercent(d.cohesion.dt) + "</b>\n";
-    s += "\t\t\t  <i>Previously: " + utils.universalMap(d.d) + " " + utils.toPercent(d.cohesion.d) + "</i>"
+    s += "⚔️<b> " + utils.truncate(utils.universalMap(d.o), 10) + " " + utils.toPercent(d.cohesion.o) + "</b> => <b>" + utils.truncate(utils.universalMap(d.dt), 10) + " </b>\n";
+    s += "\t\t\t  <i>Previously: " + utils.universalMap(d.d) + "</i>\n"
   } else {
-    s += "✨🍀<b>" + utils.universalMap(d.o) + " (" + utils.toPercent(d.cohesion.o) + ")</b> rebelled on  <b>" + utils.universalMap(d.d) + " (" + utils.toPercent(d.cohesion.d) + ")</b>\n"
-    s += "\t\t\t  <i>Long live " + utils.universalMap(d.o) + "!</i>"
+    s += "✨<b>" + utils.truncate(utils.universalMap(d.o), 10) + " </b> rebelled on  <b>" + utils.truncate(utils.universalMap(d.d), 10) + "</b>\n"
+    s += "\t\t\t  <i>🍀 Long live " + utils.universalMap(d.o) + "!</i>\n"
   }
   if (_tMessage) {
     _text = _text + "\n" + s
@@ -37,7 +38,7 @@ async function runUpdate(){
   let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
   let leaderboard = wwb.leaderboard();
   let countriesStillAlive = wwb.countriesStillAlive();
-  let s = "⏱♟ <b>TURN: " + wwb.currentTurn() +"</b> RUN UPDATE ♟⏱\n"
+  let s = "⏱♟ <b>TURN " + wwb.currentTurn() +"</b> UPDATE ♟⏱\n"
   s += "\n🌎 <b>" + countriesStillAlive.length + "</b> countries alive!\n\n"
   s +="🎖🎖 <b>TOP 5 ARMIES</b> 🎖🎖\n"
   s += "🥇<b>" + leaderboard[0].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[0].idx) + "</b>\t C: "+utils.toPercent(leaderboard[0].cohesion)+"\n";
