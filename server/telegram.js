@@ -19,11 +19,11 @@ async function battleUpdate(d) {
 
   let s = "<b> " + d.turn + "</b>\t"
   if (!d.civilWar) {
-    s += "⚔️<b> " + utils.truncate(utils.universalMap(d.o), 10) + " " + utils.toPercent(d.cohesion.o) + "</b> => <b>" + utils.truncate(utils.universalMap(d.dt), 10) + " </b>\n";
-    s += "\t\t\t  <i>Previously: " + utils.universalMap(d.d) + "</i>\n"
+    s += "⚔️<b> " + utils.truncate(utils.universalMap(d.o), 10) + " " + utils.toPercent(d.cohesion.o) + "</b> > <b>" + utils.truncate(utils.universalMap(d.dt), 10) + " </b>\n";
+    s += "\t\t\t  <i>Previously: " + utils.truncate(utils.universalMap(d.d) ,23) + "</i>\n"
   } else {
     s += "✨<b>" + utils.truncate(utils.universalMap(d.o), 10) + " </b> rebelled on  <b>" + utils.truncate(utils.universalMap(d.d), 10) + "</b>\n"
-    s += "\t\t\t  <i>🍀 Long live " + utils.universalMap(d.o) + "!</i>\n"
+    s += "\t\t\t  <i>🍀 Long live " + utils.truncate(utils.universalMap(d.o) ,23) + "!</i>\n"
   }
   if (_tMessage) {
     _text = _text + "\n" + s
