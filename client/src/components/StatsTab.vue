@@ -64,6 +64,7 @@
                     {{ (props.item.probability * 100).toFixed(2) + ' %'}}
                   </v-btn>
                 </td>
+                <td class="text-xs-right">{{ universalMap(props.item.occupiedBy) }}</td>
               </template>
               <template v-slot:no-results>
                 <v-alert :value="true" color="error" icon="warning">
@@ -220,6 +221,13 @@
           text: 'Next Conquer %',
           value: 'probability',
           sortable: true,
+          align: 'right',
+          class: 'title'
+        },
+        {
+          text: 'Occupied by',
+          value: 'occupiedBy',
+          sortable: false,
           align: 'right',
           class: 'title'
         },
