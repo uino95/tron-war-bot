@@ -492,7 +492,7 @@
         return this.bets.filter(bet => bet.from === this.account && bet.gameType == this.gameType).reverse()
       },
       latestBets: function () {
-        return this.bets.filter(bet => bet.gameType == this.gameType).reverse().slice(0, 20)
+        return this.bets.filter(bet => bet.gameType == this.gameType).reverse().slice(0, 150)
       },
       winChance: function () {
         let country = this.currentCountry
