@@ -5,6 +5,7 @@ const firebase = require('./firebase')
 const fairness = require('./fairness')
 const wwb = require('./worldWarBot')
 const twb = require('./tronWarBot')
+const telegram = require('./telegram')
 const referral = require('./referral')
 const betValidator = require('./bet')
 const config = require('./config')
@@ -13,52 +14,10 @@ const utils = require('./utils')
 const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const toPercent = (n) =>(n * 100).toFixed(1) + "%"
 
-const PROCESSING_TIME = config.test ? 5 : 10;
 const STOP_BET_MARGIN = config.test ? 5 : 15;
-const NET_TURN_DURATION = (config.timing.turn - (config.timing.blockConfirmation * 3) - PROCESSING_TIME - STOP_BET_MARGIN) * 1000;
 const STOP_BET_DURATION = ((config.timing.blockConfirmation * 3) + STOP_BET_MARGIN)  * 1000;
 
-console.log("[TIMING]: Net turn duration is: " + (NET_TURN_DURATION/1000) + "s");
 console.log("[TIMING]: Stop bet duration is: " + (STOP_BET_DURATION/1000) + "s");
-
-async function notifyTelegramBot(d) {
-  if (config.test) return;
-  if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
-
-  let s = "⚔️ <b>BATTLE " + d.turn + "</b>⚔️\n"
-  let m = {}
-  if (!d.civilWar) {
-    s += "<b>🌎 " + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.o) + ")</b> => <b>" + utils.universalMap(d.dt) + " (" + toPercent(d.cohesion.dt) + ")</b> 🌎\n";
-    s += "<i>Previously: " + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</i>"
-  } else {
-    s += "✨<b>" + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.d) + ")</b> rebelled on  <b>" + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</b>✨\n"
-    s += "🍀 <b>Long live " + utils.universalMap(d.o) + "!! </b> 🍀"
-  }
-  let uri = "https://api.telegram.org/bot" + config.telegram.token + "/" + "sendMessage?chat_id=" + config.telegram.group + "&parse_mode=HTML&reply_markup=" + encodeURIComponent(JSON.stringify(m)) + "&disable_web_page_preview=true&text=" + encodeURIComponent(s);
-
-  await rp.get(uri).catch(console.error);
-  if (d.turn%10) return;
-
-  let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
-  let leaderboard = wwb.leaderboard();
-  let countriesStillAlive = wwb.countriesStillAlive();
-  s = "⏱♟ <b>RUN UPDATE </b>♟⏱\n"
-  s += "\n🌎 <b>" + countriesStillAlive.length + "</b> countries alive!\n\n"
-  s +="🎖🎖 <b>TOP 3 ARMIES</b> 🎖🎖\n"
-  s += "🥇<b>" + leaderboard[0].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[0].idx) + "</b>\t C: "+toPercent(leaderboard[0].cohesion)+"\n";
-  s += "🥈<b>" + leaderboard[1].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[1].idx) + "</b>\t C: "+toPercent(leaderboard[1].cohesion)+"\n";
-  s += "🥉<b>" + leaderboard[2].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[2].idx) + "</b>\t C: "+toPercent(leaderboard[2].cohesion)+"\n";
-  s += "\nJackpot: <b>" + j + " TRX</b>\n\n";
-  s += "Who will conquer the world?? <b>Do not miss out!</b>\n";
-  s += "🎖👇👇👇👇👇👇👇🎖";
-
-  m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};
-
-
-  await sleep(20000);
-  uri = "https://api.telegram.org/bot" + config.telegram.token + "/" + "sendMessage?chat_id=" + config.telegram.group + "&parse_mode=HTML&reply_markup=" + encodeURIComponent(JSON.stringify(m)) + "&disable_web_page_preview=true&text=" + encodeURIComponent(s);
-  await rp.get(uri).catch(console.error);
-}
 
 const stopGame = async ()=>{
   await firebase.data.update({ serverStatus: 500 });
@@ -97,7 +56,7 @@ const stopBets = async (waitTime) => {
   wwb.updateTurn();
 }
 
-const simulateNextTurn = async () => {
+const simulate = async () => {
   if (wwb.winner()) return;
   // CALCULATE MAGIC NUMBER AND SEED
   let turn = wwb.currentTurn();
@@ -146,21 +105,33 @@ const revealFairWinner = async () => {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
+module.exports.simulateNextTurn = async () =>{
+  if (wwb.winner()) return;
+  console.log("[SCHEDULER]: ********* Simulating next turn! *********");
+
+  let nextTurnTime = new Date()
+  nextTurnTime.setSeconds(nextTurnTime.getSeconds() + config.timing.turn - config.timing.spread);
+  await firebase.data.update({ serverStatus: 200, turnTime: nextTurnTime.valueOf() });
+  [magic, seed] = await simulate();
+
+  console.log("[SCHEDULER]: ********* Simulating next turn finished! *********");
+}
+
 
 module.exports.launchNextTurn = async () =>{
   if (wwb.winner()) return;
-  console.log("\n[SCHEDULER]: ********* Launching next turn! *********");
+  console.log("[SCHEDULER]: ********* Launch next turn! *********");
 
-  // CAN PLACE BETS
-  let nextTurnTime = (new Date()).valueOf() + NET_TURN_DURATION;
-  await firebase.data.update({ serverStatus: 200, turnTime: nextTurnTime });
+  // READY TO LAUNCH TURN
+  let turn = wwb.currentTurn();
 
-  [magic, seed] = await simulateNextTurn();
-
-  await sleep(NET_TURN_DURATION);
+  let currentSecret = await firebase.secret.once('value').then(r=>r.val());
+  if (turn != currentSecret.turn) return console.error("[LOGIC] Need to simulate turn before updating. Wait for next one.");
 
   console.log("!!!!!! Declaring winner in seconds! DO NOT STOP SERVER NOW (please) !!!!!!!")
-  // READY TO LAUNCH TURN
+  let magic = currentSecret.magic;
+  let seed = currentSecret.seed;
+
   await stopBets(STOP_BET_DURATION);
 
 
@@ -189,15 +160,15 @@ module.exports.launchNextTurn = async () =>{
   await revealFairWinner();
 
   // **** PAYOUT FOR GAME 1 AGAINST DEALER **** //
-  console.log("[SCHEDULER]: ********* Critical turn operations completed! *********\n");
+  console.log("[SCHEDULER]: ********* Critical turn operations completed! *********");
 
   // STOP GAME BETS
   if (go) await stopGame();
 
   // COMMUNICATE WINNER
-  notifyTelegramBot(data);
+  telegram.notifyTelegramBot(data);
 
-  console.log("\n[SCHEDULER]: ----- Running payouts! ------");
+  console.log("[SCHEDULER]: ----- Running payouts! ------");
   // GET CURRENT TURN BETS
   var _bets = await firebase.bets.getCurrentTurnBets(1, cr.round, data.turn);
 
@@ -209,7 +180,7 @@ module.exports.launchNextTurn = async () =>{
   // PAYOUT FINAL
   if (go) gameOver();
 
-  console.log("[SCHEDULER]: ----- Payout finished! ------\n");
+  console.log("[SCHEDULER]: ----- Payout finished! ------");
 }
 
 
@@ -253,5 +224,3 @@ module.exports.watchBet = function () {
     console.info("Successfully registered bet in tx " + r.transaction + " at " + betTime)
   });
 }
-
-module.exports.notifyTelegramBot = notifyTelegramBot;

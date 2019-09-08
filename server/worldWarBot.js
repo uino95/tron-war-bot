@@ -50,7 +50,7 @@ const init = async (restart) => {
       occupiedBy: idx,
       cohesion: 0.5,
       finalQuote: 50, // PRICE OF FINAL BET
-      nextQuote: 0, // MULTIPLIER FOR BET ON NEXT CONQUERER
+      nextQuote: 200, // MULTIPLIER FOR BET ON NEXT CONQUERER
       territories: 1,
       probability: (1/COUNTRIES)
     }
