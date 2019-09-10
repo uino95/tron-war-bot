@@ -150,6 +150,7 @@ module.exports.launchNextTurn = async () =>{
 
   // UPDATE HISTORY
   firebase.history.push().set({
+    data,
     conquest: [data.o, data.dt],
     prev: data.d,
     turn: data.turn,
