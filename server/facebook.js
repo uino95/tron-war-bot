@@ -19,6 +19,7 @@ const me = async (body)=>{
 }
 
 const post = async (body)=>{
+  if (config.test) return console.log("[FACEBOOK]: Not posting in test mode. Preview:\n\n" + body);
   let r = await FB.api('me/feed', 'post', { message: body });
   console.log("[FACEBOOK]: Post published successfully with id: " + r.id);
 }
