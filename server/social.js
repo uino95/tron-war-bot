@@ -17,11 +17,11 @@ async function runUpdate(){
     r = r.data;
     if (r.civilWar) civilWar.push(utils.universalMap(r.o));
     u[r.d] = u[r.d] || { id: r.d }
-    u[r.d].ic = u[r.d].ic || r.cohesion.d
+    u[r.d].dc = (u[r.d].dc || 0) + r.cohesion.delta_d
     u[r.d].fc = r.cohesion.d
     u[r.d].wt = (u[r.d].wt || 0) - 1
     u[r.o] = u[r.o] || { id: r.o }
-    u[r.o].ic = u[r.o].ic || r.cohesion.o
+    u[r.o].dc = (u[r.o].dc || 0) + r.cohesion.delta_o
     u[r.o].fc = r.cohesion.o
     u[r.o].wt = (u[r.o].wt || 0) + 1
   })
@@ -57,24 +57,24 @@ async function runUpdate(){
   f += "\n🕛 12 HOURS BREAK: 🕛\n"
   // t += "\n👍 <b> BEST 3 </b> 👍\n"
   f += "\n👍 BEST 3 👍\n"
-  // t +=  "<b>+" + top3[0].wt + " " + utils.universalMap(top3[0].id) + "</b>  C: " + utils.toPercent(top3[0].fc) + " (" + utils.toPercent(top3[0].fc-top3[0].ic) +")\n"
-  f +=  "+" + top3[0].wt + " " + utils.universalMap(top3[0].id) + "  C: " + utils.toPercent(top3[0].fc) + " (" + utils.toPercent(top3[0].fc-top3[0].ic) +")\n"
-  // t +=  "<b>+" + top3[1].wt + " " + utils.universalMap(top3[1].id) + "</b>  C: " + utils.toPercent(top3[1].fc) + " (" + utils.toPercent(top3[1].fc-top3[1].ic) +")\n"
-  f +=  "+" + top3[1].wt + " " + utils.universalMap(top3[1].id) + "  C: " + utils.toPercent(top3[1].fc) + " (" + utils.toPercent(top3[1].fc-top3[1].ic) +")\n"
-  // t +=  "<b>+" + top3[2].wt + " " + utils.universalMap(top3[2].id) + "</b>  C: " + utils.toPercent(top3[2].fc) + " (" + utils.toPercent(top3[2].fc-top3[2].ic) +")\n"
-  f +=  "+" + top3[2].wt + " " + utils.universalMap(top3[2].id) + "  C: " + utils.toPercent(top3[2].fc) + " (" + utils.toPercent(top3[2].fc-top3[2].ic) +")\n"
+  // t +=  "<b>+" + top3[0].wt + " " + utils.universalMap(top3[0].id) + "</b>  C: " + utils.toPercent(top3[0].fc) + " (" + utils.toPercent(top3[0].dc) +")\n"
+  f +=  "+" + top3[0].wt + " " + utils.universalMap(top3[0].id) + "  C: " + utils.toPercent(top3[0].fc) + " (" + utils.toPercent(top3[0].dc) +")\n"
+  // t +=  "<b>+" + top3[1].wt + " " + utils.universalMap(top3[1].id) + "</b>  C: " + utils.toPercent(top3[1].fc) + " (" + utils.toPercent(top3[1].dc) +")\n"
+  f +=  "+" + top3[1].wt + " " + utils.universalMap(top3[1].id) + "  C: " + utils.toPercent(top3[1].fc) + " (" + utils.toPercent(top3[1].dc) +")\n"
+  // t +=  "<b>+" + top3[2].wt + " " + utils.universalMap(top3[2].id) + "</b>  C: " + utils.toPercent(top3[2].fc) + " (" + utils.toPercent(top3[2].dc) +")\n"
+  f +=  "+" + top3[2].wt + " " + utils.universalMap(top3[2].id) + "  C: " + utils.toPercent(top3[2].fc) + " (" + utils.toPercent(top3[2].dc) +")\n"
   top3.reverse();
   // t += "\n🔻<b> WORST 3 </b> 🔻\n"
   f += "\n🔻 WORST 3 🔻\n"
-  // t +=  "<b>" + top3[0].wt + " " + utils.universalMap(top3[0].id) +  "</b>  C: " + utils.toPercent(top3[0].fc) + " (" + utils.toPercent(top3[0].fc-top3[0].ic) +")\n"
-  f +=  top3[0].wt + " " + utils.universalMap(top3[0].id) +  "  C: " + utils.toPercent(top3[0].fc) + " (" + utils.toPercent(top3[0].fc-top3[0].ic) +")\n"
-  // t +=  "<b>" + top3[1].wt + " " + utils.universalMap(top3[1].id) +  "</b>  C: " + utils.toPercent(top3[1].fc) + " (" + utils.toPercent(top3[1].fc-top3[1].ic) +")\n"
-  f +=  top3[1].wt + " " + utils.universalMap(top3[1].id) +  "  C: " + utils.toPercent(top3[1].fc) + " (" + utils.toPercent(top3[1].fc-top3[1].ic) +")\n"
-  // t +=  "<b>" + top3[2].wt + " " + utils.universalMap(top3[2].id) +  "</b>  C: " + utils.toPercent(top3[2].fc) + " (" + utils.toPercent(top3[2].fc-top3[2].ic) +")\n"
-  f +=  top3[2].wt + " " + utils.universalMap(top3[2].id) +  "  C: " + utils.toPercent(top3[2].fc) + " (" + utils.toPercent(top3[2].fc-top3[2].ic) +")\n"
+  // t +=  "<b>" + top3[0].wt + " " + utils.universalMap(top3[0].id) +  "</b>  C: " + utils.toPercent(top3[0].fc) + " (" + utils.toPercent(top3[0].dc) +")\n"
+  f +=  top3[0].wt + " " + utils.universalMap(top3[0].id) +  "  C: " + utils.toPercent(top3[0].fc) + " (" + utils.toPercent(top3[0].dc) +")\n"
+  // t +=  "<b>" + top3[1].wt + " " + utils.universalMap(top3[1].id) +  "</b>  C: " + utils.toPercent(top3[1].fc) + " (" + utils.toPercent(top3[1].dc) +")\n"
+  f +=  top3[1].wt + " " + utils.universalMap(top3[1].id) +  "  C: " + utils.toPercent(top3[1].fc) + " (" + utils.toPercent(top3[1].dc) +")\n"
+  // t +=  "<b>" + top3[2].wt + " " + utils.universalMap(top3[2].id) +  "</b>  C: " + utils.toPercent(top3[2].fc) + " (" + utils.toPercent(top3[2].dc) +")\n"
+  f +=  top3[2].wt + " " + utils.universalMap(top3[2].id) +  "  C: " + utils.toPercent(top3[2].fc) + " (" + utils.toPercent(top3[2].dc) +")\n"
 
   // t += "\nInsurrections: <b>" + civilWar.length + "</b> <i>(" + civilWar + ")</i>\n"
-  f += "\nInsurrections: " + civilWar.length + "<i>(" + civilWar + ")</i>\n"
+  f += "\nInsurrections: " + civilWar.length + "(" + civilWar + ")\n"
 
   f += "\nStay up to date at https://tronwarbot.com\n"
   f += "#tron #world #war #gaming #simulation #bot"
