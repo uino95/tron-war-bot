@@ -4,7 +4,11 @@ const firebase = require('./firebase')
 const wwb = require('./worldWarBot')
 const telegram = require('./telegram')
 const facebook = require('./facebook')
-
+//
+// const rp = require("request-promise")
+// const sharp = require('sharp');
+// const fs = require("fs");
+// const img = await rp.get('https://api.browshot.com/api/v1/screenshot/html?url=http://tronwarbot.com/&instance_id=26&delay=10&width=1000&height=500&cache=0&size=screen&key=Sv38zA15tm7zGScDnZg3fqqZ')
 
 async function runUpdate(){
   _tMessage = undefined;
@@ -74,7 +78,7 @@ async function runUpdate(){
   f +=  top3[2].wt + " " + utils.universalMap(top3[2].id) +  "  C: " + utils.toPercent(top3[2].fc) + " (" + utils.toPercent(top3[2].dc) +")\n"
 
   // t += "\nInsurrections: <b>" + civilWar.length + "</b> <i>(" + civilWar + ")</i>\n"
-  f += "\nInsurrections: " + civilWar.length + "(" + civilWar + ")\n"
+  f += "\nInsurrections: " + civilWar.length + " (" + civilWar + ")\n"
 
   f += "\nStay up to date at https://tronwarbot.com\n"
   f += "#tron #world #war #gaming #simulation #bot"
