@@ -35,6 +35,7 @@ app.get('/', (req, res) => {
 
 twb.launchGame(0, false);
 twb.launchGame(1, true);
+twb.launchGame(2, true);
 // backendLogic.syncServer(false);
 backendLogic.watchBet();
 // backendLogic.watchNewTurn();

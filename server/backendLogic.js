@@ -23,6 +23,7 @@ const stopGame = async ()=>{
   await firebase.data.update({ serverStatus: 500 });
   await twb.endGame(0);
   await twb.endGame(1);
+  await twb.endGame(2);
 }
 
 const gameOver = async () => {
@@ -47,17 +48,15 @@ const updateResultsOnDB = (_b, _wb) => {
 }
 
 const stopBets = async (waitTime) => {
-  if (wwb.winner()) return;
   // STOP BET BUTTON
   await firebase.data.update({serverStatus: 300})
   // AWAIT FOR DATA PROPAGATION AND BET HALT
   await sleep(waitTime || 0);
   //UPDATE TURN CURRENT WHICH PREVENTS BET SLIPPAGE
-  wwb.updateTurn();
+  wwb.preTurn();
 }
 
 const simulate = async () => {
-  if (wwb.winner()) return;
   // CALCULATE MAGIC NUMBER AND SEED
   let turn = wwb.currentTurn();
   let currentSecret = await firebase.secret.once('value').then(r=>r.val());
@@ -70,14 +69,15 @@ const simulate = async () => {
   // SAVE MAGIC NUMBER AND SEED
   else await firebase.secret.update({turn, magic, seed});
   // SIMULATE TURN
-  var cMap = await wwb.mapState();
-  [ cMap , turnData, computedRandom] = fairness.computeNextState(cMap, magic, seed);
+  // let cMap = await wwb.mapState();
+  // let turnData = currentTurnData();
+  // [ cMap , turnData, computedRandom] = fairness.resolveNextConqueror(cMap, turnData, magic, seed);
   // EVALUATE WINNER
-  var stringToHash = utils.universalMap(turnData.o) + "(" + turnData.o + "):"  + seed;
-  // console.log("[SIMULATE]: Winner on turn " + turn + " is => " + utils.universalMap(turnData.o) + "("+ turnData.o +") with computed randoms: " + JSON.stringify(computedRandom));
+  // var stringToHash = utils.universalMap(turnData.next.o) + "(" + turnData.next.o + "):"  + seed;
+  // console.log("[SIMULATE]: Winner on turn " + turn + " is => " + utils.universalMap(turnData.next.o) + "("+ turnData.next.o +") with computed randoms: " + JSON.stringify(computedRandom));
   // COMPUTE SHA256 (WINNER + SEED)
   // console.log("Computing SHA256 of:     " + stringToHash);
-  let nextMagicHash = utils.sha256(stringToHash);
+  let nextMagicHash = utils.sha256(magic);
   // console.log("SHA256 is " + nextMagicHash);
   // SAVE SHA256
   await firebase.fairness.update({nextMagicHash});
@@ -92,9 +92,9 @@ const revealFairWinner = async () => {
 
   let currentFairness = await firebase.fairness.once('value').then(r=>r.val());
 
-  console.log("[LOGIC]: Winner on current turn is: " + turnData.o + " => " + utils.universalMap(turnData.o));
+  console.log("[LOGIC]: Winner on current turn is: " + turnData.next.o + " => " + utils.universalMap(turnData.next.o));
   let seed = currentSecret.seed;
-  let magicHashRevealed = utils.universalMap(turnData.o) + "(" + turnData.o + "):"  + seed;
+  let magicHashRevealed = utils.universalMap(turnData.next.o) + "(" + turnData.next.o + "):"  + seed;
   console.log("Computing SHA256 of:    " + magicHashRevealed);
   let previousMagicHash = utils.sha256(magicHashRevealed);
   if (previousMagicHash != currentFairness.nextMagicHash) console.error("[FAIRNESS]: I don't think that is a really fair game... Hope noone notices that... Shh!!");
@@ -142,20 +142,12 @@ module.exports.launchNextTurn = async () =>{
 
 
   // GET WINNER AND UPDATES
-  var data = wwb.currentTurnData();
-  // GET WINNER AND RATE
-  var _winner = cMap[data.o];
+  var td = wwb.currentTurnData();
   // GET CHAIN ROUND
   var cr = await twb.cachedCurrentRound(1);
 
   // UPDATE HISTORY
-  firebase.history.push().set({
-    data,
-    conquest: [data.o, data.dt],
-    prev: data.d,
-    turn: data.turn,
-    civilWar: data.civilWar
-  });
+  firebase.history.push().set(td);
 
   // REVEAL FAIRNESS
   await revealFairWinner();
@@ -167,17 +159,19 @@ module.exports.launchNextTurn = async () =>{
   if (go) await stopGame();
 
   // COMMUNICATE WINNER
-  telegram.notifyTelegramBot(data);
+  telegram.notifyTelegramBot(td);
 
   console.log("[SCHEDULER]: ----- Running payouts! ------");
   // GET CURRENT TURN BETS
-  var _bets = await firebase.bets.getCurrentTurnBets(1, cr.round, data.turn);
+  var _betsNext = await firebase.bets.getCurrentTurnBets(1, cr.round, td.turn);
+  var _betsBattle = await firebase.bets.getCurrentTurnBets(2, cr.round, td.turn);
 
 
   // PAYOUT
-  const winningBets = await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
+  let _winningBetsNext = td.next ? (await twb.dealerPayout(1, cr.round, td.next.o, cMap[td.next.o].nextQuote, _betsNext)) : [];
+  let _winningBetsBattle = td.battle ? (await twb.dealerPayout(2, cr.round, td.battle.result, td.battle.quotes[td.battle.result], _betsBattle)) : [];
   // UPDATE RESULTS BET ON DB
-  await updateResultsOnDB(_bets, winningBets);
+  await updateResultsOnDB(_betsNext.concat(_betsBattle), _winningBetsNext.concat(_winningBetsBattle));
   // PAYOUT FINAL
   if (go) gameOver();
 

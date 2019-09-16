@@ -34,6 +34,10 @@ const utils = {
       .toString('hex') // convert to hexadecimal format
       .slice(0, len) // return required number of characters
   },
+  quoteFromProbability: (p) => {
+    let w = p ? Math.min(1/p, 200) : 200;
+    return Math.floor(w *100)/100;
+  },
   toPercent : (n) =>(n * 100).toFixed(1) + "%",
   truncate: (s, n)=> (s.length > n) ? s.substr(0, n-2) + '..' : s
 }

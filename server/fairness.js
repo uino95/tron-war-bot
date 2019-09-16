@@ -1,27 +1,18 @@
 const config = require("./config");
 const COHESION_BIAS = config.wwb.cohesionBias;
 const CIVIL_WAR_LIKELIHOOD = config.wwb.civilWarLikelihood;
+const BATTLE_WEIGHT = [0.1, 2, 1];
 const neighborCountries = require('./map-utilities/neighborCountries');
 const utils = require("./utils");
 
 const initTurnData = () => {
   return {
-    winner: null,
     civilWar: false,
     o: null,
     ot: null,
     d: null,
     dt: null,
-    cohesion: {
-      o: null,
-      d: null,
-      ot: null,
-      dt: null,
-      delta_o: null,
-      delta_d: null,
-      delta_ot: null,
-      delta_dt: null,
-    }
+    probabilities: []
   };
 }
 
@@ -94,81 +85,115 @@ const getIntegerFrom = (random, odds) => {
 
 
 const updateCohesion = (countriesMap, turnData, random) => {
-  let o = turnData.o;
-  let d = turnData.d;
-  let ot = turnData.ot;
-  let dt = turnData.dt;
-  let o_amp = conqueredTerritoriesOf(countriesMap, o).length / countriesMap.length;
-  let d_amp = conqueredTerritoriesOf(countriesMap, d).length / countriesMap.length;
-  let rnd = COHESION_BIAS - random;
-  let c_o = countriesMap[o].cohesion - 0.5;
-  let c_d = countriesMap[d].cohesion - 0.5;
-  let c_ot = countriesMap[ot].cohesion - 0.5;
-  let c_dt = countriesMap[dt].cohesion - 0.5;
-  let delta_o =  (rnd + (-c_ot - c_d - c_dt)/3) * o_amp;
-  let delta_d =  (rnd + (c_ot - c_o - c_dt)/3) * d_amp;
-  let delta_ot = (rnd + (-c_o + c_d + c_dt)/3) * o_amp;
-  let delta_dt = (rnd + (-c_o + c_d + c_ot)/3) * d_amp; 
-  let new_o = countriesMap[o].cohesion + delta_o;
-  let new_d = countriesMap[d].cohesion + delta_d;
-  let new_ot = countriesMap[ot].cohesion + delta_ot;
-  let new_dt = countriesMap[dt].cohesion + delta_dt;
-  countriesMap[dt].cohesion = Math.max(0, Math.min(1, new_dt));
-  countriesMap[ot].cohesion =  Math.max(0, Math.min(1, new_ot));
-  countriesMap[d].cohesion = Math.max(0.001, Math.min(1, new_d));
-  countriesMap[o].cohesion =  Math.max(0.001, Math.min(1, new_o));
-  turnData.cohesion = {
-    o :countriesMap[o].cohesion,
-    d :countriesMap[d].cohesion,
-    ot :countriesMap[ot].cohesion,
-    dt :countriesMap[dt].cohesion,
-    delta_o,
-    delta_d,
-    delta_ot,
-    delta_dt,
-  }
+  // let o = turnData.o;
+  // let d = turnData.d;
+  // let ot = turnData.ot;
+  // let dt = turnData.dt;
+  // let o_amp = conqueredTerritoriesOf(countriesMap, o).length / countriesMap.length;
+  // let d_amp = conqueredTerritoriesOf(countriesMap, d).length / countriesMap.length;
+  // let rnd = COHESION_BIAS - random;
+  // let c_o = countriesMap[o].cohesion - 0.5;
+  // let c_d = countriesMap[d].cohesion - 0.5;
+  // let c_ot = countriesMap[ot].cohesion - 0.5;
+  // let c_dt = countriesMap[dt].cohesion - 0.5;
+  // let delta_o =  (rnd + (-c_ot - c_d - c_dt)/3) * o_amp;
+  // let delta_d =  (rnd + (c_ot - c_o - c_dt)/3) * d_amp;
+  // let delta_ot = (rnd + (-c_o + c_d + c_dt)/3) * o_amp;
+  // let delta_dt = (rnd + (-c_o + c_d + c_ot)/3) * d_amp;
+  // let new_o = countriesMap[o].cohesion + delta_o;
+  // let new_d = countriesMap[d].cohesion + delta_d;
+  // let new_ot = countriesMap[ot].cohesion + delta_ot;
+  // let new_dt = countriesMap[dt].cohesion + delta_dt;
+  // countriesMap[dt].cohesion = Math.max(0, Math.min(1, new_dt));
+  // countriesMap[ot].cohesion =  Math.max(0, Math.min(1, new_ot));
+  // countriesMap[d].cohesion = Math.max(0.001, Math.min(1, new_d));
+  // countriesMap[o].cohesion =  Math.max(0.001, Math.min(1, new_o));
+  // turnData.cohesion = {
+  //   o :countriesMap[o].cohesion,
+  //   d :countriesMap[d].cohesion,
+  //   ot :countriesMap[ot].cohesion,
+  //   dt :countriesMap[dt].cohesion,
+  //   delta_o,
+  //   delta_d,
+  //   delta_ot,
+  //   delta_dt,
+  // }
 }
 
-// returns [newCountriesMap, turnData]
-const computeNextState = (countriesMap, firstEntropy, secondEntropy) => {
-  let turnData = initTurnData();
-  //CHECK WINNER
-  if (winner(countriesMap)!=null) {
-    turnData.winner = winner(countriesMap);
-    return [countriesMap, turnData];
-  }
+const battlePdf = (countriesMap, nextData) => {
+  var _x = BATTLE_WEIGHT[0] * (countriesMap[nextData.ot].cohesion + countriesMap[nextData.dt].cohesion)
+  var _1 = BATTLE_WEIGHT[1] * countriesMap[nextData.o].cohesion
+  var _2 = BATTLE_WEIGHT[2] * countriesMap[nextData.d].cohesion
+  var _tot = _x + _1 + _2;
+  return [_x/_tot, _1/_tot, _2/_tot];
+}
 
-  let rand0 = computeRandom(firstEntropy, secondEntropy, 0);
-  let rand1 = computeRandom(firstEntropy, secondEntropy, 1);
-  let rand2 = computeRandom(firstEntropy, secondEntropy, 2);
+const cumulatedBattlePdf = (countriesMap, nextData) => {
+  let cumulated = 0;
+  return battlePdf(countriesMap, nextData).map(c=>cumulated += c[0]);
+}
 
-  let cpdf = cumulatedPdf(countriesMap).reduce((acc, val) => acc.concat(val), []);
+const resolveScenario = (cpdf, random) => {
   let scenario = cpdf.length - 1;
   for (var i in cpdf) {
-    if (rand0 > cpdf[i]) continue;
+    if (random > cpdf[i]) continue;
     scenario = i;
     break;
   }
-  let conquererTerritory = Math.floor(scenario / 2);
-  let civilWar = scenario % 2;
-  let conquerer = civilWar ? conquererTerritory : countriesMap[conquererTerritory].occupiedBy;
-  let cts = conquerableTerritoriesOf(countriesMap, conquererTerritory);
-  let conqueredTerritory = civilWar ? conquerer : cts[getIntegerFrom(rand1, cts.length)];
-  let conquered = civilWar ? countriesMap[conquererTerritory].occupiedBy : countriesMap[conqueredTerritory].occupiedBy;
-
-  turnData.civilWar = civilWar;
-  turnData.o = conquerer;
-  turnData.ot = conquererTerritory;
-  turnData.d = conquered;
-  turnData.dt = conqueredTerritory;
-  // UPDATE CORE DATA
-  updateCohesion(countriesMap, turnData, rand2);
-  countriesMap[conqueredTerritory].occupiedBy = conquerer;
-
-  turnData.winner = winner(countriesMap);
-
-  return [countriesMap, turnData, [rand0, rand1, rand2]]
+  return scenario;
 }
+
+const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) => {
+  if (!turnData.next) return [countriesMap, undefined];
+  let battleData = turnData.next;
+  let rand = computeRandom(firstEntropy, secondEntropy, 0);
+  let cpdf = cumulatedBattlePdf(countriesMap, battleData);
+  let scenario = resolveScenario(cpdf, rand);
+  battleData.result = scenario;
+  switch (scenario) {
+    case 1:
+      countriesMap[next.dt].occupiedBy = next.o;
+      break;
+    case 2:
+      countriesMap[next.ot].occupiedBy = next.d;
+      break;
+  }
+  return [countriesMap, battleData];
+}
+
+
+// returns [newCountriesMap, nextData]
+const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntropy) => {
+  if (winner(countriesMap)!=null) return [countriesMap, undefined];
+  let nextData = initTurnData();
+  //CHECK WINNER
+  // if (winner(countriesMap)!=null) {
+  //   nextData.winner = winner(countriesMap);
+  //   return [countriesMap, nextData];
+  // }
+
+  let rand0 = computeRandom(firstEntropy, secondEntropy, 0);
+  let rand1 = computeRandom(firstEntropy, secondEntropy, 1);
+
+  let cpdf = cumulatedPdf(countriesMap).reduce((acc, val) => acc.concat(val), []);
+  let scenario = resolveScenario(cpdf, rand0);
+
+  let civilWar = scenario % 2;
+  let ot = Math.floor(scenario / 2);
+  let cts = conquerableTerritoriesOf(countriesMap, ot);
+  let o = civilWar ? ot : countriesMap[ot].occupiedBy;
+  let dt = civilWar ? o : cts[getIntegerFrom(rand1, cts.length)];
+
+  nextData.civilWar = civilWar;
+  nextData.ot = ot;
+  nextData.o = o;
+  nextData.dt = dt;
+  nextData.d = civilWar ? countriesMap[ot].occupiedBy : countriesMap[dt].occupiedBy;
+  nextData.probabilities = battlePdf(countriesMap, nextData);
+
+  return [countriesMap, nextData, [rand0, rand1]];
+}
+
 
 
 
@@ -180,6 +205,7 @@ module.exports = {
   cumulatedPdf,
   pdf,
   realPdf,
-  computeNextState,
+  resolveNextBattle,
+  resolveNextConqueror,
   winner
 }

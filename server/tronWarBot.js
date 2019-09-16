@@ -260,7 +260,7 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
 
 }
 
-module.exports.housePayout = async function (gameType, gameRound, winningChoice, winRate, _bets = []) {
+module.exports.dealerPayout = async function (gameType, gameRound, winningChoice, winRate, _bets = []) {
   if (!twb || !war) await isReady();
   let bets = _bets;
   // let bets = await twb.getEvents({
@@ -274,7 +274,7 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
   //   }
   // });
   let a = await this.availableJackpot(gameType, gameRound);
-  if (!a.playAgainstDealer) throw "This is not a house payout type of game! Use a jackpot payout instead.";
+  if (!a.playAgainstDealer) throw "This is not a dealer payout type of game! Use a jackpot payout instead.";
   // if (true) return bets;
   let winningBets = [];
   let winningAmount = tronWeb.toBigNumber(0);
