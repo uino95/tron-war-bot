@@ -7,13 +7,41 @@
         <v-card>
           <v-toolbar color="primary_stats_tab" dark>
             <v-toolbar-title>Current Run Status</v-toolbar-title>
-            <v-spacer/>
-            <v-text-field class="pa-2" v-model="searchStats" append-icon="search" label="Search" single-line hide-details></v-text-field>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
+              </template>
+              <span> 
+                - Territories:
+                It represents the number of national territories controlled by the conquerer country. There are 241
+                countries in the map, once a country controls them all it is declared the winner of the current run.<br>
+
+                - Cohesion:
+                It represents the level of welfare and patriotism of a specific national territory. The higher the
+                cohesion, the more united is the country and the higher is the chance for that country to keep
+                conquering territories. The cohesion gets updated.<br>
+
+                - Final conquer quote:
+                It represents the price for a single bet on the final winner which allows to redeem the final jackpot.
+                The price varies depending on jackpot size and the probability of the chosen country to win the full
+                run. The higher the probability or the jackpot, the higher the cost of a single bet. Prices steadily
+                increase over turns, the sooner the bets get placed the higher will be the reward in case of victory.<br>
+
+                - Next conquer %:
+                It represents the exact likelihood for a country to conquer a territory in the upcoming turn. It is
+                calculated considering the size of the conquered borders for a given country times its cohesion index.
+                The more cohesive the country is the higher the chance it keeps on conquering territories. Similarly,
+                the cohesion index affects also the probability for a given territory to rebel on the dominating
+                country.<br></span>
+            </v-tooltip>
+            <v-spacer />
+            <v-text-field class="pa-2" v-model="searchStats" append-icon="search" label="Search" single-line
+              hide-details></v-text-field>
           </v-toolbar>
 
           <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
-            <v-data-table :search="searchStats" :headers="headers" :items="countryStatus" :item-key="'idx'" class="elevation-1"
-              :pagination.sync="pagination" :rows-per-page-items="[10,20,50]">
+            <v-data-table :search="searchStats" :headers="headers" :items="countryStatus" :item-key="'idx'"
+              class="elevation-1" :pagination.sync="pagination" :rows-per-page-items="[10,20,50]">
               <template v-slot:items="props">
                 <td class="text-xs-right">
                   <v-avatar>
@@ -25,15 +53,18 @@
                 <td class="text-xs-right">{{ props.item.territories }}</td>
                 <td class="text-xs-right">{{ (props.item.cohesion * 100).toFixed(2) + ' %'}}</td>
                 <td class="text-xs-right ">
-                  <v-btn class="white--text" color="primary_final_tab" v-on:click="goToBet('betfinal',universalMap(props.item.idx, 'numberId'))">
+                  <v-btn class="white--text" color="primary_final_tab"
+                    v-on:click="goToBet('betfinal',universalMap(props.item.idx, 'numberId'))">
                     {{ (props.item.finalQuote + ' TRX')}}
                   </v-btn>
                 </td>
                 <td class="text-xs-right ">
-                  <v-btn class="white--text" color="primary_next_tab" v-on:click="goToBet('betnext',universalMap(props.item.idx, 'numberId'))">
+                  <v-btn class="white--text" color="primary_next_tab"
+                    v-on:click="goToBet('betnext',universalMap(props.item.idx, 'numberId'))">
                     {{ (props.item.probability * 100).toFixed(2) + ' %'}}
                   </v-btn>
                 </td>
+                <td class="text-xs-right">{{ universalMap(props.item.occupiedBy) }}</td>
               </template>
               <template v-slot:no-results>
                 <v-alert :value="true" color="error" icon="warning">
@@ -193,6 +224,13 @@
           align: 'right',
           class: 'title'
         },
+        {
+          text: 'Occupied by',
+          value: 'occupiedBy',
+          sortable: false,
+          align: 'right',
+          class: 'title'
+        },
       ],
       pagination: {
         sortBy: 'territories',
@@ -226,8 +264,8 @@
           .replaceAll("é", "e")
           .replaceAll("í", "i") + ".svg";
       },
-      goToBet(path,country){
-        this.$store.commit('setSelectedCountry',country)
+      goToBet(path, country) {
+        this.$store.commit('setSelectedCountry', country)
         this.$router.push(path)
       }
     },
