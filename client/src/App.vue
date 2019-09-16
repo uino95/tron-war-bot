@@ -159,7 +159,13 @@ export default {
         text: 'Twitter',
         link: true,
         body: "https://twitter.com/TronWarBot_"
-      }
+      },
+        {
+            icon: 'fab fa-instagram',
+            text: 'Instagram',
+            link: true,
+            body: "https://www.instagram.com/tronwarbot"
+        }
     ]
   }),
   methods: {
