@@ -46,6 +46,12 @@ const config = {
     token: process.env.TELEGRAM_TOKEN,
     group: JSON.parse(process.env.TELEGRAM_GROUP || -331523835),
   },
+  facebook:{
+    pageId: "TronWarBot",
+    token: process.env.FB_PAGE_ACCESS_TOKEN,
+    appId: process.env.FB_APP_ID,
+    appSecret: process.env.FB_APP_SECRET,
+  },
   timing: {
     turn: 600,
     blockConfirmation: 6,

@@ -10,6 +10,7 @@ const twb = require('./tronWarBot');
 const referral = require('./referral');
 const backendLogic = require('./backendLogic')
 const scheduler = require('./scheduler')
+const facebook = require('./facebook');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -20,11 +21,14 @@ app.use(bodyParser.json());
 
 // Post for the referral
 app.post('/referral', referral.registerReferral);
+app.get('/webhooks', facebook.webhooksVerification);
+app.post('/webhooks', facebook.webhooks);
 
 // just for keeping it alive
 app.get('/', (req, res) => {
     return res.status(200).send({ success: 'true', message: 'pinged'});
 });
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// STARTUP ////////////////////////////////////////
