@@ -41,6 +41,22 @@ const realPdf = () => fairness.realPdf(countriesMap);
 
 const winner = () => fairness.winner(countriesMap);
 
+const compressedState = async ()=>{
+  let cMap = await mapState();
+  let td = await currentTurnData();
+  cMap.forEach(e=>{
+    delete e.nextCohesion;
+    delete e.finalQuote;
+    delete e.nextQuote
+    delete e.territories;
+    delete e.probability;
+  });
+  if (td.battle && td.battle.quotes) delete td.battle.quotes;
+  if (td.next && td.next.quotes) delete td.battle.quotes;
+  let o = {countriesMap : cMap, turnData: td}
+  return Buffer.from(JSON.stringify(o), "ascii").toString("base64");
+}
+
 
 const init = async (restart) => {
   turn = 1;
@@ -152,8 +168,8 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
 
 
   // COMPUTE NEW TURN
-  [countriesMap, battleData, computedRandom] = fairness.resolveNextBattle(countriesMap, turnData, _entropy1, _entropy2);
-  [countriesMap, nextData, computedRandom] = fairness.resolveNextConqueror(countriesMap, turnData, _entropy1, _entropy2);
+  [battleData, computedRandom] = fairness.resolveNextBattle(countriesMap, turnData, _entropy1, _entropy2);
+  [nextData, computedRandom] = fairness.resolveNextConqueror(countriesMap, turnData, _entropy1, _entropy2);
   updateState(battleData);
   turnData = {};
   turnData.turn = turn - 1;
@@ -243,5 +259,6 @@ module.exports = {
   printStatus,
   pdf,
   simulate,
+  compressedState,
   winner
 }

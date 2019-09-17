@@ -150,7 +150,7 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
   let cpdf = cumulatedBattlePdf(countriesMap, battleData);
   let scenario = resolveScenario(cpdf, rand);
   battleData.result = scenario;
-  return [countriesMap, battleData];
+  return [battleData, [rand]];
 }
 
 
@@ -178,10 +178,19 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
   nextData.d = civilWar ? countriesMap[ot].occupiedBy : countriesMap[dt].occupiedBy;
   nextData.probabilities = battlePdf(countriesMap, nextData);
 
-  return [countriesMap, nextData, [rand0, rand1]];
+  return [nextData, [rand0, rand1]];
 }
 
 
+const computeFairResult = (mapState, firstEntropy, secondEntropy) => {
+  let m = JSON.parse(Buffer.from(mapState, 'base64').toString('ascii'));
+  [battle, random] = resolveNextBattle(m.countriesMap, m.turnData, firstEntropy, secondEntropy);
+  [next, random] = resolveNextConqueror(m.countriesMap, m.turnData, firstEntropy, secondEntropy);
+  // console.log("Previous Battle:  " + utils.universalMap(battle.o) + " vs " + utils.universalMap(battle.d) + " ended with a " + (battle.result || "X" ) );
+  // if (next.civilWar) console.log("Next is a civil war:  " + utils.universalMap(next.o) + " is rebelling on " + utils.universalMap(next.d));
+  // else console.log("Next conqueror is:  " + utils.universalMap(next.o) + " attacking " + utils.universalMap(next.d) + " from: " + utils.universalMap(next.ot) + " to control: " + utils.universalMap(next.dt) );
+  return [battle, next];
+}
 
 
 module.exports = {
@@ -194,5 +203,6 @@ module.exports = {
   realPdf,
   resolveNextBattle,
   resolveNextConqueror,
+  computeFairResult,
   winner
 }

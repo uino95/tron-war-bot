@@ -60,45 +60,38 @@ const simulate = async () => {
   let turn = wwb.currentTurn();
   let currentSecret = await firebase.secret.once('value').then(r=>r.val());
   var magic = utils.randomHex();
-  var seed = utils.randomHex();
-  if (turn == currentSecret.turn) {
-    magic = currentSecret.magic;
-    seed = currentSecret.seed;
-  }
+  if (turn == currentSecret.turn) magic = currentSecret.magic;
   // SAVE MAGIC NUMBER AND SEED
-  else await firebase.secret.update({turn, magic, seed});
-  // SIMULATE TURN
-  // let cMap = await wwb.mapState();
-  // let turnData = currentTurnData();
-  // [ cMap , turnData, computedRandom] = fairness.resolveNextConqueror(cMap, turnData, magic, seed);
+  else await firebase.secret.update({turn, magic});
   // EVALUATE WINNER
-  // var stringToHash = utils.universalMap(turnData.next.o) + "(" + turnData.next.o + "):"  + seed;
-  // console.log("[SIMULATE]: Winner on turn " + turn + " is => " + utils.universalMap(turnData.next.o) + "("+ turnData.next.o +") with computed randoms: " + JSON.stringify(computedRandom));
-  // COMPUTE SHA256 (WINNER + SEED)
-  // console.log("Computing SHA256 of:     " + stringToHash);
-  let nextMagicHash = utils.sha256(magic);
-  // console.log("SHA256 is " + nextMagicHash);
+  let magicHash = utils.sha256(magic);
+  let blockNumber = 50;
+  let mapState = await wwb.compressedState();
+  let next = {mapState, magicHash, blockNumber, turn: turn+1}
   // SAVE SHA256
-  await firebase.fairness.update({nextMagicHash});
-  return [magic, seed];
+  await firebase.fairness.update({next});
+  return magic;
 }
 
 const revealFairWinner = async () => {
   let turnData = await wwb.currentTurnData();
   let currentSecret = await firebase.secret.once('value').then(r=>r.val());
-
   if (turnData.turn != currentSecret.turn) return console.error("[LOGIC]: We have overlapping turns. Make sure to reveal winner prior to launch next turn!");
 
   let currentFairness = await firebase.fairness.once('value').then(r=>r.val());
 
-  console.log("[LOGIC]: Winner on current turn is: " + turnData.next.o + " => " + utils.universalMap(turnData.next.o));
-  let seed = currentSecret.seed;
-  let magicHashRevealed = utils.universalMap(turnData.next.o) + "(" + turnData.next.o + "):"  + seed;
-  console.log("Computing SHA256 of:    " + magicHashRevealed);
-  let previousMagicHash = utils.sha256(magicHashRevealed);
-  if (previousMagicHash != currentFairness.nextMagicHash) console.error("[FAIRNESS]: I don't think that is a really fair game... Hope noone notices that... Shh!!");
-  console.log("SHA256 is " + previousMagicHash);
-  await firebase.fairness.update({previousMagicHash, magicHashRevealed});
+  console.log("[LOGIC]: Next conquerer on current turn is: " + turnData.next.o + " => " + utils.universalMap(turnData.next.o) + (turnData.battle ? (" and battle result is: " + turnData.battle.result ): ""));
+  let previous = currentFairness.next;
+  previous.magic = currentSecret.magic;
+  previous.blockHash = currentSecret.magic;
+  // COMPUTE RESULT
+  [battle, next] = fairness.computeFairResult(previous.mapState, previous.magic, previous.blockHash)
+  previous.battle = utils.universalMap(battle.o) + (battle.civilWar ? " rebelling on " : " vs " ) + utils.universalMap(battle.d) + " => " + (battle.result || "X")
+  previous.next = utils.universalMap(next.o) + (next.civilWar ? " rebelling on " : " vs " ) + utils.universalMap(next.d)
+  console.log("####################")
+  console.log(previous.battle)
+  console.log(previous.next)
+  await firebase.fairness.update({previous});
 }
 
 
@@ -111,7 +104,7 @@ module.exports.simulateNextTurn = async () =>{
   let nextTurnTime = new Date()
   nextTurnTime.setSeconds(nextTurnTime.getSeconds() + config.timing.turn - config.timing.spread);
   await firebase.data.update({ serverStatus: 200, turnTime: nextTurnTime.valueOf() });
-  [magic, seed] = await simulate();
+  magic = await simulate();
 
   console.log("[SCHEDULER]: ********* Simulating next turn finished! *********");
 }
@@ -129,14 +122,14 @@ module.exports.launchNextTurn = async () =>{
 
   console.log("!!!!!! Declaring winner in seconds! DO NOT STOP SERVER NOW (please) !!!!!!!")
   let magic = currentSecret.magic;
-  let seed = currentSecret.seed;
+  // let seed = currentSecret.seed;
 
   await stopBets(STOP_BET_DURATION);
 
 
   // GET CURRENT BET RATES AND MAP
   var cMap = await wwb.mapState();
-  var go = await wwb.launchNextTurn(magic, seed);
+  var go = await wwb.launchNextTurn(magic, magic);
 
 
 
