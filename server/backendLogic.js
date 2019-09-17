@@ -36,7 +36,6 @@ const gameOver = async () => {
   // GET WINNING BETS
   let _bets = await firebase.bets.getCurrentRoundBets(0, cr.round);
   let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
-
   await twb.jackpotPayout(0, cr.round, winner, _bets, j);
   console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
 }
@@ -85,7 +84,7 @@ const simulate = async () => {
 }
 
 const revealFairWinner = async () => {
-  let turnData = wwb.currentTurnData();
+  let turnData = await wwb.currentTurnData();
   let currentSecret = await firebase.secret.once('value').then(r=>r.val());
 
   if (turnData.turn != currentSecret.turn) return console.error("[LOGIC]: We have overlapping turns. Make sure to reveal winner prior to launch next turn!");
@@ -142,9 +141,7 @@ module.exports.launchNextTurn = async () =>{
 
 
   // GET WINNER AND UPDATES
-  var td = wwb.currentTurnData();
-  // GET CHAIN ROUND
-  var cr = await twb.cachedCurrentRound(1);
+  var td = await wwb.currentTurnData();
 
   // UPDATE HISTORY
   firebase.history.push().set(td);
@@ -159,17 +156,21 @@ module.exports.launchNextTurn = async () =>{
   if (go) await stopGame();
 
   // COMMUNICATE WINNER
-  telegram.notifyTelegramBot(td);
+  telegram.notifyTelegramBot(cMap, td);
 
   console.log("[SCHEDULER]: ----- Running payouts! ------");
   // GET CURRENT TURN BETS
-  var _betsNext = await firebase.bets.getCurrentTurnBets(1, cr.round, td.turn);
-  var _betsBattle = await firebase.bets.getCurrentTurnBets(2, cr.round, td.turn);
+
+  // GET CHAIN ROUND
+  var cr1 = await twb.cachedCurrentRound(1);
+  var _betsNext = await firebase.bets.getCurrentTurnBets(1, cr1.round, td.turn);
+  var cr2 = await twb.cachedCurrentRound(2);
+  var _betsBattle = await firebase.bets.getCurrentTurnBets(2, cr2.round, td.turn);
 
 
   // PAYOUT
-  let _winningBetsNext = td.next ? (await twb.dealerPayout(1, cr.round, td.next.o, cMap[td.next.o].nextQuote, _betsNext)) : [];
-  let _winningBetsBattle = td.battle ? (await twb.dealerPayout(2, cr.round, td.battle.result, td.battle.quotes[td.battle.result], _betsBattle)) : [];
+  let _winningBetsNext = td.next ? (await twb.dealerPayout(1, cr1.round, td.next.o, cMap[td.next.o].nextQuote, _betsNext)) : [];
+  let _winningBetsBattle = td.battle ? (await twb.dealerPayout(2, cr2.round, td.battle.result, td.battle.quotes[td.battle.result], _betsBattle)) : [];
   // UPDATE RESULTS BET ON DB
   await updateResultsOnDB(_betsNext.concat(_betsBattle), _winningBetsNext.concat(_winningBetsBattle));
   // PAYOUT FINAL

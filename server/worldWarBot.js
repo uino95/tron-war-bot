@@ -1,5 +1,5 @@
 // SIMULATION PARAMS
-const SIMULATIONS = 10;
+const SIMULATIONS = 1;
 const EXPECTED_TURN_DURATION = 300;
 // DB interface
 const firebase = require('./firebase')
@@ -26,7 +26,7 @@ var simulation = false;
 var paused = false;
 
 const currentTurn = () => turn;
-const currentTurnData = async () => {if (!countriesMap) await init(); JSON.parse(JSON.stringify(turnData))};
+const currentTurnData = async () => {if (!countriesMap) await init(); return JSON.parse(JSON.stringify(turnData))};
 const mapState = async () => {if (!countriesMap) await init(); return JSON.parse(JSON.stringify(countriesMap));}
 
 // Returns array of countryIndexes
@@ -44,6 +44,7 @@ const winner = () => fairness.winner(countriesMap);
 
 const init = async (restart) => {
   turn = 1;
+  turnData = {};
   countriesMap = new Array(COUNTRIES).fill(0).map((e,idx)=>{
     return {
       occupiedBy: idx,
@@ -61,8 +62,8 @@ const init = async (restart) => {
 };
 
 const loadSavedState = async () => {
-  let r = firebase.data.once('value').then(r=>r.val());
-  countriesMap = firebase.countriesMap.once('value').then(r=>r.val());
+  let r = await firebase.data.once('value').then(r=>r.val());
+  countriesMap = await firebase.countriesMap.once('value').then(r=>r.val());
   turn = r["turn"];
   turnData = r["turnData"];
 };
@@ -96,18 +97,7 @@ const preTurn = async () => {
 }
 
 const postTurn = async (turnData) => {
-  // UPDATE TERRITORIES
-  if (turnData.battle)
-    switch (turnData.battle.result) {
-      case 1:
-        countriesMap[turnData.battle.o].territories = (countriesMap[turnData.battle.o].territories || 1) + 1;
-        countriesMap[turnData.battle.d].territories = (countriesMap[turnData.battle.d].territories || 1) - 1;
-        break;
-      case 2:
-        countriesMap[turnData.battle.o].territories = (countriesMap[turnData.battle.o].territories || 1) - 1;
-        countriesMap[turnData.battle.d].territories = (countriesMap[turnData.battle.d].territories || 1) + 1;
-        break;
-    }
+
   // GET JACKPOT
   let jackpot = await firebase.data.once("value").then(r=>r.val()['jackpot']);
   let bets = await firebase.bets.getCurrentTurnBets(0, ROUND);
@@ -126,9 +116,32 @@ const postTurn = async (turnData) => {
 
 }
 
+// UPDATE STATE AND TERRITORIES
+const updateState = (battle) => {
+  if (!battle) return;
+  switch (battle.result) {
+    case 0:
+      if (!simulation) console.log("[WWB]: FULL TIE! " + battle.o + " peacefully resolved with " + battle.d);
+      break;
+    case 1:
+      countriesMap[battle.dt].occupiedBy = battle.o;
+      // countriesMap[battle.d].cohesion = 0;
+      countriesMap[battle.o].territories += 1;
+      countriesMap[battle.d].territories -= 1;
+      if (!simulation) console.log("[WWB]: WIN 1: " + battle.dt + " <= " + battle.o)
+      break;
+    case 2:
+      countriesMap[battleData.ot].occupiedBy = battleData.d;
+      countriesMap[battle.o].territories -= 1;
+      countriesMap[battle.d].territories += 1;
+      if (!simulation) console.log("[WWB]: WIN 2: " + battle.ot + " <= " + battle.d)
+      break;
+  }
+}
+
 
 // Returns is game over?
-const launchNextTurn = async (_entropy1, _entropy2) => {
+const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.randomHex()) => {
   if (!paused) throw "Turn needs to be paused before computing next state.";
   paused = false;
 
@@ -139,14 +152,14 @@ const launchNextTurn = async (_entropy1, _entropy2) => {
 
 
   // COMPUTE NEW TURN
-  [countriesMap, battleData, computedRandom] = fairness.resolveNextBattle(countriesMap, turnData, (_entropy1 || utils.randomHex()), (_entropy2 || utils.randomHex()));
-  [countriesMap, nextData, computedRandom] = fairness.resolveNextConqueror(countriesMap, turnData, (_entropy1 || utils.randomHex()), (_entropy2 || utils.randomHex()));
+  [countriesMap, battleData, computedRandom] = fairness.resolveNextBattle(countriesMap, turnData, _entropy1, _entropy2);
+  [countriesMap, nextData, computedRandom] = fairness.resolveNextConqueror(countriesMap, turnData, _entropy1, _entropy2);
+  updateState(battleData);
   turnData = {};
   turnData.turn = turn - 1;
-  turnData.battle = battleData;
+  turnData.battle = battleData || "";
   turnData.next = nextData;
   turnData.winner = fairness.winner(countriesMap);
-
 
   if (simulation) return turnData.winner != null;
 
@@ -155,17 +168,7 @@ const launchNextTurn = async (_entropy1, _entropy2) => {
   await saveCurrentState();
 
   console.log("[WWB]: War concluded with: " + turnData.battle.result)
-  switch (turnData.battle.result) {
-    case 0:
-      console.log("[WWB]: FULL TIE! " + turnData.battle.o + " peacefully resolved with " + turnData.battle.d);
-      break;
-    case 1:
-      console.log("[WWB]: Offender " + turnData.battle.o + " striked " + turnData.battle.d + " and got " + turnData.battle.dt);
-      break;
-    case 2:
-      console.log("[WWB]: Defender " + turnData.battle.d + " counterattacked " + turnData.battle.o + " and gained " + turnData.battle.ot);
-      break;
-  }
+
   if (turnData.next.civilWar) console.log("[WWB]:KABOOM! " + turnData.next.o + " is rebelling on " + turnData.next.d);
   console.log("[WWB]: Conquerer " + turnData.next.o + "  is attacking: " + turnData.next.d + "   in country: " + turnData.next.dt + " from: "  + turnData.next.ot);
 
@@ -186,7 +189,7 @@ const simulate = async () => {
   var civilWars = 0;
   simulation = true;
   for (var i=0; i<SIMULATIONS; i++){
-    init(true);
+    await init(true);
     let go
     let leaders = {}
     do {
@@ -194,12 +197,14 @@ const simulate = async () => {
       if (!(turn % 100)) {
         let l = leaderboard();
         leaders[l[0].idx] = l[0];
-        // console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion of: " + l[0].cohesion)
+        console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion of: " + l[0].cohesion + " and territories " + l[0].territories + " and prob: " +  + l[0].probability)
       }
+      // if (!(turn % 100)) return;
       go = await launchNextTurn()
-      let d = currentTurnData()
-      civilWars += d.civilWar;
-      conquest[d.o] += 1;
+      realPdf().forEach((e,i)=>{countriesMap[i].probability = e})
+      let d = turnData;
+      civilWars += d.next.civilWar;
+      conquest[d.next.o] += 1;
       cohesion = cohesion.map((e,idx)=> e + countriesMap[idx].cohesion);
     } while (!go);
     let c_tot = countriesMap.reduce((acc, c) => acc + c.cohesion, 0);

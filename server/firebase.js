@@ -33,7 +33,8 @@ out.bets.getCurrentTurnBets = async (gameType, round, turn) => {
   var snapshot, bets = []
   await out.bets.orderByChild("gameType").equalTo(gameType.toString()).once("value")
     .then(r => {
-      snapshot = r.val()
+      snapshot = r.val();
+      if (!snapshot) return [];
       r = Object.keys(snapshot);
       return r.forEach(key => {
         if (round && snapshot[key].round.toString() != round.toString()) return;

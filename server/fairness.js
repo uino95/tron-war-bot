@@ -130,12 +130,12 @@ const battlePdf = (countriesMap, nextData) => {
 
 const cumulatedBattlePdf = (countriesMap, nextData) => {
   let cumulated = 0;
-  return battlePdf(countriesMap, nextData).map(c=>cumulated += c[0]);
+  return battlePdf(countriesMap, nextData).map(c=>cumulated += c);
 }
 
 const resolveScenario = (cpdf, random) => {
   let scenario = cpdf.length - 1;
-  for (var i in cpdf) {
+  for (var i=0; i < cpdf.length; i++) {
     if (random > cpdf[i]) continue;
     scenario = i;
     break;
@@ -150,14 +150,6 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
   let cpdf = cumulatedBattlePdf(countriesMap, battleData);
   let scenario = resolveScenario(cpdf, rand);
   battleData.result = scenario;
-  switch (scenario) {
-    case 1:
-      countriesMap[next.dt].occupiedBy = next.o;
-      break;
-    case 2:
-      countriesMap[next.ot].occupiedBy = next.d;
-      break;
-  }
   return [countriesMap, battleData];
 }
 
@@ -166,11 +158,6 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
 const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntropy) => {
   if (winner(countriesMap)!=null) return [countriesMap, undefined];
   let nextData = initTurnData();
-  //CHECK WINNER
-  // if (winner(countriesMap)!=null) {
-  //   nextData.winner = winner(countriesMap);
-  //   return [countriesMap, nextData];
-  // }
 
   let rand0 = computeRandom(firstEntropy, secondEntropy, 0);
   let rand1 = computeRandom(firstEntropy, secondEntropy, 1);
@@ -180,9 +167,9 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
 
   let civilWar = scenario % 2;
   let ot = Math.floor(scenario / 2);
-  let cts = conquerableTerritoriesOf(countriesMap, ot);
   let o = civilWar ? ot : countriesMap[ot].occupiedBy;
-  let dt = civilWar ? o : cts[getIntegerFrom(rand1, cts.length)];
+  let cts = conquerableTerritoriesOf(countriesMap, ot);
+  let dt = civilWar ? countriesMap[ot].occupiedBy : cts[getIntegerFrom(rand1, cts.length)];
 
   nextData.civilWar = civilWar;
   nextData.ot = ot;

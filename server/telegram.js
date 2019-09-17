@@ -13,17 +13,17 @@ const chatId = config.telegram.group;
 
 var _tMessage, _text = "";
 
-async function battleUpdate(d) {
+async function battleUpdate(cmap, td) {
   if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
-  if (!(d.turn % 6)) _tMessage = undefined;
+  if (!(td.turn % 6)) _tMessage = undefined;
 
-  let s = "<b> " + d.turn + "</b>\t"
-  if (!d.civilWar) {
-    s += "⚔️<b> " + utils.truncate(utils.universalMap(d.o), 10) + " " + utils.toPercent(d.cohesion.o) + "</b> > <b>" + utils.truncate(utils.universalMap(d.dt), 10) + " </b>\n";
-    s += "\t\t\t  <i>Previously: " + utils.truncate(utils.universalMap(d.d) ,23) + "</i>\n"
+  let s = "<b> " + td.turn + "</b>\t"
+  if (!td.next.civilWar) {
+    s += "⚔️<b> " + utils.truncate(utils.universalMap(td.next.o), 10) + " " + utils.toPercent(cmap[td.next.o].cohesion) + "</b> > <b>" + utils.truncate(utils.universalMap(td.next.dt), 10) + " </b>\n";
+    s += "\t\t\t  <i>Previously: " + utils.truncate(utils.universalMap(td.next.d) ,23) + "</i>\n"
   } else {
-    s += "✨<b>" + utils.truncate(utils.universalMap(d.o), 10) + " </b> rebelled on  <b>" + utils.truncate(utils.universalMap(d.d), 10) + "</b>\n"
-    s += "\t\t\t  <i>🍀 Long live " + utils.truncate(utils.universalMap(d.o) ,21) + "!</i>\n"
+    s += "✨<b>" + utils.truncate(utils.universalMap(td.next.o), 10) + " </b> rebelled on  <b>" + utils.truncate(utils.universalMap(td.next.d), 10) + "</b>\n"
+    s += "\t\t\t  <i>🍀 Long live " + utils.truncate(utils.universalMap(td.next.o) ,21) + "!</i>\n"
   }
   if (_tMessage) {
     _text = _text + "\n" + s

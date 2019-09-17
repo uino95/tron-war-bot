@@ -63,8 +63,8 @@ const config = {
     spread: 15
   },
   wwb:{
-    cohesionBias: 0.41,
-    civilWarLikelihood: 0.25
+    cohesionBias: 0.35,
+    civilWarLikelihood: 0
   }
 }
 
