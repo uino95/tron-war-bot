@@ -192,7 +192,7 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
 }
 
 
-init();
+
 
 const simulate = async () => {
   console.log("Simulating with " + COUNTRIES + " countries");

@@ -32,16 +32,19 @@ app.get('/', (req, res) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// STARTUP ////////////////////////////////////////
-
-twb.launchGame(0, false);
-twb.launchGame(1, true);
-twb.launchGame(2, true);
-// backendLogic.syncServer(false);
-backendLogic.watchBet();
-// backendLogic.watchNewTurn();
+const init = async () => {
+  await twb.init();
+  await twb.launchGame(0, false);
+  await twb.launchGame(1, true);
+  await twb.launchGame(2, true);
+  // backendLogic.syncServer(false);
+  backendLogic.watchBet();
+  backendLogic.start();
+}
 
 var PORT = process.env.PORT || 3000;
-
 http.listen(PORT, function() {
     console.log("[SERVER]: Server is running on Port: " + PORT);
 });
+
+init();

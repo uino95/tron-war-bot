@@ -54,13 +54,13 @@ const config = {
   },
   timing: {
     turn: 600,
-    blockConfirmation: 6,
-    spread: 45
+    blockConfirmation: 4,
+    txMargin: 15
   },
   timingTest: {
     turn: 30,
     blockConfirmation: 2,
-    spread: 15
+    txMargin: 5
   },
   wwb:{
     cohesionBias: 0.35,
