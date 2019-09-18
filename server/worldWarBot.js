@@ -59,6 +59,7 @@ const compressedState = async ()=>{
 
 
 const init = async (restart) => {
+  if(restart) console.warn("[WWB]: Restarting game...")
   turn = 1;
   turnData = {};
   countriesMap = new Array(COUNTRIES).fill(0).map((e,idx)=>{
@@ -137,20 +138,20 @@ const updateState = (battle) => {
   if (!battle) return;
   switch (battle.result) {
     case 0:
-      if (!simulation) console.log("[WWB]: FULL TIE! " + battle.o + " peacefully resolved with " + battle.d);
+      if (!simulation) console.log("[WWB]: BATTLE -> X : " + utils.universalMap(battle.o) +  " (" + battle.o + ") peacefully resolved with " + utils.universalMap(battle.d) +  " (" + battle.d + ")");
       break;
     case 1:
       countriesMap[battle.dt].occupiedBy = battle.o;
       // countriesMap[battle.d].cohesion = 0;
       countriesMap[battle.o].territories += 1;
       countriesMap[battle.d].territories -= 1;
-      if (!simulation) console.log("[WWB]: WIN 1: " + battle.dt + " <= " + battle.o)
+      if (!simulation) console.log("[WWB]: BATTLE -> 1 :  " + utils.universalMap(battle.o) +  " (" + battle.o + ") => " + utils.universalMap(battle.dt) +  " (" + battle.dt + ")")
       break;
     case 2:
       countriesMap[battleData.ot].occupiedBy = battleData.d;
       countriesMap[battle.o].territories -= 1;
       countriesMap[battle.d].territories += 1;
-      if (!simulation) console.log("[WWB]: WIN 2: " + battle.ot + " <= " + battle.d)
+      if (!simulation) console.log("[WWB]: BATTLE -> 2 :  " + utils.universalMap(battle.d) +  " (" + battle.d + ") => " + utils.universalMap(battle.ot) +  " (" + battle.ot + ")")
       break;
   }
 }
@@ -183,11 +184,7 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
   await postTurn(turnData);
   await saveCurrentState();
 
-  console.log("[WWB]: War concluded with: " + turnData.battle.result)
-
   if (turnData.next.civilWar) console.log("[WWB]:KABOOM! " + turnData.next.o + " is rebelling on " + turnData.next.d);
-  console.log("[WWB]: Conquerer " + turnData.next.o + "  is attacking: " + turnData.next.d + "   in country: " + turnData.next.dt + " from: "  + turnData.next.ot);
-
   return turnData.winner != null;
 }
 

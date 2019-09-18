@@ -46,14 +46,15 @@ const revealFairWinner = async (block) => {
   if (turnData.turn != currentSecret.turn) return console.error("[LOGIC]: We have overlapping turns. Make sure to reveal winner prior to launch next turn!");
   let currentFairness = await firebase.fairness.once('value').then(r=>r.val());
 
-  console.log("[LOGIC]: Next conquerer on current turn is: " + turnData.next.o + " => " + utils.universalMap(turnData.next.o) + (turnData.battle ? (" and battle result is: " + turnData.battle.result ): ""));
+  console.log("[LOGIC]: Next attacker is: " + turnData.next.o + " => " + utils.universalMap(turnData.next.o) + (turnData.battle ? (" and battle result is: " + (turnData.battle.result || "X") ): ""));
   let previous = currentFairness.next;
   previous.magic = currentSecret.magic;
   previous.blockHash = block.hash;
   // COMPUTE RESULT
   [battle, next] = fairness.computeFairResult(previous.mapState, previous.magic, previous.blockHash)
-  previous.battle = utils.universalMap(battle.o) + (battle.civilWar ? " rebelling on " : " vs " ) + utils.universalMap(battle.d) + " => " + (battle.result || "X")
-  previous.next = utils.universalMap(next.o) + (next.civilWar ? " rebelling on " : " vs " ) + utils.universalMap(next.d)
+  if (battle) previous.battle = utils.universalMap(battle.o) + (battle.civilWar ? " rebelling on " : " vs " ) + utils.universalMap(battle.d) + " => " + (battle.result || "X")
+  if (next) previous.next = utils.universalMap(next.o) + (next.civilWar ? " rebelling on " : " vs " ) + utils.universalMap(next.d)
+  console.log("[FAIRNESS]: NEXT   -> "+  previous.next + "\n[FAIRNESS]: BATTLE -> " + previous.battle )
   await firebase.fairness.update({previous});
 }
 
@@ -115,7 +116,7 @@ const launchNextTurn = async (block) =>{
   console.log("[SCHEDULER]: ********* Next turn! Block: " + block.number + " *********");
   let turn = wwb.currentTurn();
   let currentSecret = await firebase.secret.once('value').then(r=>r.val());
-  if (turn != currentSecret.turn) return console.error("[LOGIC] Need to simulate turn before updating. Wait for next one.");
+  if (turn != currentSecret.turn) return console.error("[LOGIC] Need to prepare turn before updating. Wait for next one.");
   let magic = currentSecret.magic;
   wwb.preTurn();
 

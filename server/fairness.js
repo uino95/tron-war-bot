@@ -144,7 +144,7 @@ const resolveScenario = (cpdf, random) => {
 }
 
 const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) => {
-  if (!turnData.next) return [countriesMap, undefined];
+  if (!turnData.next) return [undefined, undefined];
   let battleData = turnData.next;
   let rand = computeRandom(firstEntropy, secondEntropy, 0);
   let cpdf = cumulatedBattlePdf(countriesMap, battleData);
@@ -156,7 +156,7 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
 
 // returns [newCountriesMap, nextData]
 const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntropy) => {
-  if (winner(countriesMap)!=null) return [countriesMap, undefined];
+  if (winner(countriesMap)!=null) return [undefined, undefined];
   let nextData = initTurnData();
 
   let rand0 = computeRandom(firstEntropy, secondEntropy, 0);
