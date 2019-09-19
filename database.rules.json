@@ -1,6 +1,17 @@
 {
   "rules": {
-    ".read": true,
+    "public":{
+      ".read":true,
+      "history": {
+       ".indexOn": "turn" 
+      },
+      "bets":{
+        ".indexOn": "gameType"
+      }
+    },
+    "secret":{
+      ".read": false
+    },
     ".write": false
   }
 }
