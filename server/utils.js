@@ -30,6 +30,9 @@ const utils = {
   randomFromHex: (e)=> {
     return utils.randomFromSHA(utils.sha256(e));
   },
+  randomInt : (odds=100) => {
+    return Math.floor(Math.random() * odds);
+  },
   randomHex: (len = 16) => {
     return crypto
       .randomBytes(Math.ceil(len / 2))
