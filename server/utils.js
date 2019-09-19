@@ -2,6 +2,7 @@ const mapping = require( './map-utilities/mapping');
 const crypto = require('crypto');
 
 const utils = {
+    map: mapping,
     universalMap: function(id,to){
 		switch(to){
 			case 'name':
@@ -9,8 +10,9 @@ const utils = {
 			case 'charId':
 				return mapping[id]['charId'];
 			case 'numberId':
+        id = id.replace(/ |-/g, "").toLowerCase()
 				for (var i = mapping.length - 1; i >= 0; i--) {
-					if (mapping[i]['name'] === id){
+					if (mapping[i]['name'].replace(/ |-/g, "").toLowerCase() === id){
 						return i
 					}
 				}

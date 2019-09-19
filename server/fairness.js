@@ -146,11 +146,11 @@ const resolveScenario = (cpdf, random) => {
 const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) => {
   if (!turnData.next) return [undefined, undefined];
   let battleData = turnData.next;
-  let rand = computeRandom(firstEntropy, secondEntropy, 0);
+  let rand0 = computeRandom(firstEntropy, secondEntropy, 0);
   let cpdf = cumulatedBattlePdf(countriesMap, battleData);
-  let scenario = resolveScenario(cpdf, rand);
+  let scenario = resolveScenario(cpdf, rand0);
   battleData.result = scenario;
-  return [battleData, [rand]];
+  return [battleData, [rand0]];
 }
 
 
@@ -159,17 +159,17 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
   if (winner(countriesMap)!=null) return [undefined, undefined];
   let nextData = initTurnData();
 
-  let rand0 = computeRandom(firstEntropy, secondEntropy, 0);
   let rand1 = computeRandom(firstEntropy, secondEntropy, 1);
+  let rand2 = computeRandom(firstEntropy, secondEntropy, 2);
 
   let cpdf = cumulatedPdf(countriesMap).reduce((acc, val) => acc.concat(val), []);
-  let scenario = resolveScenario(cpdf, rand0);
+  let scenario = resolveScenario(cpdf, rand1);
 
   let civilWar = scenario % 2;
   let ot = Math.floor(scenario / 2);
   let o = civilWar ? ot : countriesMap[ot].occupiedBy;
   let cts = conquerableTerritoriesOf(countriesMap, ot);
-  let dt = civilWar ? countriesMap[ot].occupiedBy : cts[getIntegerFrom(rand1, cts.length)];
+  let dt = civilWar ? countriesMap[ot].occupiedBy : cts[getIntegerFrom(rand2, cts.length)];
 
   nextData.civilWar = civilWar;
   nextData.ot = ot;
@@ -178,7 +178,7 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
   nextData.d = civilWar ? countriesMap[ot].occupiedBy : countriesMap[dt].occupiedBy;
   nextData.probabilities = battlePdf(countriesMap, nextData);
 
-  return [nextData, [rand0, rand1]];
+  return [nextData, [rand1, rand2]];
 }
 
 

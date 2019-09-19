@@ -64,7 +64,8 @@ const config = {
   },
   wwb:{
     cohesionBias: 0.35,
-    civilWarLikelihood: 0.1
+    civilWarLikelihood: 0.1,
+    restart: false
   }
 }
 

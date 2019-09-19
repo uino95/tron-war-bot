@@ -1,6 +1,4 @@
 const rp = require('request-promise')
-const cron = require("node-cron");
-
 const firebase = require('./firebase')
 const fairness = require('./fairness')
 const wwb = require('./worldWarBot')
@@ -161,7 +159,7 @@ const launchNextTurn = async (block) =>{
 
 
 module.exports.start = async () =>{
-  await wwb.init();
+  await wwb.init(config.wwb.restart);
   if (wwb.winner()) return;
   prepareNextTurn();
 }
