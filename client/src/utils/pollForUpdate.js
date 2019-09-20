@@ -16,10 +16,9 @@ async function pollTronWeb(interval){
       if(tronWebPrivate.ready){
         clearInterval(handle)
         store.commit('setTronWebInstance', tronWebPrivate)
-        await store.dispatch('registerContractsInstance')
         pollAccount(2000)
         pollBalance(2000)
-        pollMyWar(4000)
+        await store.dispatch('registerContractsInstance')
       }
     } catch (error) {
       console.log('tronweb not found')
@@ -102,7 +101,7 @@ function pollMyWar(interval){
     try{
       // update current address war balance
       if (store.state.loggedInAccount !== null) {
-        const currentWarBalanceInSun = await store.state.contracts.WarCoinInstance.balanceOf(store.state.loggedInAccount).call();
+        const currentWarBalanceInSun = await warCoinInstance.balanceOf(store.state.loggedInAccount).call();
         store.commit('setCurrentAddressWarBalance', {
           currentAddressWarBalance: store.state.tronWeb.BigNumber(currentWarBalanceInSun)
         })
@@ -140,16 +139,23 @@ async function getGameParams(){
 
 
 const pollForUpdate = async function () {
+
   tronWebPublic = new tronWeb({
     fullHost: 'https://api.trongrid.io', 
     privateKey: 'a548c2dda3cd5d0a5c8a484f9c0130aacd1c4fd185762caef13a45318647ca32',
   })
+  console.log(tronWebPublic)
   tronWarBotInstance = await tronWebPublic.contract().at(store.state.contracts.TronWarBotAddress)
   warCoinInstance = await tronWebPublic.contract().at(store.state.contracts.WarCoinAddress)
+
+  console.log(tronWarBotInstance)
+  console.log(warCoinInstance)
 
   getGameParams()
   pollTronWeb(500)
   pollDividends(4000)
+  pollMyWar(4000)
 }
 
 export default pollForUpdate
+
