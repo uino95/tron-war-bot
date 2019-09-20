@@ -133,6 +133,16 @@ const postTurn = async (turnData) => {
 
 }
 
+const saveCohesion = async (update, battle)=>{
+  if (simulation) return;
+  if (!update) return;
+  update.date = (new Date()).valueOf();
+  update.update_type= "BATTLE";
+  update.battle = battle;
+  let id = 'TWB|' + update.country +'|'+ update.turn +'|'+ update.update_type;
+  await firebase.cohesion.child(id).set(update);
+}
+
 // UPDATE STATE AND TERRITORIES
 const updateState = (battle) => {
   if (!battle) return;
@@ -142,7 +152,6 @@ const updateState = (battle) => {
       break;
     case 1:
       countriesMap[battle.dt].occupiedBy = battle.o;
-      // countriesMap[battle.d].cohesion = 0;
       countriesMap[battle.o].territories += 1;
       countriesMap[battle.d].territories -= 1;
       if (!simulation) console.log("[WWB]: BATTLE -> 1 :  " + utils.universalMap(battle.o) +  " (" + battle.o + ") => " + utils.universalMap(battle.dt) +  " (" + battle.dt + ")")
@@ -154,16 +163,25 @@ const updateState = (battle) => {
       if (!simulation) console.log("[WWB]: BATTLE -> 2 :  " + utils.universalMap(battle.d) +  " (" + battle.d + ") => " + utils.universalMap(battle.ot) +  " (" + battle.ot + ")")
       break;
   }
+  saveCohesion(updateCohesion(battle.o, config.cohesion.battle[battle.result.toString()].o), battle)
+  saveCohesion(updateCohesion(battle.ot, config.cohesion.battle[battle.result.toString()].ot), battle)
+  saveCohesion(updateCohesion(battle.d, config.cohesion.battle[battle.result.toString()].d), battle)
+  saveCohesion(updateCohesion(battle.dt, config.cohesion.battle[battle.result.toString()].dt), battle)
 }
 
 
 const updateCohesion = (country, delta) => {
+  if (!country || !delta) return;
+  delta = delta/100;
   let old = countriesMap[country].nextCohesion;
-  countriesMap[country].nextCohesion += delta;
+  let n = countriesMap[country].nextCohesion + (delta);
+  countriesMap[country].nextCohesion = Math.min(Math.max(n,0),1);
   console.log("[WWB]: Updating cohesion of " + utils.universalMap(country) +  "("+utils.toPercent(countriesMap[country].cohesion)+") by: " + utils.toPercent(delta)+ "\tnew value: " +  utils.toPercent(countriesMap[country].nextCohesion));
   return {
+    country: country,
     old,
-    new: countriesMap[country].nextCohesion
+    new: countriesMap[country].nextCohesion,
+    delta: delta
   }
 }
 

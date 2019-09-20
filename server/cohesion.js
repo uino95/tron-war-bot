@@ -48,7 +48,7 @@ const fuzzyMatch = (txt) => {
 
 
 const update = async (text, user_id, user_name, post_id, update_type, platform, link)=>{
-  console.log("[COHESION]: Received new " + update_type +" by: " + user_name + " on " + platform + "  saying: '" + text +"'")
+  console.log("[COHESION]: Received new " + update_type +" by: " + user_name + " on " + platform + "  saying: '" + text +"'  " + platform + '|' + user_id +'|'+ post_id +'|'+ update_type)
   // VALID INPUT
   if (!text || !user_id || !post_id || !update_type || !platform) return;
   let id = platform + '|' + user_id +'|'+ post_id +'|'+ update_type;
@@ -59,19 +59,21 @@ const update = async (text, user_id, user_name, post_id, update_type, platform, 
   let r = analyze(text);
   if (!r) return;
   let multiplier = 0;
+  let delta = 0;
   switch (update_type) {
     case "SHARE" :
-      multiplier = 1;
+      delta = config.cohesion.share * Math.sign(r.score)*Math.ceil(Math.abs(r.score)*10)/10
       break;
     case "COMMENT" :
-      multiplier = 0.1;
+      delta = config.cohesion.comment * Math.sign(r.score)
       break;
     default:
       return;
   }
-  let delta = multiplier * r.score;
+  let date = (new Date()).valueOf()
   let u = wwb.updateCohesion(r.country, delta);
   let c = {
+    date,
     user_id,
     post_id,
     user_name,
@@ -82,17 +84,18 @@ const update = async (text, user_id, user_name, post_id, update_type, platform, 
     score: r.score,
     new: u.new,
     old: u.old,
-    delta,
+    delta: u.delta,
   }
   return await firebase.cohesion.child(id).set(c);
 }
 
 const samples = (c, s) => {
+  c = "Samoa"
   let i = {
     '0': c + " is great",
     '1': c +" is awesome",
-    '2': c +" truly sucks",
-    '3':"Long live " + c
+    '2': c +" really sucks",
+    '3':"Long live in hell " + c
   }
   return i[s.toString()];
 }
@@ -102,25 +105,18 @@ const users = (c) => {
     '0':"Mario Rossi",
     '1':"Giuseppe Verdi",
     '2':"Calogero Porceddu",
-  }
-  return u[c.toString()];
-}
-
-const posts = (p) => {
-  let u = {
-    '0':"3r6afgera",
-    '1':"dsaf4311a",
-    '2':"124sdqra5",
+    '3':"Matusalemme Zigarolo",
+    '4':"Brambilla Busatti",
   }
   return u[c.toString()];
 }
 
 const test = async () =>{
-  let r = utils.randomInt(241);
+  let r = utils.randomInt(241).toString();
   let s = samples(utils.universalMap(r),utils.randomInt(4));
-  let u = utils.randomInt(3);
-  let p = utils.randomInt(3);
-  await update(s, u, users(u), p, (utils.randomInt(2) ? "SHARE" : "COMMENT"), "FB", "https://google.com");
+  let u = utils.randomInt(5).toString();
+  let p = utils.randomHex();
+  await update(s, u, users(u), p, (utils.randomInt(1) ? "SHARE" : "COMMENT"), "FB", "https://google.com");
 }
 
 module.exports = {

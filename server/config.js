@@ -62,6 +62,15 @@ const config = {
     blockConfirmation: 2,
     txMargin: 5
   },
+  cohesion:{
+    comment: 0.1,
+    share: 1,
+    battle:{
+      "0":{ o:0, ot:0, d:0, dt:0 },
+      "1":{ o:-0.1, ot:0, d:0, dt:0 },
+      "2":{ o:0, ot:0, d:0, dt:0 }
+    }
+  },
   wwb:{
     cohesionBias: 0.35,
     civilWarLikelihood: 0.1,
