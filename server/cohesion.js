@@ -28,20 +28,14 @@ const sentenceScore = (txt) => {
 }
 
 const regexMatch = (txt) => {
-  // let s = new Date()
   txt = txt.replace(/ /g,"")
   let r = txt.match(new RegExp(REGEXPMATCHER, "gi"));
-  // let e = new Date()
-  // console.log("REGEX: "+ (r ? (r[0] + " => " + utils.universalMap(r[0], "numberId")) : "-") + "  | Process time: " + (e.valueOf() - s.valueOf()) + "ms")
   if (!r) return;
   return utils.universalMap(r[0], "numberId");
 }
 
 const fuzzyMatch = (txt) => {
-  // let s = new Date()
   let r = fuzz.extract(txt, FUZZYMATCHER, {limit: 4, cutoff: 50, scorer: fuzz.token_set_ratio});
-  // let e = new Date()
-  // console.log("FUZZ: "+ (r.length ?( r[0][0] + " => " + r[0][2])  : "-") + " | Process time: " +( e.valueOf() - s.valueOf()) + "ms")
   if (!r.length) return;
   return r[0][2]
 }
@@ -51,7 +45,8 @@ const update = async (text, user_id, user_name, post_id, update_type, platform, 
   console.log("[COHESION]: Received new " + update_type +" by: " + user_name + " on " + platform + "  saying: '" + text +"'  " + platform + '|' + user_id +'|'+ post_id +'|'+ update_type)
   // VALID INPUT
   if (!text || !user_id || !post_id || !update_type || !platform) return;
-  let id = platform + '|' + user_id +'|'+ post_id +'|'+ update_type;
+  let date = new Date()
+  let id = platform + '|' + user_id +'|'+ post_id +'|'+ update_type + '|' + date.toISOString().substr(0,10);
   // ALREADY EXISTS?
   let alreadyExists = await firebase.cohesion.once('value').then((r) => r.child(id).exists())
   if (alreadyExists) return;
@@ -67,13 +62,15 @@ const update = async (text, user_id, user_name, post_id, update_type, platform, 
     case "COMMENT" :
       delta = config.cohesion.comment * Math.sign(r.score)
       break;
+    case "REVIEW" :
+      delta = config.cohesion.review * Math.sign(r.score)*Math.ceil(Math.abs(r.score)*10)/10
+      break;
     default:
       return;
   }
-  let date = (new Date()).valueOf()
   let u = wwb.updateCohesion(r.country, delta);
   let c = {
-    date,
+    date: date.valueOf,
     user_id,
     post_id,
     user_name,
@@ -90,7 +87,6 @@ const update = async (text, user_id, user_name, post_id, update_type, platform, 
 }
 
 const samples = (c, s) => {
-  c = "Samoa"
   let i = {
     '0': c + " is great",
     '1': c +" is awesome",

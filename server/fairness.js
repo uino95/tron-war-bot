@@ -1,7 +1,6 @@
 const config = require("./config");
-const COHESION_BIAS = config.wwb.cohesionBias;
 const CIVIL_WAR_LIKELIHOOD = config.wwb.civilWarLikelihood;
-const BATTLE_WEIGHT = [0.1, 2, 1];
+const BATTLE_WEIGHT = [0.5, 2, 1];
 const neighborCountries = require('./map-utilities/neighborCountries');
 const utils = require("./utils");
 
@@ -83,48 +82,15 @@ const getIntegerFrom = (random, odds) => {
   return Math.floor(random * odds);
 }
 
-
-const updateCohesion = (countriesMap, turnData, random) => {
-  // let o = turnData.o;
-  // let d = turnData.d;
-  // let ot = turnData.ot;
-  // let dt = turnData.dt;
-  // let o_amp = conqueredTerritoriesOf(countriesMap, o).length / countriesMap.length;
-  // let d_amp = conqueredTerritoriesOf(countriesMap, d).length / countriesMap.length;
-  // let rnd = COHESION_BIAS - random;
-  // let c_o = countriesMap[o].cohesion - 0.5;
-  // let c_d = countriesMap[d].cohesion - 0.5;
-  // let c_ot = countriesMap[ot].cohesion - 0.5;
-  // let c_dt = countriesMap[dt].cohesion - 0.5;
-  // let delta_o =  (rnd + (-c_ot - c_d - c_dt)/3) * o_amp;
-  // let delta_d =  (rnd + (c_ot - c_o - c_dt)/3) * d_amp;
-  // let delta_ot = (rnd + (-c_o + c_d + c_dt)/3) * o_amp;
-  // let delta_dt = (rnd + (-c_o + c_d + c_ot)/3) * d_amp;
-  // let new_o = countriesMap[o].cohesion + delta_o;
-  // let new_d = countriesMap[d].cohesion + delta_d;
-  // let new_ot = countriesMap[ot].cohesion + delta_ot;
-  // let new_dt = countriesMap[dt].cohesion + delta_dt;
-  // countriesMap[dt].cohesion = Math.max(0, Math.min(1, new_dt));
-  // countriesMap[ot].cohesion =  Math.max(0, Math.min(1, new_ot));
-  // countriesMap[d].cohesion = Math.max(0.001, Math.min(1, new_d));
-  // countriesMap[o].cohesion =  Math.max(0.001, Math.min(1, new_o));
-  // turnData.cohesion = {
-  //   o :countriesMap[o].cohesion,
-  //   d :countriesMap[d].cohesion,
-  //   ot :countriesMap[ot].cohesion,
-  //   dt :countriesMap[dt].cohesion,
-  //   delta_o,
-  //   delta_d,
-  //   delta_ot,
-  //   delta_dt,
-  // }
-}
-
 const battlePdf = (countriesMap, nextData) => {
-  var _x = BATTLE_WEIGHT[0] * (countriesMap[nextData.ot].cohesion + countriesMap[nextData.dt].cohesion)
-  var _1 = BATTLE_WEIGHT[1] * countriesMap[nextData.o].cohesion
-  var _2 = BATTLE_WEIGHT[2] * countriesMap[nextData.d].cohesion
-  var _tot = _x + _1 + _2;
+  let _1 = BATTLE_WEIGHT[1] * countriesMap[nextData.o].cohesion
+  let _2 = BATTLE_WEIGHT[2] * countriesMap[nextData.d].cohesion
+  let _x = BATTLE_WEIGHT[0] * (countriesMap[nextData.ot].cohesion + countriesMap[nextData.dt].cohesion)/2
+  if (nextData.civilWar) {
+    _x = _2;
+    _2 = 0;
+  }
+  let _tot = _x + _1 + _2;
   return [_x/_tot, _1/_tot, _2/_tot];
 }
 
@@ -165,17 +131,20 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
   let cpdf = cumulatedPdf(countriesMap).reduce((acc, val) => acc.concat(val), []);
   let scenario = resolveScenario(cpdf, rand1);
 
-  let civilWar = scenario % 2;
+  nextData.civilWar = scenario % 2;
   let ot = Math.floor(scenario / 2);
-  let o = civilWar ? ot : countriesMap[ot].occupiedBy;
-  let cts = conquerableTerritoriesOf(countriesMap, ot);
-  let dt = civilWar ? countriesMap[ot].occupiedBy : cts[getIntegerFrom(rand2, cts.length)];
-
-  nextData.civilWar = civilWar;
-  nextData.ot = ot;
-  nextData.o = o;
-  nextData.dt = dt;
-  nextData.d = civilWar ? countriesMap[ot].occupiedBy : countriesMap[dt].occupiedBy;
+  if (nextData.civilWar) {
+    nextData.ot = ot;
+    nextData.o = ot;
+    nextData.dt = ot;
+    nextData.d = countriesMap[ot].occupiedBy;
+  } else {
+    nextData.ot = ot;
+    nextData.o = countriesMap[ot].occupiedBy;
+    let cts = conquerableTerritoriesOf(countriesMap, nextData.ot);
+    nextData.dt = cts[getIntegerFrom(rand2, cts.length)];
+    nextData.d = countriesMap[nextData.dt].occupiedBy;
+  }
   nextData.probabilities = battlePdf(countriesMap, nextData);
 
   return [nextData, [rand1, rand2]];
