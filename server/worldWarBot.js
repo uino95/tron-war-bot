@@ -157,6 +157,16 @@ const updateState = (battle) => {
 }
 
 
+const updateCohesion = (country, delta) => {
+  let old = countriesMap[country].nextCohesion;
+  countriesMap[country].nextCohesion += delta;
+  console.log("[WWB]: Updating cohesion of " + utils.universalMap(country) +  "("+utils.toPercent(countriesMap[country].cohesion)+") by: " + utils.toPercent(delta)+ "\tnew value: " +  utils.toPercent(countriesMap[country].nextCohesion));
+  return {
+    old,
+    new: countriesMap[country].nextCohesion
+  }
+}
+
 // Returns is game over?
 const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.randomHex()) => {
   if (!paused) throw "Turn needs to be paused before computing next state.";
@@ -248,6 +258,7 @@ module.exports = {
   leaderboard,
   preTurn,
   launchNextTurn,
+  updateCohesion,
   countriesStillAlive,
   conquerableTerritoriesOf,
   conqueredTerritoriesOf,

@@ -22,6 +22,7 @@ const out = {
   bets : db.ref('public/bets'),
   data : db.ref('public/data'),
   fairness : db.ref('public/fairness'),
+  cohesion : db.ref('public/cohesion'),
   referral: db.ref('public/referral'),
   countriesMap : db.ref('public/countriesMap')
 }
