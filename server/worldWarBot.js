@@ -127,7 +127,6 @@ const postTurn = async (turnData) => {
     let pf = countriesMap[i].territories/COUNTRIES;
     countriesMap[i].nextQuote = utils.quoteFromProbability(e);
     countriesMap[i].finalQuote = Math.round(((jackpot * pf)/(betsPerCountry[i]+1)) + 50 + (turn/100));
-    countriesMap[i].cohesion = countriesMap[i].nextCohesion;
   })
   turnData.next.quotes = turnData.next.probabilities.map(e=>utils.quoteFromProbability(e));
 
@@ -142,7 +141,6 @@ const updateState = (battle) => {
       break;
     case 1:
       countriesMap[battle.dt].occupiedBy = battle.o;
-      // countriesMap[battle.d].cohesion = 0;
       countriesMap[battle.o].territories += 1;
       countriesMap[battle.d].territories -= 1;
       if (!simulation) console.log("[WWB]: BATTLE -> 1 :  " + utils.universalMap(battle.o) +  " (" + battle.o + ") => " + utils.universalMap(battle.dt) +  " (" + battle.dt + ")")
@@ -154,17 +152,39 @@ const updateState = (battle) => {
       if (!simulation) console.log("[WWB]: BATTLE -> 2 :  " + utils.universalMap(battle.d) +  " (" + battle.d + ") => " + utils.universalMap(battle.ot) +  " (" + battle.ot + ")")
       break;
   }
+  countriesMap.forEach((e,i)=>{countriesMap[i].cohesion = countriesMap[i].nextCohesion;});
+  saveCohesion(updateCohesion(battle.o, config.cohesion.battle[battle.result.toString()].o, config.cohesion.battle.threshold), battle)
+  saveCohesion(updateCohesion(battle.ot, config.cohesion.battle[battle.result.toString()].ot, config.cohesion.battle.threshold), battle)
+  saveCohesion(updateCohesion(battle.d, config.cohesion.battle[battle.result.toString()].d, config.cohesion.battle.threshold), battle)
+  saveCohesion(updateCohesion(battle.dt, config.cohesion.battle[battle.result.toString()].dt, config.cohesion.battle.threshold), battle)
 }
 
 
-const updateCohesion = (country, delta) => {
+const updateCohesion = (country, delta, threshold=0.1) => {
+  if (!delta) return;
+  delta = delta/100;
+  threshold = threshold/100;
   let old = countriesMap[country].nextCohesion;
-  countriesMap[country].nextCohesion += delta;
-  console.log("[WWB]: Updating cohesion of " + utils.universalMap(country) +  "("+utils.toPercent(countriesMap[country].cohesion)+") by: " + utils.toPercent(delta)+ "\tnew value: " +  utils.toPercent(countriesMap[country].nextCohesion));
+  let n = countriesMap[country].nextCohesion + (delta);
+  countriesMap[country].nextCohesion = Math.min(Math.max(n, threshold),1);
+  if (old == countriesMap[country].nextCohesion) return;
+  if (!simulation) console.log("[WWB]: Updating cohesion of " + utils.universalMap(country) +  "("+utils.toPercent(countriesMap[country].cohesion)+") by: " + utils.toPercent(delta)+ "\tnew value: " +  utils.toPercent(countriesMap[country].nextCohesion));
   return {
+    country: country,
     old,
-    new: countriesMap[country].nextCohesion
+    new: countriesMap[country].nextCohesion,
+    delta: old - countriesMap[country].nextCohesion
   }
+}
+
+const saveCohesion = async (update, battle)=>{
+  if (simulation) return;
+  if (!update) return;
+  update.date = (new Date()).valueOf();
+  update.update_type= "BATTLE";
+  update.battle = battle;
+  let id = 'TWB|' + update.update_type +'|'+ update.turn +'|'+ update.country;
+  await firebase.cohesion.child(id).set(update);
 }
 
 // Returns is game over?
@@ -180,8 +200,8 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
 
   // COMPUTE NEW TURN
   [battleData, computedRandom] = fairness.resolveNextBattle(countriesMap, turnData, _entropy1, _entropy2);
-  [nextData, computedRandom] = fairness.resolveNextConqueror(countriesMap, turnData, _entropy1, _entropy2);
   updateState(battleData);
+  [nextData, computedRandom] = fairness.resolveNextConqueror(countriesMap, turnData, _entropy1, _entropy2);
   turnData = {};
   turnData.turn = turn - 1;
   turnData.battle = battleData || "";
@@ -217,17 +237,21 @@ const simulate = async () => {
     let leaders = {}
     do {
       preTurn();
+      go = await launchNextTurn()
+      realPdf().forEach((e,i)=>{
+        countriesMap[i].probability = e;
+      })
+      if (!(turn % 10)) updateCohesion(utils.randomInt(20), (utils.randomInt(20)-5)/10)
       if (!(turn % 100)) {
         let l = leaderboard();
         leaders[l[0].idx] = l[0];
         console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion of: " + l[0].cohesion + " and territories " + l[0].territories + " and prob: " +  + l[0].probability)
       }
-      // if (!(turn % 100)) return;
-      go = await launchNextTurn()
-      realPdf().forEach((e,i)=>{countriesMap[i].probability = e})
       let d = turnData;
-      civilWars += d.next.civilWar;
-      conquest[d.next.o] += 1;
+      if (d.next) {
+        civilWars += d.next.civilWar;
+        conquest[d.next.o] += 1;
+      }
       cohesion = cohesion.map((e,idx)=> e + countriesMap[idx].cohesion);
     } while (!go);
     let c_tot = countriesMap.reduce((acc, c) => acc + c.cohesion, 0);
