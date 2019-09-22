@@ -37,7 +37,7 @@
                 <td class="text-xs-right"
                   v-bind:class="{greenText: props.item.delta > 0, redText: props.item.delta <= 0}">
                   {{ props.item.delta.toFixed(5) }}</td>
-                <td class="text-xs-right">{{ props.item.link }}</td>
+                <td class="text-xs-right"><a :href="props.item.link" target="blank"> {{props.item.link }}</a></td>
                 <td class="text-xs-right">{{ props.item.date | DATE }}</td>
               </template>
               <template v-slot:no-results>
