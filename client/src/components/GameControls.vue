@@ -9,8 +9,14 @@
       <v-btn flat replace to="/stats">
         <v-icon color="primary_stats_tab">poll</v-icon> Stats
       </v-btn>
+      <v-btn flat replace to="/cohesion">
+        <v-icon color="primary_next_tab">attach_money</v-icon> Cohesion
+      </v-btn>
       <v-btn flat replace to="/betnext">
         <v-icon color="primary_next_tab">attach_money</v-icon> Bet Next
+      </v-btn>
+      <v-btn flat replace to="/betbattle">
+        <v-icon color="primary_next_tab">attach_money</v-icon> Bet Battle
       </v-btn>
     </v-toolbar-items>
     <v-spacer></v-spacer>

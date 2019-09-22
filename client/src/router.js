@@ -26,5 +26,15 @@ export default new Router({
       name: 'betnext',
       component: () => import('./components/BetNextTab.vue')
     },
+    {
+      path: '/betbattle',
+      name: 'betbattle',
+      component: () => import('./components/BetBattle.vue')
+    },
+    {
+      path: '/cohesion',
+      name: 'cohesion',
+      component: () => import('./components/Cohesion.vue')
+    },
   ]
 })
