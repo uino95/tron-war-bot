@@ -79,7 +79,7 @@
 
 
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark
-                  @click="placeBet">Bet {{betAmount}} {{currency}}
+                  @click="placeBet">Bet {{betAmount}} TRX
                   {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
                 <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">
                   Battle in progress...</v-btn>
@@ -328,16 +328,10 @@
       snackbarText: "",
       snackbarColor: "",
       betAmount: null,
-      info: {},
       snackbarTimeout: 6000,
-      currencies: ["TRX", "WAR"],
-      currency: "TRX",
-      currencyRule: [v => !!v || 'Select a currency',
-        //v => v < 50 || 'You don\'t have enough money'
-      ],
 
       gameType: 1,
-      history: [],
+      info: {},
       bets: [],
       mapStatus: [],
       mapping: mapping,
@@ -346,7 +340,6 @@
     }),
 
     firebase: {
-      history: db.ref('public/history').orderByChild('turn'),
       bets: db.ref('public/bets').orderByChild('time'),
       info: db.ref('public/data'),
       mapStatus: db.ref('public/countriesMap')
@@ -445,12 +438,6 @@
         this.snackbarColor = "info";
         this.snackbarTimeout = 2000;
         this.snackbar = true;
-      },
-      getProbability: async function (idCountry) {
-        let p = await db.ref('public/countriesMap').orderByKey().equalTo(idCountry.toString()).once('value')
-        //let p = Math.random()
-        //console.log(p.val()[idCountry].probability)
-        return p.val()[idCountry].probability
       },
       initBetAmount: function () {
         setTimeout(() => {

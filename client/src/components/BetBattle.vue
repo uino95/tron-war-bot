@@ -11,7 +11,9 @@
                 <template v-slot:activator="{ on }">
                   <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
                 </template>
-                <span>Here you can see who is fighting right now. If you feel that you can predict the outcome of this epic battle just choose your part and bet on it. 1 stand for the offender the one the left, 2 stands for the defender the one on the right, x stands for a peaceful resolution.</span>
+                <span>Here you can see who is fighting right now. If you feel that you can predict the outcome of this
+                  epic battle just choose your part and bet on it. 1 stand for the offender the one the left, 2 stands
+                  for the defender the one on the right, x stands for a peaceful resolution.</span>
               </v-tooltip>
             </v-toolbar-title>
             <v-spacer></v-spacer>
@@ -20,36 +22,32 @@
 
           <v-card-title primary-title class="justify-center">
             <v-flex md10>
-                <v-layout row wrap align-center justify-center>
-                        <v-card >
-                            <v-card-title primary-title>
-                                <div>
-                                    <h3 class="headline mb-0">Italy</h3>
-                                </div>
-                            </v-card-title>
-                            <v-avatar>
-                                <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                                :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
-                            </v-avatar>
-                        </v-card>
-
-                VS
-
-                <v-card class="pa-20">
-                    <v-card-title primary-title>
-                        <div>
-                            <h3 class="headline mb-0">Italy</h3>
-                        </div>
-                    </v-card-title>
-                    <v-avatar>
+              <v-card class="mb-4">
+                <v-img class="white--text" height='130px' src="img/vs-battle.jpg">
+                  <v-layout row wrap align-center justify-center>
+                    <v-layout class="pt-4" column align-center>
+                      <div class="title pb-2">Italy</div>
+                      <v-avatar>
                         <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                        :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
-                    </v-avatar>
-                </v-card>
+                          :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
+                      </v-avatar>
+                    </v-layout>
+                    <v-spacer />
+                    <v-spacer />
+                    <v-layout column align-center>
+                      <div class="title pb-2"> Italy </div>
+                      <v-avatar>
+                        <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                          :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
+                      </v-avatar>
+                    </v-layout>
+                  </v-layout>
+                  <core-timer />
+                </v-img>
+              </v-card>
+              <v-spacer />
+              <v-form ref="form" v-model="valid" lazy-validation>
 
-                </v-layout>
-              <!-- <v-form ref="form" v-model="valid" lazy-validation>
-                
                 <v-layout row wrap align-center justify-center>
                   <v-flex md4>
                     <v-text-field :value="potentialWin" label="Potential win" outline readonly></v-text-field>
@@ -64,10 +62,6 @@
                   <v-flex md4>
                     <v-text-field :value="multiplier" label="Multiplier" outline readonly></v-text-field>
                   </v-flex>
-
-                  <v-flex md4>
-                    <core-timer isTurnTimer />
-                  </v-flex>
                 </v-layout>
 
                 <v-layout row wrap>
@@ -76,9 +70,21 @@
                       :max="betNextGameParam.maximumBet " label="Bet Amount"></v-slider>
                   </v-flex>
                 </v-layout>
-
+                <v-flex xs12 class="text-xs-center pa-2" >
+                  <v-btn-toggle v-model="toggle_exclusive">
+                    <v-btn  color="primary_next_tab" >
+                      1
+                    </v-btn>
+                    <v-btn color="primary_next_tab" >
+                      X
+                    </v-btn>
+                    <v-btn color="primary_next_tab" >
+                      2
+                    </v-btn>
+                  </v-btn-toggle>
+                </v-flex>
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark
-                  @click="placeBet">Bet {{betAmount}} {{currency}}
+                  @click="placeBet">Bet {{betAmount}} TRX
                   {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
                 <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">
                   Battle in progress...</v-btn>
@@ -86,7 +92,7 @@
                   Payout in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over
                 </v-btn>
-              </v-form> -->
+              </v-form>
             </v-flex>
           </v-card-title>
 
@@ -315,32 +321,25 @@
   import mapping from '../assets/mapping';
   import axios from 'axios'
   import tronweb from 'tronweb'
-    import VLazyImage from "v-lazy-image";
+  import VLazyImage from "v-lazy-image";
 
   export default {
-      components: {
+    components: {
       VLazyImage,
     },
     data: () => ({
       currentMyBetPagination: 1,
       currentLatestBetPagination: 1,
-      showBetNextTab: false,
-      isLoading: false,
       valid: false,
       snackbar: false,
       snackbarText: "",
       snackbarColor: "",
       betAmount: null,
-      info: {},
       snackbarTimeout: 6000,
-      currencies: ["TRX", "WAR"],
-      currency: "TRX",
-      currencyRule: [v => !!v || 'Select a currency',
-        //v => v < 50 || 'You don\'t have enough money'
-      ],
       placeholderFlag: "/img/flags/placeholder.svg",
 
       gameType: 3,
+      info: {},
       history: [],
       bets: [],
       mapStatus: [],
@@ -350,7 +349,6 @@
     }),
 
     firebase: {
-      history: db.ref('public/history').orderByChild('turn'),
       bets: db.ref('public/bets').orderByChild('time'),
       info: db.ref('public/data'),
       mapStatus: db.ref('public/countriesMap')
@@ -377,7 +375,7 @@
     },
 
     methods: {
-    getFlagString(str) {
+      getFlagString(str) {
         return "/img/flags/" + str.toLowerCase()
           .replaceAll(" ", "-")
           .replaceAll("ã", "a")
@@ -461,12 +459,6 @@
         this.snackbarTimeout = 2000;
         this.snackbar = true;
       },
-      getProbability: async function (idCountry) {
-        let p = await db.ref('public/countriesMap').orderByKey().equalTo(idCountry.toString()).once('value')
-        //let p = Math.random()
-        //console.log(p.val()[idCountry].probability)
-        return p.val()[idCountry].probability
-      },
       initBetAmount: function () {
         setTimeout(() => {
           if (this.betNextGameParam) {
@@ -540,7 +532,7 @@
       account() {
         return this.$store.state.loggedInAccount
       },
-      betBattleGameParam() {
+      betNextGameParam() {
         return this.$store.state.gameParams.betNextParams
       },
     }
