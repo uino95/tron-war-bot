@@ -21,23 +21,21 @@
           <v-card-title primary-title class="justify-center">
             <v-flex md10>
                 <v-layout row wrap align-center justify-center>
-                  
-                    <v-card class="ma-20">
-                        <v-card-title primary-title>
-                            <div>
-                                <h3 class="headline mb-0">Italy</h3>
-                            </div>
-                        </v-card-title>
-                        <v-avatar>
-                            <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                            :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
-                        </v-avatar>
-                    </v-card>
-
+                        <v-card >
+                            <v-card-title primary-title>
+                                <div>
+                                    <h3 class="headline mb-0">Italy</h3>
+                                </div>
+                            </v-card-title>
+                            <v-avatar>
+                                <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                                :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
+                            </v-avatar>
+                        </v-card>
 
                 VS
 
-                <v-card class="ma-20">
+                <v-card class="pa-20">
                     <v-card-title primary-title>
                         <div>
                             <h3 class="headline mb-0">Italy</h3>

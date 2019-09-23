@@ -2,7 +2,7 @@
   <v-container grid-list-md text-xs-center class="outerTabContainer">
     <v-layout row wrap>
 
-      <!-- Countries -->
+      <!-- Data Table -->
       <v-flex sm12 md12 lg12 shrink>
         <v-card>
           <v-toolbar color="primary_stats_tab" dark>
@@ -19,6 +19,7 @@
             <v-spacer />
             <v-text-field class="pa-2" v-model="searchCohesion" append-icon="search" label="Search" single-line
               hide-details></v-text-field>
+            <v-btn v-on:click="shareOnFb"> Share on facebook </v-btn>
           </v-toolbar>
 
           <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
@@ -87,20 +88,20 @@
           sortable: true,
           align: 'right',
           class: 'title'
-        }, 
+        },
         {
           text: 'Country',
           value: 'countryName',
           sortable: true,
           align: 'right',
           class: 'title'
-        }, 
+        },
         {
           text: '',
           value: 'no-value',
           sortable: false,
           align: 'left',
-        }, 
+        },
         {
           text: 'Delta',
           value: 'delta',
@@ -149,6 +150,26 @@
       goToBet(path, country) {
         this.$store.commit('setSelectedCountry', country)
         this.$router.push(path)
+      },
+      loginOnFb: function () {
+        FB.login(function (response) {
+          if (response.authResponse) {
+            console.log('Welcome!  Fetching your information.... ');
+            FB.api('/me', function (response) {
+              console.log('Good to see you, ' + response.name + '.');
+            });
+          } else {
+            console.log('User cancelled login or did not fully authorize.');
+          }
+        });
+      },
+      shareOnFb: function () {
+        this.loginOnFb()
+        FB.ui({
+          method: 'feed',
+          hashtag: '#tronwarbot',
+          display: 'popup',
+        }, function (response) {});
       }
     },
     filters: {
@@ -165,7 +186,7 @@
         return time;
       }
     },
-    computed:{ 
+    computed: {
       cohesionWithNames: function () {
         return this.cohesionHistory.map(elem => {
           elem.countryName = this.universalMap(elem.country)

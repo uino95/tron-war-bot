@@ -57,5 +57,18 @@
   <!-- built files will be auto injected -->
 </body>
 
+<!-- TODO: hide app-id -->
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId            : 1165517713645322,
+      autoLogAppEvents : true,
+      xfbml            : true,
+      version          : 'v4.0'
+    });
+  };
+</script>
+<script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
+
 </html>
 
