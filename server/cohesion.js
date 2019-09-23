@@ -68,9 +68,9 @@ const update = async (text, user_id, user_name, post_id, update_type, platform, 
     default:
       return;
   }
-  let u = wwb.updateCohesion(r.country, delta);
+  let u = wwb.editCohesion(r.country, delta);
   let c = {
-    date: date.valueOf,
+    date: date.valueOf(),
     user_id,
     post_id,
     user_name,

@@ -1,4 +1,4 @@
-const config = require('./config');
+const config = require('../config');
 const cron = require("node-cron");
 const TronWeb = require('tronweb');
 const wwb = require("./worldWarBotApi");

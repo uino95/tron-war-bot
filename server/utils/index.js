@@ -1,4 +1,4 @@
-const mapping = require( './map-utilities/mapping');
+const mapping = require( '../map-utilities/mapping');
 const crypto = require('crypto');
 
 const utils = {

@@ -1,4 +1,4 @@
-//require('./fakeBots');
+//require('./utils/fakeBots');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -10,7 +10,7 @@ const twb = require('./tronWarBot');
 const referral = require('./referral');
 const backendLogic = require('./backendLogic')
 const scheduler = require('./scheduler')
-const facebook = require('./facebook');
+const facebook = require('./utils/facebook');
 
 app.use(cors());
 app.use(bodyParser.json());
