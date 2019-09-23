@@ -1,6 +1,6 @@
 const config = require("./config");
 const CIVIL_WAR_LIKELIHOOD = config.wwb.civilWarLikelihood;
-const BATTLE_WEIGHT = [0.5, 2, 1];
+const BATTLE_WEIGHT = config.wwb.battleWeight;
 const neighborCountries = require('./map-utilities/neighborCountries');
 const utils = require("./utils");
 

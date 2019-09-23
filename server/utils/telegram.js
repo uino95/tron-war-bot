@@ -3,8 +3,8 @@ process.env["NTBA_FIX_319"] = 1;
 
 const TelegramBot = require('node-telegram-bot-api');
 
-const config = require('./config')
-const utils = require('./utils')
+const config = require('../config')
+const utils = require('../utils')
 // const firebase = require('./firebase')
 // const wwb = require('./worldWarBot')
 

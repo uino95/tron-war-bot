@@ -12,6 +12,7 @@ const COUNTRIES = neighborCountries.length;
 var ROUND = 0;
 
 var countriesMap, turnData;
+const turnQueue = {};
 // the countriesMap is an array of (CountryIndex => CountryStatus) where CountryStatus is:
 // {
   //   occupiedBy: CountryIndex,
@@ -105,6 +106,20 @@ const leaderboard = ()=>{
 }
 
 
+const onTurn = (tn, fn)=>{
+  if (!tn) throw "Missing callback or turn number";
+  if (!fn && typeof tn != "function") throw "Missing callback or turn number";
+  if (fn && !parseInt(tn)) throw "Invalid parameter";
+  if (fn && typeof fn != "function") throw "Missing callback";
+  if (typeof tn == "function") {fn = tn; tn = 0;}
+  tn = parseInt(tn);
+  if (tn!=0 && tn < turn) return;
+  turnQueue[tn.toString()] = turnQueue[tn.toString()] || [];
+  let idx = turnQueue[tn.toString()].push(fn);
+  return {
+    stop:()=>{ turnQueue[tn.toString()][idx] = undefined; }
+  };
+}
 
 const preTurn = async () => {
   if (paused) throw "Turn needs to be resumed before updating turn.";
@@ -114,7 +129,6 @@ const preTurn = async () => {
 }
 
 const postTurn = async (turnData) => {
-
   // GET JACKPOT
   let jackpot = await firebase.data.once("value").then(r=>r.val()['jackpot']);
   let bets = await firebase.bets.getCurrentTurnBets(0, ROUND);
@@ -129,11 +143,18 @@ const postTurn = async (turnData) => {
     countriesMap[i].finalQuote = Math.round(((jackpot * pf)/(betsPerCountry[i]+1)) + 50 + (turn/100));
   })
   turnData.next.quotes = turnData.next.probabilities.map(e=>utils.quoteFromProbability(e));
-
+  //CALL EXTERNAL SCHEDULED FUNCTIONS
+  let awakeFn = turnQueue[turnData.turn.toString()] || [];
+  awakeFn = awakeFn.concat(turnQueue["0"] || []);
+  awakeFn.forEach(async (fn)=>{
+    try { if(fn) fn(await currentTurnData()); }
+    catch (e) {console.error(e)}
+  });
+  delete turnQueue[turn.toString()];
 }
 
 // UPDATE STATE AND TERRITORIES
-const updateState = (battle) => {
+const updateMap = (battle, next) => {
   if (!battle) return;
   switch (battle.result) {
     case 0:
@@ -152,15 +173,19 @@ const updateState = (battle) => {
       if (!simulation) console.log("[WWB]: BATTLE -> 2 :  " + utils.universalMap(battle.d) +  " (" + battle.d + ") => " + utils.universalMap(battle.ot) +  " (" + battle.ot + ")")
       break;
   }
+}
+
+const updateCohesion = (battle, next) => {
+  if (!battle) return;
+  saveCohesion(editCohesion(battle.o, config.cohesion.battle[battle.result.toString()].o, config.cohesion.battle.threshold), battle)
+  saveCohesion(editCohesion(battle.ot, config.cohesion.battle[battle.result.toString()].ot, config.cohesion.battle.threshold), battle)
+  saveCohesion(editCohesion(battle.d, config.cohesion.battle[battle.result.toString()].d, config.cohesion.battle.threshold), battle)
+  saveCohesion(editCohesion(battle.dt, config.cohesion.battle[battle.result.toString()].dt, config.cohesion.battle.threshold), battle)
   countriesMap.forEach((e,i)=>{countriesMap[i].cohesion = countriesMap[i].nextCohesion;});
-  saveCohesion(updateCohesion(battle.o, config.cohesion.battle[battle.result.toString()].o, config.cohesion.battle.threshold), battle)
-  saveCohesion(updateCohesion(battle.ot, config.cohesion.battle[battle.result.toString()].ot, config.cohesion.battle.threshold), battle)
-  saveCohesion(updateCohesion(battle.d, config.cohesion.battle[battle.result.toString()].d, config.cohesion.battle.threshold), battle)
-  saveCohesion(updateCohesion(battle.dt, config.cohesion.battle[battle.result.toString()].dt, config.cohesion.battle.threshold), battle)
 }
 
 
-const updateCohesion = (country, delta, threshold=0.1) => {
+const editCohesion = (country, delta, threshold=0.1) => {
   if (!delta) return;
   delta = delta/100;
   threshold = threshold/100;
@@ -200,8 +225,9 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
 
   // COMPUTE NEW TURN
   [battleData, computedRandom] = fairness.resolveNextBattle(countriesMap, turnData, _entropy1, _entropy2);
-  updateState(battleData);
+  updateMap(battleData);
   [nextData, computedRandom] = fairness.resolveNextConqueror(countriesMap, turnData, _entropy1, _entropy2);
+  updateCohesion(battleData, nextData);
   turnData = {};
   turnData.turn = turn - 1;
   turnData.battle = battleData || "";
@@ -238,14 +264,14 @@ const simulate = async () => {
     do {
       preTurn();
       go = await launchNextTurn()
-      realPdf().forEach((e,i)=>{
-        countriesMap[i].probability = e;
-      })
-      if (!(turn % 10)) updateCohesion(utils.randomInt(20), (utils.randomInt(20)-5)/10)
+      // if (!(turn % 10)) editCohesion(utils.randomInt(20), (utils.randomInt(20)-5)/10)
       if (!(turn % 100)) {
+        realPdf().forEach((e,i)=>{
+          countriesMap[i].probability = e;
+        })
         let l = leaderboard();
         leaders[l[0].idx] = l[0];
-        console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion of: " + l[0].cohesion + " and territories " + l[0].territories + " and prob: " +  + l[0].probability)
+        console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion of: " + utils.toPercent(l[0].cohesion) + " and territories " + l[0].territories + " and prob: " + utils.toPercent(l[0].probability))
       }
       let d = turnData;
       if (d.next) {
@@ -267,7 +293,7 @@ const simulate = async () => {
   console.log("[WWB]:###########  Results ###########")
   console.log("[WWB]: Wins:   Conquest:   \tAvg.Cohesion: ")
   wins.forEach((c,idx)=>{if (c) console.log(idx + " => \t" + c + "    \t" + (conquest[idx]).toFixed(2) + "    \t" + (cohesion[idx]).toFixed(5))});
-  console.log("\n[WWB]: Using Cohesion Bias: " + config.wwb.cohesionBias + " and civil War Likelihood: " + config.wwb.civilWarLikelihood);
+  console.log("\n[WWB]: Using civil War Likelihood: " + config.wwb.civilWarLikelihood);
   console.log("\n[WWB]: Turns => min: " + minRounds + "  avg: " + rounds/SIMULATIONS + "  max:" + maxRounds);
   console.log("[WWB]:Average civil wars: " + civilWars/SIMULATIONS);
   console.log("[WWB]:Civil wars a posteriori likelihood: " + (civilWars*100/rounds).toFixed(2) + "%");
@@ -281,8 +307,9 @@ module.exports = {
   mapState,
   leaderboard,
   preTurn,
+  onTurn,
   launchNextTurn,
-  updateCohesion,
+  editCohesion,
   countriesStillAlive,
   conquerableTerritoriesOf,
   conqueredTerritoriesOf,

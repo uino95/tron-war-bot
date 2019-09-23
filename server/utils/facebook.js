@@ -1,4 +1,4 @@
-const config = require("./config");
+const config = require("../config");
 const FB = require('fb').default;
 
 if (!config.facebook.token) throw "[FACEBOOK]: Access token is not set in environment variables!"
