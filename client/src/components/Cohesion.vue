@@ -163,12 +163,13 @@
           }
         });
       },
-      shareOnFb: function () {
-        this.loginOnFb()
+      shareOnFb: async function () {
+        await this.loginOnFb()
         FB.ui({
           method: 'feed',
-          hashtag: '#tronwarbot',
+          link: 'https://tronwarbot.com',
           display: 'popup',
+          to: '423138885180430'
         }, function (response) {});
       }
     },

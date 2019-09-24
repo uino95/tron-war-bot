@@ -31,6 +31,7 @@
                         <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
                           :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
                       </v-avatar>
+                      
                     </v-layout>
                     <v-spacer />
                     <v-spacer />
