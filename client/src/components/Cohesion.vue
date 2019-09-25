@@ -19,25 +19,27 @@
             <v-spacer />
             <v-text-field class="pa-2" v-model="searchCohesion" append-icon="search" label="Search" single-line
               hide-details></v-text-field>
-            <v-btn v-on:click="shareOnFb"> Share on facebook </v-btn>
           </v-toolbar>
 
           <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
-            <v-data-table :search="searchCohesion" :headers="headers" :items="cohesionWithNames" :item-key="'date'"
+            <v-data-table :search="searchCohesion" :headers="headers" :items="cohesionHistory" :item-key="'date'"
               class="elevation-1" :pagination.sync="pagination" :rows-per-page-items="[10,20,50]">
               <template v-slot:items="props">
-                <td class="text-xs-left font-weight-bold">{{ props.item.user_name}}</td>
+                <td class="text-xs-left font-weight-bold">{{ props.item.update_type == "BATTLE" ?"TronWarBot" : props.item.user_name}}</td>
                 <td class="text-xs-right">{{ props.item.update_type }}</td>
-                <td class="text-xs-right">{{ props.item.countryName}}</td>
+                <td class="text-xs-right">{{props.item.update_type == "BATTLE" ? universalMap(props.item.battle.o) + " VS " + universalMap(props.item.battle.d) : props.item.text}}</td>
                 <td class="text-xs-left">
                   <v-avatar>
-                    <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                    <v-lazy-image v-if="props.item.update_type != 'BATTLE'" class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
                       :src="getFlagString(universalMap(props.item.country))" :alt="universalMap(props.item.country)" />
+                    <v-lazy-image v-else class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                      :src="getFlagString('battle')" :alt="'battle'" />
                   </v-avatar>
                 </td>
                 <td class="text-xs-right"
                   v-bind:class="{greenText: props.item.delta > 0, redText: props.item.delta <= 0}">
                   {{ props.item.delta.toFixed(5) }}</td>
+                <td class="text-xs-right">{{(props.item.new * 100).toFixed(2) + ' %'}}</td>
                 <td class="text-xs-right"><a :href="props.item.link" target="blank"> {{props.item.link }}</a></td>
                 <td class="text-xs-right">{{ props.item.date | DATE }}</td>
               </template>
@@ -90,9 +92,9 @@
           class: 'title'
         },
         {
-          text: 'Country',
-          value: 'countryName',
-          sortable: true,
+          text: 'Content',
+          value: 'content',
+          sortable: false,
           align: 'right',
           class: 'title'
         },
@@ -107,6 +109,13 @@
           value: 'delta',
           sortable: true,
           align: 'right',
+          class: 'title'
+        },
+        {
+          text: 'New %',
+          value: 'new',
+          sotable: true,
+          aligh: 'right',
           class: 'title'
         },
         {
@@ -150,27 +159,6 @@
       goToBet(path, country) {
         this.$store.commit('setSelectedCountry', country)
         this.$router.push(path)
-      },
-      loginOnFb: function () {
-        FB.login(function (response) {
-          if (response.authResponse) {
-            console.log('Welcome!  Fetching your information.... ');
-            FB.api('/me', function (response) {
-              console.log('Good to see you, ' + response.name + '.');
-            });
-          } else {
-            console.log('User cancelled login or did not fully authorize.');
-          }
-        });
-      },
-      shareOnFb: async function () {
-        await this.loginOnFb()
-        FB.ui({
-          method: 'feed',
-          link: 'https://tronwarbot.com',
-          display: 'popup',
-          to: '423138885180430'
-        }, function (response) {});
       }
     },
     filters: {
@@ -185,14 +173,6 @@
         var sec = a.getSeconds() < 10 ? '0' + a.getSeconds() : a.getSeconds();
         var time = day + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
         return time;
-      }
-    },
-    computed: {
-      cohesionWithNames: function () {
-        return this.cohesionHistory.map(elem => {
-          elem.countryName = this.universalMap(elem.country)
-          return elem
-        })
       }
     }
   }
