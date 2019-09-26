@@ -4,9 +4,45 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>TronWarBot</title>
+  <!-- SEO -->
+  <meta name="description" content="What happens if a new World War will explode?
+
+  tronwarbot.com is a game which simulates a World War situation. The War ends when the entire world is fully controlled by a single nation. 
+  Who do you think will conquer the world?">
+  <meta name="keywords" content="tron, WorldWar, WAR, TRX, Gaming, WorldWarBot, TronWarBot">
+
+
+  <meta itemprop="name" content="TronWarBot">
+  <meta itemprop="description" content="What happens if a new World War will explode?
+
+  tronwarbot.com is a game which simulates a World War situation. The War ends when the entire world is fully controlled by a single nation. 
+  Who do you think will conquer the world?">
+
+  <meta property="og:title" content="TronWarBot">
+  <meta property="og:site_name" content='TronWarBot'>
+  <meta property="og:type" content="game">
+  <meta property="og:image" content="<%= BASE_URL %>img/map.jpg" />
+  <meta property="og:url" content="https://tronwarbot.com/">
+  <!-- meta  property="og:image', content: 'https://www.my-site.com/my-special-image.jpg'}, -->
+  <meta property="og:description" content="What happens if a new World War will explode?
+
+  tronwarbot.com is a game which simulates a World War situation. The War ends when the entire world is fully controlled by a single nation. 
+  Who do you think will conquer the world?">
+
+  <meta name="twitter:card" content='TronWarBot is a Dapp which supports TRX, inspired by WorldWarBot facebook page. You can try to forecast the conqueror state of the next turn to win the jackpot made by all the bets of the turn. Community driven development, fairness and trasparency are the 3 pillars of the Dapp'>
+  <meta name= 'twitter:site' content='https://tronwarbot.com/'>
+  <meta name= 'twitter:title' content='TronWarBot'>
+  <meta name= 'twitter:description' content= 'What happens if a new World War will explode?
+
+  tronwarbot.com is a game which simulates a World War situation. The War ends when the entire world is fully controlled by a single nation. 
+  Who do you think will conquer the world?'>
+  <meta name= 'twitter:image:src' content= '<%= BASE_URL %>img/map.jpg'> 
+
+  <!-- <meta name= 'twitter:creator' content= '@tronwarbot'>-->
+
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-  <title>TronWarBot</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons">
 
@@ -14,10 +50,25 @@
 
 <body>
   <noscript>
-    <strong>We're sorry but vuejs doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    <strong>We're sorry but vuejs doesn't work properly without JavaScript enabled. Please enable it to
+      continue.</strong>
   </noscript>
   <div id="app"></div>
   <!-- built files will be auto injected -->
 </body>
 
+<!-- TODO: hide app-id -->
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId            : 1165517713645322,
+      autoLogAppEvents : true,
+      xfbml            : true,
+      version          : 'v4.0'
+    });
+  };
+</script>
+<script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
+
 </html>
+

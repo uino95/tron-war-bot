@@ -18,5 +18,6 @@ Vue.use(Vuetify, {
     secondary_next_tab: "#FFFFFF",
     primary_stats_tab: "#e67e22",
     secondary_stats_tab: "#FFFFFF",
+    facebook: "#4267b2"
   }
 });

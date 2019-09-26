@@ -1,83 +1,34 @@
 const rp = require('request-promise')
-const cron = require("node-cron");
-
 const firebase = require('./firebase')
 const fairness = require('./fairness')
 const wwb = require('./worldWarBot')
 const twb = require('./tronWarBot')
+const telegram = require('./utils/telegram')
 const referral = require('./referral')
 const betValidator = require('./bet')
 const config = require('./config')
 const utils = require('./utils')
 
-const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
-const toPercent = (n) =>(n * 100).toFixed(1) + "%"
-
-const PROCESSING_TIME = config.test ? 5 : 10;
-const STOP_BET_MARGIN = config.test ? 5 : 15;
-const NET_TURN_DURATION = (config.timing.turn - (config.timing.blockConfirmation * 3) - PROCESSING_TIME - STOP_BET_MARGIN) * 1000;
-const STOP_BET_DURATION = ((config.timing.blockConfirmation * 3) + STOP_BET_MARGIN)  * 1000;
-
-console.log("[TIMING]: Net turn duration is: " + (NET_TURN_DURATION/1000) + "s");
-console.log("[TIMING]: Stop bet duration is: " + (STOP_BET_DURATION/1000) + "s");
-
-async function notifyTelegramBot(d) {
-  // if (config.test) return;
-  if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
-
-  let s = "⚔️ <b>BATTLE " + d.turn + "</b>⚔️\n"
-  let m = {}
-  if (!d.civilWar) {
-    s += "<b>🌎 " + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.o) + ")</b> => <b>" + utils.universalMap(d.dt) + " (" + toPercent(d.cohesion.dt) + ")</b> 🌎\n";
-    s += "<i>Previously: " + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</i>"
-  } else {
-    s += "✨<b>" + utils.universalMap(d.o) + " (" + toPercent(d.cohesion.d) + ")</b> rebelled on  <b>" + utils.universalMap(d.d) + " (" + toPercent(d.cohesion.d) + ")</b>✨\n"
-    s += "🍀 <b>Long live " + utils.universalMap(d.o) + "!! </b> 🍀"
-  }
-  let uri = "https://api.telegram.org/bot" + config.telegram.token + "/" + "sendMessage?chat_id=" + config.telegram.group + "&parse_mode=HTML&reply_markup=" + encodeURIComponent(JSON.stringify(m)) + "&disable_web_page_preview=true&text=" + encodeURIComponent(s);
-
-  await rp.get(uri).catch(console.error);
-  if (d.turn%10) return;
-
-  let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
-  let leaderboard = wwb.leaderboard();
-  let countriesStillAlive = wwb.countriesStillAlive();
-  s = "⏱♟ <b>RUN UPDATE </b>♟⏱\n"
-  s += "\n🌎 <b>" + countriesStillAlive.length + "</b> countries alive!\n\n"
-  s +="🎖🎖 <b>TOP 3 ARMIES</b> 🎖🎖\n"
-  s += "🥇<b>" + leaderboard[0].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[0].idx) + "</b>\t C: "+toPercent(leaderboard[0].cohesion)+"\n";
-  s += "🥈<b>" + leaderboard[1].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[1].idx) + "</b>\t C: "+toPercent(leaderboard[1].cohesion)+"\n";
-  s += "🥉<b>" + leaderboard[2].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[2].idx) + "</b>\t C: "+toPercent(leaderboard[2].cohesion)+"\n";
-  s += "\nJackpot: <b>" + j + " TRX</b>\n\n";
-  s += "Who will conquer the world?? <b>Do not miss out!</b>\n";
-  s += "🎖👇👇👇👇👇👇👇🎖";
-
-  m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};
-
-
-  await sleep(20000);
-  uri = "https://api.telegram.org/bot" + config.telegram.token + "/" + "sendMessage?chat_id=" + config.telegram.group + "&parse_mode=HTML&reply_markup=" + encodeURIComponent(JSON.stringify(m)) + "&disable_web_page_preview=true&text=" + encodeURIComponent(s);
-  await rp.get(uri).catch(console.error);
-}
+console.log("[TIMING]: Stop bet duration is: " + (config.timing.txMargin) + "s");
 
 const stopGame = async ()=>{
   await firebase.data.update({ serverStatus: 500 });
   await twb.endGame(0);
   await twb.endGame(1);
+  await twb.endGame(2);
 }
 
 const gameOver = async () => {
-
+  console.log("[SCHEDULER]: ********* Final payout! *********");
   var cr = await twb.cachedCurrentRound(0);
   var winner = wwb.winner();
   console.log("[LOGIC]: Sleeping one minute before automatic jackpot payout...");
-  await sleep(60000);
-
+  await utils.sleep(60000);
   // GET WINNING BETS
   let _bets = await firebase.bets.getCurrentRoundBets(0, cr.round);
   let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
-
   await twb.jackpotPayout(0, cr.round, winner, _bets, j);
+  console.log("[SCHEDULER]: ********* Final payout finished! *********");
   console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
 }
 
@@ -87,131 +38,131 @@ const updateResultsOnDB = (_b, _wb) => {
   _b.forEach(b =>{firebase.bets.child(b.txId).update({result: (_wb[b.txId] ? _wb[b.txId].win : 0)})})
 }
 
-const stopBets = async (waitTime) => {
-  if (wwb.winner()) return;
-  // STOP BET BUTTON
-  await firebase.data.update({serverStatus: 300})
-  // AWAIT FOR DATA PROPAGATION AND BET HALT
-  await sleep(waitTime || 0);
-  //UPDATE TURN CURRENT WHICH PREVENTS BET SLIPPAGE
-  wwb.updateTurn();
-}
-
-const simulateNextTurn = async () => {
-  if (wwb.winner()) return;
-  // CALCULATE MAGIC NUMBER AND SEED
-  let turn = wwb.currentTurn();
+const revealFairWinner = async (block) => {
+  let turnData = await wwb.currentTurnData();
   let currentSecret = await firebase.secret.once('value').then(r=>r.val());
-  var magic = utils.randomHex();
-  var seed = utils.randomHex();
-  if (turn == currentSecret.turn) {
-    magic = currentSecret.magic;
-    seed = currentSecret.seed;
-  }
-  // SAVE MAGIC NUMBER AND SEED
-  else await firebase.secret.update({turn, magic, seed});
-  // SIMULATE TURN
-  var cMap = await wwb.mapState();
-  [ cMap , turnData, computedRandom] = fairness.computeNextState(cMap, magic, seed);
-  // EVALUATE WINNER
-  var stringToHash = utils.universalMap(turnData.o) + "(" + turnData.o + "):"  + seed;
-  // console.log("[SIMULATE]: Winner on turn " + turn + " is => " + utils.universalMap(turnData.o) + "("+ turnData.o +") with computed randoms: " + JSON.stringify(computedRandom));
-  // COMPUTE SHA256 (WINNER + SEED)
-  // console.log("Computing SHA256 of:     " + stringToHash);
-  let nextMagicHash = utils.sha256(stringToHash);
-  // console.log("SHA256 is " + nextMagicHash);
-  // SAVE SHA256
-  await firebase.fairness.update({nextMagicHash});
-  return [magic, seed];
-}
-
-const revealFairWinner = async () => {
-  let turnData = wwb.currentTurnData();
-  let currentSecret = await firebase.secret.once('value').then(r=>r.val());
-
   if (turnData.turn != currentSecret.turn) return console.error("[LOGIC]: We have overlapping turns. Make sure to reveal winner prior to launch next turn!");
-
   let currentFairness = await firebase.fairness.once('value').then(r=>r.val());
 
-  console.log("[LOGIC]: Winner on current turn is: " + turnData.o + " => " + utils.universalMap(turnData.o));
-  let seed = currentSecret.seed;
-  let magicHashRevealed = utils.universalMap(turnData.o) + "(" + turnData.o + "):"  + seed;
-  console.log("Computing SHA256 of:    " + magicHashRevealed);
-  let previousMagicHash = utils.sha256(magicHashRevealed);
-  if (previousMagicHash != currentFairness.nextMagicHash) console.error("[FAIRNESS]: I don't think that is a really fair game... Hope noone notices that... Shh!!");
-  console.log("SHA256 is " + previousMagicHash);
-  await firebase.fairness.update({previousMagicHash, magicHashRevealed});
+  console.log("[LOGIC]: Next attacker is: " + turnData.next.o + " => " + utils.universalMap(turnData.next.o) + (turnData.battle ? (" and battle result is: " + (turnData.battle.result || "X") ): ""));
+  let previous = currentFairness.next;
+  previous.magic = currentSecret.magic;
+  previous.blockHash = block.hash;
+  // COMPUTE RESULT
+  [battle, next] = fairness.computeFairResult(previous.mapState, previous.magic, previous.blockHash)
+  if (battle) previous.battle = utils.universalMap(battle.o) + (battle.civilWar ? " rebelling on " : " vs " ) + utils.universalMap(battle.d) + " => " + (battle.result || "X")
+  if (next) previous.next = utils.universalMap(next.o) + (next.civilWar ? " rebelling on " : " vs " ) + utils.universalMap(next.d)
+  console.log("[FAIRNESS]: NEXT   -> "+  previous.next + "\n[FAIRNESS]: BATTLE -> " + previous.battle )
+  await firebase.fairness.update({previous});
 }
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
+const prepareNextTurn = async () =>{
+  console.log("[SCHEDULER]: ********* Preparing next turn! *********");
+  let cb = await twb.getBlock();
+  // CALCULATE MAGIC NUMBER
+  let turn = wwb.currentTurn();
+  let currentSecret = await firebase.secret.once('value').then(r=>r.val());
+  let magic = utils.randomHex();
+  let nextTurnBlock = cb.number + Math.ceil(config.timing.turn/3);
+  if (turn == currentSecret.turn) {
+    magic = currentSecret.magic || magic;
+    nextTurnBlock = currentSecret.block || nextTurnBlock;
+  }
+  // SAVE MAGIC NUMBER AND SEED
+  else await firebase.secret.update({turn, magic, block: nextTurnBlock});
+  // EVALUATE WINNER
+  let magicHash = utils.sha256(magic);
+  let mapState = await wwb.compressedState();
+  let next = {mapState, magicHash, nextTurnBlock, turn}
+  // SAVE SHA256
+  await firebase.fairness.update({next});
 
-module.exports.launchNextTurn = async () =>{
-  if (wwb.winner()) return;
-  console.log("\n[SCHEDULER]: ********* Launching next turn! *********");
+  let stopBetsBlock = nextTurnBlock - Math.ceil(config.timing.txMargin/3);
+  let ts = cb.timestamp + ((stopBetsBlock - cb.number) * 3000);
+  let nextTurnTime = new Date(ts);
+  cb = await twb.getBlock();
+  console.log("[PREPARE]: Current block is: " + cb.number + "  nextTurn at: " + nextTurnBlock + " stopBets at: " + stopBetsBlock);
+  if (cb.number < stopBetsBlock) {
+    await firebase.data.update({ serverStatus: 200, turnTime: nextTurnTime.valueOf() });
+    twb.onBlock(stopBetsBlock, stopBets);
+    twb.onBlock(nextTurnBlock, launchNextTurn);
+  }
+  else if (cb.number < nextTurnBlock) {
+    console.warn("[PREPARE]: BEYOND STOP BET BLOCK!");
+    let b = await twb.getBlock(stopBetsBlock);
+    await stopBets(b);
+    twb.onBlock(nextTurnBlock, launchNextTurn);
+  }
+  else {
+    console.warn("[PREPARE]: BEYOND NEXT TURN BLOCK! Launching right away...");
+    let b = await twb.getBlock(nextTurnBlock);
+    launchNextTurn(b);
+  }
+  console.log("[SCHEDULER]: ********* Preparing next turn finished! *********");
+}
 
-  // CAN PLACE BETS
-  let nextTurnTime = (new Date()).valueOf() + NET_TURN_DURATION;
-  await firebase.data.update({ serverStatus: 200, turnTime: nextTurnTime });
+const stopBets = async (block) => {
+  // STOP BET BUTTON
+  console.log("[STOP BETS]: Stopping bets... Block: " + block.number )
+  await firebase.data.update({serverStatus: 300})
+}
 
-  [magic, seed] = await simulateNextTurn();
-
-  await sleep(NET_TURN_DURATION);
-
-  console.log("!!!!!! Declaring winner in seconds! DO NOT STOP SERVER NOW (please) !!!!!!!")
-  // READY TO LAUNCH TURN
-  await stopBets(STOP_BET_DURATION);
-
+const launchNextTurn = async (block) =>{
+  console.log("[SCHEDULER]: ********* Next turn! Block: " + block.number + " *********");
+  let turn = wwb.currentTurn();
+  let currentSecret = await firebase.secret.once('value').then(r=>r.val());
+  if (turn != currentSecret.turn) return console.error("[LOGIC] Need to prepare turn before updating. Wait for next one.");
+  let magic = currentSecret.magic;
+  wwb.preTurn();
 
   // GET CURRENT BET RATES AND MAP
   var cMap = await wwb.mapState();
-  var go = await wwb.launchNextTurn(magic, seed);
-
-
+  var go = await wwb.launchNextTurn(magic, block.hash);
 
   // GET WINNER AND UPDATES
-  var data = wwb.currentTurnData();
-  // GET WINNER AND RATE
-  var _winner = cMap[data.o];
-  // GET CHAIN ROUND
-  var cr = await twb.cachedCurrentRound(1);
+  var td = await wwb.currentTurnData();
 
   // UPDATE HISTORY
-  firebase.history.push().set({
-    conquest: [data.o, data.dt],
-    prev: data.d,
-    turn: data.turn,
-    civilWar: data.civilWar
-  });
+  firebase.history.push().set(td);
 
   // REVEAL FAIRNESS
-  await revealFairWinner();
+  await revealFairWinner(block);
 
   // **** PAYOUT FOR GAME 1 AGAINST DEALER **** //
-  console.log("[SCHEDULER]: ********* Critical turn operations completed! *********\n");
+  console.log("[SCHEDULER]: ********* Next turn finished! *********");
 
+  console.log("[SCHEDULER]: ----- Payouts! ------");
   // STOP GAME BETS
   if (go) await stopGame();
-
   // COMMUNICATE WINNER
-  notifyTelegramBot(data);
+  telegram.notifyTelegramBot(cMap, td);
 
-  console.log("\n[SCHEDULER]: ----- Running payouts! ------");
-  // GET CURRENT TURN BETS
-  var _bets = await firebase.bets.getCurrentTurnBets(1, cr.round, data.turn);
-
+  // GET TURN BETS
+  var cr1 = await twb.cachedCurrentRound(1);
+  var _betsNext = await firebase.bets.getCurrentTurnBets(1, cr1.round, td.turn);
+  var cr2 = await twb.cachedCurrentRound(2);
+  var _betsBattle = await firebase.bets.getCurrentTurnBets(2, cr2.round, td.turn);
 
   // PAYOUT
-  const winningBets = await twb.housePayout(1, cr.round, data.o, _winner.nextQuote, _bets);
+  let _winningBetsNext = td.next ? (await twb.dealerPayout(1, cr1.round, td.next.o, cMap[td.next.o].nextQuote, _betsNext)) : [];
+  let _winningBetsBattle = td.battle ? (await twb.dealerPayout(2, cr2.round, td.battle.result, td.battle.quotes[td.battle.result], _betsBattle)) : [];
   // UPDATE RESULTS BET ON DB
-  await updateResultsOnDB(_bets, winningBets);
+  await updateResultsOnDB(_betsNext.concat(_betsBattle), _winningBetsNext.concat(_winningBetsBattle));
   // PAYOUT FINAL
-  if (go) gameOver();
-
-  console.log("[SCHEDULER]: ----- Payout finished! ------\n");
+  console.log("[SCHEDULER]: ----- Payout finished! ------");
+  if (go) return await gameOver();
+  prepareNextTurn();
 }
 
+
+module.exports.start = async () =>{
+  await wwb.init(config.wwb.restart);
+  if (wwb.winner()) return;
+  prepareNextTurn();
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -250,8 +201,6 @@ module.exports.watchBet = function () {
       firebase.data.update({ jackpot })
       console.info("Jackpot is: ", jackpot)
     }
-    console.info("Successfully registered bet in tx " + r.transaction + " at " + betTime)
+    console.info("[BET]: Successfully registered bet in tx " + r.transaction + " at " + betTime)
   });
 }
-
-module.exports.notifyTelegramBot = notifyTelegramBot;

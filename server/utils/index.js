@@ -1,7 +1,8 @@
-const mapping = require( './map-utilities/mapping');
+const mapping = require( '../map-utilities/mapping');
 const crypto = require('crypto');
 
 const utils = {
+    map: mapping,
     universalMap: function(id,to){
 		switch(to){
 			case 'name':
@@ -9,8 +10,9 @@ const utils = {
 			case 'charId':
 				return mapping[id]['charId'];
 			case 'numberId':
+        id = id.replace(/ |-/g, "").toLowerCase()
 				for (var i = mapping.length - 1; i >= 0; i--) {
-					if (mapping[i]['name'] === id){
+					if (mapping[i]['name'].replace(/ |-/g, "").toLowerCase() === id){
 						return i
 					}
 				}
@@ -28,12 +30,21 @@ const utils = {
   randomFromHex: (e)=> {
     return utils.randomFromSHA(utils.sha256(e));
   },
+  randomInt : (odds=100) => {
+    return Math.floor(Math.random() * odds);
+  },
   randomHex: (len = 16) => {
     return crypto
       .randomBytes(Math.ceil(len / 2))
       .toString('hex') // convert to hexadecimal format
       .slice(0, len) // return required number of characters
-  }
+  },
+  quoteFromProbability: (p) => {
+    let w = p ? Math.min(1/p, 200) : 200;
+    return Math.floor(w *100)/100;
+  },
+  toPercent : (n) =>(n * 100).toFixed(1) + "%",
+  truncate: (s, n)=> (s.length > n) ? s.substr(0, n-2) + '..' : s
 }
 
 module.exports = utils;

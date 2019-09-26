@@ -57,7 +57,7 @@
                   </v-flex>
                 </v-layout>
 
-              <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{currentCountry != null ? this.countriesMap[this.currentCountry].finalQuote : ''}} {{currentCountry != null ? currency : ''}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+              <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{currentCountry != null && this.countriesMap.length != 0 ? this.countriesMap[this.currentCountry].finalQuote : ''}} {{currentCountry != null ? currency : ''}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
               <v-btn v-else-if="data.serverStatus == 300" dark color="primary_final_tab" @click="battleInProgress">Battle in progress...</v-btn>
               <v-btn v-else-if="data.serverStatus == 400" dark color="primary_final_tab" @click="payoutInProgress">Payout in progress...</v-btn>
               <v-btn v-else-if="data.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over</v-btn>
@@ -547,7 +547,7 @@
         return this.bets.filter(bet => bet.gameType == this.gameType).reverse().slice(0,20)
       },
       calculatePotentialWin: function () {
-        if (this.currentCountry == null) return 0;
+        if (this.currentCountry == null || this.countriesMap.length == 0) return 0;
         let bets = this.betsPerCountry
         let betsOnThatCountry = bets.find(el => (el.countryId === this.currentCountry))
         return ((parseFloat(this.data.jackpot) + this.countriesMap[this.currentCountry].finalQuote) * (1 - this.$store.state.gameParams.finalBetParams.houseEdge) * 1 /

@@ -2,31 +2,66 @@
 const TronWeb = require('tronweb');
 const TronGrid = require('trongrid');
 const config = require('./config');
+const utils = require('./utils');
 const BLOCK_CONFIRMATION = config.timing.blockConfirmation;
-
-
 
 const tronWeb = new TronWeb({
   fullHost: config.tron.fullHost,
   privateKey: config.tron.privateKey
 })
-const tronGrid = new TronGrid(tronWeb);
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-module.exports.tronGrid = tronGrid;
 module.exports.tronWeb = tronWeb;
 
 var twb, war;
 var ready = false;
+const block = {number:0, hash:'', timestamp: 0};
+const blockQueue = {};
 const cacheRounds = {};
 
 const isReady = async ()=>{
   if (ready) return;
-  while (!ready) {console.log("[TWB]: Not ready yet...");await sleep(1000);}
+  while (!ready) {console.log("[TWB]: Not ready yet..."); await utils.sleep(1000);}
   return;
+}
+
+const startup = async  () => {
+  let cycle = async ()=>{
+    try {
+      let cb = await tronWeb.trx.getCurrentBlock();
+      let currentBlock = cb.block_header.raw_data.number - BLOCK_CONFIRMATION;
+      block.number = block.number || currentBlock;
+      if (currentBlock < (block.number + 1)) return; //Skip this interval
+      if (currentBlock > (block.number + 1)) currentBlock = block.number + 1;
+      let b = await tronWeb.trx.getBlock(currentBlock)
+      block.number = b.block_header.raw_data.number;
+      block.hash = b.blockID;
+      block.timestamp = b.block_header.raw_data.timestamp;
+    } catch (err) { return console.error(err);}
+    let awakeFn = blockQueue[block.number.toString()] || [];
+    awakeFn = awakeFn.concat(blockQueue["0"] || []);
+    awakeFn.forEach((fn)=>{
+      try { if(fn) fn(JSON.parse(JSON.stringify(block))); }
+      catch (e) {console.error(e)}
+    });
+    delete blockQueue[block.number.toString()];
+  }
+  await cycle();
+  setInterval(cycle, 2500);
+}
+
+const onBlock = (bn, fn)=>{
+  if (!bn) throw "Missing callback or block number";
+  if (!fn && typeof bn != "function") throw "Missing callback or block number";
+  if (fn && !parseInt(bn)) throw "Invalid parameter";
+  if (fn && typeof fn != "function") throw "Missing callback";
+  if (typeof bn == "function") {fn = bn; bn = 0;}
+  bn = parseInt(bn);
+  if (bn!=0 && bn <= block.number) return;
+  blockQueue[bn.toString()] = blockQueue[bn.toString()] || [];
+  let idx = blockQueue[bn.toString()].push(fn);
+  return {
+    stop:()=>{ blockQueue[bn.toString()][idx] = undefined; }
+  };
 }
 
 const createEventsFilter = function(c){
@@ -39,39 +74,26 @@ const createEventsFilter = function(c){
 }
 
 const createWatchEvents = function(c){
-  return async function (opts={}, fn){
+  return function (opts={}, fn){
     if(typeof opts == "string") opts = { eventName : opts};
     if(!fn || (typeof fn != "function")) throw "Invalid callback function";
-    let b = await tronWeb.trx.getCurrentBlock();
-    var bn = b.block_header.raw_data.number - BLOCK_CONFIRMATION;
-
-    var intervalId = setInterval(async ()=>{
+    return onBlock(async (b)=>{
       var events;
+      opts.onlyConfirmed=false;
+      opts.orderBy="timestamp,desc";
+      opts.blockNumber=b.number;
+      opts.limit=200;
       try {
-        let b = await tronWeb.trx.getCurrentBlock();
-        let currentBlock = b.block_header.raw_data.number - BLOCK_CONFIRMATION;
-        if (currentBlock<bn) return; //Skip this interval
-        opts.onlyConfirmed=false;
-        opts.orderBy="timestamp,desc";
-        opts.blockNumber=bn;
-        opts.limit=200;
         events = await twb.getEvents(opts);
-        bn = bn + 1;
       } catch (err) {
         return console.error(err);
       }
       for (var e of events) await fn(e);
-    }, 2500);
-
-    return {
-      stop: () => {
-        clearInterval(intervalId);
-      }
-    }
+    })
   }
 }
 
-const init = async () => {
+module.exports.init = async () => {
   if (twb && war) return;
   if (config.test) console.log("[TWB]: Using Test contracts");
   console.log("[TWB]: Using WarCoin Contract at: " + config.tron.warCoinAddress);
@@ -84,10 +106,22 @@ const init = async () => {
   war.watchEvents = createWatchEvents(war);
   module.exports.twb = twb;
   module.exports.war = war;
+  await startup();
   ready = true;
 }
 
+module.exports.getBlock = async (bn) => {
+  if (!twb || !war) await isReady();
+  if (!bn || !parseInt(bn)) return JSON.parse(JSON.stringify(block));
+  let b = await tronWeb.trx.getBlock(bn);
+  return {
+    number : b.block_header.raw_data.number,
+    hash : b.blockID,
+    timestamp : b.block_header.raw_data.timestamp
+  }
+}
 
+module.exports.onBlock = onBlock;
 
 module.exports.getCurrentRound = async function (gameType) {
   if (!twb || !war) await isReady();
@@ -140,7 +174,7 @@ module.exports.startGame = async function (gameType, playAgainstDealer) {
   var round = await this.getCurrentRound(gameType);
   if (!round.stoppedAt) throw "Game must be stopped before a new round can be started";
   let txId = await this.twb.startGame(gameType, !!playAgainstDealer).send();
-  await sleep(10000);
+  await utils.sleep(10000);
   let tx = await this.tronWeb.trx.getTransaction(txId)
   if (tx.ret[0].contractRet!="SUCCESS") throw tx;
   return round.round;
@@ -151,7 +185,7 @@ module.exports.endGame = async function (gameType) {
   var round = await this.getCurrentRound(gameType);
   if (!!round.stoppedAt) throw "Game must be started before it can be stopped";
   let txId = await this.twb.endGame(gameType,tronWeb.toSun(config.game.preservedJackpotRateForNextTurn)).send();
-  await sleep(10000);
+  await utils.sleep(10000);
   let tx = await this.tronWeb.trx.getTransaction(txId)
   if (tx.ret[0].contractRet!="SUCCESS") throw tx;
   return round.round;
@@ -210,7 +244,7 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
   if (!a.finalJackpot.eq(a.availableFunds)) throw "Payout has already been paid";
   if (!winningBets.length) {
     let txId = await this.twb.payout(gameType, gameRound, this.twb.address, a.finalJackpot.toString()).send();
-    await sleep(10000);
+    await utils.sleep(10000);
     let tx = await this.tronWeb.trx.getTransaction(txId);
     if (tx.ret[0].contractRet!="SUCCESS") {
       console.error("[PAYOUT ERROR]" +
@@ -238,7 +272,7 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
     }
     if (!skip) {
       if (win.gt("0")) txId = await this.twb.payout(gameType, gameRound, b.from, win.toString()).send();
-      await sleep(10000);
+      await utils.sleep(10000);
       tx = await this.tronWeb.trx.getTransaction(txId)
       console.info("[PAYOUT SUCCESSFUL]" +
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
@@ -260,7 +294,7 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
 
 }
 
-module.exports.housePayout = async function (gameType, gameRound, winningChoice, winRate, _bets = []) {
+module.exports.dealerPayout = async function (gameType, gameRound, winningChoice, winRate, _bets = []) {
   if (!twb || !war) await isReady();
   let bets = _bets;
   // let bets = await twb.getEvents({
@@ -274,7 +308,7 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
   //   }
   // });
   let a = await this.availableJackpot(gameType, gameRound);
-  if (!a.playAgainstDealer) throw "This is not a house payout type of game! Use a jackpot payout instead.";
+  if (!a.playAgainstDealer) throw "This is not a dealer payout type of game! Use a jackpot payout instead.";
   // if (true) return bets;
   let winningBets = [];
   let winningAmount = tronWeb.toBigNumber(0);
@@ -307,7 +341,7 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
     }
     if (!skip) {
       if (win.gt("0")) txId = await this.twb.payout(gameType, gameRound, b.from, win.toString()).send();
-      await sleep(10000);
+      await utils.sleep(10000);
       tx = await this.tronWeb.trx.getTransaction(txId)
       console.info("[PAYOUT SUCCESSFUL]" +
         "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
@@ -326,7 +360,6 @@ module.exports.housePayout = async function (gameType, gameRound, winningChoice,
         "\n\tTxId => " + b.txId);
   }
   return winningBets;
-
 }
 
 
@@ -337,7 +370,7 @@ module.exports.cachedCurrentRound = async (gameType) => {
   return cacheRounds[g];
 }
 
-module.exports.launchGame = async function(gameType, playAgainstDealer){
+module.exports.launchGame = async (gameType, playAgainstDealer) => {
   if (!twb || !war) await isReady();
   var l = await this.getCurrentRound(gameType);
   if (!l.stoppedAt) return console.log("[TWB]: START-UP completed. Game already started!");
@@ -345,5 +378,3 @@ module.exports.launchGame = async function(gameType, playAgainstDealer){
   var r = await this.startGame(gameType, playAgainstDealer);
   console.log("[TWB]: START-UP completed")
 }
-
-init();

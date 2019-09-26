@@ -1,7 +1,7 @@
 <template>
   <v-text-field v-if="isTurnTimer" :value="timerValue" label="Next Turn" outline readonly></v-text-field>
   <v-chip disabled dark v-else-if="isRunTimer">{{this.timerValue}}</v-chip>
-  <div v-else> Next Turn: <b>{{this.timerValue}} </b></div>
+  <div class="title pt-3" v-else> Next Turn: <b>{{this.timerValue}} </b></div>
 
 </template>
 

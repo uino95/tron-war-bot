@@ -1,5 +1,5 @@
 // SIMULATION PARAMS
-const SIMULATIONS = 10;
+const SIMULATIONS = 1;
 const EXPECTED_TURN_DURATION = 300;
 // DB interface
 const firebase = require('./firebase')
@@ -11,7 +11,8 @@ const neighborCountries = require('./map-utilities/neighborCountries');
 const COUNTRIES = neighborCountries.length;
 var ROUND = 0;
 
-var countriesMap;
+var countriesMap, turnData;
+const turnQueue = {};
 // the countriesMap is an array of (CountryIndex => CountryStatus) where CountryStatus is:
 // {
   //   occupiedBy: CountryIndex,
@@ -22,12 +23,11 @@ var countriesMap;
   // probability: 0
   // }
 var turn = 0;
-var turnData = {};
 var simulation = false;
 var paused = false;
 
 const currentTurn = () => turn;
-const currentTurnData = () => turnData;
+const currentTurnData = async () => {if (!countriesMap) await init(); return JSON.parse(JSON.stringify(turnData))};
 const mapState = async () => {if (!countriesMap) await init(); return JSON.parse(JSON.stringify(countriesMap));}
 
 // Returns array of countryIndexes
@@ -42,37 +42,53 @@ const realPdf = () => fairness.realPdf(countriesMap);
 
 const winner = () => fairness.winner(countriesMap);
 
+const compressedState = async ()=>{
+  let cMap = await mapState();
+  let td = await currentTurnData();
+  cMap.forEach(e=>{
+    delete e.nextCohesion;
+    delete e.finalQuote;
+    delete e.nextQuote
+    delete e.territories;
+    delete e.probability;
+  });
+  if (td.battle && td.battle.quotes) delete td.battle.quotes;
+  if (td.next && td.next.quotes) delete td.battle.quotes;
+  let o = {countriesMap : cMap, turnData: td}
+  return Buffer.from(JSON.stringify(o), "ascii").toString("base64");
+}
+
 
 const init = async (restart) => {
+  if(restart) console.warn("[WWB]: Restarting game...")
   turn = 1;
+  turnData = {};
   countriesMap = new Array(COUNTRIES).fill(0).map((e,idx)=>{
     return {
       occupiedBy: idx,
       cohesion: 0.5,
+      nextCohesion: 0.5,
       finalQuote: 50, // PRICE OF FINAL BET
-      nextQuote: 0, // MULTIPLIER FOR BET ON NEXT CONQUERER
+      nextQuote: 200, // MULTIPLIER FOR BET ON NEXT CONQUERER
       territories: 1,
       probability: (1/COUNTRIES)
     }
   });
-  if (!restart) countriesMap = await loadSavedState();
-  if (!restart) turn = await loadSavedTurn();
+  if (!restart)  await loadSavedState();
   if (!simulation) ROUND = await t.getCurrentRound(0).then(r=>r.round);
   if (!simulation && restart) return await saveCurrentState();
 };
 
-
-const loadSavedTurn = async () => {
-  return firebase.data.once('value').then(r=>r.val()["turn"]);
-};
-
 const loadSavedState = async () => {
-  return firebase.countriesMap.once('value').then(r=>r.val());
+  let r = await firebase.data.once('value').then(r=>r.val());
+  countriesMap = await firebase.countriesMap.once('value').then(r=>r.val());
+  turn = r["turn"];
+  turnData = r["turnData"];
 };
 
 const saveCurrentState = async () => {
   firebase.countriesMap.set(countriesMap);
-  return firebase.data.update({ turn });
+  return firebase.data.update({ turn, turnData });
 };
 
 
@@ -89,64 +105,147 @@ const leaderboard = ()=>{
   });
 }
 
-const updateExternalData = async (conquerer, conquered, conquererTerritory, conqueredTerritory) => {
 
+const onTurn = (tn, fn)=>{
+  if (!tn) throw "Missing callback or turn number";
+  if (!fn && typeof tn != "function") throw "Missing callback or turn number";
+  if (fn && !parseInt(tn)) throw "Invalid parameter";
+  if (fn && typeof fn != "function") throw "Missing callback";
+  if (typeof tn == "function") {fn = tn; tn = 0;}
+  tn = parseInt(tn);
+  if (tn!=0 && tn < turn) return;
+  turnQueue[tn.toString()] = turnQueue[tn.toString()] || [];
+  let idx = turnQueue[tn.toString()].push(fn);
+  return {
+    stop:()=>{ turnQueue[tn.toString()][idx] = undefined; }
+  };
+}
+
+const preTurn = async () => {
+  if (paused) throw "Turn needs to be resumed before updating turn.";
+  if (winner() != null) return;
+  turn += 1;
+  paused = true;
+}
+
+const postTurn = async (turnData) => {
   // GET JACKPOT
   let jackpot = await firebase.data.once("value").then(r=>r.val()['jackpot']);
   let bets = await firebase.bets.getCurrentTurnBets(0, ROUND);
   let betsPerCountry = new Array(COUNTRIES).fill(0);
   bets.forEach((e,i)=>betsPerCountry[e.userChoice]+=1);
 
-  // CALCULATE NEW EXACT PDF
+  // CALCULATE NEW EXACT PDF AND QUOTES
   realPdf().forEach((e,i)=>{
     countriesMap[i].probability = e;
-    let next = e ? Math.min(1/e, 200) : 200;
     let pf = countriesMap[i].territories/COUNTRIES;
-    countriesMap[i].nextQuote = Math.floor(next*100)/100;
+    countriesMap[i].nextQuote = utils.quoteFromProbability(e);
     countriesMap[i].finalQuote = Math.round(((jackpot * pf)/(betsPerCountry[i]+1)) + 50 + (turn/100));
   })
+  turnData.next.quotes = turnData.next.probabilities.map(e=>utils.quoteFromProbability(e));
+  //CALL EXTERNAL SCHEDULED FUNCTIONS
+  let awakeFn = turnQueue[turnData.turn.toString()] || [];
+  awakeFn = awakeFn.concat(turnQueue["0"] || []);
+  awakeFn.forEach(async (fn)=>{
+    try { if(fn) fn(await currentTurnData()); }
+    catch (e) {console.error(e)}
+  });
+  delete turnQueue[turn.toString()];
+}
+
+// UPDATE STATE AND TERRITORIES
+const updateMap = (battle, next) => {
+  if (!battle) return;
+  switch (battle.result) {
+    case 0:
+      if (!simulation) console.log("[WWB]: BATTLE -> X : " + utils.universalMap(battle.o) +  " (" + battle.o + ") peacefully resolved with " + utils.universalMap(battle.d) +  " (" + battle.d + ")");
+      break;
+    case 1:
+      countriesMap[battle.dt].occupiedBy = battle.o;
+      countriesMap[battle.o].territories += 1;
+      countriesMap[battle.d].territories -= 1;
+      if (!simulation) console.log("[WWB]: BATTLE -> 1 :  " + utils.universalMap(battle.o) +  " (" + battle.o + ") => " + utils.universalMap(battle.dt) +  " (" + battle.dt + ")")
+      break;
+    case 2:
+      countriesMap[battleData.ot].occupiedBy = battleData.d;
+      countriesMap[battle.o].territories -= 1;
+      countriesMap[battle.d].territories += 1;
+      if (!simulation) console.log("[WWB]: BATTLE -> 2 :  " + utils.universalMap(battle.d) +  " (" + battle.d + ") => " + utils.universalMap(battle.ot) +  " (" + battle.ot + ")")
+      break;
+  }
+}
+
+const updateCohesion = (battle, next) => {
+  if (!battle) return;
+  saveCohesion(editCohesion(battle.o, config.cohesion.battle[battle.result.toString()].o, config.cohesion.battle.threshold), battle)
+  saveCohesion(editCohesion(battle.ot, config.cohesion.battle[battle.result.toString()].ot, config.cohesion.battle.threshold), battle)
+  saveCohesion(editCohesion(battle.d, config.cohesion.battle[battle.result.toString()].d, config.cohesion.battle.threshold), battle)
+  saveCohesion(editCohesion(battle.dt, config.cohesion.battle[battle.result.toString()].dt, config.cohesion.battle.threshold), battle)
+  countriesMap.forEach((e,i)=>{countriesMap[i].cohesion = countriesMap[i].nextCohesion;});
 }
 
 
-const updateTurn = () => {
-  if (paused) throw "Turn needs to be resumed before updating turn.";
-  turn += 1;
-  paused = true;
+const editCohesion = (country, delta, threshold=0.1) => {
+  if (!delta) return;
+  delta = delta/100;
+  threshold = threshold/100;
+  let old = countriesMap[country].nextCohesion;
+  let n = countriesMap[country].nextCohesion + (delta);
+  countriesMap[country].nextCohesion = Math.min(Math.max(n, threshold),1);
+  if (old == countriesMap[country].nextCohesion) return;
+  if (!simulation) console.log("[WWB]: Updating cohesion of " + utils.universalMap(country) +  "("+utils.toPercent(countriesMap[country].cohesion)+") by: " + utils.toPercent(delta)+ "\tnew value: " +  utils.toPercent(countriesMap[country].nextCohesion));
+  return {
+    country: country,
+    old,
+    new: countriesMap[country].nextCohesion,
+    delta: old - countriesMap[country].nextCohesion
+  }
 }
 
+const saveCohesion = async (update, battle)=>{
+  if (simulation) return;
+  if (!update) return;
+  update.date = (new Date()).valueOf();
+  update.update_type= "BATTLE";
+  update.battle = battle;
+  let id = 'TWB|' + update.update_type +'|'+ update.turn +'|'+ update.country;
+  await firebase.cohesion.child(id).set(update);
+}
 
 // Returns is game over?
-const launchNextTurn = async (_entropy1, _entropy2) => {
+const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.randomHex()) => {
   if (!paused) throw "Turn needs to be paused before computing next state.";
   paused = false;
 
   if (!countriesMap) await init();
-
   // GAME IS ALREADY OVER
   if (fairness.winner(countriesMap)!=null) return true;
 
-  // COMPUTE NEW TURN
-  [countriesMap, turnData, computedRandom] = fairness.computeNextState(countriesMap, (_entropy1 || utils.randomHex()), (_entropy2 || utils.randomHex()));
-  turnData.turn = turn - 1;
 
-  // UPDATE TERRITORIES
-  countriesMap[turnData.o].territories = countriesMap[turnData.o].territories + 1;
-  countriesMap[turnData.d].territories = countriesMap[turnData.d].territories - 1;
+
+  // COMPUTE NEW TURN
+  [battleData, computedRandom] = fairness.resolveNextBattle(countriesMap, turnData, _entropy1, _entropy2);
+  updateMap(battleData);
+  [nextData, computedRandom] = fairness.resolveNextConqueror(countriesMap, turnData, _entropy1, _entropy2);
+  updateCohesion(battleData, nextData);
+  turnData = {};
+  turnData.turn = turn - 1;
+  turnData.battle = battleData || "";
+  turnData.next = nextData;
+  turnData.winner = fairness.winner(countriesMap);
 
   if (simulation) return turnData.winner != null;
 
   // UPDATE EXTERNAL DATA
-  await updateExternalData(turnData.o, turnData.d, turnData.ot, turnData.dt);
-
+  await postTurn(turnData);
   await saveCurrentState();
-  if (turnData.civilWar) console.log("[WWB]:KABOOM! There was a civil war: " + turnData.o + " rebelled on " + turnData.d);
-  console.log("[WWB]:Conquerer is: " + turnData.o + "  on: " + turnData.d + "   from country: " + turnData.ot);
 
+  if (turnData.next.civilWar) console.log("[WWB]:KABOOM! " + turnData.next.o + " is rebelling on " + turnData.next.d);
   return turnData.winner != null;
 }
 
 
-init();
+
 
 const simulate = async () => {
   console.log("Simulating with " + COUNTRIES + " countries");
@@ -159,20 +258,26 @@ const simulate = async () => {
   var civilWars = 0;
   simulation = true;
   for (var i=0; i<SIMULATIONS; i++){
-    init(true);
+    await init(true);
     let go
     let leaders = {}
     do {
-      updateTurn();
+      preTurn();
+      go = await launchNextTurn()
+      // if (!(turn % 10)) editCohesion(utils.randomInt(20), (utils.randomInt(20)-5)/10)
       if (!(turn % 100)) {
+        realPdf().forEach((e,i)=>{
+          countriesMap[i].probability = e;
+        })
         let l = leaderboard();
         leaders[l[0].idx] = l[0];
-        // console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion of: " + l[0].cohesion)
+        console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion of: " + utils.toPercent(l[0].cohesion) + " and territories " + l[0].territories + " and prob: " + utils.toPercent(l[0].probability))
       }
-      go = await launchNextTurn()
-      let d = currentTurnData()
-      civilWars += d.civilWar;
-      conquest[d.o] += 1;
+      let d = turnData;
+      if (d.next) {
+        civilWars += d.next.civilWar;
+        conquest[d.next.o] += 1;
+      }
       cohesion = cohesion.map((e,idx)=> e + countriesMap[idx].cohesion);
     } while (!go);
     let c_tot = countriesMap.reduce((acc, c) => acc + c.cohesion, 0);
@@ -188,7 +293,7 @@ const simulate = async () => {
   console.log("[WWB]:###########  Results ###########")
   console.log("[WWB]: Wins:   Conquest:   \tAvg.Cohesion: ")
   wins.forEach((c,idx)=>{if (c) console.log(idx + " => \t" + c + "    \t" + (conquest[idx]).toFixed(2) + "    \t" + (cohesion[idx]).toFixed(5))});
-  console.log("\n[WWB]: Using Cohesion Bias: " + config.wwb.cohesionBias + " and civil War Likelihood: " + config.wwb.civilWarLikelihood);
+  console.log("\n[WWB]: Using civil War Likelihood: " + config.wwb.civilWarLikelihood);
   console.log("\n[WWB]: Turns => min: " + minRounds + "  avg: " + rounds/SIMULATIONS + "  max:" + maxRounds);
   console.log("[WWB]:Average civil wars: " + civilWars/SIMULATIONS);
   console.log("[WWB]:Civil wars a posteriori likelihood: " + (civilWars*100/rounds).toFixed(2) + "%");
@@ -201,8 +306,10 @@ module.exports = {
   currentTurnData,
   mapState,
   leaderboard,
-  updateTurn,
+  preTurn,
+  onTurn,
   launchNextTurn,
+  editCohesion,
   countriesStillAlive,
   conquerableTerritoriesOf,
   conqueredTerritoriesOf,
@@ -211,5 +318,6 @@ module.exports = {
   printStatus,
   pdf,
   simulate,
+  compressedState,
   winner
 }

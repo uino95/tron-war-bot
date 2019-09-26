@@ -304,28 +304,33 @@
                     </v-container>
                 </v-card-text>
 
+        <v-card-text class="display-1" v-if="headerTile === 'Whitepaper'">
+          <div>
+            We are updating it. It will be available in a few days
+          </div>
+        </v-card-text>
 
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on">Claim
-                                your Dividends
-                            </v-btn>
-                        </template>
-                        <span>It will be available when the run is finished</span>
-                    </v-tooltip>
-                    <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <v-snackbar v-model="snackbar" :color="'info'" :timeout="3000" vertical bottom>
-            <span class="title"> Copied to clipboard</span>
-            <v-btn dark flat @click="snackbar = false">
-                Close
-            </v-btn>
-        </v-snackbar>
-    </v-layout>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on">Claim your Dividends
+              </v-btn>
+            </template>
+            <span>It will be available when the run is finished</span>
+          </v-tooltip>
+          <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
+        </v-card-actions>
+
+      </v-card>
+    </v-dialog>
+    <v-snackbar v-model="snackbar" :color="'info'" :timeout="3000" vertical bottom>
+      <span class="title"> Copied to clipboard</span>
+      <v-btn dark flat @click="snackbar = false">
+        Close
+      </v-btn>
+    </v-snackbar>
+  </v-layout>
 </template>
 
 <script>

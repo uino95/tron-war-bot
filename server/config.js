@@ -46,17 +46,37 @@ const config = {
     token: process.env.TELEGRAM_TOKEN,
     group: JSON.parse(process.env.TELEGRAM_GROUP || -331523835),
   },
+  facebook:{
+    pageId: "TronWarBot",
+    token: process.env.FB_PAGE_ACCESS_TOKEN,
+    appId: process.env.FB_APP_ID,
+    appSecret: process.env.FB_APP_SECRET,
+  },
   timing: {
     turn: 600,
-    blockConfirmation: 6
+    blockConfirmation: 4,
+    txMargin: 15
   },
   timingTest: {
     turn: 30,
-    blockConfirmation: 2
+    blockConfirmation: 2,
+    txMargin: 5
+  },
+  cohesion:{
+    comment: 0.1,
+    share: 1,
+    review: 0.3,
+    battle:{
+      "0":{ o:0.1, ot:0, d:0, dt:0 },
+      "1":{ o:-0.1, ot:0, d:0, dt:0 },
+      "2":{ o:0, ot:0, d:0.2, dt:0 },
+      threshold: 40
+    }
   },
   wwb:{
-    cohesionBias: 0.41,
-    civilWarLikelihood: 0.25
+    battleWeight: [0.15, 0.56, 0.29],
+    civilWarLikelihood: 0.03,
+    restart: false
   }
 }
 
