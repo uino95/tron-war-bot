@@ -304,11 +304,11 @@
                     </v-container>
                 </v-card-text>
 
-        <v-card-text class="display-1" v-if="headerTile === 'Whitepaper'">
+                <!--<v-card-text class="display-1" v-if="headerTile === 'Whitepaper'">
           <div class="title">
             We are updating it. It will be available in a few days
           </div>
-        </v-card-text>
+        </v-card-text>-->
 
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -495,6 +495,10 @@
                     question: "Couldn't find your answer?",
                     answer: "Please reach us out on the telegram group (please find the link on the bottom side of the menu)! We would be very happy to answer your questions :)"
                 },
+                {
+                    question: "Is there a whitepaper?",
+                    answer: "We're updating it. It'll became available soon."
+                }
             ],
             partners: [
                 {

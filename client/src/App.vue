@@ -50,6 +50,35 @@
 
     <span class="headline ml-3 mr-5" style="color: white">Tron<span class="font-weight-light" style="color: white">WarBot</span></span>
     <v-spacer></v-spacer>
+      <v-toolbar-items>
+    <v-menu offset-y>
+      <template v-slot:activator="{ on }">
+        <v-btn flat dark v-on="on">
+          Account Info
+        </v-btn>
+      </template>
+      <v-list class="secondary" dark>
+        <v-list-tile>
+          <v-list-tile-avatar>
+            <v-icon>fa-paper-plane</v-icon>
+          </v-list-tile-avatar>
+          <v-list-tile-title v-text="this.$store.state.loggedInAccount"></v-list-tile-title>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-avatar>
+            <img src="https://cdn.coinranking.com/behejNqQs/trx.svg">
+          </v-list-tile-avatar>
+          <v-list-tile-title v-text="this.$store.state.accountBalance"></v-list-tile-title>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-avatar>
+            <img src="/img/logo.png"/>
+          </v-list-tile-avatar>
+          <v-list-tile-title v-text="this.$store.state.currentAddressWarBalance"></v-list-tile-title>
+        </v-list-tile>
+      </v-list>
+    </v-menu>
+      </v-toolbar-items>
   </v-toolbar>
 
 
@@ -136,12 +165,12 @@ export default {
         link: false,
         body: 'WIP'
       },
-      {
+/*      {
         icon: 'assignment',
         text: 'Whitepaper',
         link: false,
         body: 'WIP'
-      },
+      },*/
       {
         divider: true
       },
