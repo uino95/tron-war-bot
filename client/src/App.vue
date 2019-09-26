@@ -12,22 +12,17 @@
                         </v-flex>
                     </v-layout>
                     <v-divider v-else-if="item.divider" :key="i" dark class="my-3"></v-divider>
-                    <v-list-tile v-else-if="!item.link" :key="i" @click.stop="showModal(i)">
+                    <v-list-tile v-else-if="!item.link && i !== 1" :key="i" @click.stop="showModal(i)">
                         <v-list-tile-action>
                             <v-icon>{{ item.icon }}</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-content>
                             <v-list-tile-title class="grey--text">
-              <span v-if="item.login && $store.state.loggedInAccount!=null">
-                {{($store.state.loggedInAccount).substring(0,10)}}...
-              </span>
-                                <span v-else>
-                {{ item.text }}
-              </span>
+                                <span>{{ item.text }}</span>
                             </v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>
-                    <v-list-tile v-else :key="i" @click="openLink(item.body)">
+                    <v-list-tile v-else-if="i !== 1" :key="i" @click="openLink(item.body)">
                         <v-list-tile-action>
                             <v-icon>{{ item.icon }}</v-icon>
                         </v-list-tile-action>
@@ -55,7 +50,7 @@
                 <v-menu offset-y>
                     <template v-slot:activator="{ on }">
                         <v-btn flat dark v-on="on">
-                            Account Info
+                            Account
                         </v-btn>
                     </template>
                     <v-list class="secondary" dark>
@@ -66,19 +61,24 @@
                             <v-list-tile-title v-text="this.$store.state.loggedInAccount"></v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
-                            <v-list-tile-avatar>
-                                <img src="https://cdn.coinranking.com/behejNqQs/trx.svg">
+                            <v-list-tile-avatar tile>
+                                <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" alt="trx">
                             </v-list-tile-avatar>
                             <v-list-tile-title v-text="this.$store.state.accountBalance"></v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
                             <v-list-tile-avatar>
-                                <img src="/img/logo.png"/>
+                                <img src="/img/logo.png" alt="war"/>
                             </v-list-tile-avatar>
                             <v-list-tile-title v-text="this.$store.state.currentAddressWarBalance"></v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+            </v-toolbar-items>
+            <v-toolbar-items v-else>
+                <v-btn @click.stop="showModal(1)" flat dark>
+                    Login
+                </v-btn>
             </v-toolbar-items>
         </v-toolbar>
 
@@ -103,8 +103,6 @@
                 </v-layout>
             </v-container>
         </v-content>
-
-
     </v-app>
 </template>
 
@@ -123,9 +121,10 @@
             itemClicked: 4,
             tronLinkStatus: null,
             selected_country: null,
-            menuItems: [{
-                heading: 'My Info'
-            },
+            menuItems: [
+                {
+                    heading: 'My Info'
+                },
                 {
                     icon: 'fa-paper-plane',
                     text: 'Login With Tronlink',
