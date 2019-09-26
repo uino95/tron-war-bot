@@ -46,7 +46,7 @@ const update = async (text, user_id, user_name, post_id, update_type, platform, 
   // VALID INPUT
   if (!text || !user_id || !post_id || !update_type || !platform) return;
   let date = new Date()
-  let id = platform + '|' + user_id +'|'+ post_id +'|'+ update_type + '|' + date.toISOString().substr(0,10);
+  let id = date.toISOString().substr(0,10) + '|' +platform +'|'+ update_type + '|' + user_id;
   // ALREADY EXISTS?
   let alreadyExists = await firebase.cohesion.once('value').then((r) => r.child(id).exists())
   if (alreadyExists) return;
@@ -56,21 +56,25 @@ const update = async (text, user_id, user_name, post_id, update_type, platform, 
   let multiplier = 0;
   let delta = 0;
   switch (update_type) {
+    case "COMMENT" :
+    delta = config.cohesion.comment * Math.sign(r.score)
+    break;
     case "SHARE" :
       delta = config.cohesion.share * Math.sign(r.score)*Math.ceil(Math.abs(r.score)*10)/10
-      break;
-    case "COMMENT" :
-      delta = config.cohesion.comment * Math.sign(r.score)
       break;
     case "REVIEW" :
       delta = config.cohesion.review * Math.sign(r.score)*Math.ceil(Math.abs(r.score)*10)/10
       break;
+    case "POST" :
+      delta = config.cohesion.post * Math.sign(r.score)*Math.ceil(Math.abs(r.score)*10)/10
+      break;
     default:
       return;
   }
+  await ww.currentTurnData();
   let u = wwb.editCohesion(r.country, delta);
   let c = {
-    date: date.valueOf(),
+    turn: u.turn,
     user_id,
     post_id,
     user_name,

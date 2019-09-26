@@ -3,9 +3,9 @@ const firebase = require('./firebase')
 const fairness = require('./fairness')
 const wwb = require('./worldWarBot')
 const twb = require('./tronWarBot')
-const telegram = require('./utils/telegram')
 const referral = require('./referral')
 const betValidator = require('./bet')
+const social = require('./social')
 const config = require('./config')
 const utils = require('./utils')
 
@@ -137,8 +137,7 @@ const launchNextTurn = async (block) =>{
   console.log("[SCHEDULER]: ----- Payouts! ------");
   // STOP GAME BETS
   if (go) await stopGame();
-  // COMMUNICATE WINNER
-  telegram.notifyTelegramBot(cMap, td);
+
 
   // GET TURN BETS
   var cr1 = await twb.cachedCurrentRound(1);
