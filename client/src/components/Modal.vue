@@ -305,7 +305,7 @@
                 </v-card-text>
 
         <v-card-text class="display-1" v-if="headerTile === 'Whitepaper'">
-          <div>
+          <div class="title">
             We are updating it. It will be available in a few days
           </div>
         </v-card-text>
