@@ -1,6 +1,3 @@
-// SIMULATION PARAMS
-const SIMULATIONS = 1;
-const EXPECTED_TURN_DURATION = 300;
 // DB interface
 const firebase = require('./firebase')
 const t = require('./tronWarBot')
@@ -10,6 +7,9 @@ const fairness = require('./fairness')
 const neighborCountries = require('./map-utilities/neighborCountries');
 const COUNTRIES = neighborCountries.length;
 var ROUND = 0;
+// SIMULATION PARAMS
+const SIMULATIONS = 30;
+const EXPECTED_TURN_DURATION = 300;
 
 var countriesMap, turnData;
 const turnQueue = {};
@@ -146,8 +146,11 @@ const postTurn = async (turnData) => {
   //CALL EXTERNAL SCHEDULED FUNCTIONS
   let awakeFn = turnQueue[turnData.turn.toString()] || [];
   awakeFn = awakeFn.concat(turnQueue["0"] || []);
-  awakeFn.forEach(async (fn)=>{
-    try { if(fn) fn(await currentTurnData()); }
+  if (!awakeFn.length) return;
+  let cmap = await mapState();
+  let td = await currentTurnData();
+  awakeFn.forEach((fn)=>{
+    try { if(fn) fn(cmap,td); }
     catch (e) {console.error(e)}
   });
   delete turnQueue[turn.toString()];
@@ -195,6 +198,7 @@ const editCohesion = (country, delta, threshold=0.1) => {
   if (old == countriesMap[country].nextCohesion) return;
   if (!simulation) console.log("[WWB]: Updating cohesion of " + utils.universalMap(country) +  "("+utils.toPercent(countriesMap[country].cohesion)+") by: " + utils.toPercent(delta)+ "\tnew value: " +  utils.toPercent(countriesMap[country].nextCohesion));
   return {
+    turn: turn,
     country: country,
     old,
     new: countriesMap[country].nextCohesion,
@@ -205,10 +209,9 @@ const editCohesion = (country, delta, threshold=0.1) => {
 const saveCohesion = async (update, battle)=>{
   if (simulation) return;
   if (!update) return;
-  update.date = (new Date()).valueOf();
   update.update_type= "BATTLE";
   update.battle = battle;
-  let id = 'TWB|' + update.update_type +'|'+ update.turn +'|'+ update.country;
+  let id = update.turn +'|TWB|' + update.update_type +'|'+ update.country;
   await firebase.cohesion.child(id).set(update);
 }
 
@@ -264,7 +267,8 @@ const simulate = async () => {
     do {
       preTurn();
       go = await launchNextTurn()
-      // if (!(turn % 10)) editCohesion(utils.randomInt(20), (utils.randomInt(20)-5)/10)
+      // if (!(turn % 7)) editCohesion(utils.randomInt(30), (utils.randomInt(12)-2)/10)
+      // if (!(turn % 100)) {saveCurrentState(), await utils.sleep(5000)}
       if (!(turn % 100)) {
         realPdf().forEach((e,i)=>{
           countriesMap[i].probability = e;

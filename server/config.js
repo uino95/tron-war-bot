@@ -53,7 +53,7 @@ const config = {
     appSecret: process.env.FB_APP_SECRET,
   },
   timing: {
-    turn: 600,
+    turn: 300,
     blockConfirmation: 4,
     txMargin: 15
   },
@@ -65,7 +65,8 @@ const config = {
   cohesion:{
     comment: 0.1,
     share: 1,
-    review: 0.3,
+    post: 0.2,
+    review: 0.5,
     battle:{
       "0":{ o:0.1, ot:0, d:0, dt:0 },
       "1":{ o:-0.1, ot:0, d:0, dt:0 },
@@ -75,7 +76,7 @@ const config = {
   },
   wwb:{
     battleWeight: [0.15, 0.56, 0.29],
-    civilWarLikelihood: 0.03,
+    civilWarLikelihood: 0.02,
     restart: false
   }
 }
