@@ -339,7 +339,7 @@
           class: 'title'
         },
         {
-          text: '',
+          text: 'Support',
           value: 'no-value',
           sortable: false,
           align: 'left'

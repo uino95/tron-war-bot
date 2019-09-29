@@ -22,7 +22,7 @@
           </v-toolbar>
 
           <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
-            <v-data-table :search="searchCohesion" :headers="headers" :items="cohesionHistory" :item-key="'date'"
+            <v-data-table :search="searchCohesion" :headers="headers" :items="cohesionHistory" :item-key="'turn'"
               class="elevation-1" :pagination.sync="pagination" :rows-per-page-items="[10,20,50]">
               <template v-slot:items="props">
                 <td class="text-xs-left font-weight-bold">{{ props.item.update_type == "BATTLE" ?"TronWarBot" : props.item.user_name}}</td>
@@ -36,12 +36,12 @@
                       :src="getFlagString('battle')" :alt="'battle'" />
                   </v-avatar>
                 </td>
+                <td class="text-xs-right">{{(props.item.old * 100).toFixed(2) + ' %'}}</td>
                 <td class="text-xs-right"
                   v-bind:class="{greenText: props.item.delta > 0, redText: props.item.delta <= 0}">
-                  {{ props.item.delta.toFixed(5) }}</td>
-                <td class="text-xs-right">{{(props.item.new * 100).toFixed(2) + ' %'}}</td>
+                  {{ props.item.old.toFixed(5) }}</td>
                 <td class="text-xs-right"><a :href="props.item.link" target="blank"> {{props.item.link }}</a></td>
-                <td class="text-xs-right">{{ props.item.date | DATE }}</td>
+                <td class="text-xs-right">{{ props.item.turn }}</td>
               </template>
               <template v-slot:no-results>
                 <v-alert :value="true" color="error" icon="warning">
@@ -105,36 +105,28 @@
           align: 'left',
         },
         {
-          text: 'Delta',
+          text: 'Cohesion',
+          value: 'cohesion',
+          sortable: true,
+          align: 'right',
+          class: 'title'
+        },
+        {
+          text: '',
           value: 'delta',
           sortable: true,
           align: 'right',
-          class: 'title'
         },
         {
-          text: 'New %',
-          value: 'new',
-          sotable: true,
-          aligh: 'right',
-          class: 'title'
-        },
-        {
-          text: 'Link',
-          value: 'link',
-          sortable: true,
-          align: 'right',
-          class: 'title'
-        },
-        {
-          text: 'Date',
-          value: 'date',
+          text: 'Turn',
+          value: 'turn',
           sortable: true,
           align: 'right',
           class: 'title'
         }
       ],
       pagination: {
-        sortBy: 'date',
+        sortBy: 'turn',
         descending: true,
       },
       searchCohesion: '',
