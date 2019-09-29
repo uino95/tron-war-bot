@@ -64,7 +64,6 @@
                     {{ (props.item.probability * 100).toFixed(2) + ' %'}}
                   </v-btn>
                 </td>
-                <td class="text-xs-right">{{ universalMap(props.item.occupiedBy) }}</td>
               </template>
               <template v-slot:no-results>
                 <v-alert :value="true" color="error" icon="warning">
@@ -82,7 +81,7 @@
         <v-card>
 
           <v-toolbar color="primary_stats_tab" dark>
-            <v-toolbar-title>Current Run History</v-toolbar-title>
+            <v-toolbar-title>Recent History</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
 
@@ -141,14 +140,6 @@
                   </v-tooltip>
                 </v-flex>
 
-                <v-flex xs3 class="subheading text-truncate">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <span v-on="on" v-text="universalMap(conquest.prev)" v-bind:alt="snackbar"></span>
-                    </template>
-                    <span>{{universalMap(conquest.prev)}}</span>
-                  </v-tooltip>
-                </v-flex>
               </v-layout>
 
             </v-container>
@@ -224,13 +215,6 @@
           align: 'right',
           class: 'title'
         },
-        {
-          text: 'Occupied by',
-          value: 'occupiedBy',
-          sortable: false,
-          align: 'right',
-          class: 'title'
-        },
       ],
       pagination: {
         sortBy: 'territories',
@@ -249,7 +233,7 @@
       mapStatus: [],
     }),
     firebase: {
-      history: db.ref('public/history').orderByChild('turn'),
+      history: db.ref('public/history').orderByChild('turn').limitToLast(30),
       mapStatus: db.ref('public/countriesMap').orderByChild('territories')
     },
     methods: {
