@@ -145,6 +145,12 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
     nextData.dt = cts[getIntegerFrom(rand2, cts.length)];
     nextData.d = countriesMap[nextData.dt].occupiedBy;
   }
+  nextData.cohesion = {
+    ot:countriesMap[nextData.ot].cohesion,
+    o:countriesMap[nextData.o].cohesion,
+    d:countriesMap[nextData.d].cohesion,
+    dt:countriesMap[nextData.dt].cohesion
+  }
   nextData.probabilities = battlePdf(countriesMap, nextData);
 
   return [nextData, [rand1, rand2]];
