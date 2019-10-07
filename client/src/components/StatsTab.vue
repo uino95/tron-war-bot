@@ -82,6 +82,7 @@
       </v-flex>
 
       <!-- History -->
+      <!--
       <v-flex sm12 md12 lg12 grow>
         <v-card>
 
@@ -163,11 +164,11 @@
 
           </v-container>
         </v-card>
-      </v-flex>
+      </v-flex> -->
 
     </v-layout>
     <v-layout row justify-center>
-      <v-dialog v-model="isVisible" max-width="500">
+      <v-dialog v-model="isVisible" >
         <v-card>
           <v-card-title class="headline grey lighten-2"> Support Your Country </v-card-title>
           <v-card-text>
@@ -177,51 +178,27 @@
             </div>
             <br>
             <div>
-              All you have to do is to engage with Tron War Bot's <a
+              All you have to do is to engage with <b>Tron War Bot's </b><a
                 href="https://www.facebook.com/TronWarBot/">Facebook page</a> and mention your favorite
-              country in either a post, a comment, a review or a share of a page's post and encourage your country's
-              army into doing its best with a great motivational message.
+              <b>country</b> in either a <i>post, a comment, a review or a share</i> of a page's post and encourage your <b>country's
+              army</b> into doing its best with a great motivational message.
               <br>
-              As an example you can use this message, copy it and post it on Tron War Bot's page feed using the share
-              button below!
+              <br>
+              As an example you can use this message, copy it and post it on <b>Tron War Bot's page feed</b> using the share button below!
             </div>
             <br>
             <v-flex>
               <v-text-field ref='phrase' :append-icon="'content_copy'"
                 @click:append="copyToClipBoard(universalMap($store.state.selectedCountry), 'phrase')"
                 :label="'Sample Phrase'"
-                :value="this.universalMap(this.$store.state.selectedCountry) + ' is best country ever'" readonly>
-              </v-text-field>
-            </v-flex>
-            <v-flex>
-              <v-text-field ref='phrase' :append-icon="'content_copy'"
-                @click:append="copyToClipBoard(universalMap($store.state.selectedCountry), 'phrase')"
-                :label="'Sample Phrase'"
-                :value="'I love ' + this.universalMap(this.$store.state.selectedCountry) + ' and all of its super cute penguins'"
-                readonly>
-              </v-text-field>
-            </v-flex>
-            <v-flex>
-              <v-text-field ref='phrase' :append-icon="'content_copy'"
-                @click:append="copyToClipBoard(universalMap($store.state.selectedCountry), 'phrase')"
-                :label="'Sample Phrase'"
-                :value="'I think nothing is stronger than ' + this.universalMap(this.$store.state.selectedCountry) + ' with all of its wonderful yet explosive nuclear bombs!!!'"
-                readonly>
-              </v-text-field>
-            </v-flex>
-            <v-flex>
-              <v-text-field ref='phrase' :append-icon="'content_copy'"
-                @click:append="copyToClipBoard(universalMap($store.state.selectedCountry), 'phrase')"
-                :label="'Sample Phrase'"
-                :value="'I am in love with ' + this.universalMap(this.$store.state.selectedCountry) + '\'s army and all the strong and charming soldiers'"
-                readonly>
+                :value="chosePhrase" readonly>
               </v-text-field>
             </v-flex>
             <br>
             <div>
-              TronWarBot will automatically read your post/comment and update the cohesion of the mentioned country
+              <b> TronWarBot </b> will automatically read your post/comment and update the <b>cohesion</b> of the mentioned country
               based on the energy of your message, which will drastically increase the winning odds for that country in
-              the Tron World War!
+              the <b>Tron World War!</b>
               <br>
               Be creative now!!
             </div>
@@ -229,7 +206,7 @@
             <v-expansion-panel>
               <v-expansion-panel-content v-for="(item,i) in 1" :key="i">
                 <template v-slot:header>
-                  <div>Rules</div>
+                  <div> <b>Rules</b></div>
                 </template>
                 <v-card>
                   <v-card-text>
@@ -239,15 +216,15 @@
                       criteria:
                       <br>
                       <ul>
-                        <li> A COMMENT is worth +-0.1% cohesion point for the mentioned country </li>
-                        <li>A VISITOR POST on page's feed is worth +-0.2% cohesion point for the mentioned country (or
+                        <li><b>COMMENT</b> is worth <span style="color: green"><b>+/- 0.1%</b></span> cohesion point for the mentioned country </li>
+                        <li><b>VISITOR POST</b> on page's feed is worth <span style="color: green"><b>+/- 0.2%</b></span> cohesion point for the mentioned country (or
                           anything in
                           between based on the message energy) </li>
-                        <li>A REVIEW is worth +-0.5% cohesion point for the mentioned country (or anything in between
+                        <li><b>REVIEW</b> is worth <span style="color: green"><b>+/- 0.5%</b></span> cohesion point for the mentioned country (or anything in between
                           based on
                           the
                           message energy)</li>
-                        <li>A SHARE of a page's post is worth +-1.0% cohesion point for the mentioned country (or
+                        <li><b>SHARE</b> of a page's post is worth <span style="color: green"><b>+/- 1.0%</b></span> cohesion point for the mentioned country (or
                           anything in
                           between based on the message energy)</li>
                       </ul>
@@ -255,10 +232,10 @@
                       Beware that a negative message, will also make a country lose its cohesion!
                       <v-spacer />
                       <br>
-                      P.S: Each facebook user is entitled to only one motivational comment plus one post and one share
+                      <i>P.S: Each facebook user is entitled to only one motivational comment plus one post and one share
                       per
                       day
-                      (UTC time), and a single page's review.
+                      (UTC time), and a single page's review.</i>
                     </div>
                   </v-card-text>
                 </v-card>
@@ -267,7 +244,10 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn class="white--text" color="facebook" v-on:click="shareOnFb"> Share on facebook </v-btn>
+            <v-btn class="white--text" color="facebook" v-on:click="shareOnFb">
+              <v-icon class="mr-2"> fab fa-facebook-square </v-icon>
+                Share on facebook 
+               </v-btn>
             <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
           </v-card-actions>
         </v-card>
@@ -299,6 +279,12 @@
       VLazyImage,
     },
     data: () => ({
+      phrases: [
+        '<placeholder> is best country ever',
+        'I love <placeholder> and all of its super cute penguins',
+        'I think nothing is stronger than <placeholder> with all of its wonderful yet explosive nuclear bombs!!!',
+        'I am in love with <placeholder>\'s army and all the strong and charming soldiers'
+      ],
       headers: [{
           text: '',
           value: 'no-value',
@@ -342,7 +328,8 @@
           text: 'Support',
           value: 'no-value',
           sortable: false,
-          align: 'left'
+          align: 'left',
+          class: 'title'
         }
       ],
       pagination: {
@@ -431,6 +418,10 @@
           country.idx = this.universalMap(country.idx)
           return country
         })
+      },
+      chosePhrase(){
+        let random = Math.floor(Math.random() * this.phrases.length);
+        return this.phrases[random].replace("<placeholder>", this.universalMap(this.$store.state.selectedCountry));
       },
       text: function () {
         return "<b> " + this.universalMap(this.$store.state.selectedCountry) + "</b>"
