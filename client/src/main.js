@@ -15,7 +15,7 @@ Vue.config.devtools = true;
 
 Vue.use(VueAnalytics, {
   id: 'UA-141721214-1'
-})
+});
 
 Vue.mixin({
   methods: {
