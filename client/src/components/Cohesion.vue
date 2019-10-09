@@ -28,10 +28,10 @@
               <template v-slot:items="props">
                 <!-- User -->
                 <td class="text-xs-left font-weight-bold">
-                  {{ props.item.update_type == "BATTLE" ?"TronWarBot" : props.item.user_name}}</td>
+                  {{ props.item.update_type == "BATTLE" ?"TronWarBot" : props.item.user_name | justFirstName}}</td>
                 <!-- Update type -->
                 <td class="text-xs-right">
-                  <v-avatar >
+                  <v-avatar size="32">
                     <v-img :src="getInteractionImg(props.item.update_type)" />
                   </v-avatar>
                 </td>
@@ -56,8 +56,8 @@
                 <td class="text-xs-left">
                   <v-tooltip right>
                     <template v-slot:activator="{ on }">
-                      <v-avatar  v-on="on">
-                        <v-img  class="ma-2" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                      <v-avatar size="40" v-on="on">
+                        <v-img class="ma-2" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
                           :src="getFlagString(universalMap(props.item.country))"
                           :alt="universalMap(props.item.country)" />
                       </v-avatar>
@@ -66,9 +66,15 @@
                   </v-tooltip>
                 </td>
                 <!-- Cohesion -->
-                <td class="text-xs-right">{{(props.item.old * 100).toFixed(2) + ' %'}}
-                  <div v-bind:class="{greenText: props.item.delta > 0, redText: props.item.delta <= 0}">
-                    ({{ props.item.delta.toFixed(3) | cohesionSign }})</div>
+                <td class="text-xs-center">
+                  <v-layout row>
+                    <v-flex xs5> {{(props.item.old * 100).toFixed(2) + '%'}} </v-flex>
+                    <v-flex xs2>
+                      <v-icon small> keyboard_arrow_right </v-icon>
+                    </v-flex>
+                    <v-flex xs5 v-bind:class="{greenText: props.item.delta > 0, redText: props.item.delta <= 0}">
+                      <b>{{ props.item.delta.toFixed(3) | cohesionSign }} </b> </v-flex>
+                  </v-layout>
                 </td>
                 <!-- Turn -->
                 <td class="text-xs-right">{{ props.item.turn }}</td>
@@ -138,7 +144,7 @@
           text: 'Cohesion',
           value: 'cohesion',
           sortable: true,
-          align: 'right',
+          align: 'center',
           class: 'title'
         },
         {
@@ -177,8 +183,8 @@
           .replaceAll("é", "e")
           .replaceAll("í", "i") + ".svg";
       },
-      getInteractionImg(str){
-        switch(str){
+      getInteractionImg(str) {
+        switch (str) {
           case 'BATTLE':
             return "/img/flags/battle.svg"
           default:
@@ -210,11 +216,14 @@
     },
     filters: {
       cohesionSign(delta) {
-        return delta >= 0 ? '+' + delta : delta
+        return delta >= 0 ? '+' + delta + '%' : delta + '%'
       },
       truncate(text) {
         return text.length > 50 ? text.substring(0, 49) + '...' : text
       },
+      justFirstName(name){
+        return name.slice(0,name.indexOf(' '))
+      }
     }
   }
 </script>
