@@ -26,17 +26,14 @@
               :custom-sort="customSort" class="elevation-1" :pagination.sync="pagination"
               :rows-per-page-items="[10,20,50]">
               <template v-slot:items="props">
-                <!-- User -->
-                <td class="text-xs-left font-weight-bold">
-                  {{ props.item.update_type == "BATTLE" ?"TronWarBot" : props.item.user_name | justFirstName}}</td>
                 <!-- Update type -->
-                <td class="text-xs-right">
+                <td class="text-xs-center">
                   <v-avatar size="32">
                     <v-img :src="getInteractionImg(props.item.update_type)" />
                   </v-avatar>
                 </td>
                 <!-- Content -->
-                <td class="text-xs-right">
+                <td class="text-xs-left">
                   <div v-if="props.item.update_type == 'BATTLE'">
                     {{universalMap(props.item.battle.o)}}
                     <b> VS </b>
@@ -73,7 +70,7 @@
                       <v-icon small> keyboard_arrow_right </v-icon>
                     </v-flex>
                     <v-flex xs5 v-bind:class="{greenText: props.item.delta > 0, redText: props.item.delta <= 0}">
-                      <b>{{ props.item.delta.toFixed(3) | cohesionSign }} </b> </v-flex>
+                      <b>{{ (props.item.delta * 100).toFixed(2) | cohesionSign }} </b> </v-flex>
                   </v-layout>
                 </td>
                 <!-- Turn -->
@@ -113,25 +110,19 @@
       VLazyImage,
     },
     data: () => ({
-      headers: [{
-          text: 'User',
-          value: 'user_name',
-          sortable: true,
-          align: 'left',
-          class: 'title'
-        },
+      headers: [
         {
-          text: '',
+          text: 'Update',
           value: 'update_type',
           sortable: true,
-          align: 'right',
+          align: 'center',
           class: 'title'
         },
         {
           text: 'Content',
           value: 'content',
           sortable: false,
-          align: 'right',
+          align: 'left',
           class: 'title'
         },
         {
@@ -220,9 +211,6 @@
       },
       truncate(text) {
         return text.length > 50 ? text.substring(0, 49) + '...' : text
-      },
-      justFirstName(name){
-        return name.slice(0,name.indexOf(' '))
       }
     }
   }
