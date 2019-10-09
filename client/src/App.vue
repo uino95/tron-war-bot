@@ -1,5 +1,11 @@
 <template>
     <v-app id="keep">
+        <loading :active.sync="loading"
+                 color="#ffffff"
+                 opacity="1"
+                 background-color="#001537"
+                 :is-full-page="true">
+        </loading>
 
         <v-navigation-drawer v-model="drawer" fixed clipped class="secondary" app dark>
             <v-list dense class="secondary" dark>
@@ -109,11 +115,15 @@
 
 <script>
     import pollForUpdate from './utils/pollForUpdate'
+    import Loading from 'vue-loading-overlay';
+    import 'vue-loading-overlay/dist/vue-loading.css';
 
     export default {
         name: 'App',
+        components: {Loading},
         data: () => ({
             loading: true,
+            loadingOverlay: false,
             noShowMap: true,
             toDisplay: 'none',
             drawer: null,
@@ -229,7 +239,7 @@
             },
             startLoading() {
                 setTimeout(() => {
-                    this.loading = false
+                    this.loading = false;
                     this.toDisplay = "flex"
                 }, this.$store.state.isMobile ? 8000 : 4000)
             },
