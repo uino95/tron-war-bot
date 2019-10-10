@@ -24,27 +24,39 @@
             <v-flex md10>
 
               <v-card class="mb-4">
-                <v-img class="white--text" height='130px' src="img/vs-battle.jpg">
-                  <v-layout row wrap align-center justify-space-between>
+                <v-img class="white--text" height='150px' src="img/vs-battle.jpg">
+                  <v-layout class="mt-4" row wrap align-center justify-space-between>
                     
-                    <v-flex xs6>
-                      <v-layout class="pt-4" column align-center>
+                    <v-flex xs4>
+                      <v-layout column align-center>
                         <div class="title pb-2">Italy</div>
                         <v-hover>
-                          <v-avatar slot-scope="{ hover }" :size="hover ? 55 : 50">
-                            <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                              :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
+                          <v-avatar  slot-scope="{ hover }" >
+                            <v-btn large icon dark v-if="hover" v-on:click="toggle_country(66,1)"> <div class="title"> 1 </div> </v-btn>
+                            <v-img  v-else  :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                              :src="getFlagString(universalMap(66))" :alt="universalMap(66)"/>
                           </v-avatar>
                         </v-hover>
                       </v-layout>
                     </v-flex>
 
-                    <v-flex xs6>
+                    <v-flex  xs2>
+                      <v-hover>
+                          <v-avatar class="mt-4" slot-scope="{ hover }">
+                            <v-btn fab dark color="primary_next_tab" v-if="hover" fab v-on:click="toggle_country(241,0)">
+                              <div class="title"> X </div> 
+                            </v-btn>
+                          </v-avatar>
+                        </v-hover>
+                    </v-flex>
+
+                    <v-flex xs4>
                       <v-layout column align-center>
                         <div class="title pb-2"> Italy </div>
                         <v-hover>
-                          <v-avatar slot-scope="{ hover }" :size="hover ? 55 : 50">
-                            <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                          <v-avatar slot-scope="{ hover }" >
+                            <v-btn large icon dark v-on:click="toggle_country(66, 2)" v-if="hover"> <div class="title"> 2 </div> </v-btn>
+                            <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
                               :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
                           </v-avatar>
                         </v-hover>
@@ -53,8 +65,7 @@
                   
                   </v-layout>
 
-
-                  <core-timer />
+                  <core-timer class="mt-4"/>
                 </v-img>
               </v-card>
               </v-hover>
@@ -84,23 +95,29 @@
                   </v-flex>
                 </v-layout>
                 <v-flex xs12 class="text-xs-center pa-2">
-                  <v-btn-toggle v-model="toggle_exclusive">
-                    <v-btn color="primary_next_tab">
-                      1
+                  <v-hover>
+                    <v-btn slot-scope="{ hover }" fab dark color="primary_next_tab" v-on:click="toggle_country(66,1)">
+                      <div v-if="hover" class ="title white--text"> 1 </div>
+                      <v-img  v-else  :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                              :src="getFlagString(universalMap(66))" :alt="universalMap(66)"/>
                     </v-btn>
-                    <v-btn color="primary_next_tab">
-                      X
+                  </v-hover>
+                    <v-btn fab dark color="primary_next_tab" v-on:click="toggle_country(241,0)">
+                      <div class ="title white--text"> x </div>
                     </v-btn>
-                    <v-btn color="primary_next_tab">
-                      2
+                    <v-hover>
+                    <v-btn slot-scope="{ hover }" fab dark color="primary_next_tab" v-on:click="toggle_country(66,2)">
+                      <div v-if="hover" class ="title white--text"> 2 </div>
+                      <v-img  v-else  :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                              :src="getFlagString(universalMap(66))" :alt="universalMap(66)"/>
                     </v-btn>
-                  </v-btn-toggle>
+                  </v-hover>
                 </v-flex>
-                <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark
+                <v-btn v-if="info.serverStatus == 300" :loading="isWaitingForConfirm" color="primary_next_tab" dark
                   @click="placeBet">Bet {{betAmount}} TRX
                   {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
-                <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">
-                  Battle in progress...</v-btn>
+                <!-- <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">
+                  Battle in progress...</v-btn> -->
                 <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">
                   Payout in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over
@@ -331,7 +348,6 @@
     db
   }
   from '../plugins/firebase';
-  import mapping from '../assets/mapping';
   import axios from 'axios'
   import tronweb from 'tronweb'
   import VLazyImage from "v-lazy-image";
@@ -356,9 +372,9 @@
       history: [],
       bets: [],
       mapStatus: [],
-      mapping: mapping,
       isWaitingForConfirm: false,
-      currentTxId: null
+      currentTxId: null,
+      currentChoice: null
     }),
 
     firebase: {
@@ -480,6 +496,11 @@
             this.initBetAmount()
           }
         }, 500)
+      },
+      toggle_country: function(country, choice){
+        console.log(country + ' ' + choice)
+        this.currentCountry = country
+        this.currentChoice = choice
       }
     },
     watch: {
@@ -517,14 +538,14 @@
       winChance: function () {
         let country = this.currentCountry
         if (country == null || this.mapStatus.length == 0) return 0;
-        let p = this.mapStatus[country].probability * 100
+        let p = 0.1
         return p
       },
       multiplier: function () {
         let country = this.currentCountry
         if (country == null || this.mapStatus.length == 0) return 0;
 
-        return this.mapStatus[country.toString()].nextQuote
+        return 0.1
       },
       potentialWin: function () {
 
