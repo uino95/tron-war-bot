@@ -507,7 +507,7 @@
                     img: 'chips.png'
                 },
                 {
-                    name: 'TronGameCenter',
+                    name: 'Tron Game Center',
                     link: 'https://trongamecenter.org/',
                     img: 'tgc.png'
                 },
