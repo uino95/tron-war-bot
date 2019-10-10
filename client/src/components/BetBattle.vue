@@ -22,30 +22,42 @@
 
           <v-card-title primary-title class="justify-center">
             <v-flex md10>
+
               <v-card class="mb-4">
                 <v-img class="white--text" height='130px' src="img/vs-battle.jpg">
-                  <v-layout row wrap align-center justify-center>
-                    <v-layout class="pt-4" column align-center>
-                      <div class="title pb-2">Italy</div>
-                      <v-avatar>
-                        <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                          :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
-                      </v-avatar>
-                      
-                    </v-layout>
-                    <v-spacer />
-                    <v-spacer />
-                    <v-layout column align-center>
-                      <div class="title pb-2"> Italy </div>
-                      <v-avatar>
-                        <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                          :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
-                      </v-avatar>
-                    </v-layout>
+                  <v-layout row wrap align-center justify-space-between>
+                    
+                    <v-flex xs6>
+                      <v-layout class="pt-4" column align-center>
+                        <div class="title pb-2">Italy</div>
+                        <v-hover>
+                          <v-avatar slot-scope="{ hover }" :size="hover ? 55 : 50">
+                            <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                              :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
+                          </v-avatar>
+                        </v-hover>
+                      </v-layout>
+                    </v-flex>
+
+                    <v-flex xs6>
+                      <v-layout column align-center>
+                        <div class="title pb-2"> Italy </div>
+                        <v-hover>
+                          <v-avatar slot-scope="{ hover }" :size="hover ? 55 : 50">
+                            <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                              :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
+                          </v-avatar>
+                        </v-hover>
+                      </v-layout>
+                    </v-flex>
+                  
                   </v-layout>
+
+
                   <core-timer />
                 </v-img>
               </v-card>
+              </v-hover>
               <v-spacer />
               <v-form ref="form" v-model="valid" lazy-validation>
 
@@ -71,15 +83,15 @@
                       :max="betNextGameParam.maximumBet " label="Bet Amount"></v-slider>
                   </v-flex>
                 </v-layout>
-                <v-flex xs12 class="text-xs-center pa-2" >
+                <v-flex xs12 class="text-xs-center pa-2">
                   <v-btn-toggle v-model="toggle_exclusive">
-                    <v-btn  color="primary_next_tab" >
+                    <v-btn color="primary_next_tab">
                       1
                     </v-btn>
-                    <v-btn color="primary_next_tab" >
+                    <v-btn color="primary_next_tab">
                       X
                     </v-btn>
-                    <v-btn color="primary_next_tab" >
+                    <v-btn color="primary_next_tab">
                       2
                     </v-btn>
                   </v-btn-toggle>
@@ -350,7 +362,7 @@
     }),
 
     firebase: {
-      bets: db.ref('public/bets').orderByChild('time'),
+      bets: db.ref('public/bets').orderByChild('time').limitToLast(100),
       info: db.ref('public/data'),
       mapStatus: db.ref('public/countriesMap')
     },

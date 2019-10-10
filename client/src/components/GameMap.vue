@@ -60,9 +60,6 @@
         }
       })
 
-
-
-
       db.ref('public/countriesMap').once('value', (snapshot) => {
         let j = this.colors.length
         let data = snapshot.val();

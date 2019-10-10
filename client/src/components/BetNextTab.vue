@@ -340,7 +340,7 @@
     }),
 
     firebase: {
-      bets: db.ref('public/bets').orderByChild('time'),
+      bets: db.ref('public/bets').orderByChild('gameType').equalTo('1').limitToLast(30),
       info: db.ref('public/data'),
       mapStatus: db.ref('public/countriesMap')
     },
@@ -447,6 +447,9 @@
             this.initBetAmount()
           }
         }, 500)
+      },
+      compare: function(a,b){
+        return a.turn - b.turn
       }
     },
     watch: {
@@ -476,10 +479,10 @@
     },
     computed: {
       myBets: function () {
-        return this.bets.filter(bet => bet.from === this.account && bet.gameType == this.gameType).reverse()
+        return this.bets.filter((bet) => bet.from == this.account && bet.gameType == this.gameType).reverse()
       },
       latestBets: function () {
-        return this.bets.filter(bet => bet.gameType == this.gameType).reverse().slice(0, 150)
+        return this.bets.sort(this.compare).reverse();
       },
       winChance: function () {
         let country = this.currentCountry

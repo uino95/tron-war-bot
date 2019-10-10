@@ -41,8 +41,8 @@
           </v-toolbar>
 
           <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
-            <v-data-table :search="searchStats" :headers="headers" :items="countryStatus" :item-key="'idx'"
-              class="elevation-1" :pagination.sync="pagination" :rows-per-page-items="[10,20,50]">
+            <v-data-table :search="searchStats" :headers="headersStats" :items="countryStatus" :item-key="'idx'"
+              class="elevation-1" :pagination.sync="paginationStats" :rows-per-page-items="[10,20,50]">
               <template v-slot:items="props">
                 <td class="text-xs-right">
                   <v-avatar>
@@ -53,12 +53,12 @@
                 <td class="text-xs-right && font-weight-bold">{{props.item.idx}}</td>
                 <td class="text-xs-right">{{ props.item.territories }}</td>
                 <td class="text-xs-right">{{ (props.item.cohesion * 100).toFixed(2) + ' %'}}</td>
-                <!-- <td class="text-xs-right ">
+                 <td class="text-xs-right ">
                   <v-btn class="white--text" color="primary_final_tab"
                     v-on:click="goToBet('betfinal',universalMap(props.item.idx, 'numberId'))">
                     {{ (props.item.finalQuote + ' TRX')}}
                   </v-btn>
-                </td> -->
+                </td> 
                 <td class="text-xs-right ">
                   <v-btn class="white--text" color="primary_next_tab"
                     v-on:click="goToBet('betnext',universalMap(props.item.idx, 'numberId'))">
@@ -66,8 +66,12 @@
                   </v-btn>
                 </td>
                 <td class="text-xs-right ">
-                  <v-icon large v-on:click="openModal(universalMap(props.item.idx, 'numberId'))" color="facebook">
-                    fab fa-facebook-square</v-icon>
+                  <v-btn color="facebook" class="white--text" v-on:click="openModal(universalMap(props.item.idx, 'numberId'))">
+                    Support 
+                    <v-icon class="ml-2" small color="white">
+                      fab fa-facebook-square
+                    </v-icon>
+                  </v-btn>
                 </td>
               </template>
               <template v-slot:no-results>
@@ -79,95 +83,46 @@
 
           </v-container>
         </v-card>
-      </v-flex>
+      </v-flex> 
 
       <!-- History -->
-      <v-flex sm12 md12 lg12 grow>
+      <v-flex sm12 md12 lg12 shrink>
         <v-card>
-
           <v-toolbar color="primary_stats_tab" dark>
-            <v-toolbar-title>Current Run History</v-toolbar-title>
-            <v-spacer></v-spacer>
+            <v-toolbar-title>Recent History</v-toolbar-title>
+            <v-spacer/>
+            <v-text-field class="pa-2" v-model="searchHistory" append-icon="search" label="Search" single-line
+              hide-details></v-text-field>
           </v-toolbar>
-
           <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
-
-            <v-container v-if="history.length <= 1" class="gameTabContent">
-              <v-flex class="subheading">
-                <v-chip label outline color="red">Run has not started yet...</v-chip>
-              </v-flex>
-            </v-container>
-
-            <v-container v-else class="gameTabContent">
-
-              <v-layout align-center justify-space-between row wrap class="gameTabHeader">
-                <v-flex style="text-align: start;" xs3 class="title">
-                  Turn
-                </v-flex>
-
-                <v-flex xs6 class="title" style="text-align: center;">
-                  Conquest
-                </v-flex>
-
-                <v-flex xs3 class="title" style="text-align: end;">
-                  Prev. owner
-                </v-flex>
-              </v-layout>
-
-              <v-divider class="gameTabDivider"></v-divider>
-
-              <v-layout align-center justify-space-between row wrap
-                v-for="conquest in history.slice().reverse().slice(10 * currentHistoryPagination - 10, 10 * currentHistoryPagination)"
-                :key="conquest.turn">
-                <v-flex xs2 style="text-align: start" class="subheading">
-                  {{conquest.turn}}
-                </v-flex>
-
-                <v-flex xs3 text-truncated class="subheading greenText text-truncate">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <span v-on="on" v-text="universalMap(conquest.conquest[0])" v-bind:alt="snackbar"></span>
-                    </template>
-                    <span>{{universalMap(conquest.conquest[0])}}</span>
-                  </v-tooltip>
-                </v-flex>
-
-                <v-flex xs1>
-                  <v-icon>arrow_forward</v-icon>
-                </v-flex>
-
-                <v-flex xs3 class="subheading redText text-truncate">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <span v-on="on" v-text="universalMap(conquest.conquest[1])" v-bind:alt="snackbar"></span>
-                    </template>
-                    <span>{{universalMap(conquest.conquest[1])}}</span>
-                  </v-tooltip>
-                </v-flex>
-
-                <v-flex xs3 class="subheading text-truncate">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <span v-on="on" v-text="universalMap(conquest.prev)" v-bind:alt="snackbar"></span>
-                    </template>
-                    <span>{{universalMap(conquest.prev)}}</span>
-                  </v-tooltip>
-                </v-flex>
-              </v-layout>
-
-            </v-container>
-
-            <v-pagination v-if="history.length > 1" v-model="currentHistoryPagination" color="primary_stats_tab"
-              :length="Math.ceil(history.length/10)">
-            </v-pagination>
-
+            <v-data-table :search="searchHistory" :headers="headersHistory" :items="history" :item-key="'turn'"
+              class="elevation-1" :pagination.sync="paginationHistory" :rows-per-page-items="[10,20,50]">
+              <template v-slot:items="props">
+                <td class="text-xs-center">{{ props.item.turn }}</td>
+                <td class="text-xs-center">
+                  <div v-if="props.item.battle.civilWar">
+                    <b>{{universalMap(props.item.battle.d)}}</b> has insurrected
+                  </div>
+                  <div v-else>
+                    <v-container >
+                      <v-layout align-center justify-space-around row fill-height>
+                        <v-flex xs5 class="greenText ">{{universalMap(props.item.battle.o)}}</v-flex>
+                        <v-flex xs2 ><b> VS </b></v-flex>
+                        <v-flex xs5 class="redText ">{{universalMap(props.item.battle.d)}}</v-flex>
+                      </v-layout>
+                    </v-container>
+                  </div>
+                </td>
+                <td class="text-xs-center">{{ props.item.battle.result | result}}</td>
+                <td class="text-xs-right" v-bind:class="{greenText : props.item.battle.result ==1 , redText : props.item.battle.result == 2}">{{ computeBattleField(props.item.battle) }}</td>
+              </template>
+            </v-data-table>
           </v-container>
         </v-card>
       </v-flex>
-
     </v-layout>
-    <v-layout row justify-center>
-      <v-dialog v-model="isVisible" max-width="500">
+    <v-layout row justify-center> 
+      <v-dialog max-width="800" v-model="isVisible">
         <v-card>
           <v-card-title class="headline grey lighten-2"> Support Your Country </v-card-title>
           <v-card-text>
@@ -177,51 +132,29 @@
             </div>
             <br>
             <div>
-              All you have to do is to engage with Tron War Bot's <a
+              All you have to do is to engage with <b>Tron War Bot's </b><a
                 href="https://www.facebook.com/TronWarBot/">Facebook page</a> and mention your favorite
-              country in either a post, a comment, a review or a share of a page's post and encourage your country's
-              army into doing its best with a great motivational message.
+              <b>country</b> in either a <i>post, a comment, a review or a share</i> of a page's post and encourage your
+              <b>country's
+                army</b> into doing its best with a great motivational message.
               <br>
-              As an example you can use this message, copy it and post it on Tron War Bot's page feed using the share
-              button below!
+              <br>
+              As an example you can use this message, copy it and post it on <b>Tron War Bot's page feed</b> using the
+              share button below!
             </div>
             <br>
             <v-flex>
               <v-text-field ref='phrase' :append-icon="'content_copy'"
                 @click:append="copyToClipBoard(universalMap($store.state.selectedCountry), 'phrase')"
-                :label="'Sample Phrase'"
-                :value="this.universalMap(this.$store.state.selectedCountry) + ' is best country ever'" readonly>
-              </v-text-field>
-            </v-flex>
-            <v-flex>
-              <v-text-field ref='phrase' :append-icon="'content_copy'"
-                @click:append="copyToClipBoard(universalMap($store.state.selectedCountry), 'phrase')"
-                :label="'Sample Phrase'"
-                :value="'I love ' + this.universalMap(this.$store.state.selectedCountry) + ' and all of its super cute penguins'"
-                readonly>
-              </v-text-field>
-            </v-flex>
-            <v-flex>
-              <v-text-field ref='phrase' :append-icon="'content_copy'"
-                @click:append="copyToClipBoard(universalMap($store.state.selectedCountry), 'phrase')"
-                :label="'Sample Phrase'"
-                :value="'I think nothing is stronger than ' + this.universalMap(this.$store.state.selectedCountry) + ' with all of its wonderful yet explosive nuclear bombs!!!'"
-                readonly>
-              </v-text-field>
-            </v-flex>
-            <v-flex>
-              <v-text-field ref='phrase' :append-icon="'content_copy'"
-                @click:append="copyToClipBoard(universalMap($store.state.selectedCountry), 'phrase')"
-                :label="'Sample Phrase'"
-                :value="'I am in love with ' + this.universalMap(this.$store.state.selectedCountry) + '\'s army and all the strong and charming soldiers'"
-                readonly>
+                :label="'Sample Phrase'" :value="chosePhrase" readonly>
               </v-text-field>
             </v-flex>
             <br>
             <div>
-              TronWarBot will automatically read your post/comment and update the cohesion of the mentioned country
+              <b> TronWarBot </b> will automatically read your post/comment and update the <b>cohesion</b> of the
+              mentioned country
               based on the energy of your message, which will drastically increase the winning odds for that country in
-              the Tron World War!
+              the <b>Tron World War!</b>
               <br>
               Be creative now!!
             </div>
@@ -229,7 +162,7 @@
             <v-expansion-panel>
               <v-expansion-panel-content v-for="(item,i) in 1" :key="i">
                 <template v-slot:header>
-                  <div>Rules</div>
+                  <div> <b>Rules</b></div>
                 </template>
                 <v-card>
                   <v-card-text>
@@ -239,15 +172,19 @@
                       criteria:
                       <br>
                       <ul>
-                        <li> A COMMENT is worth +-0.1% cohesion point for the mentioned country </li>
-                        <li>A VISITOR POST on page's feed is worth +-0.2% cohesion point for the mentioned country (or
+                        <li><b>COMMENT</b> is worth <span style="color: green"><b>+/- 0.1%</b></span> cohesion point for
+                          the mentioned country </li>
+                        <li><b>VISITOR POST</b> on page's feed is worth <span style="color: green"><b>+/-
+                              0.2%</b></span> cohesion point for the mentioned country (or
                           anything in
                           between based on the message energy) </li>
-                        <li>A REVIEW is worth +-0.5% cohesion point for the mentioned country (or anything in between
+                        <li><b>REVIEW</b> is worth <span style="color: green"><b>+/- 0.5%</b></span> cohesion point for
+                          the mentioned country (or anything in between
                           based on
                           the
                           message energy)</li>
-                        <li>A SHARE of a page's post is worth +-1.0% cohesion point for the mentioned country (or
+                        <li><b>SHARE</b> of a page's post is worth <span style="color: green"><b>+/- 1.0%</b></span>
+                          cohesion point for the mentioned country (or
                           anything in
                           between based on the message energy)</li>
                       </ul>
@@ -255,10 +192,11 @@
                       Beware that a negative message, will also make a country lose its cohesion!
                       <v-spacer />
                       <br>
-                      P.S: Each facebook user is entitled to only one motivational comment plus one post and one share
-                      per
-                      day
-                      (UTC time), and a single page's review.
+                      <i>P.S: Each facebook user is entitled to only one motivational comment plus one post and one
+                        share
+                        per
+                        day
+                        (UTC time), and a single page's review.</i>
                     </div>
                   </v-card-text>
                 </v-card>
@@ -267,7 +205,10 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn class="white--text" color="facebook" v-on:click="shareOnFb"> Share on facebook </v-btn>
+            <v-btn class="white--text" color="facebook" v-on:click="shareOnFb">
+              <v-icon class="mr-2"> fab fa-facebook-square </v-icon>
+              Share on facebook
+            </v-btn>
             <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
           </v-card-actions>
         </v-card>
@@ -299,7 +240,42 @@
       VLazyImage,
     },
     data: () => ({
-      headers: [{
+      phrases: [
+        '<placeholder> is best country ever',
+        'I love <placeholder> and all of its super cute penguins',
+        'I think nothing is stronger than <placeholder> with all of its wonderful yet explosive nuclear bombs!!!',
+        'I am in love with <placeholder>\'s army and all the strong and charming soldiers'
+      ],
+      headersHistory: [{
+          text: 'Turn',
+          value: 'turn',
+          sortable: true,
+          align: 'center',
+          class: 'title'
+        },
+        {
+          text: 'Battle',
+          value: 'battle',
+          sortable: false,
+          align: 'center',
+          class: 'title'
+        },
+        {
+          text: 'Result',
+          value: 'result',
+          sortable: true,
+          align: 'center',
+          class: 'title'
+        },
+        {
+          text: 'Battlefield',
+          value: 'battlefield',
+          sortable: false,
+          align: 'right',
+          class: 'title'
+        },
+      ],
+      headersStats: [{
           text: '',
           value: 'no-value',
           sortable: false,
@@ -339,25 +315,24 @@
           class: 'title'
         },
         {
-          text: 'Support',
+          text: '',
           value: 'no-value',
           sortable: false,
-          align: 'left'
+          align: 'left',
+          class: 'title'
         }
       ],
-      pagination: {
+      paginationStats: {
         sortBy: 'territories',
         descending: true,
       },
+      paginationHistory: {
+        sortBy: 'turn',
+        descending: true
+      },
       isVisible: false,
-      snackbar: false,
-      snackbarText: "",
-      snackbarColor: "",
-      snackbarTimeout: 6000,
       searchStats: '',
-      currentRunPagination: 1,
-      currentHistoryPagination: 1,
-      reversed: false,
+      searchHistory: '',
       placeholderFlag: "/img/flags/placeholder.svg",
       snackbar: false,
       snackbarText: "",
@@ -367,7 +342,7 @@
       mapStatus: [],
     }),
     firebase: {
-      history: db.ref('public/history').orderByChild('turn'),
+      history: db.ref('public/history').orderByChild('turn').limitToLast(10),
       mapStatus: db.ref('public/countriesMap').orderByChild('territories')
     },
     methods: {
@@ -423,6 +398,20 @@
           display: 'touch',
           to: '423138885180430'
         }, function (response) {});
+      },
+      computeBattleField(item) {
+        //TODO understand in case of civilWar what is the correct battlefield but also the correct outcome in general also for cohesionTab
+        if (item.civilWar) {
+          return this.universalMap(item.ot)
+        }
+        switch (item.result) {
+          case 0:
+            return 'Neutral';
+          case 1:
+            return this.universalMap(item.dt);
+          case 2:
+            return this.universalMap(item.ot);
+        }
       }
     },
     computed: {
@@ -432,8 +421,17 @@
           return country
         })
       },
+      chosePhrase() {
+        let random = Math.floor(Math.random() * this.phrases.length);
+        return this.phrases[random].replace("<placeholder>", this.universalMap(this.$store.state.selectedCountry));
+      },
       text: function () {
         return "<b> " + this.universalMap(this.$store.state.selectedCountry) + "</b>"
+      }
+    },
+    filters: {
+      result(battle) {
+        return battle != 0 ? battle : 'X'
       }
     }
   }
