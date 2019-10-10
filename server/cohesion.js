@@ -71,7 +71,7 @@ const update = async (text, user_id, user_name, post_id, update_type, platform, 
     default:
       return;
   }
-  await ww.currentTurnData();
+  await wwb.currentTurnData();
   let u = wwb.editCohesion(r.country, delta);
   let c = {
     turn: u.turn,
@@ -92,7 +92,7 @@ const update = async (text, user_id, user_name, post_id, update_type, platform, 
 
 const samples = (c, s) => {
   let i = {
-    '0': c + " is great",
+    '0': c + " is amazing!!",
     '1': c +" is awesome",
     '2': c +" really sucks",
     '3':"Long live in hell " + c
@@ -112,11 +112,11 @@ const users = (c) => {
 }
 
 const test = async () =>{
-  let r = utils.randomInt(241).toString();
-  let s = samples(utils.universalMap(r),utils.randomInt(4));
-  let u = utils.randomInt(5).toString();
-  let p = utils.randomHex();
-  await update(s, u, users(u), p, (utils.randomInt(1) ? "SHARE" : "COMMENT"), "FB", "https://google.com");
+  // let r = utils.randomInt(241).toString();
+  // let s = samples(utils.universalMap(r),utils.randomInt(0));
+  // let u = utils.randomInt(5).toString();
+  // let p = utils.randomHex();
+  // await update("Ireland is amazing!", 1, "Samuele Rodi", 99, "SHARE", "FB", "https://www.facebook.com/TronWarBot/posts/525547494939568");
 }
 
 module.exports = {

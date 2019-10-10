@@ -14,7 +14,11 @@ const chatId = config.telegram.group;
 var _tMessage = "";
 
 
-const sendMessage = async (...d) => { if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured."); return await bot.sendMessage(chatId, ...d)};
+const sendMessage = async (...d) => {
+  if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
+  _tMessage="" 
+  return await bot.sendMessage(chatId, ...d)
+};
 
 const sendOrUpdate = async (...d) => {
     if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");

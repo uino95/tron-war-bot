@@ -71,7 +71,10 @@ const config = {
       "0":{ o:0.1, ot:0, d:0, dt:0 },
       "1":{ o:-0.1, ot:0, d:0, dt:0 },
       "2":{ o:0, ot:0, d:0.2, dt:0 },
-      threshold: 40
+      threshold: {
+        upper:70,
+        lower:30
+      }
     }
   },
   wwb:{

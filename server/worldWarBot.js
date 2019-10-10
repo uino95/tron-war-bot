@@ -188,13 +188,13 @@ const updateCohesion = (battle, next) => {
 }
 
 
-const editCohesion = (country, delta, threshold=0.1) => {
+const editCohesion = (country, delta, threshold) => {
+  threshold = threshold || {upper: 100, lower: 0.1};
   if (!delta) return;
   delta = delta/100;
-  threshold = threshold/100;
   let old = countriesMap[country].nextCohesion;
   let n = countriesMap[country].nextCohesion + (delta);
-  countriesMap[country].nextCohesion = Math.min(Math.max(n, threshold),1);
+  countriesMap[country].nextCohesion = Math.min(Math.max(n, (threshold.lower/100)),(threshold.upper/100));
   if (old == countriesMap[country].nextCohesion) return;
   if (!simulation) console.log("[WWB]: Updating cohesion of " + utils.universalMap(country) +  "("+utils.toPercent(countriesMap[country].cohesion)+") by: " + utils.toPercent(delta)+ "\tnew value: " +  utils.toPercent(countriesMap[country].nextCohesion));
   return {
@@ -267,7 +267,7 @@ const simulate = async () => {
     do {
       preTurn();
       go = await launchNextTurn()
-      // if (!(turn % 7)) editCohesion(utils.randomInt(30), (utils.randomInt(12)-2)/10)
+      if (!(turn % 7)) editCohesion(utils.randomInt(5), (utils.randomInt(12)-2)/10)
       // if (!(turn % 100)) {saveCurrentState(), await utils.sleep(5000)}
       if (!(turn % 100)) {
         realPdf().forEach((e,i)=>{
