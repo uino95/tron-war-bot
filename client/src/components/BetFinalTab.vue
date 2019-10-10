@@ -366,7 +366,6 @@
       currentTxId: null,
 
       gameType: 0,
-      history: [],
       bets: [],
       data:{},
       countriesMap:[],
@@ -374,8 +373,7 @@
     }),
 
     firebase: {
-      history: db.ref('public/history').orderByChild('turn'),
-      bets: db.ref('public/bets').orderByChild('time'),
+      bets: db.ref('public/bets').orderByChild('gameType').equalTo('0'),
       data: db.ref('public/data'),
       countriesMap: db.ref('public/countriesMap')
     },
@@ -385,6 +383,7 @@
         return tronweb.fromSun(amount) + 'TRX'
       }
     },
+
 
     methods: {
       getFlagString(str) {
@@ -486,6 +485,9 @@
         sec = sec < 10 ? `0${sec}` : sec;
         min = min < 10 ? `0${min}` : min;
         return hours + ':' + min + ':' + sec
+      },
+      compare: function(a,b){
+        return a.turn - b.turn
       }
     },
     watch:{
@@ -514,8 +516,9 @@
       }
     },
     computed: {
+      
       myBets: function () {
-        return this.bets.filter(bet => (bet.from) === this.account && bet.gameType == this.gameType).reverse()
+        return this.bets.filter(bet => bet.from == this.account && bet.gameType == this.gameType).reverse()
       },
       //returns an array of objects [{countryId: "id", numberOfBets: x}, ...]
       betsPerCountry: function () {
@@ -544,7 +547,7 @@
         return betsPerCountryList
       },
       latestBets: function () {
-        return this.bets.filter(bet => bet.gameType == this.gameType).reverse().slice(0,20)
+        return this.bets.sort(this.compare).reverse();
       },
       calculatePotentialWin: function () {
         if (this.currentCountry == null || this.countriesMap.length == 0) return 0;

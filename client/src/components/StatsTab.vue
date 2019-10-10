@@ -53,12 +53,12 @@
                 <td class="text-xs-right && font-weight-bold">{{props.item.idx}}</td>
                 <td class="text-xs-right">{{ props.item.territories }}</td>
                 <td class="text-xs-right">{{ (props.item.cohesion * 100).toFixed(2) + ' %'}}</td>
-                <!-- <td class="text-xs-right ">
+                 <td class="text-xs-right ">
                   <v-btn class="white--text" color="primary_final_tab"
                     v-on:click="goToBet('betfinal',universalMap(props.item.idx, 'numberId'))">
                     {{ (props.item.finalQuote + ' TRX')}}
                   </v-btn>
-                </td> -->
+                </td> 
                 <td class="text-xs-right ">
                   <v-btn class="white--text" color="primary_next_tab"
                     v-on:click="goToBet('betnext',universalMap(props.item.idx, 'numberId'))">
@@ -83,7 +83,7 @@
 
           </v-container>
         </v-card>
-      </v-flex>
+      </v-flex> 
 
       <!-- History -->
       <v-flex sm12 md12 lg12 shrink>
@@ -121,7 +121,7 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <v-layout row justify-center>
+    <v-layout row justify-center> 
       <v-dialog max-width="800" v-model="isVisible">
         <v-card>
           <v-card-title class="headline grey lighten-2"> Support Your Country </v-card-title>
@@ -342,7 +342,7 @@
       mapStatus: [],
     }),
     firebase: {
-      history: db.ref('public/history').orderByChild('turn'),
+      history: db.ref('public/history').orderByChild('turn').limitToLast(10),
       mapStatus: db.ref('public/countriesMap').orderByChild('territories')
     },
     methods: {

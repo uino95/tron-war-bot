@@ -97,9 +97,6 @@
                             <v-btn v-on:click="showMobileMap()"> Load Map</v-btn>
                         </div>
                         <div v-else-if="!noShowMap">
-                            <div v-if="loading" class="loader-container">
-                                <v-progress-circular :size="70" :width="8" color="primary" indeterminate mt-5/>
-                            </div>
                             <core-game-map v-bind:style="{ display: toDisplay }"/>
                         </div>
                         <core-game-controls @showModal="showModal(1)"/>
@@ -256,11 +253,10 @@
         },
         mounted() {
             this.$store.commit('setIsMobile', this.isMobile())
-            this.track()
             if (!this.$store.state.isMobile) {
                 this.noShowMap = false
-                this.startLoading()
             }
+            this.startLoading()
         }
     }
 </script>

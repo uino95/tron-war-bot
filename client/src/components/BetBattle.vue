@@ -362,7 +362,7 @@
     }),
 
     firebase: {
-      bets: db.ref('public/bets').orderByChild('time'),
+      bets: db.ref('public/bets').orderByChild('time').limitToLast(100),
       info: db.ref('public/data'),
       mapStatus: db.ref('public/countriesMap')
     },
