@@ -1,36 +1,60 @@
 // WE DO NOT NEED PROMISE CANCELLATION
-process.env["NTBA_FIX_319"] = 1;
-
-const TelegramBot = require('node-telegram-bot-api');
+const Telegraf = require('telegraf')
+const Telegram = require('telegraf/telegram')
+const Extra = require('telegraf/extra')
 
 const config = require('../config')
 const utils = require('../utils')
-// const firebase = require('./firebase')
-// const wwb = require('./worldWarBot')
+const firebase = require('../firebase')
 
-const bot = new TelegramBot(config.telegram.token);
+if (!config.telegram.token) throw "[TELEGRAM]: Bot token not configured.";
+
+const telegram = new Telegram(config.telegram.token)
 const chatId = config.telegram.group;
 
-var _tMessage = "";
-
+const mxCache = {};
 
 const sendMessage = async (...d) => {
-  if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
-  _tMessage="" 
-  return await bot.sendMessage(chatId, ...d)
+  return await telegram.sendMessage(chatId, ...d).catch(console.error);
 };
 
 const sendOrUpdate = async (...d) => {
-    if (!config.telegram.token) return console.error("[TELEGRAM]: Bot token not configured.");
-  _text = d[0];
-  if (_tMessage) {
-    d[1] = d[1] || {};
-    d[1].message_id=_tMessage.message_id;
-    d[1].chat_id = chatId;
-    return await bot.editMessageText(...d);
+  let idx = d.shift();
+  if (!idx) return await sendMessage(...d);
+  if (idx && mxCache[idx]) {
+    let t = d[0];
+    let o = d[1];
+    let mId = mxCache[idx].message_id;
+    return await telegram.editMessageText(chatId, mId, mId, t, o).catch(console.error);
   }
-  return _tMessage = await sendMessage(...d).catch(console.error);
+  return mxCache[idx] = await sendMessage(...d);
 };
+
+
+
+
+
+const russianRoulette = async ()=>{
+  let text = "Support your country!"
+  let m = { 'inline_keyboard': [[{'text': '🤩', 'callback_data': '2'},{'text': '👍🏻', 'callback_data': '1'},{'text': '👎🏻', 'callback_data': '-1'},{'text': '🤬', 'callback_data': '-2'}]]};
+  await sendMessage(text, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true})
+}
+const onRussianRouletteUpdate = async (ctx, next)=>{
+  let o = ctx.update.callback_query.data;
+  let user = ctx.from.id;
+  console.log("###### ",user," -> ",o)
+}
+
+
+const bot = new Telegraf(config.telegram.token)
+bot.use((ctx, next)=>{
+  if (ctx.chat.id !=chatId) return console.error("[TELEGRAF]: Someone is sending messages.");
+  return next();
+}) //ONLY AVAILABLE IN OFFICIAL TWB GROUP
+bot.on('callback_query', onRussianRouletteUpdate)
+bot.launch()
+russianRoulette()
 
 module.exports.sendOrUpdate = sendOrUpdate;
 module.exports.sendMessage = sendMessage;
+module.exports.russianRoulette = russianRoulette;

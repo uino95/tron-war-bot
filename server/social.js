@@ -6,7 +6,7 @@ const wwb = require('./worldWarBot')
 const telegram = require('./utils/telegram')
 const facebook = require('./utils/facebook')
 
-const STATS_UPDATE_FREQ = 50
+const STATS_UPDATE_FREQ = 100
 const NEW_UPDATE_FREQ = 25
 const QUOTES_FREQ = 150
 
@@ -115,21 +115,16 @@ const buildTgStats = (td, leaderboard, countriesStillAlive, j, top3, civilWar) =
 }
 
 const battleUpdate = async (cmap, td) => {
-  let n = false
+  let n = "BU" + Math.ceil(td.turn/NEW_UPDATE_FREQ);
   if (!(td.turn%NEW_UPDATE_FREQ)) {
-    n=true;
     epic = []
     insurrections = [];
     partials = {};
   }
-  history.push(td);
-  // TODOS:
-  // - PARTIALS +- TERRITORIES OK
   if (td.battle && td.battle.result){
     let w,l;
     switch (td.battle.result){
       case 1:
-      // - SUCCESSFUL INSURRECTIONS OK
         if (td.battle.civilWar) insurrections.push(td.battle);
         w=td.battle.o;
         l=td.battle.d;
@@ -144,12 +139,8 @@ const battleUpdate = async (cmap, td) => {
   }
   let top = Object.keys(partials).map((i)=>{return {idx:i, t:partials[i]}}).sort((a,b)=>b.t-a.t);
 
-  // - BET WINS??
-  // - EPIC BATTLES (wins with low probability)
   if (td.battle && td.battle.probabilities[td.battle.result]<0.05) epic.push(td.battle);
   insurrections = insurrections.filter((b)=>!!cmap[b.o].territories);
-  // - LAST RESULT
-  // - CURRENT BATTLE
 
   let s ="";
   if (top.length) s += "<b>🆕 Territories:</b>\t\n"
@@ -157,13 +148,13 @@ const battleUpdate = async (cmap, td) => {
     if (!c.t) return;
     s += "<b>" + (c.t>0 ? "+" : "\-") + c.t + "</b> " + utils.universalMap(c.idx) + "\n";
   })
-  if (epic.length) s += "\n🔥 <b>Epic battles:</b> 🔥\n";
+  if (epic.length) s += "\n<b>🔥 Epic battles:</b>\n";
   epic.forEach((b)=>{
     s += (b.result==1 ? "<b>" : "" ) + utils.universalMap(b.o) + (b.result==1 ? "</b>" : "" ) + " vs " + (b.result==2 ? "<b>" : "" ) + utils.universalMap(b.d) + (b.result==2 ? "</b>" : "" ) + " ➡️ <b>"+ (b.result || "X") + "</b> <i>with a " + utils.toPercent(b.probabilities[b.result])+" chance</i>\n";
   })
 
   if (insurrections.length) {
-    s+= "\n<b>Successful insurrections:</b>"
+    s+= "\n<b>🍀 Successful insurrections:</b>"
     s+= insurrections.map(e=> "\n" + utils.universalMap(e.o) + ": " + cmap[e.o].territories + " territories").toString();
     s+= "\n";
   }
@@ -176,7 +167,7 @@ const battleUpdate = async (cmap, td) => {
     if (td.battle.result == 2) s += "<i>The defender "+ utils.universalMap(td.battle.d) + " conquered " + utils.universalMap(td.battle.ot) + "</i>\n";
   }
   if (td.next) {
-    s += "\n\n⚔️<b>"+ td.turn +" 💥 BATTLE IN PROGRESS ⚔️</b>\n"
+    s += "\n\n<b>"+ td.turn +" ⚔️ BATTLE IN PROGRESS 💥</b>\n"
     s += (td.next.civilWar ? "✨":"") +"<b>" + utils.universalMap(td.next.o) + (td.next.civilWar ? " is rebelling on ": " vs ") + utils.universalMap(td.next.d) + "</b>\n";
     s += "<i>attacking from " + utils.universalMap(td.next.ot) + " to " + utils.universalMap(td.next.dt) + "</i>\n"
     s += "<b>1</b>: " + utils.toPercent(td.next.probabilities[1]) + "\t ";
@@ -184,17 +175,8 @@ const battleUpdate = async (cmap, td) => {
     s += (td.next.civilWar ? "" : ("<b>2</b>: " + utils.toPercent(td.next.probabilities[2]) + "\n"));
   }
 
-  // if (!td.next.civilWar) {
-  //   s += "⚔️<b> " + utils.truncate(utils.universalMap(td.next.o), 10) + " " + utils.toPercent(cmap[td.next.o].cohesion) + "</b> > <b>" + utils.truncate(utils.universalMap(td.next.dt), 10) + " </b>\n";
-  //   s += "\t\t\t  <i>Previously: " + utils.truncate(utils.universalMap(td.next.d) ,23) + "</i>\n"
-  // } else {
-  //   s += "✨<b>" + utils.truncate(utils.universalMap(td.next.o), 10) + " </b> rebelled on  <b>" + utils.truncate(utils.universalMap(td.next.d), 10) + "</b>\n"
-  //   s += "\t\t\t  <i>🍀 Long live " + utils.truncate(utils.universalMap(td.next.o) ,21) + "!</i>\n"
-  // }
-  if (!n) await telegram.sendOrUpdate(s, {parse_mode: "HTML", disable_web_page_preview: true, disable_notification:true}).catch(console.error);
-  else await telegram.sendMessage(s, {parse_mode: "HTML", disable_web_page_preview: true, disable_notification:true}).catch(console.error);
+  await telegram.sendOrUpdate(n, s, {parse_mode: "HTML", disable_web_page_preview: true, disable_notification:true}).catch(console.error);
 }
-
 
 module.exports.battleUpdate = battleUpdate;
 module.exports.runUpdate = runUpdate;
