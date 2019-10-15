@@ -10,6 +10,7 @@ export default new Vuex.Store({
     loggedInAccount: null,
     accountBalance: -1,
     selectedCountry: null,
+    battleChoice: null,
     isMobile: false,
     test: test, 
     contracts:{
@@ -36,6 +37,9 @@ export default new Vuex.Store({
     },
     setSelectedCountry(state, payload) {
       state.selectedCountry = payload
+    },
+    setBattleChoice(state, battleChoice){
+      state.battleChoice = battleChoice
     },
     setIsMobile(state, value){
       state.isMobile = value

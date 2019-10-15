@@ -2,7 +2,7 @@
     <v-app id="keep">
         <loading :active.sync="loading"
                  color="#ffffff"
-                 opacity="1"
+                 :opacity="1"
                  background-color="#001537"
                  :is-full-page="true">
         </loading>

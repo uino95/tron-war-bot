@@ -28,20 +28,22 @@
       updateTurnTimer: function () {
         var now = new Date().getTime();
 
-        // Find the distance between now and the count down date
-        var distance = this.info.turnTime - now;
+        if (this.info) {
+          // Find the distance between now and the count down date
+          var distance = this.info.turnTime - now;
 
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+          var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        minutes = minutes < 10 ? `0${minutes}` : minutes
-        seconds = seconds < 10 ? `0${seconds}` : seconds
+          minutes = minutes < 10 ? `0${minutes}` : minutes
+          seconds = seconds < 10 ? `0${seconds}` : seconds
 
-        // If the count down is finished, write some text
-        if (distance < 0) {
-          this.timerValue = '#' + (this.info.turn || ' loading...') + ` in 00:00`
-        } else {
-          this.timerValue = '#' + (this.info.turn || ' loading...') + ` in ${minutes}:${seconds}`
+          // If the count down is finished, write some text
+          if (distance < 0) {
+            this.timerValue = '#' + (this.info.turn || ' loading...') + ` in 00:00`
+          } else {
+            this.timerValue = '#' + (this.info.turn || ' loading...') + ` in ${minutes}:${seconds}`
+          }
         }
         setTimeout(() => {
           this.updateTurnTimer();

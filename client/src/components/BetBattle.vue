@@ -24,51 +24,95 @@
             <v-flex md10>
 
               <v-card class="mb-4">
-                <v-img class="white--text" height='150px' src="img/vs-battle.jpg">
+                <v-img class="white--text" :aspect-ratio="this.windowSize.x/150" src="img/vs-battle.jpg">
                   <v-layout class="mt-4" row wrap align-center justify-space-between>
-                    
-                    <v-flex xs4>
+                    <v-flex ml-1 xs4>
                       <v-layout column align-center>
-                        <div class="title pb-2">Italy</div>
-                        <v-hover>
-                          <v-avatar  slot-scope="{ hover }" >
-                            <v-btn large icon dark v-if="hover" v-on:click="toggle_country(66,1)"> <div class="title"> 1 </div> </v-btn>
-                            <v-img  v-else  :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                              :src="getFlagString(universalMap(66))" :alt="universalMap(66)"/>
-                          </v-avatar>
-                        </v-hover>
-                      </v-layout>
-                    </v-flex>
-
-                    <v-flex  xs2>
-                      <v-hover>
-                          <v-avatar class="mt-4" slot-scope="{ hover }">
-                            <v-btn fab dark color="primary_next_tab" v-if="hover" fab v-on:click="toggle_country(241,0)">
-                              <div class="title"> X </div> 
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on }">
+                            <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
+                          class="title pb-2 truncate">{{universalMap(history[0].next.o)}} </div>
+                          </template>
+                          <span>{{universalMap(history[0].next.o)}}</span>
+                        </v-tooltip>
+                        <v-hover v-if="!isMobile">
+                          <v-avatar slot-scope="{ hover }">
+                            <v-btn large icon dark v-if="hover" v-on:click="toggle_country(history[0].next.o,1)">
+                              <div class="title"> 1 </div>
                             </v-btn>
-                          </v-avatar>
-                        </v-hover>
-                    </v-flex>
-
-                    <v-flex xs4>
-                      <v-layout column align-center>
-                        <div class="title pb-2"> Italy </div>
-                        <v-hover>
-                          <v-avatar slot-scope="{ hover }" >
-                            <v-btn large icon dark v-on:click="toggle_country(66, 2)" v-if="hover"> <div class="title"> 2 </div> </v-btn>
+                            <v-btn large icon dark color="primary_next_tab" v-else-if="currentChoice==1"
+                              v-on:click="toggle_country(history[0].next.o,1)">
+                              <div class="title"> 1 </div>
+                            </v-btn>
                             <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                              :src="getFlagString(universalMap(66))" :alt="universalMap(66)" />
+                              :src="getFlagString(universalMap(history[0].next.o))"
+                              :alt="universalMap(history[0].next.o)" />
                           </v-avatar>
                         </v-hover>
+                        <v-avatar v-else>
+                            <v-btn large icon dark color="primary_next_tab" v-if="currentChoice==1"
+                              v-on:click="toggle_country(history[0].next.o,1)">
+                              <div class="title"> 1 </div>
+                            </v-btn>
+                            <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                              :src="getFlagString(universalMap(history[0].next.o))"
+                              :alt="universalMap(history[0].next.o)" v-on:click="toggle_country(history[0].next.o,1)"/>
+                        </v-avatar>
+                        <div class="title pt-2">{{history[0].next.probabilities[1] | probability}}</div>
                       </v-layout>
                     </v-flex>
-                  
+
+                    <v-flex xs2>
+                      <v-hover >
+                        <v-avatar class="mt-2" slot-scope="{ hover }">
+                          <v-btn fab dark color="primary_next_tab" v-if="hover || currentChoice == 0" v-on:click="toggle_country(241,0)">
+                            <div class="title"> X </div>
+                          </v-btn>
+                        </v-avatar>
+                      </v-hover>
+                    </v-flex>
+
+                    <v-flex mr-1 xs4>
+                      <v-layout column align-center>
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on }">
+                            <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
+                          class="title pb-2 truncate">{{universalMap(history[0].next.d)}} </div>
+                          </template>
+                          <span>{{universalMap(history[0].next.d)}}</span>
+                        </v-tooltip>
+                        <v-hover v-if="!isMobile">
+                          <v-avatar slot-scope="{ hover }">
+                            <v-btn large icon dark v-on:click="toggle_country(history[0].next.d, 2)" v-if="hover">
+                              <div class="title"> 2 </div>
+                            </v-btn>
+                            <v-btn large icon dark color="primary_next_tab" v-else-if="currentChoice==2"
+                              v-on:click="toggle_country(history[0].next.d,2)">
+                              <div class="title"> 2 </div>
+                            </v-btn>
+                            <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                              :src="getFlagString(universalMap(history[0].next.d))"
+                              :alt="universalMap(history[0].next.d)" />
+                          </v-avatar>
+                        </v-hover>
+                        <v-avatar v-else>
+                            <v-btn large icon dark color="primary_next_tab" v-if="currentChoice==2"
+                              v-on:click="toggle_country(history[0].next.d,2)">
+                              <div class="title"> 2 </div>
+                            </v-btn>
+                            <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                              :src="getFlagString(universalMap(history[0].next.d))"
+                              :alt="universalMap(history[0].next.d)" v-on:click="toggle_country(history[0].next.d,2)"/>
+                        </v-avatar>
+                        <div class="title pt-2">{{history[0].next.probabilities[2] | probability}}</div>
+                      </v-layout>
+                    </v-flex>
+
                   </v-layout>
 
-                  <core-timer class="mt-4"/>
+                  <core-timer class="mt-4" />
                 </v-img>
               </v-card>
-              </v-hover>
               <v-spacer />
               <v-form ref="form" v-model="valid" lazy-validation>
 
@@ -90,34 +134,34 @@
 
                 <v-layout row wrap>
                   <v-flex xs12>
-                    <v-slider thumb-label v-model="betAmount" :min="betNextGameParam.minimumBet "
-                      :max="betNextGameParam.maximumBet " label="Bet Amount"></v-slider>
+                    <v-slider thumb-label v-model="betAmount" :min="1 " :max="betNextGameParam.maximumBet "
+                      label="Bet Amount"></v-slider>
                   </v-flex>
                 </v-layout>
                 <v-flex xs12 class="text-xs-center pa-2">
+                  <div class="title pb-2"> Choose your guess </div>
                   <v-hover>
-                    <v-btn slot-scope="{ hover }" fab dark color="primary_next_tab" v-on:click="toggle_country(66,1)">
-                      <div v-if="hover" class ="title white--text"> 1 </div>
-                      <v-img  v-else  :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                              :src="getFlagString(universalMap(66))" :alt="universalMap(66)"/>
+                    <v-btn fab dark color="primary_next_tab" v-on:click="toggle_country(history[0].next.o,1)">
+                      <div class="title white--text"> 1 </div>
                     </v-btn>
                   </v-hover>
-                    <v-btn fab dark color="primary_next_tab" v-on:click="toggle_country(241,0)">
-                      <div class ="title white--text"> x </div>
-                    </v-btn>
-                    <v-hover>
-                    <v-btn slot-scope="{ hover }" fab dark color="primary_next_tab" v-on:click="toggle_country(66,2)">
-                      <div v-if="hover" class ="title white--text"> 2 </div>
-                      <v-img  v-else  :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                              :src="getFlagString(universalMap(66))" :alt="universalMap(66)"/>
+                  <v-btn fab dark color="primary_next_tab" v-on:click="toggle_country(241,0)">
+                    <div class="title white--text"> x </div>
+                  </v-btn>
+                  <v-hover>
+                    <v-btn fab dark color="primary_next_tab" v-on:click="toggle_country(history[0].next.d,2)">
+                      <div class="title white--text"> 2 </div>
                     </v-btn>
                   </v-hover>
                 </v-flex>
-                <v-btn v-if="info.serverStatus == 300" :loading="isWaitingForConfirm" color="primary_next_tab" dark
-                  @click="placeBet">Bet {{betAmount}} TRX
-                  {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
-                <!-- <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">
-                  Battle in progress...</v-btn> -->
+                <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark
+                  @click="placeBet">
+                  <div v-bind:style="{'max-width': windowSize.x * 0.6 + 'px'}" class="truncate">
+                    Bet {{betAmount}} TRX {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}
+                  </div>
+                </v-btn>
+                <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">
+                  Battle in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">
                   Payout in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over
@@ -367,20 +411,28 @@
       snackbarTimeout: 6000,
       placeholderFlag: "/img/flags/placeholder.svg",
 
-      gameType: 3,
+      gameType: 2,
       info: {},
-      history: [],
       bets: [],
+      personalBets: [],
       mapStatus: [],
+      history: [],
       isWaitingForConfirm: false,
       currentTxId: null,
-      currentChoice: null
+      windowSize: {
+        x: 0,
+        y: 0
+      }
     }),
 
-    firebase: {
-      bets: db.ref('public/bets').orderByChild('time').limitToLast(100),
-      info: db.ref('public/data'),
-      mapStatus: db.ref('public/countriesMap')
+    firebase: function() {
+      return {
+        bets: db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30),
+        personalBets: db.ref('public/bets').orderByChild('from').equalTo(this.account),
+        info: db.ref('public/data'),
+        mapStatus: db.ref('public/countriesMap'),
+        history: db.ref('public/history').orderByChild('turn').limitToLast(1)
+      }
     },
 
     filters: {
@@ -395,15 +447,23 @@
         return tronweb.fromSun(amount) + 'TRX'
       },
       probability: (p) => {
-        return (p <= 0.1 && p > 0) ? 'very low' : p.toFixed(2) + ' %'
+        let P = p * 100
+        return (P <= 0.1 && P > 0) ? 'very low' : P.toFixed(2) + ' %'
       }
     },
 
     mounted() {
       this.initBetAmount()
+      this.onResize()
     },
 
     methods: {
+      onResize() {
+        this.windowSize = {
+          x: window.innerWidth,
+          y: window.innerHeight
+        }
+      },
       getFlagString(str) {
         return "/img/flags/" + str.toLowerCase()
           .replaceAll(" ", "-")
@@ -429,7 +489,6 @@
           this.snackbar = true;
           this.isWaitingForConfirm = false
         } else {
-          //console.log("instance ",this.$store.state.contracts.TronWarBotInstance)
           this.snackbarText = "The blockchain is processing your bet. Please wait...";
           this.snackbarColor = "info";
           this.snackbar = true;
@@ -491,22 +550,23 @@
       initBetAmount: function () {
         setTimeout(() => {
           if (this.betNextGameParam) {
-            this.betAmount = this.betNextGameParam.minimumBet
+            this.betAmount = 1
           } else {
             this.initBetAmount()
           }
         }, 500)
       },
-      toggle_country: function(country, choice){
-        console.log(country + ' ' + choice)
+      toggle_country: function (country, choice) {
         this.currentCountry = country
         this.currentChoice = choice
+      },
+      compare: function(a,b){
+        return b.turn - a.turn
       }
     },
     watch: {
       myBets: function () {
         let _this = this
-        // console.log("ENTRO NEL TIMEOUT")
         if (this.currentTxId !== null) {
           const txId = this.currentTxId
           window.tronWeb.trx.getTransaction(txId).then((tx) => {
@@ -529,23 +589,27 @@
       }
     },
     computed: {
-      myBets: function () {
-        return this.bets.filter(bet => bet.from === this.account && bet.gameType == this.gameType).reverse()
+      isMobile: function(){
+        return this.$store.state.isMobile
+      },
+      myBets: function(){
+        let pBets = this.personalBets.sort(this.compare)
+        return pBets.filter((bet) => bet.gameType == this.gameType)
       },
       latestBets: function () {
-        return this.bets.filter(bet => bet.gameType == this.gameType).reverse().slice(0, 150)
+        return this.bets.sort(this.compare)
       },
       winChance: function () {
         let country = this.currentCountry
-        if (country == null || this.mapStatus.length == 0) return 0;
-        let p = 0.1
+        if (country == null) return 0;
+        let p = this.history[0].next.probabilities[this.currentChoice]
         return p
       },
       multiplier: function () {
         let country = this.currentCountry
-        if (country == null || this.mapStatus.length == 0) return 0;
-
-        return 0.1
+        if (country == null) return 0;
+        let m = this.history[0].next.quotes[this.currentChoice]
+        return m
       },
       potentialWin: function () {
 
@@ -563,6 +627,14 @@
           this.$store.commit('setSelectedCountry', value)
         }
       },
+      currentChoice: {
+        get() {
+          return this.$store.state.battleChoice
+        },
+        set(value) {
+          this.$store.commit('setBattleChoice', value)
+        }
+      },
       account() {
         return this.$store.state.loggedInAccount
       },
@@ -577,5 +649,11 @@
   .info {
     width: 100%;
     height: 300px;
+  }
+
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>

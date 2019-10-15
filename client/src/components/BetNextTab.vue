@@ -333,16 +333,20 @@
       gameType: 1,
       info: {},
       bets: [],
+      personalBets: [],
       mapStatus: [],
       mapping: mapping,
       isWaitingForConfirm: false,
       currentTxId: null
     }),
 
-    firebase: {
-      bets: db.ref('public/bets').orderByChild('gameType').equalTo('1').limitToLast(30),
-      info: db.ref('public/data'),
-      mapStatus: db.ref('public/countriesMap')
+    firebase() {
+      return {
+        bets: db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30),
+        personalBets: db.ref('public/bets').orderByChild('from').equalTo(this.account),
+        info: db.ref('public/data'),
+        mapStatus: db.ref('public/countriesMap')
+      }
     },
 
     filters: {
@@ -449,7 +453,7 @@
         }, 500)
       },
       compare: function(a,b){
-        return a.turn - b.turn
+        return b.turn - a.turn
       }
     },
     watch: {
@@ -479,10 +483,11 @@
     },
     computed: {
       myBets: function () {
-        return this.bets.filter((bet) => bet.from == this.account && bet.gameType == this.gameType).reverse()
+        let pBets = this.personalBets.sort(this.compare)
+        return pBets.filter((bet) => bet.gameType == this.gameType)
       },
       latestBets: function () {
-        return this.bets.sort(this.compare).reverse();
+        return this.bets.sort(this.compare)
       },
       winChance: function () {
         let country = this.currentCountry
