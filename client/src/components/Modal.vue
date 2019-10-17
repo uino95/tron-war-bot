@@ -295,7 +295,7 @@
                                     </v-img>
                                     <v-card-title primary-title>
                                         <div>
-                                            <a class="title" :href="partner.link" target="_blank" style="text-decoration: none;">{{partner.name}}</a>
+                                            <a class="title text-truncate" :href="partner.link" target="_blank" style="text-decoration: none;">{{partner.name}}</a>
                                         </div>
                                     </v-card-title>
                                 </v-card>
