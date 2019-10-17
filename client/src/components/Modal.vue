@@ -221,13 +221,14 @@
                                     At the very beginning of a turn the Bot decides which country will conquer next. The
                                     Bot will hash (sha256) the name of the winner + a random string (called seed or salt
                                     in cryptography). You can find that hash in the box under Next Turn.<br>
-                                    Once the timer runs out, the battle takes place and the conqueror is revelead
-                                    alogside that seed used to compute the hash. You will then find the initial hash and
-                                    the Conqueror + its seed under Previus Turn.
+                                    Once the timer runs out, the battle takes place and the conqueror is revealed
+                                    alongside that seed used to compute the hash. You will then find the initial hash and
+                                    the Conqueror and its seed under Previous Turn.
                                     <br/><br/>
                                     This way we prove the Bot truly picks the countries in a random manner and doesn't
                                     "change its mind" on the way! And this is done in a way you can easily check, that
                                     is use any sha256 online tool like the one suggested below.
+                                    <br/>
                                     <br/>
                                     <v-divider mt-3/>
                                     <br/>
@@ -264,7 +265,7 @@
 
                                     <v-card mt-3>
                                         <v-card-text style="text-align:center;">
-                                            If you want to check the correcteness of the hash, we suggest you to use the
+                                            If you want to check the correctness of the hash, we suggest to use the
                                             following sha256 online calculator, but you can whatever tool you prefer.
                                         </v-card-text>
                                         <v-chip label outline color="primary" style="margin-left:4.5em;">
