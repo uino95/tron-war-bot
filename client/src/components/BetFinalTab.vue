@@ -520,6 +520,9 @@
       }
     },
     computed: {
+       account() {
+        return this.$store.state.loggedInAccount
+      },
       myBets: function(){
         let pBets = this.personalBets.sort(this.compare)
         return pBets.filter((bet) => bet.gameType == this.gameType)
@@ -567,10 +570,7 @@
         set(value) {
           this.$store.commit('setSelectedCountry', value)
         }
-      },
-      account() {
-        return this.$store.state.loggedInAccount
-      },
+      }
     },
     mounted() {}
   }
