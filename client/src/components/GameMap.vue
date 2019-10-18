@@ -60,9 +60,6 @@
         }
       })
 
-
-
-
       db.ref('public/countriesMap').once('value', (snapshot) => {
         let j = this.colors.length
         let data = snapshot.val();
@@ -79,6 +76,8 @@
             j = this.colors.length - 1
           }
         })
+        // assign a color to a particular country
+        this.colorsDefault[90] = "#009688"
         data.map(el => {
           el['controllerCohesion'] = (data[el['occupiedBy']]['cohesion']);
           el['color'] = this.colorsDefault[el['occupiedBy']];

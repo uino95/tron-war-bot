@@ -366,7 +366,6 @@
       currentTxId: null,
 
       gameType: 0,
-      history: [],
       bets: [],
       data:{},
       countriesMap:[],
@@ -374,7 +373,6 @@
     }),
 
     firebase: {
-      history: db.ref('public/history').orderByChild('turn'),
       bets: db.ref('public/bets').orderByChild('time'),
       data: db.ref('public/data'),
       countriesMap: db.ref('public/countriesMap')

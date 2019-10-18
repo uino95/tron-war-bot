@@ -337,7 +337,6 @@
       ],
 
       gameType: 1,
-      history: [],
       bets: [],
       mapStatus: [],
       mapping: mapping,
@@ -346,7 +345,6 @@
     }),
 
     firebase: {
-      history: db.ref('public/history').orderByChild('turn'),
       bets: db.ref('public/bets').orderByChild('time'),
       info: db.ref('public/data'),
       mapStatus: db.ref('public/countriesMap')
