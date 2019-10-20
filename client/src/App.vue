@@ -146,7 +146,7 @@
                 },
                 {
                     icon: 'attach_money',
-                    text: 'Dividends',
+                    text: 'WAR Supply',
                     link: false,
                     body: 'WIP'
                 },

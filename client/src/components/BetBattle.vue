@@ -171,7 +171,7 @@
 
                 <v-layout row wrap>
                   <v-flex xs12>
-                    <v-slider thumb-label v-model="betAmount" :min="1 " :max="betNextGameParam.maximumBet "
+                    <v-slider thumb-label v-model="betAmount" :min="1 " :max="betBattleGameParams.maximumBet "
                       label="Bet Amount"></v-slider>
                   </v-flex>
                 </v-layout>
@@ -585,7 +585,7 @@
       },
       initBetAmount: function () {
         setTimeout(() => {
-          if (this.betNextGameParam) {
+          if (this.betBattleGameParams) {
             this.betAmount = 1
           } else {
             this.initBetAmount()
@@ -674,8 +674,8 @@
       account() {
         return this.$store.state.loggedInAccount
       },
-      betNextGameParam() {
-        return this.$store.state.gameParams.betNextParams
+      betBattleGameParams() {
+        return this.$store.state.gameParams.betBattleParams
       },
     }
   }

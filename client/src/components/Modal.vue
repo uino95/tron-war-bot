@@ -85,13 +85,11 @@
                     </v-container>
                 </v-card-text>
 
-                <v-card-text v-if="headerTile === 'Dividends'">
+                <v-card-text v-if="headerTile === 'WAR Supply'">
                     We want to build this game together with our users, and that's why 100% of TronWarBot profits are
                     shared back
                     to token holders! (..but yes we detain around 50% of the current
-                    token supply). After every stage you will need 50 more TRX to mine one WAR. Dividend payout will
-                    happen at the
-                    end of the run.
+                    token supply). After every stage you will need 50 more TRX to mine one WAR. WAR will be used in the future runs.
                     <br/>
                     <v-divider mt-3/>
                     <br/>
@@ -100,32 +98,6 @@
                     <v-divider mt-8/>
                     <br/>
                     <v-layout row wrap>
-                        <v-flex xs12 sm5>
-                            <v-text-field :value="availableTRX | TRX" label=" Estimate Available Dividends" outline
-                                          readonly>
-                                <template v-slot:append>
-                                    <v-avatar class="pb-2" tile size="40">
-                                        <img src="https://cdn.coinranking.com/behejNqQs/trx.svg"/>
-                                    </v-avatar>
-                                </template>
-                            </v-text-field>
-                        </v-flex>
-
-                        <v-spacer/>
-
-                        <v-flex xs12 sm5>
-                            <v-text-field :value="totalWARSupply | WAR" label="Total WAR mined" outline readonly>
-                                <template v-slot:append>
-                                    <v-avatar class="pb-2" tile size="40">
-                                        <img src="/img/logo.png"/>
-                                    </v-avatar>
-                                </template>
-                            </v-text-field>
-                        </v-flex>
-                    </v-layout>
-
-                    <v-layout>
-                        <v-spacer/>
                         <v-flex xs12 sm5>
                             <v-text-field v-if="account == null" :value="'Login First'" background-color="red"
                                           label="You have mined" outline readonly>
@@ -144,12 +116,33 @@
                                 </template>
                             </v-text-field>
                         </v-flex>
+                        <!-- <v-flex xs12 sm5>
+                            <v-text-field :value="availableTRX | TRX" label=" Estimate Available Dividends" outline
+                                          readonly>
+                                <template v-slot:append>
+                                    <v-avatar class="pb-2" tile size="40">
+                                        <img src="https://cdn.coinranking.com/behejNqQs/trx.svg"/>
+                                    </v-avatar>
+                                </template>
+                            </v-text-field>
+                        </v-flex> -->
+
                         <v-spacer/>
+
+                        <v-flex xs12 sm5>
+                            <v-text-field :value="totalWARSupply | WAR" label="Total WAR mined" outline readonly>
+                                <template v-slot:append>
+                                    <v-avatar class="pb-2" tile size="40">
+                                        <img src="/img/logo.png"/>
+                                    </v-avatar>
+                                </template>
+                            </v-text-field>
+                        </v-flex>
                     </v-layout>
 
                     <v-divider/>
 
-                    <v-card mt-3>
+                    <!-- <v-card mt-3>
                         <v-card-text style="text-align:center;">
                             At the end of the run you will be eligible to get your share of dividends by clicking the
                             button "Claim
@@ -162,7 +155,7 @@
                             With your current WARs you will receive:
                             {{availableTRX.times(myWAR.div(totalWARSupply).toString()) | TRX }}
                         </v-chip>
-                    </v-card>
+                    </v-card> -->
 
                     <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
                     (end of the run)-->
@@ -339,6 +332,7 @@
         db
     } from "../plugins/firebase";
     import tronweb from 'tronweb'
+    import {pollMyWar} from '../utils/pollForUpdate'
 
     export default {
         name: "Modal",
@@ -354,7 +348,18 @@
                 return tronweb.fromSun(amount).toFixed(3) + ' TRX'
             },
             WAR: (amount) => {
-                return amount.div("1000000000000000000").toFixed(3) + ' WAR'
+                return amount != 0 ? amount.div("1000000000000000000").toFixed(3) + ' WAR' : 0 + ' WAR'
+            }
+        },
+
+        watch:{
+            isVisible: function(){
+                if(this.isVisible && this.headerTile == "WAR Supply"){
+                    this.$store.commit("setPollWar", false)
+                    pollMyWar(1000)
+                } else {
+                    this.$store.commit("setPollWar", true)
+                }
             }
         },
 
@@ -392,13 +397,13 @@
             account() {
                 return this.$store.state.loggedInAccount;
             },
-            availableTRX() {
-                // BetFinal Jackpot + max((BetNext - deposit),0)
-                const BetFinal = tronweb.BigNumber(tronweb.toSun(this.data.jackpot * this.$store.state.gameParams.finalBetParams.houseEdge))
-                const BetNext = this.$store.state.availableDividends
-                const deposit = tronweb.toSun(this.data.deposit)
-                return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
-            },
+            // availableTRX() {
+            //     // BetFinal Jackpot + max((BetNext - deposit),0)
+            //     const BetFinal = tronweb.BigNumber(tronweb.toSun(this.data.jackpot * this.$store.state.gameParams.finalBetParams.houseEdge))
+            //     const BetNext = this.$store.state.availableDividends
+            //     const deposit = tronweb.toSun(this.data.deposit)
+            //     return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
+            // },
             myWAR() {
                 return this.$store.state.currentAddressWarBalance;
             },
@@ -406,7 +411,7 @@
                 return this.$store.state.totalWARSupply;
             },
             dividendStage() {
-                return parseInt(this.totalWARSupply.div("1000000000000000000").mod(1000000).div(100).toString());
+                return this.totalWARSupply != 0 ? parseInt(this.totalWARSupply.div("1000000000000000000").mod(1000000).div(100).toString()) : 0 
             }
         },
         firebase: {

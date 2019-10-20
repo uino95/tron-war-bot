@@ -25,8 +25,10 @@ export default new Vuex.Store({
     tronWeb: null,
     gameParams:{
       finalBetParams: null,
-      betNextParams: null
-    }
+      betNextParams: null,
+      betBattleParams: null
+    },
+    pollWarEndend: false
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -64,6 +66,10 @@ export default new Vuex.Store({
     setGameParams(state,payload){
       state.gameParams.finalBetParams = payload.finalBetParams
       state.gameParams.betNextParams = payload.betNextParams
+      state.gameParams.betBattleParams = payload.betBattleParams
+    },
+    setPollWar(state, payload){
+      state.pollWarEndend = payload
     }
   },
   actions: {
