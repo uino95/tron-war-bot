@@ -1,10 +1,10 @@
-const config = require('./config')
-const utils = require('./utils')
-const q = require('./utils/quotes')
-const firebase = require('./firebase')
-const wwb = require('./worldWarBot')
-const telegram = require('./utils/telegram')
-const facebook = require('./utils/facebook')
+const config = require('../config')
+const utils = require('../utils')
+const q = require('../utils/quotes')
+const firebase = require('../firebase')
+const wwb = require('../worldWarBot')
+const telegram = require('../utils/telegram')
+const facebook = require('../utils/facebook')
 
 const STATS_UPDATE_FREQ = 100
 const NEW_UPDATE_FREQ = 25
@@ -15,14 +15,8 @@ var epic = [];
 var insurrections = [];
 var partials = {};
 
-const runUpdate = async (cmap, td) => {
-  if (!(td.turn % STATS_UPDATE_FREQ)) stats(td);
-  else if (!(td.turn % QUOTES_FREQ)) quotes(td);
-  battleUpdate(cmap, td);
-}
-
-const quotes = async (td) => {
-  let i = (td.turn-QUOTES_FREQ)/(QUOTES_FREQ*2);
+module.exports.quotes = async (td) => {
+  let i = (td.turn-config.social.updates.quotesFreq)/(config.social.updates.quotesFreq*2);
   if (!q[i]) return;
   let f = "“"+q[i][0] + "”\ncit. " + q[i][1];
   f += "\n\nStay up to date at https://tronwarbot.com\n"
@@ -30,47 +24,15 @@ const quotes = async (td) => {
   await facebook.post(f).catch(console.error);
 }
 
-const stats = async (td) =>{
-  history = await firebase.history.orderByChild('turn').limitToLast(STATS_UPDATE_FREQ).once("value").then(r=>r.val());
-  let u = {}
-  let civilWar = []
-  let cmap = await wwb.mapState();
-  Object.values(history).forEach(r=>{
-    if (!r.battle) return;
-    r = r.battle;
-    if (r.civilWar) civilWar.push(utils.universalMap(r.o));
-    u[r.d] = u[r.d] || { id: r.d }
-    u[r.d].ic = u[r.d].ic || r.cohesion.d;
-    u[r.d].fc = cmap[r.d].cohesion
-    u[r.d].wt = (u[r.d].wt || 0) - (r.result%2) + (Math.floor(r.result/2))
-    u[r.o] = u[r.o] || { id: r.o }
-    u[r.o].ic = u[r.o].ic || r.cohesion.o;
-    u[r.o].fc = cmap[r.o].cohesion
-    u[r.o].wt = (u[r.o].wt || 0) + (r.result%2) - (Math.floor(r.result/2))
-  })
-
-  let top3 = Object.values(u).sort(function(a, b){return b.wt - a.wt});
-  let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
-  let leaderboard = wwb.leaderboard();
-  let countriesStillAlive = wwb.countriesStillAlive();
-
-  let t = buildTgStats(td, leaderboard, countriesStillAlive, j, top3, civilWar);
-  let m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};
-  await telegram.sendMessage(t, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true}).catch(console.error);
-
-  let f = buildFbStats(td, leaderboard, countriesStillAlive, j, top3, civilWar);
-  await facebook.post(f).catch(console.error);
-}
-
 const buildFbStats = (td, leaderboard, countriesStillAlive, j, top3, civilWar) => {
   // FACEBOOK
   let f = "♟ Tron World War ⚔️ " + td.turn +" ♟\n\n"
   f +="🎖🎖 TOP 5 ARMIES 🎖🎖\n"
-  f += "🥇 " + leaderboard[0].territories + " territories -\t" + utils.universalMap(leaderboard[0].idx) + "\t C: "+utils.toPercent(leaderboard[0].cohesion)+"\n";
-  f += "🥈 " + leaderboard[1].territories + " territories -\t" + utils.universalMap(leaderboard[1].idx) + "\t C: "+utils.toPercent(leaderboard[1].cohesion)+"\n";
-  f += "🥉 " + leaderboard[2].territories + " territories -\t" + utils.universalMap(leaderboard[2].idx) + "\t C: "+utils.toPercent(leaderboard[2].cohesion)+"\n";
-  f += "4th " + leaderboard[3].territories + " territories -\t" + utils.universalMap(leaderboard[3].idx) + "\t C: "+utils.toPercent(leaderboard[3].cohesion)+"\n";
-  f += "5th " + leaderboard[4].territories + " territories -\t" + utils.universalMap(leaderboard[4].idx) + "\t C: "+utils.toPercent(leaderboard[4].cohesion)+"\n";
+  f += "🥇 " + leaderboard[0].territories + " territories -\t" + utils.universalMap(leaderboard[0].idx, "full") + "\t C: "+utils.toPercent(leaderboard[0].cohesion)+"\n";
+  f += "🥈 " + leaderboard[1].territories + " territories -\t" + utils.universalMap(leaderboard[1].idx, "full") + "\t C: "+utils.toPercent(leaderboard[1].cohesion)+"\n";
+  f += "🥉 " + leaderboard[2].territories + " territories -\t" + utils.universalMap(leaderboard[2].idx, "full") + "\t C: "+utils.toPercent(leaderboard[2].cohesion)+"\n";
+  f += "4th " + leaderboard[3].territories + " territories -\t" + utils.universalMap(leaderboard[3].idx, "full") + "\t C: "+utils.toPercent(leaderboard[3].cohesion)+"\n";
+  f += "5th " + leaderboard[4].territories + " territories -\t" + utils.universalMap(leaderboard[4].idx, "full") + "\t C: "+utils.toPercent(leaderboard[4].cohesion)+"\n";
   f += "\n🌎 " + countriesStillAlive.length + " countries in the game!\n\n"
   f += "\n🕛 12 HOURS BREAK: 🕛\n"
   f += "\n👍 BEST 3 👍\n"
@@ -114,9 +76,41 @@ const buildTgStats = (td, leaderboard, countriesStillAlive, j, top3, civilWar) =
   return t
 }
 
-const battleUpdate = async (cmap, td) => {
-  let n = "BU" + Math.ceil(td.turn/NEW_UPDATE_FREQ);
-  if (!(td.turn%NEW_UPDATE_FREQ)) {
+module.exports.stats = async (td) =>{
+  history = await firebase.history.orderByChild('turn').limitToLast(config.social.updates.statsFreq).once("value").then(r=>r.val());
+  let u = {}
+  let civilWar = []
+  let cmap = await wwb.mapState();
+  Object.values(history).forEach(r=>{
+    if (!r.battle) return;
+    r = r.battle;
+    if (r.civilWar) civilWar.push(utils.universalMap(r.o));
+    u[r.d] = u[r.d] || { id: r.d }
+    u[r.d].ic = u[r.d].ic || r.cohesion.d;
+    u[r.d].fc = cmap[r.d].cohesion
+    u[r.d].wt = (u[r.d].wt || 0) - (r.result%2) + (Math.floor(r.result/2))
+    u[r.o] = u[r.o] || { id: r.o }
+    u[r.o].ic = u[r.o].ic || r.cohesion.o;
+    u[r.o].fc = cmap[r.o].cohesion
+    u[r.o].wt = (u[r.o].wt || 0) + (r.result%2) - (Math.floor(r.result/2))
+  })
+
+  let top3 = Object.values(u).sort(function(a, b){return b.wt - a.wt});
+  let j = await firebase.data.once("value").then(r=>r.val()['jackpot']);
+  let leaderboard = wwb.leaderboard();
+  let countriesStillAlive = wwb.countriesStillAlive();
+
+  let t = buildTgStats(td, leaderboard, countriesStillAlive, j, top3, civilWar);
+  let m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};
+  await telegram.sendMessage(t, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true}).catch(console.error);
+
+  let f = buildFbStats(td, leaderboard, countriesStillAlive, j, top3, civilWar);
+  await facebook.post(f).catch(console.error);
+}
+
+module.exports.battleUpdate = async (cmap, td) => {
+  let n = "BU" + Math.ceil(td.turn/config.social.updates.battleFreq);
+  if (!(td.turn%config.social.updates.battleFreq)) {
     epic = []
     insurrections = [];
     partials = {};
@@ -144,9 +138,10 @@ const battleUpdate = async (cmap, td) => {
 
   let s ="";
   if (top.length) s += "<b>🆕 Territories:</b>\t\n"
-  top.forEach((c)=>{
-    if (!c.t) return;
-    s += "<b>" + (c.t>0 ? "+" : "\-") + c.t + "</b> " + utils.universalMap(c.idx) + "\n";
+  top.filter(c=>c.t!=0).forEach((c, idx, arr)=>{
+    if (arr.length > 10 && idx==5) s+= "<b>...</b>\n";
+    if (arr.length > 10 && idx>=5 && idx<(arr.length-5)) return;
+    s += "<b>" + (c.t>0 ? "+" : "") + c.t + "</b> " + utils.universalMap(c.idx, "full") + "\n";
   })
   if (epic.length) s += "\n<b>🔥 Epic battles:</b>\n";
   epic.forEach((b)=>{
@@ -168,7 +163,7 @@ const battleUpdate = async (cmap, td) => {
   }
   if (td.next) {
     s += "\n\n<b>"+ td.turn +" ⚔️ BATTLE IN PROGRESS 💥</b>\n"
-    s += (td.next.civilWar ? "✨":"") +"<b>" + utils.universalMap(td.next.o) + (td.next.civilWar ? " is rebelling on ": " vs ") + utils.universalMap(td.next.d) + "</b>\n";
+    s += (td.next.civilWar ? "✨":"") +"<b>" + utils.universalMap(td.next.o, "full") + (td.next.civilWar ? " is rebelling on ": " vs ") + utils.universalMap(td.next.d, "full") + "</b>\n";
     s += "<i>attacking from " + utils.universalMap(td.next.ot) + " to " + utils.universalMap(td.next.dt) + "</i>\n"
     s += "<b>1</b>: " + utils.toPercent(td.next.probabilities[1]) + "\t ";
     s += "<b>X</b>: " + utils.toPercent(td.next.probabilities[0]) + "\t ";
@@ -177,6 +172,3 @@ const battleUpdate = async (cmap, td) => {
 
   await telegram.sendOrUpdate(n, s, {parse_mode: "HTML", disable_web_page_preview: true, disable_notification:true}).catch(console.error);
 }
-
-module.exports.battleUpdate = battleUpdate;
-module.exports.runUpdate = runUpdate;

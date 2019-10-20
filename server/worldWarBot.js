@@ -130,8 +130,8 @@ const preTurn = async () => {
 
 const postTurn = async (turnData) => {
   // GET JACKPOT
-  let jackpot = await firebase.data.once("value").then(r=>r.val()['jackpot']);
-  let bets = await firebase.bets.getCurrentTurnBets(0, ROUND);
+  let jackpot = await firebase.data.once("value").then(r=>r.val()['jackpot'] || 0);
+  let bets = (await firebase.bets.getCurrentTurnBets(0, ROUND) )|| [];
   let betsPerCountry = new Array(COUNTRIES).fill(0);
   bets.forEach((e,i)=>betsPerCountry[e.userChoice]+=1);
 

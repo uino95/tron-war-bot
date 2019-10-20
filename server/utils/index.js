@@ -7,8 +7,12 @@ const utils = {
 		switch(to){
 			case 'name':
 				return mapping[id]['name'];
-			case 'charId':
-				return mapping[id]['charId'];
+			case 'cc':
+				return mapping[id]['cc'];
+      case 'flag':
+        return getFlag(mapping[id]['cc']);
+      case 'full':
+        return mapping[id]['name'] + ' ' + getFlag(mapping[id]['cc']);
 			case 'numberId':
         id = id.replace(/ |-/g, "").toLowerCase()
 				for (var i = mapping.length - 1; i >= 0; i--) {
@@ -39,6 +43,13 @@ const utils = {
       .toString('hex') // convert to hexadecimal format
       .slice(0, len) // return required number of characters
   },
+  random: ()=>{
+    return utils.randomFromHex(utils.randomHex())
+  },
+  trimUp: (v, decimals=0) => {
+    let m = 10**decimals;
+    return Math.sign(v)*Math.ceil(Math.abs(v)*m)/m
+  },
   quoteFromProbability: (p) => {
     let w = p ? Math.min(1/p, 200) : 200;
     return Math.floor(w *100)/100;
@@ -48,3 +59,13 @@ const utils = {
 }
 
 module.exports = utils;
+
+
+const getFlag = (cc)=>{
+  // country code regex
+  const CC_REGEX = /^[a-z]{2}$/i;
+  const OFFSET = 127397;
+  if (!CC_REGEX.test(cc)) return '🏳';
+  const chars = [...cc.toUpperCase()].map(c => c.charCodeAt() + OFFSET);
+  return String.fromCodePoint(...chars);
+}

@@ -1,4 +1,4 @@
-import json 
+import json
 
 # with open('./countries.json', 'r') as f:
 #     distros_dict = json.load(f)
@@ -41,7 +41,7 @@ i = len(colorBlue) - 1
 
 
 # for item in territories:
-# 	obj['id'] = 
+# 	obj['id'] =
 
 def convert (name):
     for item in territories:
@@ -52,7 +52,7 @@ def convert (name):
 
 numberId = 0
 name = ''
-charId	= ''
+cc	= ''
 
 for item in territories:
     for item2 in status:
@@ -68,12 +68,12 @@ for item in territories:
     	# 	featuresList.append(
 	    # 		{
 	    # 			"controlledBy": numberId,
-	    # 			# "charId": charId,
+	    # 			# "cc": cc,
 	    # 			# "name": name
 	    # 		}
     	# 	)
     	# 	break
-    	
+
 
 #print(len(features))
 
@@ -85,7 +85,7 @@ with open('./mapStatus.json', 'w') as f:
 # def anydup(thelist):
 #   seen = set()
 #   for x in thelist:
-#     if x in seen: 
+#     if x in seen:
 #         print(x)
 #         return True
 #     seen.add(x)

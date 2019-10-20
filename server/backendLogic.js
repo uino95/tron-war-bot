@@ -5,8 +5,8 @@ const wwb = require('./worldWarBot')
 const twb = require('./tronWarBot')
 const referral = require('./referral')
 const betValidator = require('./bet')
-const social = require('./social')
 const config = require('./config')
+const social = require('./social')
 const utils = require('./utils')
 
 console.log("[TIMING]: Stop bet duration is: " + (config.timing.txMargin) + "s");
@@ -67,7 +67,7 @@ const prepareNextTurn = async () =>{
   let currentSecret = await firebase.secret.once('value').then(r=>r.val());
   let magic = utils.randomHex();
   let nextTurnBlock = cb.number + Math.ceil(config.timing.turn/3);
-  if (turn == currentSecret.turn) {
+  if (currentSecret && turn == currentSecret.turn) {
     magic = currentSecret.magic || magic;
     nextTurnBlock = currentSecret.block || nextTurnBlock;
   }
@@ -158,8 +158,10 @@ const launchNextTurn = async (block) =>{
 
 
 module.exports.start = async () =>{
+  if (config.wwb.restart) await firebase.reset();
   await wwb.init(config.wwb.restart);
   if (wwb.winner()) return;
+  await social.init();
   prepareNextTurn();
 }
 

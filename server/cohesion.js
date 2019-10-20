@@ -41,86 +41,29 @@ const fuzzyMatch = (txt) => {
 }
 
 
-const update = async (text, user_id, user_name, post_id, update_type, platform, link)=>{
-  console.log("[COHESION]: Received new " + update_type +" by: " + user_name + " on " + platform + "  saying: '" + text +"'  " + platform + '|' + user_id +'|'+ post_id +'|'+ update_type)
+const update = async (country, delta, platform, text, extra={})=>{
   // VALID INPUT
-  if (!text || !user_id || !post_id || !update_type || !platform) return;
+  if (!delta || !country || !platform || !text) return;
   let date = new Date()
-  let id = date.toISOString().substr(0,10) + '|' +platform +'|'+ update_type + '|' + user_id;
   // ALREADY EXISTS?
+  let id = extra.id || (date.toISOString().substr(0,16) +'|'+ platform + '|' +  country)
   let alreadyExists = await firebase.cohesion.once('value').then((r) => r.child(id).exists())
   if (alreadyExists) return;
-  // VALID TEXT?
-  let r = analyze(text);
-  if (!r) return;
-  let multiplier = 0;
-  let delta = 0;
-  switch (update_type) {
-    case "COMMENT" :
-    delta = config.cohesion.comment * Math.sign(r.score)
-    break;
-    case "SHARE" :
-      delta = config.cohesion.share * Math.sign(r.score)*Math.ceil(Math.abs(r.score)*10)/10
-      break;
-    case "REVIEW" :
-      delta = config.cohesion.review * Math.sign(r.score)*Math.ceil(Math.abs(r.score)*10)/10
-      break;
-    case "POST" :
-      delta = config.cohesion.post * Math.sign(r.score)*Math.ceil(Math.abs(r.score)*10)/10
-      break;
-    default:
-      return;
-  }
   await wwb.currentTurnData();
-  let u = wwb.editCohesion(r.country, delta);
-  let c = {
-    turn: u.turn,
-    user_id,
-    post_id,
-    user_name,
-    update_type,
-    text,
-    link,
-    country: r.country,
-    score: r.score,
-    new: u.new,
-    old: u.old,
-    delta: u.delta,
-  }
-  return await firebase.cohesion.child(id).set(c);
-}
-
-const samples = (c, s) => {
-  let i = {
-    '0': c + " is amazing!!",
-    '1': c +" is awesome",
-    '2': c +" really sucks",
-    '3':"Long live in hell " + c
-  }
-  return i[s.toString()];
-}
-
-const users = (c) => {
-  let u = {
-    '0':"Mario Rossi",
-    '1':"Giuseppe Verdi",
-    '2':"Calogero Porceddu",
-    '3':"Matusalemme Zigarolo",
-    '4':"Brambilla Busatti",
-  }
-  return u[c.toString()];
-}
-
-const test = async () =>{
-  // let r = utils.randomInt(241).toString();
-  // let s = samples(utils.universalMap(r),utils.randomInt(0));
-  // let u = utils.randomInt(5).toString();
-  // let p = utils.randomHex();
-  // await update("Ireland is amazing!", 1, "Samuele Rodi", 99, "SHARE", "FB", "https://www.facebook.com/TronWarBot/posts/525547494939568");
+  let u = wwb.editCohesion(country, delta);
+  if (!u) return;
+  let c = extra;
+  c.turn = u.turn;
+  c.text = text;
+  c.country = country;
+  c.new = u.new;
+  c.old = u.old;
+  c.delta = u.delta;
+  await firebase.cohesion.child(id).set(c);
+  return c;
 }
 
 module.exports = {
   analyze,
-  test,
   update
 }

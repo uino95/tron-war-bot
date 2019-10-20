@@ -13,7 +13,7 @@ const wwb = require('./worldWarBot');
 console.log("[SCHEDULER]: Scheduling referral payout at every hour...")
 cron.schedule("0 0 1 * * *", referral.payReferrals);
 
-if (config.test) cron.schedule("*/20 * * * * *", cohesion.test);
+if (config.test) cron.schedule("*/20 * * * * *", social.shares.test);
 
 console.log("[SCHEDULER]: Scheduling social run updates...")
 wwb.onTurn(social.runUpdate);

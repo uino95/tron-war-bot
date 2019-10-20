@@ -63,5 +63,14 @@ out.bets.getCurrentRoundBets = async (gameType, round) => {
   return bets;
 }
 
+out.reset = async () => {
+  await out.data.set({})
+  await out.secret.set({})
+  await out.bets.set({})
+  await out.fairness.set({})
+  await out.referral.set({})
+  await out.countriesMap.set({})
+  await out.cohesion.set({})
+}
 
 module.exports = out;

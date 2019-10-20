@@ -24,9 +24,6 @@ const post = async (body)=>{
   console.log("[FACEBOOK]: Post published successfully with id: " + r.id);
 }
 
-const analyze = async ()=>{
-  // @TODO
-}
 
 const webhooksVerification = async (req, res, next) => {
   console.log("[FACEBOOK]: Received new webhooks verification attempt with: " + JSON.stringify(req.query));
@@ -47,7 +44,6 @@ const webhooks = async (req, res, next) => {
 module.exports = {
   me,
   post,
-  analyze,
   webhooksVerification,
   webhooks
 };
