@@ -24,7 +24,7 @@
             <v-flex md10>
 
               <v-card class="mb-4">
-                <v-img class="white--text" position="bottom 75% center" :aspect-ratio="this.windowSize.x/50" src="img/civilWar9.png">
+                <v-img class="white--text" :position="history[0].next.civilWar == 1 ? 'bottom 75% center' : 'center'" :aspect-ratio="this.windowSize.x/50" :src=" history[0].next.civilWar == 1 ? 'img/civilWar9.png' : 'img/vs-battle.jpg'">
                   <v-layout class="mt-4" row wrap align-center justify-space-between>
                     <v-flex ml-1 xs4>
                       <v-layout column align-center>
@@ -63,16 +63,53 @@
                     </v-flex>
 
                     <v-flex xs2>
-                      <v-hover >
-                        <v-avatar class="mt-2" slot-scope="{ hover }">
+                      <v-hover v-if="history[0].next.civilWar != 1" >
+                        <v-avatar  class="mt-2" slot-scope="{ hover }">
                           <v-btn fab dark color="primary_next_tab" v-if="hover || currentChoice == 0" v-on:click="toggle_country(241,0)">
                             <div class="title"> X </div>
                           </v-btn>
                         </v-avatar>
                       </v-hover>
+                      <div class="title" v-else> Raise VS </div>
                     </v-flex>
 
-                    <v-flex mr-1 xs4>
+                    <v-flex v-if="history[0].next.civilWar == 1" mr-1 xs4>
+                      <v-layout column align-center>
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on }">
+                            <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
+                          class="title pb-2 truncate">{{universalMap(history[0].next.d)}} </div>
+                          </template>
+                          <span>{{universalMap(history[0].next.d)}}</span>
+                        </v-tooltip>
+                        <v-hover v-if="!isMobile">
+                          <v-avatar slot-scope="{ hover }">
+                            <v-btn large icon dark v-on:click="toggle_country(241, 0)" v-if="hover">
+                              <div class="title"> X </div>
+                            </v-btn>
+                            <v-btn large icon dark color="primary_next_tab" v-else-if="currentChoice==0"
+                              v-on:click="toggle_country(241,0)">
+                              <div class="title"> X </div>
+                            </v-btn>
+                            <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                              :src="getFlagString(universalMap(history[0].next.d))"
+                              :alt="universalMap(history[0].next.d)" />
+                          </v-avatar>
+                        </v-hover>
+                        <v-avatar v-else>
+                            <v-btn large icon dark color="primary_next_tab" v-if="currentChoice==0"
+                              v-on:click="toggle_country(241,0)">
+                              <div class="title"> X </div>
+                            </v-btn>
+                            <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                              :src="getFlagString(universalMap(history[0].next.d))"
+                              :alt="universalMap(history[0].next.d)" v-on:click="toggle_country(241,0)"/>
+                        </v-avatar>
+                        <div class="title pt-2">{{history[0].next.probabilities[0] | probability}}</div>
+                      </v-layout>
+                    </v-flex>
+
+                    <v-flex v-else mr-1 xs4>
                       <v-layout column align-center>
                         <v-tooltip bottom>
                           <template v-slot:activator="{ on }">
@@ -149,7 +186,7 @@
                     <div class="title white--text"> x </div>
                   </v-btn>
                   <v-hover>
-                    <v-btn fab dark color="primary_next_tab" v-on:click="toggle_country(history[0].next.d,2)">
+                    <v-btn v-if="history[0].next.civilWar != 1" fab dark color="primary_next_tab" v-on:click="toggle_country(history[0].next.d,2)">
                       <div class="title white--text"> 2 </div>
                     </v-btn>
                   </v-hover>
@@ -493,8 +530,7 @@
           this.snackbarColor = "info";
           this.snackbar = true;
           try {
-            this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.gameType, this
-              .currentCountry, this.info.turn).send({
+            this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.gameType, this.currentChoice, this.info.turn).send({
               callValue: window.tronWeb.toSun(this.betAmount)
             })
           } catch (err) {

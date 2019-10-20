@@ -9,7 +9,12 @@
         <b>{{universalMap(history[0].battle.o)}}</b> has conquered
         <b>{{universalMap(history[0].battle.dt)}}</b>
         previously owned by <b>{{universalMap(history[0].battle.d)}}</b></v-card-text> -->
-      <v-card-text class="mt-2 pa-0 text-xs-center "> Current Battle: Turn {{history[0].turn}} -
+      <v-card-text v-if="history[0].next.civilWar == 1" class=" pa-0 text-xs-center "> Current Battle: Turn {{history[0].turn}} -
+        <b>{{universalMap(history[0].next.o)}}</b> Raise Against
+        <b>{{universalMap(history[0].next.d)}}</b> 
+        Choose your guess: <v-btn fab flat dark small v-on:click="goToBet(history[0].next.o,1)"> 1 </v-btn> <v-btn fab flat dark small v-on:click="goToBet(241, 0)"> X </v-btn>
+      </v-card-text>
+      <v-card-text v-else class=" pa-0 text-xs-center "> Current Battle: Turn {{history[0].turn}} -
         <b>{{universalMap(history[0].next.o)}}</b> VS
         <b>{{universalMap(history[0].next.d)}}</b> 
         Choose your guess: <v-btn fab flat dark small v-on:click="goToBet(history[0].next.o,1)"> 1 </v-btn> <v-btn fab flat dark small v-on:click="goToBet(241, 0)"> X </v-btn> <v-btn fab flat dark small v-on:click="goToBet(history[0].next.d,2)"> 2 </v-btn>
