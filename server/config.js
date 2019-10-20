@@ -65,14 +65,14 @@ const config = {
   social:{
     updates:{
       statsFreq  : 100,
-      battleFreq : 50,
-      quotesFreq : 150,
+      battleFreq : 100,
+      quotesFreq : 319,
       rouletteFreq : 72
     },
     roulette: {
-      superVote:0.3,
+      superVote:0.5,
       vote: 0.1,
-      bonus: 3
+      bonus: 5
     },
     shares:{
       comment: 0.1,

@@ -202,7 +202,7 @@ const editCohesion = (country, delta, threshold) => {
     country: country,
     old,
     new: countriesMap[country].nextCohesion,
-    delta: old - countriesMap[country].nextCohesion
+    delta: countriesMap[country].nextCohesion - old
   }
 }
 

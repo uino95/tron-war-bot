@@ -7,7 +7,7 @@ const telegram = require('../utils/telegram')
 
 module.exports.runUpdate = async (cmap, td) => {
   if (!(td.turn % config.social.updates.statsFreq)) updates.stats(td);
-  else if (!(td.turn % config.social.updates.quotesFreq)) updates.quotes(td);
+  if (!(td.turn % config.social.updates.quotesFreq)) updates.quotes(td);
   if (!(td.turn % config.social.updates.rouletteFreq)) russianRoulette.next(cmap, td);
   updates.battleUpdate(cmap, td);
 }

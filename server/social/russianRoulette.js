@@ -53,18 +53,18 @@ const closePreviousRoulette = async (cmap, td) => {
     msg += "<b>Results:</b>\n"
     Object.keys(current.votes).forEach(e=>{
       if (!current.votes[e]) return
-      msg += e + ': <b>' + current.votes[e] + '</b>\n'
+      msg += e + ': <b>' + current.votes[e] + '</b>   =>  '+ utils.formatNumber(current.votes[e] * multiplier(e)) +'\n'
       text += current.votes[e] + e + ' ';
       total += (current.votes[e] * multiplier(e))
     })
-    msg += "\nFinal count: <b>"+ total +"%</b> ➡️ "
+    msg += "\nFinal count: <b>"+ utils.formatNumber(total) +"%</b> ➡️ "
     if (!total) msg += '<b>FULL TIE!</b>'
     if (total>0) msg += '<b>Bonus: +'+config.social.roulette.bonus+'%</b>'
     if (total<0) msg += '<b>Bonus: -'+config.social.roulette.bonus+'%</b>'
     total += (3*Math.sign(total))
   } else { msg += 'No votes at this round... 😢\n'}
-  msg += "\n\nTotal Cohesion Boost: <b>" + total.toFixed(1) + "%</b>\n";
-  text += ' => Boost: '+ total.toFixed(1) + "%";
+  msg += "\n\nTotal Cohesion Boost: <b>" + utils.formatNumber(total) + "%</b>\n";
+  text += ' => Boost: '+ utils.formatNumber(total) + "%";
   // - EDIT COHESION
   let extra = {
     link: 'https://t.me/Tron_WarBot/'+current.messageId,
@@ -73,6 +73,7 @@ const closePreviousRoulette = async (cmap, td) => {
   let n = await cohesion.update(current.country, total, 'TG', text, extra)
   if (n) msg += "New cohesion: <b>" + utils.toPercent(n.new) + "</b>\n"
   await telegram.editMessageText(current.messageId, undefined, msg,  {parse_mode: "HTML", reply_markup: { 'inline_keyboard': [[]]}});
+  return utils.universalMap(current.country, "full") + " received a <b>" + utils.formatNumber(total) + "% </b> cohesion boost!\n"
 }
 
 module.exports.init = async () => { //LOAD STATUS FROM DB
@@ -97,7 +98,10 @@ module.exports.next = async (cmap, td)=>{
     users:{},
   }
   let msg = "<b>⏱ ROULETTE TIME ⏱</b>"
-  msg += "\nIt's time to show your support for:\n\n<b>" + utils.universalMap(current.country, "full") + "</b> \n\n"
+  msg += "\nIt's time to show your support for:\n\n"
+  msg += "<b>" + utils.universalMap(current.country, "full") + "</b>\n"
+  msg += "Territories: <b>" + cmap[current.country].territories + "</b>\n"
+  msg += "Cohesion: <b>" + utils.toPercent(cmap[current.country].cohesion)+"</b>\n\n"
   msg += "<i>You have got 6 hours to like (or dislike).\n"
   msg += "Likes (👍🏻/👎🏻) gives ±"+config.social.roulette.vote+"% cohesion point\n"
   msg += "Superlikes (🌟/😡) gives ±"+config.social.roulette.superVote+"% (can only use once per day)</i>\n"

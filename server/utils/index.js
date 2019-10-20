@@ -50,6 +50,9 @@ const utils = {
     let m = 10**decimals;
     return Math.sign(v)*Math.ceil(Math.abs(v)*m)/m
   },
+  formatNumber: (n) => {
+    return (n>0 ? '+' : '') + n.toFixed(1) 
+  },
   quoteFromProbability: (p) => {
     let w = p ? Math.min(1/p, 200) : 200;
     return Math.floor(w *100)/100;

@@ -6,9 +6,9 @@ const wwb = require('../worldWarBot')
 const telegram = require('../utils/telegram')
 const facebook = require('../utils/facebook')
 
-const STATS_UPDATE_FREQ = 100
-const NEW_UPDATE_FREQ = 25
-const QUOTES_FREQ = 150
+const SPLIT_UPDATE = 12
+const SPLIT_HALF = Math.ceil(SPLIT_UPDATE/2)
+
 
 var history=[];
 var epic = [];
@@ -139,8 +139,8 @@ module.exports.battleUpdate = async (cmap, td) => {
   let s ="";
   if (top.length) s += "<b>🆕 Territories:</b>\t\n"
   top.filter(c=>c.t!=0).forEach((c, idx, arr)=>{
-    if (arr.length > 10 && idx==5) s+= "<b>...</b>\n";
-    if (arr.length > 10 && idx>=5 && idx<(arr.length-5)) return;
+    if (arr.length > SPLIT_UPDATE && idx==SPLIT_HALF) s+= "<b>...</b>\n";
+    if (arr.length > SPLIT_UPDATE && idx>=SPLIT_HALF && idx<(arr.length-SPLIT_HALF)) return;
     s += "<b>" + (c.t>0 ? "+" : "") + c.t + "</b> " + utils.universalMap(c.idx, "full") + "\n";
   })
   if (epic.length) s += "\n<b>🔥 Epic battles:</b>\n";
