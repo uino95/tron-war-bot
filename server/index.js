@@ -3,16 +3,19 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const xhub = require('express-x-hub');
 
-var http = require('http').Server(app);
-
+const config = require('./config');
 const twb = require('./tronWarBot');
 const referral = require('./referral');
 const backendLogic = require('./backendLogic')
 const scheduler = require('./scheduler')
 const facebook = require('./utils/facebook');
+const telegram = require('./utils/telegram');
+
 
 app.use(cors());
+app.use(xhub({ algorithm: 'sha1', secret: config.facebook.appSecret }));
 app.use(bodyParser.json());
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -33,17 +36,23 @@ app.get('/', (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// STARTUP ////////////////////////////////////////
 const init = async () => {
-  await twb.init();
-  await twb.launchGame(0, false);
-  await twb.launchGame(1, true);
-  await twb.launchGame(2, true);
-  // backendLogic.syncServer(false);
-  backendLogic.watchBet();
+  try {
+    await twb.init();
+    backendLogic.watchBet();
+    await twb.launchGame(0, false);
+    await twb.launchGame(1, true);
+    await twb.launchGame(2, true);
+    if (!config.test) await facebook.me();
+    await telegram.getMe();
+  } catch (e) {
+    console.error(e)
+    return process.exit(1)
+  }
   backendLogic.start();
 }
 
 var PORT = process.env.PORT || 3000;
-http.listen(PORT, function() {
+app.listen(PORT, function() {
     console.log("[SERVER]: Server is running on Port: " + PORT);
 });
 

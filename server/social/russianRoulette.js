@@ -5,6 +5,7 @@ const cohesion = require('../cohesion')
 const firebase = require('../firebase')
 const telegram = require('../utils/telegram')
 
+const ROULETTE = config.social.roulette
 
 const userCache = {}
 var current;
@@ -23,10 +24,10 @@ const isSuperVote = (v) => {
   return (v == '🌟') || (v == '😡')
 }
 const multiplier = (v) => {
-  if (v=='👍🏻') return config.social.roulette.vote
-  if (v=='👎🏻') return -config.social.roulette.vote
-  if (v=='🌟') return config.social.roulette.superVote
-  if (v=='😡') return -config.social.roulette.superVote
+  if (v=='👍🏻') return ROULETTE.vote
+  if (v=='👎🏻') return -ROULETTE.vote
+  if (v=='🌟') return ROULETTE.superVote
+  if (v=='😡') return -ROULETTE.superVote
 }
 
 const pickCountry = (cmap, td) => {
@@ -59,9 +60,9 @@ const closePreviousRoulette = async (cmap, td) => {
     })
     msg += "\nFinal count: <b>"+ utils.formatNumber(total) +"%</b> ➡️ "
     if (!total) msg += '<b>FULL TIE!</b>'
-    if (total>0) msg += '<b>Bonus: +'+config.social.roulette.bonus+'%</b>'
-    if (total<0) msg += '<b>Bonus: -'+config.social.roulette.bonus+'%</b>'
-    total += (3*Math.sign(total))
+    if (total>0) msg += '<b>Bonus: +'+ROULETTE.bonus+'%</b>'
+    if (total<0) msg += '<b>Bonus: -'+ROULETTE.bonus+'%</b>'
+    total += (ROULETTE.bonus*Math.sign(total))
   } else { msg += 'No votes at this round... 😢\n'}
   msg += "\n\nTotal Cohesion Boost: <b>" + utils.formatNumber(total) + "%</b>\n";
   text += ' => Boost: '+ utils.formatNumber(total) + "%";
@@ -103,9 +104,9 @@ module.exports.next = async (cmap, td)=>{
   msg += "Territories: <b>" + cmap[current.country].territories + "</b>\n"
   msg += "Cohesion: <b>" + utils.toPercent(cmap[current.country].cohesion)+"</b>\n\n"
   msg += "<i>You have got 6 hours to like (or dislike).\n"
-  msg += "Likes (👍🏻/👎🏻) gives ±"+config.social.roulette.vote+"% cohesion point\n"
-  msg += "Superlikes (🌟/😡) gives ±"+config.social.roulette.superVote+"% (can only use once per day)</i>\n"
-  msg += "A ±"+config.social.roulette.bonus+"% cohesion bonus will be given on top"
+  msg += "Likes (👍🏻/👎🏻) gives ±"+ROULETTE.vote+"% cohesion point\n"
+  msg += "Superlikes (🌟/😡) gives ±"+ROULETTE.superVote+"% (can only use once per day)</i>\n"
+  msg += "A ±"+ROULETTE.bonus+"% cohesion bonus will be given on top"
   // PICK A COUNTRY
   // CREATE TEXT AND KEYBOARD
   let m = { 'inline_keyboard': [Object.keys(current.votes).map(e=> {return {'text':e, 'callback_data': e}})]};

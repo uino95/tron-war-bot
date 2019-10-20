@@ -12,7 +12,7 @@ const utils = {
       case 'flag':
         return getFlag(mapping[id]['cc']);
       case 'full':
-        return mapping[id]['name'] + ' ' + getFlag(mapping[id]['cc']);
+        return getFlag(mapping[id]['cc']) + ' ' +  mapping[id]['name'] ;
 			case 'numberId':
         id = id.replace(/ |-/g, "").toLowerCase()
 				for (var i = mapping.length - 1; i >= 0; i--) {
@@ -51,7 +51,7 @@ const utils = {
     return Math.sign(v)*Math.ceil(Math.abs(v)*m)/m
   },
   formatNumber: (n) => {
-    return (n>0 ? '+' : '') + n.toFixed(1) 
+    return (n>0 ? '+' : '') + n.toFixed(1)
   },
   quoteFromProbability: (p) => {
     let w = p ? Math.min(1/p, 200) : 200;

@@ -56,7 +56,11 @@ const onBlock = (bn, fn)=>{
   if (fn && typeof fn != "function") throw "Missing callback";
   if (typeof bn == "function") {fn = bn; bn = 0;}
   bn = parseInt(bn);
-  if (bn!=0 && bn <= block.number) return;
+  if (bn!=0 && bn < block.number) return;
+  if (bn!=0 && bn == block.number) {
+    try { return fn(JSON.parse(JSON.stringify(block))); }
+    catch (e) {console.error(e)};
+  }
   blockQueue[bn.toString()] = blockQueue[bn.toString()] || [];
   let idx = blockQueue[bn.toString()].push(fn);
   return {

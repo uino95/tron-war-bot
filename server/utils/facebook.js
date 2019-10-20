@@ -1,4 +1,5 @@
 const config = require("../config");
+const shares = require("../social/shares")
 const FB = require('fb').default;
 
 if (!config.facebook.token) throw "[FACEBOOK]: Access token is not set in environment variables!"
@@ -36,7 +37,18 @@ const webhooksVerification = async (req, res, next) => {
 }
 
 const webhooks = async (req, res, next) => {
+  if (!req.isXHubValid() && !config.test) return console.error("[WEBHOOKS]: Received an http call not originated from Facebook!")
   console.log("[FACEBOOK]: Received new notification with signature: " + req.headers["X-Hub-Signature"] + "  and payload:  " + JSON.stringify(req.body))
+  let bd = req.body;
+  // IF MULTIPLE ENTRIES
+  for (var el of bd.entries) {
+    let text = el.text;
+    let user_id = el.user_id;
+    let user_name = el.user_name;
+    let update_type = el.update_type;
+    let link = el.link;
+    await shares.update(text, user_id, user_name, update_type, "FB", link)
+  }
   return res.send("");
 }
 

@@ -54,9 +54,9 @@ const buildTgStats = (td, leaderboard, countriesStillAlive, j, top3, civilWar) =
   // TELEGRAM
   let t = "⏱♟ <b>TURN " + td.turn +"</b> UPDATE ♟⏱\n\n"
   t +="🎖🎖 <b>TOP 5 ARMIES</b> 🎖🎖\n"
-  t += "🥇<b>" + leaderboard[0].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[0].idx) + "</b>\t C: "+utils.toPercent(leaderboard[0].cohesion)+"\n";
-  t += "🥈<b>" + leaderboard[1].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[1].idx) + "</b>\t C: "+utils.toPercent(leaderboard[1].cohesion)+"\n";
-  t += "🥉<b>" + leaderboard[2].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[2].idx) + "</b>\t C: "+utils.toPercent(leaderboard[2].cohesion)+"\n";
+  t += "🥇<b>" + leaderboard[0].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[0].idx, "full") + "</b>\t C: "+utils.toPercent(leaderboard[0].cohesion)+"\n";
+  t += "🥈<b>" + leaderboard[1].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[1].idx, "full") + "</b>\t C: "+utils.toPercent(leaderboard[1].cohesion)+"\n";
+  t += "🥉<b>" + leaderboard[2].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[2].idx, "full") + "</b>\t C: "+utils.toPercent(leaderboard[2].cohesion)+"\n";
   t += "<i>4th</i> <b>" + leaderboard[3].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[3].idx) + "</b>\t C: "+utils.toPercent(leaderboard[3].cohesion)+"\n";
   t += "<i>5th</i> <b>" + leaderboard[4].territories + "</b> territories -\t<b>" + utils.universalMap(leaderboard[4].idx) + "</b>\t C: "+utils.toPercent(leaderboard[4].cohesion)+"\n";
   t += "\n🌎 <b>" + countriesStillAlive.length + "</b> countries in the game!\n"
@@ -109,7 +109,7 @@ module.exports.stats = async (td) =>{
 }
 
 module.exports.battleUpdate = async (cmap, td) => {
-  let n = "BU" + Math.ceil(td.turn/config.social.updates.battleFreq);
+  let n = "BU" + Math.floor(td.turn/config.social.updates.battleFreq);
   if (!(td.turn%config.social.updates.battleFreq)) {
     epic = []
     insurrections = [];
@@ -145,7 +145,7 @@ module.exports.battleUpdate = async (cmap, td) => {
   })
   if (epic.length) s += "\n<b>🔥 Epic battles:</b>\n";
   epic.forEach((b)=>{
-    s += (b.result==1 ? "<b>" : "" ) + utils.universalMap(b.o) + (b.result==1 ? "</b>" : "" ) + " vs " + (b.result==2 ? "<b>" : "" ) + utils.universalMap(b.d) + (b.result==2 ? "</b>" : "" ) + " ➡️ <b>"+ (b.result || "X") + "</b> <i>with a " + utils.toPercent(b.probabilities[b.result])+" chance</i>\n";
+    s += (b.result==1 ? "<b>" : "" ) + utils.universalMap(b.o, "full") + (b.result==1 ? "</b>" : "" ) + " vs " + (b.result==2 ? "<b>" : "" ) + utils.universalMap(b.d, "full") + (b.result==2 ? "</b>" : "" ) + " ➡️ <b>"+ (b.result || "X") + "</b> <i>with a " + utils.toPercent(b.probabilities[b.result])+" chance</i>\n";
   })
 
   if (insurrections.length) {
@@ -156,7 +156,7 @@ module.exports.battleUpdate = async (cmap, td) => {
 
   if (td.battle) {
     s += "\n<b>⏪ Previous battle:</b>\n"
-    s += (td.battle.result==1 ? "<b>" : "" ) + utils.universalMap(td.battle.o) + (td.battle.result==1 ? "</b>" : "" ) + (td.battle.civilWar ? " rebelled on ": " vs ") + (td.battle.result==2 ? "<b>" : "" ) + utils.universalMap(td.battle.d) + (td.battle.result==2 ? "</b>" : "" ) + " ➡️ <b>"+ (td.battle.result || "X") + "</b>\n";
+    s += (td.battle.result==1 ? "<b>" : "" ) + utils.universalMap(td.battle.o , "full") + (td.battle.result==1 ? "</b>" : "" ) + (td.battle.civilWar ? " rebelled on ": " vs ") + (td.battle.result==2 ? "<b>" : "" ) + utils.universalMap(td.battle.d, "full") + (td.battle.result==2 ? "</b>" : "" ) + " ➡️ <b>"+ (td.battle.result || "X") + "</b>\n";
     if (td.battle.result == 0) s += (td.battle.civilWar ? "<i>✨ The insurrection was settled with no casualties!</i>\n":"<i>The war peacefully resolved!</i>\n");
     if (td.battle.result == 1) s += (td.battle.civilWar ? ("<i>That was a successful golpe!\n🍀 Long live " + utils.universalMap(td.battle.o) + "🍀</i>\n") : ("<i>The offender "+ utils.universalMap(td.battle.o) + " conquered " + utils.universalMap(td.battle.dt) + "</i>\n"));
     if (td.battle.result == 2) s += "<i>The defender "+ utils.universalMap(td.battle.d) + " conquered " + utils.universalMap(td.battle.ot) + "</i>\n";
