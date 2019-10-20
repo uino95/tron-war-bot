@@ -24,7 +24,7 @@
             <v-flex md10>
 
               <v-card class="mb-4">
-                <v-img class="white--text" position="bottom 60% center" :aspect-ratio="this.windowSize.x/150" src="img/civilWar8.png">
+                <v-img class="white--text" position="bottom 75% center" :aspect-ratio="this.windowSize.x/50" src="img/civilWar9.png">
                   <v-layout class="mt-4" row wrap align-center justify-space-between>
                     <v-flex ml-1 xs4>
                       <v-layout column align-center>
