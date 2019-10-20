@@ -367,15 +367,19 @@
 
       gameType: 0,
       bets: [],
+      personalBets:[],
       data:{},
       countriesMap:[],
       mapping: mapping,
     }),
 
-    firebase: {
-      bets: db.ref('public/bets').orderByChild('gameType').equalTo('0'),
-      data: db.ref('public/data'),
-      countriesMap: db.ref('public/countriesMap')
+    firebase: function() {
+      return {
+        bets: db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30),
+        personalBets: db.ref('public/bets').orderByChild('from').equalTo(this.account),
+        data: db.ref('public/data'),
+        countriesMap: db.ref('public/countriesMap')
+      }
     },
 
     filters: {
@@ -487,7 +491,7 @@
         return hours + ':' + min + ':' + sec
       },
       compare: function(a,b){
-        return a.turn - b.turn
+        return b.turn - a.turn
       }
     },
     watch:{
@@ -516,9 +520,15 @@
       }
     },
     computed: {
-      
-      myBets: function () {
-        return this.bets.filter(bet => bet.from == this.account && bet.gameType == this.gameType).reverse()
+       account() {
+        return this.$store.state.loggedInAccount
+      },
+      myBets: function(){
+        let pBets = this.personalBets.sort(this.compare)
+        return pBets.filter((bet) => bet.gameType == this.gameType)
+      },
+      latestBets: function () {
+        return this.bets.sort(this.compare)
       },
       //returns an array of objects [{countryId: "id", numberOfBets: x}, ...]
       betsPerCountry: function () {
@@ -546,9 +556,6 @@
 
         return betsPerCountryList
       },
-      latestBets: function () {
-        return this.bets.sort(this.compare).reverse();
-      },
       calculatePotentialWin: function () {
         if (this.currentCountry == null || this.countriesMap.length == 0) return 0;
         let bets = this.betsPerCountry
@@ -563,10 +570,7 @@
         set(value) {
           this.$store.commit('setSelectedCountry', value)
         }
-      },
-      account() {
-        return this.$store.state.loggedInAccount
-      },
+      }
     },
     mounted() {}
   }

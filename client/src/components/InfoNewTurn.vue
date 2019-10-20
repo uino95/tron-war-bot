@@ -1,22 +1,33 @@
 <template>
   <v-flex>
-    <v-card class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text " v-if="infoNewTurn != null && data.serverStatus == 200"
+    <v-card class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text " v-if="history != null && data.serverStatus == 200"
       transition="scale-transition" color="#2c3e50">
       <v-card-text class="pa-0 text-xs-center ">
         <core-timer />
       </v-card-text>
-      <v-card-text class="pa-0 text-xs-center "> Latest conquest: Turn {{infoNewTurn.turn}} -
-        <b>{{universalMap(infoNewTurn.conquest[0])}}</b> has conquered
-        <b>{{universalMap(infoNewTurn.conquest[1])}}</b>
-        previously owned by <b>{{universalMap(infoNewTurn.prev)}}</b></v-card-text>
+      <!-- <v-card-text class="pa-0 text-xs-center "> Latest conquest: Turn {{history[0].turn}} -
+        <b>{{universalMap(history[0].battle.o)}}</b> has conquered
+        <b>{{universalMap(history[0].battle.dt)}}</b>
+        previously owned by <b>{{universalMap(history[0].battle.d)}}</b></v-card-text> -->
+      <v-card-text v-if="history[0].next.civilWar == 1" class=" pa-0 text-xs-center "> Current Battle: Turn {{history[0].turn}} -
+        <b>{{universalMap(history[0].next.o)}}</b> Raise Against
+        <b>{{universalMap(history[0].next.d)}}</b> 
+        Choose your guess: <v-btn fab flat dark small v-on:click="goToBet(history[0].next.o,1)"> 1 </v-btn> <v-btn fab flat dark small v-on:click="goToBet(241, 0)"> X </v-btn>
+      </v-card-text>
+      <v-card-text v-else class=" pa-0 text-xs-center "> Current Battle: Turn {{history[0].turn}} -
+        <b>{{universalMap(history[0].next.o)}}</b> VS
+        <b>{{universalMap(history[0].next.d)}}</b> 
+        Choose your guess: <v-btn fab flat dark small v-on:click="goToBet(history[0].next.o,1)"> 1 </v-btn> <v-btn fab flat dark small v-on:click="goToBet(241, 0)"> X </v-btn> <v-btn fab flat dark small v-on:click="goToBet(history[0].next.d,2)"> 2 </v-btn>
+      </v-card-text>
+
     </v-card>
-    <v-card class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text" v-else-if="infoNewTurn != null && data.serverStatus == 300"
+    <v-card class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text" v-else-if="history != null && data.serverStatus == 300"
       transition="scale-transition" color="error">
       <v-card-text class="pa-0 text-xs-center">
         <b>Battle in Progress</b>
       </v-card-text>
     </v-card>
-    <v-card class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text" v-else-if="infoNewTurn != null && data.serverStatus == 500"
+    <v-card class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text" v-else-if="history != null && data.serverStatus == 500"
       transition="scale-transition" color="blue">
       <v-card-text class="pa-0 text-xs-center">
         Battle in Progress
@@ -37,15 +48,16 @@
       history: [],
     }),
     firebase: {
-      history: db.ref('public/history').orderByChild('turn'),
+      history: db.ref('public/history').orderByChild('turn').limitToLast(1),
       data: db.ref('public/data')
     },
-    computed: {
-      infoNewTurn: function () {
-        let infoTurn = this.history.slice().reverse()[0]
-        return infoTurn
-      }
-    },
+    methods:{
+      goToBet(country, choice) {
+        this.$store.commit('setSelectedCountry', country)
+        this.$store.commit('setBattleChoice', choice)
+        this.$router.push('/betBattle')
+      },
+    }
   }
 </script>
 

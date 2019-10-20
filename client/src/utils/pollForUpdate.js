@@ -68,37 +68,45 @@ function pollBalance(interval){
   }, interval)
 }
 
-async function pollDividends(interval){
+// export async function pollDividends(interval){
 
-  setInterval(async () => {
-    try {
-      // update available dividends
-      const availableDividensInSunFromHouseReserves = await tronWarBotInstance.houseReserves().call()
-      const availableDividensInSunFromMaster = await tronWebPublic.trx.getBalance(masterAddress);
-      const houseReserves = tronWebPublic.BigNumber(availableDividensInSunFromHouseReserves.toString())
-      const masterBalance = tronWebPublic.BigNumber(availableDividensInSunFromMaster.toString())
-      const availableDividensInSun = houseReserves.plus(masterBalance)
-      store.commit('setAvailableDividends', {
-        availableDividends: availableDividensInSun
-      })
-    } catch (error) {
-      console.log("error is here in dividends ", error)
-    }
+//   let dividendsInterval = setInterval(async () => {
+//     try {
+//       // update available dividends
+//       const availableDividensInSunFromHouseReserves = await tronWarBotInstance.houseReserves().call()
+//       const availableDividensInSunFromMaster = await tronWebPublic.trx.getBalance(masterAddress);
+//       const houseReserves = tronWebPublic.BigNumber(availableDividensInSunFromHouseReserves.toString())
+//       const masterBalance = tronWebPublic.BigNumber(availableDividensInSunFromMaster.toString())
+//       const availableDividensInSun = houseReserves.plus(masterBalance)
+//       store.commit('setAvailableDividends', {
+//         availableDividends: availableDividensInSun
+//       })
+//     } catch (error) {
+//       console.log("error is here in dividends ", error)
+//     }
+//     try{
+//       // update total war balance supply
+//       const currentTotalWARSupply = await warCoinInstance.totalSupply().call();
+//       store.commit('setTotalWarSupply', {
+//         totalWARSupply: tronWebPublic.BigNumber(currentTotalWARSupply)
+//       })
+//     } catch (error) {
+//       console.log("error is here IN TOTAL WAR BALANCE ", error)
+//     }
+//   }, interval)
+// }
+
+export function pollMyWar(interval){
+  let warInterval = setInterval(async() => {
+    console.log("Polling war")
     try{
-      // update total war balance supply
+      if(store.state.pollWarEndend){
+        clearInterval(warInterval)
+      }
       const currentTotalWARSupply = await warCoinInstance.totalSupply().call();
-      store.commit('setTotalWarSupply', {
+        store.commit('setTotalWarSupply', {
         totalWARSupply: tronWebPublic.BigNumber(currentTotalWARSupply)
       })
-    } catch (error) {
-      console.log("error is here IN TOTAL WAR BALANCE ", error)
-    }
-  }, interval)
-}
-
-function pollMyWar(interval){
-  setInterval(async() => {
-    try{
       // update current address war balance
       if (store.state.loggedInAccount !== null) {
         const currentWarBalanceInSun = await warCoinInstance.balanceOf(store.state.loggedInAccount).call();
@@ -120,6 +128,7 @@ async function getGameParams(){
   try{
     const finalBetParams = await tronWarBotInstance.gameParams(0).call()
     const betNextParams = await tronWarBotInstance.gameParams(1).call()
+    const betBattleParams = await tronWarBotInstance.gameParams(2).call()
     store.commit('setGameParams', {
       finalBetParams: {
         houseEdge: tronWeb.fromSun(finalBetParams.houseEdge ),
@@ -130,6 +139,11 @@ async function getGameParams(){
         houseEdge: tronWeb.fromSun(betNextParams.houseEdge ),
         minimumBet: tronWeb.fromSun(betNextParams.minimumBet),
         maximumBet: tronWeb.fromSun(betNextParams.maximumBet) 
+      },
+      betBattleParams: {
+        houseEdge: tronWeb.fromSun(betBattleParams.houseEdge ),
+        minimumBet: tronWeb.fromSun(betBattleParams.minimumBet),
+        maximumBet: tronWeb.fromSun(betBattleParams.maximumBet) 
       }
     })
   } catch{
@@ -144,17 +158,12 @@ const pollForUpdate = async function () {
     fullHost: 'https://api.trongrid.io', 
     privateKey: 'a548c2dda3cd5d0a5c8a484f9c0130aacd1c4fd185762caef13a45318647ca32',
   })
-  console.log(tronWebPublic)
+
   tronWarBotInstance = await tronWebPublic.contract().at(store.state.contracts.TronWarBotAddress)
   warCoinInstance = await tronWebPublic.contract().at(store.state.contracts.WarCoinAddress)
 
-  console.log(tronWarBotInstance)
-  console.log(warCoinInstance)
-
   getGameParams()
   pollTronWeb(500)
-  pollDividends(4000)
-  pollMyWar(4000)
 }
 
 export default pollForUpdate

@@ -10,6 +10,7 @@ export default new Vuex.Store({
     loggedInAccount: null,
     accountBalance: -1,
     selectedCountry: null,
+    battleChoice: null,
     isMobile: false,
     test: test, 
     contracts:{
@@ -24,8 +25,10 @@ export default new Vuex.Store({
     tronWeb: null,
     gameParams:{
       finalBetParams: null,
-      betNextParams: null
-    }
+      betNextParams: null,
+      betBattleParams: null
+    },
+    pollWarEndend: false
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -36,6 +39,9 @@ export default new Vuex.Store({
     },
     setSelectedCountry(state, payload) {
       state.selectedCountry = payload
+    },
+    setBattleChoice(state, battleChoice){
+      state.battleChoice = battleChoice
     },
     setIsMobile(state, value){
       state.isMobile = value
@@ -60,6 +66,10 @@ export default new Vuex.Store({
     setGameParams(state,payload){
       state.gameParams.finalBetParams = payload.finalBetParams
       state.gameParams.betNextParams = payload.betNextParams
+      state.gameParams.betBattleParams = payload.betBattleParams
+    },
+    setPollWar(state, payload){
+      state.pollWarEndend = payload
     }
   },
   actions: {

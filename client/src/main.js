@@ -37,7 +37,6 @@ Vue.mixin({
             return mapping[id]['name'];
         }
       } catch(error) {
-        console.log(error)
       }
     }
   }

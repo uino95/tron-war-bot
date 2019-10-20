@@ -2,7 +2,7 @@
     <v-app id="keep">
         <loading :active.sync="loading"
                  color="#ffffff"
-                 opacity="1"
+                 :opacity="1"
                  background-color="#001537"
                  :is-full-page="true">
         </loading>
@@ -54,7 +54,7 @@
             <v-spacer></v-spacer>
             <v-toolbar-items v-if="$store.state.loggedInAccount!=null">
                 <v-menu offset-y>
-                    <template v-slot:activator="{ on }">
+                    <template v-slot:activator="{ on }" class="hidden-sm-and-down">
                         <v-btn flat dark v-on="on">
                             Account
                         </v-btn>
@@ -97,11 +97,11 @@
                             <v-btn v-on:click="showMobileMap()"> Load Map</v-btn>
                         </div>
                         <div v-else-if="!noShowMap">
-                            <core-game-map v-bind:style="{ display: toDisplay }"/>
+                            <core-game-map v-bind:style="{ display: toDisplay }"></core-game-map>
                         </div>
-                        <core-game-controls @showModal="showModal(1)"/>
-                        <core-modal v-model="isModalVisible" v-bind:header-tile="menuItems[itemClicked].text"
-                                    v-bind:body-tile="menuItems[itemClicked].body"/>
+                        <core-game-controls @showModal="showModal(1)"></core-game-controls>
+                        <core-modal v-model="isModalVisible" :header-tile="menuItems[itemClicked].text"
+                                    :body-tile="menuItems[itemClicked].body"></core-modal>
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -146,7 +146,7 @@
                 },
                 {
                     icon: 'attach_money',
-                    text: 'Dividends',
+                    text: 'WAR Supply',
                     link: false,
                     body: 'WIP'
                 },

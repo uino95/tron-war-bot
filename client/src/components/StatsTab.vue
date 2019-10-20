@@ -300,13 +300,13 @@
           align: 'right',
           class: 'title'
         },
-        // {
-        //   text: 'Final Conquer Quote',
-        //   value: 'finalQuote',
-        //   sortable: true,
-        //   align: 'right',
-        //   class: 'title'
-        // },
+        {
+          text: 'Final Conquer Quote',
+          value: 'finalQuote',
+          sortable: true,
+          align: 'right',
+          class: 'title'
+        },
         {
           text: 'Next Conquer %',
           value: 'probability',
@@ -359,7 +359,7 @@
       },
       goToBet(path, country) {
         this.$store.commit('setSelectedCountry', country)
-        //this.$router.push(path)
+        this.$router.push(path)
       },
       openModal(country) {
         this.$store.commit('setSelectedCountry', country)
