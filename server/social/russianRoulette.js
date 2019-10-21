@@ -29,6 +29,9 @@ const multiplier = (v) => {
   if (v=='🌟') return ROULETTE.superVote
   if (v=='😡') return -ROULETTE.superVote
 }
+const getCbData = (e)=>{
+  return JSON.stringify({action:'RR_VOTE', vote:e});
+}
 
 const pickCountry = (cmap, td) => {
   let total = cmap.reduce((acc, v)=>acc+v.cohesion,0)
@@ -78,6 +81,7 @@ const closePreviousRoulette = async (cmap, td) => {
 }
 
 module.exports.init = async () => { //LOAD STATUS FROM DB
+  if (current) return;
   current = await firebase.data.once("value").then(r=>r.val()['roulette']);
   if (!current) return;
   if (!current.users) current.users = {};
@@ -109,7 +113,7 @@ module.exports.next = async (cmap, td)=>{
   msg += "A ±"+ROULETTE.bonus+"% cohesion bonus will be given on top"
   // PICK A COUNTRY
   // CREATE TEXT AND KEYBOARD
-  let m = { 'inline_keyboard': [Object.keys(current.votes).map(e=> {return {'text':e, 'callback_data': e}})]};
+  let m = { 'inline_keyboard': [Object.keys(current.votes).map(e=> {return {'text':e, 'callback_data': getCbData(e)}})]};
   let r = await telegram.sendMessage(msg, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true})
   current.messageId = r.message_id;
   firebase.data.update({roulette: current})
@@ -118,8 +122,8 @@ module.exports.next = async (cmap, td)=>{
 
 
 module.exports.onUpdate = async (ctx, next)=>{
-  let o = ctx.update.callback_query.data;
-  let user = ctx.from.id;
+  let o = ctx.body.vote;
+  let user = ctx.body.user;
   if (!isValidVote(o) || !user) return telegram.answerCbQuery(ctx.update.callback_query.id, "");
   if (!current || ctx.update.callback_query.message.message_id != current.messageId) return telegram.answerCbQuery(ctx.update.callback_query.id, "");
   // CHECK IF VOTE IS VALID
@@ -135,7 +139,7 @@ module.exports.onUpdate = async (ctx, next)=>{
   // SAVE IT
   firebase.data.update({roulette: current})
   // EDIT MESSAGE KEYBOARD
-  let m = { 'inline_keyboard': [Object.keys(current.votes).map(e=> {return {'text': (e + " " + (current.votes[e] || '')), 'callback_data': e}})]};
+  let m = { 'inline_keyboard': [Object.keys(current.votes).map(e=> {return {'text': (e + " " + (current.votes[e] || '')), 'callback_data': getCbData(e)}})]};
   await telegram.editMessageReplyMarkup(current.messageId, undefined, m);
   return telegram.answerCbQuery(ctx.update.callback_query.id, "Excellent!");
 }

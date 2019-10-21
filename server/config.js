@@ -45,6 +45,7 @@ const config = {
   telegram:{
     token: process.env.TELEGRAM_TOKEN,
     group: JSON.parse(process.env.TELEGRAM_GROUP || -331523835),
+    adminGroup: JSON.parse(process.env.TELEGRAM_ADMIN_GROUP || -331523835)
   },
   facebook:{
     pageId: "TronWarBot",
