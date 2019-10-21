@@ -270,10 +270,6 @@
         homeButton.insertBefore(chart.zoomControl.plusButton);
 
         this.chart = chart;
-        //
-        // Callback here?
-        //
-        console.log("map loaded!");
 
         this.$root.$emit('map_loaded', true);
       }
