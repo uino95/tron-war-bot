@@ -1,6 +1,7 @@
 <template>
     <v-app id="keep">
-        <loading :active.sync="loading"
+        <loading :active.sync="
+        loading"
                  color="#ffffff"
                  :opacity="1"
                  background-color="#001537"
@@ -252,11 +253,15 @@
             pollForUpdate()
         },
         mounted() {
-            this.$store.commit('setIsMobile', this.isMobile())
+            this.$store.commit('setIsMobile', this.isMobile());
+            this.$root.$on('map_loaded', () => {
+                this.loading = false;
+                this.toDisplay = "flex"
+            });
             if (!this.$store.state.isMobile) {
                 this.noShowMap = false
             }
-            this.startLoading()
+            //this.startLoading()
         }
     }
 </script>

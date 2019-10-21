@@ -270,8 +270,9 @@
         homeButton.insertBefore(chart.zoomControl.plusButton);
 
         this.chart = chart;
-      }
 
+        this.$root.$emit('map_loaded', true);
+      }
     },
 
     beforeDestroy() {
