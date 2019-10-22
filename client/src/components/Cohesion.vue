@@ -65,12 +65,12 @@
                 <!-- Cohesion -->
                 <td class="text-xs-center">
                   <v-layout row>
-                    <v-flex xs5> {{(props.item.old * 100).toFixed(2) + '%'}} </v-flex>
+                    <v-flex xs5 v-bind:class="{greenText: props.item.delta > 0, redText: props.item.delta <= 0}">
+                      <b>{{ (props.item.delta * 100).toFixed(2) | cohesionSign }} </b> </v-flex>
                     <v-flex xs2>
                       <v-icon small> keyboard_arrow_right </v-icon>
                     </v-flex>
-                    <v-flex xs5 v-bind:class="{greenText: props.item.delta > 0, redText: props.item.delta <= 0}">
-                      <b>{{ (props.item.delta * 100).toFixed(2) | cohesionSign }} </b> </v-flex>
+                    <v-flex xs5> {{(props.item.old * 100).toFixed(2) + '%'}} </v-flex>
                   </v-layout>
                 </td>
                 <!-- Turn -->
@@ -144,15 +144,10 @@
           sortable: true,
           align: 'right',
           class: 'title'
-        },
-        {
-          text: '',
-          value: 'date',
-          sortable: false
         }
       ],
       pagination: {
-        sortBy: 'date',
+        sortBy: 'turn',
         descending: true,
       },
       searchCohesion: '',
@@ -177,9 +172,11 @@
       getInteractionImg(str) {
         switch (str) {
           case 'BATTLE':
-            return "/img/flags/battle.svg"
+            return "/img/interactions/battle.svg"
+          case 'ROULETTE':
+            return "/img/interactions/telegram.svg"
           default:
-            return "/img/flags/facebook.svg"
+            return "/img/interactions/facebook.svg"
         }
       },
       goToBet(path, country) {

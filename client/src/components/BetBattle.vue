@@ -28,7 +28,7 @@
                   <v-layout class="mt-4" row wrap align-center justify-space-between>
                     <v-flex ml-1 xs4>
                       <v-layout column align-center>
-                        <v-tooltip bottom>
+                        <v-tooltip open-delay="600" bottom>
                           <template v-slot:activator="{ on }">
                             <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
                           class="title pb-2 truncate">{{universalMap(history[0].next.o)}} </div>
@@ -75,7 +75,7 @@
 
                     <v-flex v-if="history[0].next.civilWar == 1" mr-1 xs4>
                       <v-layout column align-center>
-                        <v-tooltip bottom>
+                        <v-tooltip open-delay="600" bottom>
                           <template v-slot:activator="{ on }">
                             <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
                           class="title pb-2 truncate">{{universalMap(history[0].next.d)}} </div>
@@ -111,7 +111,7 @@
 
                     <v-flex v-else mr-1 xs4>
                       <v-layout column align-center>
-                        <v-tooltip bottom>
+                        <v-tooltip open-delay="600" bottom>
                           <template v-slot:activator="{ on }">
                             <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
                           class="title pb-2 truncate">{{universalMap(history[0].next.d)}} </div>
