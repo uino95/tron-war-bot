@@ -19,12 +19,12 @@ module.exports.runUpdate = async (cmap, td) => {
 module.exports.init = async () =>{
   // LOAD STATUS
   await russianRoulette.init();
-  // CONFIGURE TELEGRAM BOT
-  const bot = new Telegraf(config.telegram.token)
-  bot.use(telegram.auth)
-  bot.on('callback_query', russianRoulette.onUpdate)
-  bot.catch(console.error)
-  bot.launch()
+  // // CONFIGURE TELEGRAM BOT
+  // const bot = new Telegraf(config.telegram.token)
+  // bot.use(telegram.auth)
+  // bot.on('callback_query', russianRoulette.onUpdate)
+  // bot.catch(console.error)
+  // bot.launch()
 }
 
 module.exports.shares = shares;

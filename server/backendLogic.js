@@ -158,13 +158,14 @@ const launchNextTurn = async (block) =>{
 
 
 module.exports.start = async () =>{
-  if (config.wwb.restart) await firebase.reset();
-  await wwb.init(config.wwb.restart);
   if (wwb.winner()) return;
-  await social.init();
   prepareNextTurn();
 }
 
+module.exports.init = async () => {
+  if (config.wwb.restart) await firebase.reset();
+  await wwb.init(config.wwb.restart);
+}
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // Watch new bets

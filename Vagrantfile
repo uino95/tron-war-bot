@@ -25,6 +25,8 @@ Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 18891, host: 18891
   # Full HTTP Port
   config.vm.network "forwarded_port", guest: 9090, host: 9090, host_ip: "127.0.0.1"
+  # Debug Node Port
+  config.vm.network "forwarded_port", guest: 9229, host: 9229, host_ip: "127.0.0.1"
   # RPC Port
   config.vm.network "forwarded_port", guest: 58500, host: 58500, host_ip: "127.0.0.1"
   # Http Port
