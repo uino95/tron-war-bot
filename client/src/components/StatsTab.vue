@@ -51,13 +51,13 @@
                 <td class="text-xs-right && font-weight-bold text-truncate">{{props.item.idx}}</td>
                 <td class="text-xs-right">{{ props.item.territories }}</td>
                 <td class="text-xs-right">{{ (props.item.cohesion * 100).toFixed(2) + ' %'}}</td>
-                <td class="text-xs-right ">
+                <td class="text-xs-right hidden-xs-only">
                   <v-btn class="white--text" color="primary_final_tab"
                     v-on:click="goToBet('betfinal',universalMap(props.item.idx, 'numberId'))">
                     {{ (props.item.finalQuote + ' TRX')}}
                   </v-btn>
                 </td>
-                <td class="text-xs-right ">
+                <td class="text-xs-right hidden-xs-only">
                   <v-btn class="white--text" color="primary_next_tab"
                     v-on:click="goToBet('betnext',universalMap(props.item.idx, 'numberId'))">
                     {{ (props.item.probability * 100).toFixed(2) + ' %'}}
@@ -237,14 +237,14 @@
           value: 'finalQuote',
           sortable: true,
           align: 'right',
-          class: 'title'
+          class: 'title hidden-xs-only'
         },
         {
           text: 'Next Conquer %',
           value: 'probability',
           sortable: true,
           align: 'right',
-          class: 'title'
+          class: 'title hidden-xs-only'
         },
         {
           text: '',

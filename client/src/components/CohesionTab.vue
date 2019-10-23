@@ -25,13 +25,13 @@
               :rows-per-page-items="[10,20,50]">
               <template v-slot:items="props">
                 <!-- Update type -->
-                <td class="text-xs-center">
+                <td class="text-xs-center hidden-xs-only">
                   <v-avatar size="32">
                     <v-img :src="getInteractionImg(props.item.update_type)" />
                   </v-avatar>
                 </td>
                 <!-- Content -->
-                <td class="text-xs-left">
+                <td class="text-xs-left text-truncate">
                   <div v-if="props.item.update_type == 'BATTLE'" v-html="computePhrase(props.item.battle)">
                   </div>
                   <div v-else>
@@ -61,11 +61,11 @@
                 <td class="text-xs-center">
                   <v-layout row>
                     <v-flex xs5 v-bind:class="{greenText: props.item.delta > 0, redText: props.item.delta <= 0}">
-                      <b>{{ (props.item.delta * 100).toFixed(2) | cohesionSign }} </b> </v-flex>
+                      <b>{{ (props.item.delta * 100).toFixed(1) | cohesionSign }} </b> </v-flex>
                     <v-flex xs2>
                       <v-icon small> keyboard_arrow_right </v-icon>
                     </v-flex>
-                    <v-flex xs5> {{(props.item.old * 100).toFixed(2) + '%'}} </v-flex>
+                    <v-flex xs5> {{(props.item.old * 100).toFixed(1) + '%'}} </v-flex>
                   </v-layout>
                 </td>
                 <!-- Turn -->
@@ -112,7 +112,7 @@
           value: 'update_type',
           sortable: true,
           align: 'center',
-          class: 'title'
+          class: 'title hidden-xs-only',
         },
         {
           text: 'Content',
@@ -218,6 +218,11 @@
         this.loaded = true
         this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn'))
       },
+    },
+    computed:{
+      isMobile(){
+        return this.$store.state.isMobile
+      }
     },
     filters: {
       cohesionSign(delta) {

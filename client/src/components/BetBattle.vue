@@ -24,7 +24,7 @@
             <v-flex md10>
 
               <v-card class="mb-4">
-                <v-img class="white--text" :position="history[0].next.civilWar == 1 ? 'bottom 75% center' : 'center'" :aspect-ratio="this.windowSize.x/50" :src=" history[0].next.civilWar == 1 ? 'img/civilWar9.png' : 'img/vs-battle.jpg'">
+                <v-img class="white--text" :position="history[0].next.civilWar == 1 ? 'bottom 75% center' : 'center'" :aspect-ratio="this.windowSize.x/150" :src=" history[0].next.civilWar == 1 ? 'img/civilWar9.png' : 'img/vs-battle.jpg'">
                   <v-layout class="mt-4" row wrap align-center justify-space-between>
                     <v-flex ml-1 xs4>
                       <v-layout column align-center>

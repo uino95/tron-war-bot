@@ -62,7 +62,7 @@
     computed:{
       activeMainTab:{
         get(){
-          if (this.$route.name == 'stats' || this.$route.name == 'cohesion' || this.$route.name == 'history') return this.tabs[0].path
+          if (this.$route.name == "home" || this.$route.name == 'stats' || this.$route.name == 'cohesion' || this.$route.name == 'history') return this.tabs[0].path
           return this.tabs[1].path
         },
         set(value){

@@ -43,7 +43,7 @@
 
               </td>
               <td class="text-xs-center">{{ props.item.battle.result | result}}</td>
-              <td v-if="!isMobile" class="text-xs-right">
+              <td class="text-xs-right hidden-xs-only">
                 <div class="text-truncate" v-html="computeWinnerPhrase(props.item.battle)" />
               </td>
             </template>
@@ -93,7 +93,7 @@
           value: 'battlefield',
           sortable: false,
           align: 'right',
-          class: 'title'
+          class: 'title hidden-xs-only'
         },
       ],
       paginationHistory: {
@@ -102,13 +102,16 @@
         rowsPerPage: 10
       },
       searchHistory: '',
-      history: [],
       limit: 30,
+      history: [],
       loaded: false
     }),
     firebase: function () {
+      // db.ref('public/history').orderByChild('turn').limitToLast(this.limit).once('value', snap =>{
+      //   console.log("ALALALALALALAL DONNENENENEN")
+      // })
       return {
-        history: db.ref('public/history').orderByChild('turn').limitToLast(this.limit),
+        history: db.ref('public/history').orderByChild('turn').limitToLast(this.limit)
       }
     },
     methods: {
