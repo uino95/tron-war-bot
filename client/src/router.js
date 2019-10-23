@@ -1,6 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Stats from './components/StatsTab.vue'
+import History from './components/HistoryTab.vue'
+import Cohesion from './components/CohesionTab.vue'
+import BetFinal from './components/BetFinalTab.vue'
+import BetBattle from './components/BetBattle.vue'
+import BetNext from './components/BetNextTab.vue'
 
 Vue.use(Router)
 
@@ -14,7 +19,7 @@ export default new Router({
     {
       path: '/betfinal',
       name: 'betfinal',
-      component: () => import('./components/BetFinalTab.vue')
+      component: BetFinal
     },
     {
       path: '/stats',
@@ -22,19 +27,24 @@ export default new Router({
       component: Stats
     },
     {
+      path: '/history',
+      name: 'history',
+      component: History
+    },
+    {
       path: '/betnext',
       name: 'betnext',
-      component: () => import('./components/BetNextTab.vue')
+      component: BetNext
     },
     {
       path: '/betbattle',
       name: 'betbattle',
-      component: () => import('./components/BetBattle.vue')
+      component: BetBattle
     },
     {
       path: '/cohesion',
       name: 'cohesion',
-      component: () => import('./components/Cohesion.vue')
+      component: Cohesion
     },
   ]
 })

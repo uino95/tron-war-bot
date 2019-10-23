@@ -1,75 +1,106 @@
 <template>
-<v-card flat>
-  <v-toolbar color="secondary" dark flat>
-    <v-spacer></v-spacer>
-    <v-tabs
-      dark
-      color="secondary"
-      show-arrows
-      fixed-tabs
-      slider-color="primary"
-    >
-      <v-tab flat replace to="/betfinal">
-        <v-icon color="primary_final_tab">public</v-icon> Bet Final
-      </v-tab> 
-      <v-tab flat replace to="/stats">
-        <v-icon color="primary_stats_tab">poll</v-icon> Stats
-      </v-tab>
+  <v-card flat>
+    <v-toolbar color="secondary" dark flat >
+      <v-tabs dark color="secondary" show-arrows fixed-tabs slider-color="primary" v-model="activeMainTab">
+        <v-tab v-for="tab of tabs" :key="tab.name" flat replace :to="tab.path">
+          <v-icon :color="tab.color">{{tab.symbol}}</v-icon> {{tab.name}}
+        </v-tab>
+      </v-tabs>
+    </v-toolbar>
+
+    <v-tabs v-if="activeMainTab == 'stats' " dark color="secondary" show-arrows fixed-tabs hide-slider>
       <v-tab flat replace to="/cohesion">
-        <v-icon color="primary_next_tab">public</v-icon> Cohesion
+        <v-icon color="primary_cohesion_tab">control_point</v-icon> Cohesion
+      </v-tab>
+      <v-tab flat replace to="/stats">
+        <v-icon color="primary_stats_tab">poll</v-icon> Standings
+      </v-tab>
+      <v-tab flat replace to="/history">
+        <v-icon color="primary_history_tab">history</v-icon> History
+      </v-tab>
+    </v-tabs>
+
+    <v-tabs v-else dark color="secondary" show-arrows fixed-tabs hide-slider>
+      <v-tab flat replace to="/betfinal">
+        <v-icon color="primary_final_tab">public</v-icon> Final
+      </v-tab>
+      <v-tab flat replace to="/betbattle">
+        <v-icon color="primary_battle_tab">games</v-icon> Battle
       </v-tab>
       <v-tab flat replace to="/betnext">
-        <v-icon color="primary_next_tab">attach_money</v-icon> Bet Next
-      </v-tab> 
-      <v-tab flat replace to="/betbattle">
-        <v-icon color="primary_next_tab">attach_money</v-icon> Bet Battle
-      </v-tab> 
+        <v-icon color="primary_next_tab">attach_money</v-icon> Next
+      </v-tab>
     </v-tabs>
-    <v-spacer></v-spacer>
-  </v-toolbar>
-  <v-card style="background-color:rgb(158, 158, 158);">
-    <core-info-new-turn></core-info-new-turn>
-    <transition name="fade" mode="out-in">
-      <router-view></router-view>
-    </transition>
+
+    <v-card style="background-color:rgb(158, 158, 158);">
+      <core-info-new-turn></core-info-new-turn>
+      <transition name="fade" mode="out-in">
+        <router-view></router-view>
+      </transition>
+    </v-card>
   </v-card>
-</v-card>
 </template>
 
 <script>
-export default {
-  components: {}
-}
+  export default {
+    data: () => ({
+      tabs:[
+        {
+          name: 'Stats',
+          path: 'stats',
+          color: 'primary_stats_tab',
+          symbol: 'poll'
+        },
+        {
+          name: 'Bets',
+          path: 'betBattle',
+          color: 'primary_battle_tab',
+          symbol: 'attach_money'
+        }
+      ]
+    }),
+    computed:{
+      activeMainTab:{
+        get(){
+          if (this.$route.name == 'stats' || this.$route.name == 'cohesion' || this.$route.name == 'history') return this.tabs[0].path
+          return this.tabs[1].path
+        },
+        set(value){
+          // console.log(value)
+        }
+      }
+    }
+  }
 </script>
 
 <style>
-.outerTabContainer {
-  max-width: 1200px;
-}
+  .outerTabContainer {
+    max-width: 1200px;
+  }
 
-.gameTab {
-  padding: 0px;
-}
+  .gameTab {
+    padding: 0px;
+  }
 
-.gameTabHeader {
-  padding: 16px 16px 0 16px;
-}
+  .gameTabHeader {
+    padding: 16px 16px 0 16px;
+  }
 
-.gameTabDivider {
-  margin: 0px 16px 0px 16px;
-}
+  .gameTabDivider {
+    margin: 0px 16px 0px 16px;
+  }
 
-.gameTabContent {
-  max-height: 600px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
+  .gameTabContent {
+    max-height: 600px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 
-.greenText {
-  color: #558b2f;
-}
+  .greenText {
+    color: #558b2f;
+  }
 
-.redText {
-  color: #b71c1c;
-}
+  .redText {
+    color: #b71c1c;
+  }
 </style>

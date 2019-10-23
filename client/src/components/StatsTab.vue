@@ -1,7 +1,5 @@
 <template>
   <v-container grid-list-md text-xs-center class="outerTabContainer">
-    <v-layout row wrap>
-
       <!-- Countries -->
       <v-flex sm12 md12 lg12 shrink>
         <v-card>
@@ -50,7 +48,7 @@
                       :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
                   </v-avatar>
                 </td>
-                <td class="text-xs-right && font-weight-bold">{{props.item.idx}}</td>
+                <td class="text-xs-right && font-weight-bold text-truncate">{{props.item.idx}}</td>
                 <td class="text-xs-right">{{ props.item.territories }}</td>
                 <td class="text-xs-right">{{ (props.item.cohesion * 100).toFixed(2) + ' %'}}</td>
                 <td class="text-xs-right ">
@@ -68,10 +66,10 @@
                 <td class="text-xs-right ">
                   <v-btn color="facebook" class="white--text"
                     v-on:click="openModal(universalMap(props.item.idx, 'numberId'))">
-                    Support
-                    <v-icon class="ml-2" small color="white">
+                    <v-icon class="mr-2" small color="white">
                       fab fa-facebook-square
                     </v-icon>
+                    Support
                   </v-btn>
                 </td>
               </template>
@@ -84,62 +82,6 @@
           </v-container>
         </v-card>
       </v-flex>
-
-      <!-- History -->
-      <v-flex sm12 md12 lg12 shrink>
-        <v-card>
-          <v-toolbar color="primary_stats_tab" dark>
-            <v-toolbar-title>Recent History</v-toolbar-title>
-            <v-spacer />
-            <v-text-field class="pa-2" v-model="searchHistory" append-icon="search" label="Search" single-line
-              hide-details></v-text-field>
-          </v-toolbar>
-          <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
-            <v-data-table :search="searchHistory" :headers="headersHistory" :items="history" :item-key="'turn'"
-              class="elevation-1" :pagination.sync="paginationHistory">
-              <template v-slot:items="props">
-                <td class="text-xs-center">{{ props.item.turn }}</td>
-                <td class="text-xs-center">
-                  <div v-if="props.item.battle.civilWar">
-                    <b>{{universalMap(props.item.battle.o)}}</b> has insurrected
-                  </div>
-                  <div v-else>
-                    <v-container>
-                      <v-layout align-center justify-space-around row fill-height>
-                        <v-tooltip open-delay="600" top>
-                          <template v-slot:activator="{ on }">
-                            <v-flex xs5 class="greenText text-truncate" v-on="on"> {{universalMap(props.item.battle.o)}} {{props.item.battle.cohesion.o | cohesion}} </v-flex> 
-                          </template>
-                          <span>
-                            {{universalMap(props.item.battle.o)}} {{props.item.battle.cohesion.o | cohesion}} 
-                          </span>
-                        </v-tooltip>
-                        <v-flex xs2><b> VS </b></v-flex>
-                        <v-tooltip open-delay="600" top>
-                          <template v-slot:activator="{ on }">
-                            <v-flex xs5 class="redText text-truncate" v-on="on">{{universalMap(props.item.battle.d)}} {{props.item.battle.cohesion.d | cohesion}}</v-flex> 
-                          </template>
-                          <span>
-                            {{universalMap(props.item.battle.d)}} {{props.item.battle.cohesion.d | cohesion}} 
-                          </span>
-                        </v-tooltip>
-                      </v-layout>
-                    </v-container>
-                  </div>
-                </td>
-                <td class="text-xs-center">{{ props.item.battle.result | result}}</td>
-                <td v-if="!isMobile" class="text-xs-right">
-                  <div v-html="computeWinnerPhrase(props.item.battle)"/>
-                </td>
-              </template>
-              <template v-if="!loaded" v-slot:actions-append > 
-               <v-btn round flat dark color="primary_stats_tab" v-on:click="loadAll"> Load all data </v-btn>
-              </template>  
-            </v-data-table>
-          </v-container>
-        </v-card>
-      </v-flex>
-    </v-layout>
     <v-layout row justify-center>
       <v-dialog max-width="800" v-model="isVisible">
         <v-card>
@@ -265,35 +207,6 @@
         'I think nothing is stronger than <placeholder> with all of its wonderful yet explosive nuclear bombs!!!',
         'I am in love with <placeholder>\'s army and all the strong and charming soldiers'
       ],
-      headersHistory: [{
-          text: 'Turn',
-          value: 'turn',
-          sortable: true,
-          align: 'center',
-          class: 'title'
-        },
-        {
-          text: 'Battle',
-          value: 'battle',
-          sortable: false,
-          align: 'center',
-          class: 'title'
-        },
-        {
-          text: 'Result',
-          value: 'result',
-          sortable: true,
-          align: 'center',
-          class: 'title'
-        },
-        {
-          text: '',
-          value: 'battlefield',
-          sortable: false,
-          align: 'right',
-          class: 'title'
-        },
-      ],
       headersStats: [{
           text: '',
           value: 'no-value',
@@ -345,27 +258,17 @@
         sortBy: 'territories',
         descending: true,
       },
-      paginationHistory: {
-        sortBy: 'turn',
-        descending: true,
-        rowsPerPage: 10
-      },
       isVisible: false,
       searchStats: '',
-      searchHistory: '',
       placeholderFlag: "/img/flags/placeholder.svg",
       snackbar: false,
       snackbarText: "",
       snackbarColor: "",
       snackbarTimeout: 6000,
-      history: [],
       mapStatus: [],
-      limit: 30,
-      loaded: false
     }),
     firebase: function () {
       return {
-        history: db.ref('public/history').orderByChild('turn').limitToLast(this.limit),
         mapStatus: db.ref('public/countriesMap').orderByChild('territories')
       }
     },
@@ -396,15 +299,6 @@
         this.copied = document.execCommand('copy');
         this.snackbar = true
       },
-      // loadMore() {
-      //   this.limit = this.limit + 10
-      //   this.$rtdbBind('history', db.ref('public/history').orderByChild('turn').limitToLast(this.limit))
-      //   this.paginationHistory.page = this.paginationHistory.page + 1
-      // },
-      loadAll(){
-        this.loaded = true
-        this.$rtdbBind('history', db.ref('public/history').orderByChild('turn'))
-      },
       shareOnFb: async function () {
         // FB.logout(function (response) {
         //   // Person is now logged out
@@ -431,20 +325,6 @@
           display: 'touch',
           to: '423138885180430'
         }, function (response) {});
-      },
-      computeWinnerPhrase(item) {
-        //TODO understand in case of civilWar what is the correct battlefield but also the correct outcome in general also for cohesionTab
-        if (item.civilWar) {
-          return this.universalMap(item.o) + ' has rebelled against ' + this.universalMap(item.d)
-        }
-        switch (item.result) {
-          case 0:
-            return 'The battle has been solved peacefully without a winner';
-          case 1:
-            return '<span class="greenText">' + this.universalMap(item.o) + '</span>' + ' has conquered ' + '<span class="redText">' +  this.universalMap(item.dt) + '</span>';
-          case 2:
-            return '<span class="redText">' + this.universalMap(item.d) + '</span>' + ' has conquered ' + '<span class="greenText">' +  this.universalMap(item.ot) + '</span>';
-        }
       }
     },
     computed: {
@@ -458,20 +338,6 @@
         let random = Math.floor(Math.random() * this.phrases.length);
         return this.phrases[random].replace("<placeholder>", this.universalMap(this.$store.state.selectedCountry));
       },
-      text: function () {
-        return "<b> " + this.universalMap(this.$store.state.selectedCountry) + "</b>"
-      },
-      isMobile: function(){
-        return this.$store.state.isMobile
-      }
-    },
-    filters: {
-      result(battle) {
-        return battle != 0 ? battle : 'X'
-      },
-      cohesion(c){
-        return ' (' + (c * 100).toFixed(1) + ' %)'
-      }
     }
   }
 </script>

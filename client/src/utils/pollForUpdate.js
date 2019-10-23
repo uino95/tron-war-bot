@@ -63,7 +63,6 @@ function pollBalance(interval){
       store.commit('setAccountBalance', {
         accountBalance: -1
       })
-
     }
   }, interval)
 }

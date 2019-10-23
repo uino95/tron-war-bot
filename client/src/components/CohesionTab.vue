@@ -1,15 +1,13 @@
 <template>
   <v-container grid-list-md text-xs-center class="outerTabContainer">
-    <v-layout row wrap>
-
       <!-- Data Table -->
       <v-flex sm12 md12 lg12 shrink>
         <v-card>
-          <v-toolbar color="primary_stats_tab" dark>
+          <v-toolbar color="primary_cohesion_tab" dark>
             <v-toolbar-title>Current Run Cohesion Status</v-toolbar-title>
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
-                <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
+                <v-icon color="secondary-cohesion-tab" dark v-on="on">info</v-icon>
               </template>
               <span> todo:
                 Here you can see how the cohesion have been modified during the current run. It can be modified by your
@@ -17,12 +15,12 @@
               </span>
             </v-tooltip>
             <v-spacer />
-            <v-text-field class="pa-2" v-model="searchCohesion" append-icon="search" label="Search" single-line
+            <v-text-field class="pa-2" v-model="searchCohesion" append-icon="search" label="Search for a turn" single-line
               hide-details></v-text-field>
           </v-toolbar>
 
           <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
-            <v-data-table :search="searchCohesion" :headers="headers" :items="cohesionHistory" :item-key="'date'"
+            <v-data-table :search="searchCohesion" :headers="headers" :items="cohesionHistory" :item-key="'turn'"
               :custom-sort="customSort" class="elevation-1" :pagination.sync="pagination"
               :rows-per-page-items="[10,20,50]">
               <template v-slot:items="props">
@@ -34,17 +32,14 @@
                 </td>
                 <!-- Content -->
                 <td class="text-xs-left">
-                  <div v-if="props.item.update_type == 'BATTLE'">
-                    {{universalMap(props.item.battle.o)}}
-                    <b> VS </b>
-                    {{universalMap(props.item.battle.d)}}
+                  <div v-if="props.item.update_type == 'BATTLE'" v-html="computePhrase(props.item.battle)">
                   </div>
                   <div v-else>
-                    <v-tooltip bottom>
+                    <v-tooltip open-delay="600" bottom>
                       <template v-slot:activator="{ on }">
                         <a :href="props.item.link" target="blank" v-on="on"> {{props.item.text | truncate}}</a>
                       </template>
-                      <span> {{props.item.text }}
+                      <span> {{props.item.text}}
                       </span>
                     </v-tooltip>
                   </div>
@@ -81,12 +76,13 @@
                   Your search for "{{ searchCohesion }}" found no results.
                 </v-alert>
               </template>
+              <template v-if="!loaded" v-slot:actions-append > 
+               <v-btn round flat dark color="primary_cohesion_tab" v-on:click="loadAll"> Load all data </v-btn>
+              </template>  
             </v-data-table>
-
           </v-container>
         </v-card>
       </v-flex>
-    </v-layout>
   </v-container>
 </template>
 
@@ -152,12 +148,29 @@
       },
       searchCohesion: '',
       placeholderFlag: "/img/flags/placeholder.svg",
-      cohesionHistory: []
+      cohesionHistory: [],
+      loaded: false
     }),
     firebase: {
-      cohesionHistory: db.ref('public/cohesion').orderByChild('date'),
+      cohesionHistory: db.ref('public/cohesion').orderByChild('turn').limitToLast(30),
     },
     methods: {
+      computePhrase(battle){
+        if(battle.civilWar){
+          if(battle.result == 1){
+            return '<span> <b>' + this.universalMap(battle.o) + '</b> insurrected against <b>' + this.universalMap(battle.d) + '</b> </span>' 
+          } 
+          return '<span> <b>' + this.universalMap(battle.d) + '</b> stop the insurrection of <b>' + this.universalMap(battle.o) + '</b> </span>'
+        } else {
+          if(battle.result == 1){
+            return '<span> <b>' + this.universalMap(battle.o) + '</b> won against <b>' + this.universalMap(battle.d) + '</b> </span>'
+          }
+          if(battle.result == 0){
+            return '<span> <b>' + this.universalMap(battle.o) + '</b> and <b>' + this.universalMap(battle.d) + '</b> has solved peacefully the conflict </span>'
+          }
+          return '<span> <b>' + this.universalMap(battle.d) + '</b> defended against <b>' + this.universalMap(battle.o) + '</b> </span>'
+        }
+      },
       getFlagString(str) {
         return "/img/flags/" + str.toLowerCase()
           .replaceAll(" ", "-")
@@ -200,7 +213,11 @@
           }
         });
         return items;
-      }
+      },
+      loadAll(){
+        this.loaded = true
+        this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn'))
+      },
     },
     filters: {
       cohesionSign(delta) {
