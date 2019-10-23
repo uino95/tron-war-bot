@@ -19,13 +19,17 @@ const social = require('./social');
 app.use(cors());
 app.use(xhub({ algorithm: 'sha1', secret: config.facebook.appSecret }));
 app.use(bodyParser.json());
-
+app.use(function (err, req, res, next) {
+  console.error(err)
+  return res.status(err.status || 500).json({error:err})
+})
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// Endpoints //////////////////////////////////////
 
 
 // Post for the referral
 app.post('/referral', referral.registerReferral);
+app.post('/ambassador', social.ambassador.register);
 app.get('/webhooks', facebook.webhooksVerification);
 app.post('/webhooks', facebook.webhooks);
 

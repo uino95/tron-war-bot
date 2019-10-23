@@ -58,7 +58,6 @@ const compressedState = async ()=>{
   return Buffer.from(JSON.stringify(o), "ascii").toString("base64");
 }
 
-
 const init = async (restart) => {
   if(restart) console.warn("[WWB]: Restarting game...")
   turn = 1;
@@ -94,6 +93,22 @@ const saveCurrentState = async () => {
 
 const printStatus = ()=>{
   countriesMap.forEach((c,idx)=>console.log(idx + " => " + c.occupiedBy + "  cohesion:" + c.cohesion.toFixed(4)));
+}
+
+const isValidAmbassador = (u) => {
+  return !countriesMap
+    .filter(e=>e.ambassador && (e.ambassador.id==u.id || e.ambassador.address==u.address))
+    .length
+}
+
+const addAmbassador = (u)=>{
+  if (!countriesMap || !countriesMap[u.country] || !!countriesMap[u.country].ambassador)
+    return false;
+  if (!u.link) delete u.link;
+  countriesMap[u.country].ambassador = u;
+  firebase.countriesMap.set(countriesMap);
+  console.log("[WWB]: Added new Ambassador " + u.name + " for " + utils.universalMap(u.country));
+  return true;
 }
 
 const leaderboard = ()=>{
@@ -309,6 +324,8 @@ module.exports = {
   currentTurn,
   currentTurnData,
   mapState,
+  isValidAmbassador,
+  addAmbassador,
   leaderboard,
   preTurn,
   onTurn,

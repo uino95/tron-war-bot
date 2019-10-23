@@ -1,4 +1,5 @@
 const russianRoulette = require('../social/russianRoulette')
+const ambassador = require('../social/ambassador')
 const config = require('../config')
 
 const reject = (ctx, e='Unknown operation') => {
@@ -12,7 +13,7 @@ module.exports.handleCbQuery = (ctx,next) => {
     case 'RR_VOTE':
       return russianRoulette.onUpdate(ctx,next);
     case 'ADD_AMBASSADOR':
-      return console.log("Adding ambassador...")
+      return ambassador.approve(ctx,next);
     default:
       return reject(ctx);
   }

@@ -23,9 +23,13 @@ module.exports.getCbQueryAction = (ctx, next)=>{
 }
 
 module.exports.checkCbQueryPermissions = (ctx, next)=>{
+  if (config.test) return next(ctx)
   switch(ctx.body.action) {
     case 'RR_VOTE':
       if (ctx.mode != "GROUP") return reject(ctx);
+      return next(ctx)
+    case 'ADD_AMBASSADOR':
+      if (ctx.mode != "ADMIN_GROUP") return reject(ctx);
       return next(ctx)
     default:
       return reject(ctx, 'Unknown operation');
@@ -33,6 +37,6 @@ module.exports.checkCbQueryPermissions = (ctx, next)=>{
 }
 
 module.exports.checkStartPermissions = (ctx, next)=>{
-  // if (ctx.mode != 'PRIVATE') return reject(ctx)
+  if (ctx.mode != 'PRIVATE') return reject(ctx)
   return next(ctx);
 }

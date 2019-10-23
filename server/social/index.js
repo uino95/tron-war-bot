@@ -1,8 +1,9 @@
-const Telegraf = require('telegraf')
+
 const config = require('../config')
 const updates = require('./updates')
 const russianRoulette = require('./russianRoulette')
 const shares = require('./shares')
+const ambassador = require('./ambassador')
 const telegram = require('../utils/telegram')
 
 module.exports.runUpdate = async (cmap, td) => {
@@ -28,3 +29,4 @@ module.exports.init = async () =>{
 }
 
 module.exports.shares = shares;
+module.exports.ambassador = ambassador;
