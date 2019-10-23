@@ -20,7 +20,7 @@ export default new Vuex.Store({
       TronWarBotInstance: null
     },
     currentAddressWarBalance: 0,
-    availableDividends: 0,
+    //availableDividends: 0,
     totalWARSupply: 0,
     tronWeb: null,
     gameParams:{
@@ -50,9 +50,9 @@ export default new Vuex.Store({
       state.contracts.TronWarBotInstance = payload.tronWarBot
       state.contracts.WarCoinInstance = payload.warCoin
     },
-    setAvailableDividends(state, payload) {
-      state.availableDividends = payload.availableDividends
-    },
+    // setAvailableDividends(state, payload) {
+    //   state.availableDividends = payload.availableDividends
+    // },
     setCurrentAddressWarBalance(state, payload) {
       state.currentAddressWarBalance = payload.currentAddressWarBalance
     },

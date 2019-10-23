@@ -5,11 +5,11 @@
       <v-flex>
         <v-card>
 
-          <v-toolbar color="primary_next_tab" dark>
+          <v-toolbar color="primary_battle_tab" dark>
             <v-toolbar-title>Bet on the outcome of the current battle
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                  <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
+                  <v-icon color="secondary-battle-tab" dark v-on="on">info</v-icon>
                 </template>
                 <span>Here you can see who is fighting right now. If you feel that you can predict the outcome of this
                   epic battle just choose your part and bet on it. 1 stand for the offender the one the left, 2 stands
@@ -24,11 +24,11 @@
             <v-flex md10>
 
               <v-card class="mb-4">
-                <v-img class="white--text" :position="history[0].next.civilWar == 1 ? 'bottom 75% center' : 'center'" :aspect-ratio="this.windowSize.x/50" :src=" history[0].next.civilWar == 1 ? 'img/civilWar9.png' : 'img/vs-battle.jpg'">
+                <v-img class="white--text" :position="history[0].next.civilWar == 1 ? 'bottom 75% center' : 'center'" :aspect-ratio="this.windowSize.x/150" :src=" history[0].next.civilWar == 1 ? 'img/civilWar9.png' : 'img/vs-battle.jpg'">
                   <v-layout class="mt-4" row wrap align-center justify-space-between>
                     <v-flex ml-1 xs4>
                       <v-layout column align-center>
-                        <v-tooltip bottom>
+                        <v-tooltip open-delay="600" bottom>
                           <template v-slot:activator="{ on }">
                             <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
                           class="title pb-2 truncate">{{universalMap(history[0].next.o)}} </div>
@@ -40,7 +40,7 @@
                             <v-btn large icon dark v-if="hover" v-on:click="toggle_country(history[0].next.o,1)">
                               <div class="title"> 1 </div>
                             </v-btn>
-                            <v-btn large icon dark color="primary_next_tab" v-else-if="currentChoice==1"
+                            <v-btn large icon dark color="primary_battle_tab" v-else-if="currentChoice==1"
                               v-on:click="toggle_country(history[0].next.o,1)">
                               <div class="title"> 1 </div>
                             </v-btn>
@@ -50,7 +50,7 @@
                           </v-avatar>
                         </v-hover>
                         <v-avatar v-else>
-                            <v-btn large icon dark color="primary_next_tab" v-if="currentChoice==1"
+                            <v-btn large icon dark color="primary_battle_tab" v-if="currentChoice==1"
                               v-on:click="toggle_country(history[0].next.o,1)">
                               <div class="title"> 1 </div>
                             </v-btn>
@@ -65,7 +65,7 @@
                     <v-flex xs2>
                       <v-hover v-if="history[0].next.civilWar != 1" >
                         <v-avatar  class="mt-2" slot-scope="{ hover }">
-                          <v-btn fab dark color="primary_next_tab" v-if="hover || currentChoice == 0" v-on:click="toggle_country(241,0)">
+                          <v-btn fab dark color="primary_battle_tab" v-if="hover || currentChoice == 0" v-on:click="toggle_country(241,0)">
                             <div class="title"> X </div>
                           </v-btn>
                         </v-avatar>
@@ -75,7 +75,7 @@
 
                     <v-flex v-if="history[0].next.civilWar == 1" mr-1 xs4>
                       <v-layout column align-center>
-                        <v-tooltip bottom>
+                        <v-tooltip open-delay="600" bottom>
                           <template v-slot:activator="{ on }">
                             <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
                           class="title pb-2 truncate">{{universalMap(history[0].next.d)}} </div>
@@ -87,7 +87,7 @@
                             <v-btn large icon dark v-on:click="toggle_country(241, 0)" v-if="hover">
                               <div class="title"> X </div>
                             </v-btn>
-                            <v-btn large icon dark color="primary_next_tab" v-else-if="currentChoice==0"
+                            <v-btn large icon dark color="primary_battle_tab" v-else-if="currentChoice==0"
                               v-on:click="toggle_country(241,0)">
                               <div class="title"> X </div>
                             </v-btn>
@@ -97,7 +97,7 @@
                           </v-avatar>
                         </v-hover>
                         <v-avatar v-else>
-                            <v-btn large icon dark color="primary_next_tab" v-if="currentChoice==0"
+                            <v-btn large icon dark color="primary_battle_tab" v-if="currentChoice==0"
                               v-on:click="toggle_country(241,0)">
                               <div class="title"> X </div>
                             </v-btn>
@@ -111,7 +111,7 @@
 
                     <v-flex v-else mr-1 xs4>
                       <v-layout column align-center>
-                        <v-tooltip bottom>
+                        <v-tooltip open-delay="600" bottom>
                           <template v-slot:activator="{ on }">
                             <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
                           class="title pb-2 truncate">{{universalMap(history[0].next.d)}} </div>
@@ -123,7 +123,7 @@
                             <v-btn large icon dark v-on:click="toggle_country(history[0].next.d, 2)" v-if="hover">
                               <div class="title"> 2 </div>
                             </v-btn>
-                            <v-btn large icon dark color="primary_next_tab" v-else-if="currentChoice==2"
+                            <v-btn large icon dark color="primary_battle_tab" v-else-if="currentChoice==2"
                               v-on:click="toggle_country(history[0].next.d,2)">
                               <div class="title"> 2 </div>
                             </v-btn>
@@ -133,7 +133,7 @@
                           </v-avatar>
                         </v-hover>
                         <v-avatar v-else>
-                            <v-btn large icon dark color="primary_next_tab" v-if="currentChoice==2"
+                            <v-btn large icon dark color="primary_battle_tab" v-if="currentChoice==2"
                               v-on:click="toggle_country(history[0].next.d,2)">
                               <div class="title"> 2 </div>
                             </v-btn>
@@ -178,28 +178,28 @@
                 <v-flex xs12 class="text-xs-center pa-2">
                   <div class="title pb-2"> Choose your guess </div>
                   <v-hover>
-                    <v-btn fab dark color="primary_next_tab" v-on:click="toggle_country(history[0].next.o,1)">
+                    <v-btn fab dark color="primary_battle_tab" v-on:click="toggle_country(history[0].next.o,1)">
                       <div class="title white--text"> 1 </div>
                     </v-btn>
                   </v-hover>
-                  <v-btn fab dark color="primary_next_tab" v-on:click="toggle_country(241,0)">
+                  <v-btn fab dark color="primary_battle_tab" v-on:click="toggle_country(241,0)">
                     <div class="title white--text"> x </div>
                   </v-btn>
                   <v-hover>
-                    <v-btn v-if="history[0].next.civilWar != 1" fab dark color="primary_next_tab" v-on:click="toggle_country(history[0].next.d,2)">
+                    <v-btn v-if="history[0].next.civilWar != 1" fab dark color="primary_battle_tab" v-on:click="toggle_country(history[0].next.d,2)">
                       <div class="title white--text"> 2 </div>
                     </v-btn>
                   </v-hover>
                 </v-flex>
-                <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark
+                <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_battle_tab" dark
                   @click="placeBet">
                   <div v-bind:style="{'max-width': windowSize.x * 0.6 + 'px'}" class="truncate">
                     Bet {{betAmount}} TRX {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}
                   </div>
                 </v-btn>
-                <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">
+                <v-btn v-else-if="info.serverStatus == 300" dark color="primary_battle_tab" @click="battleInProgress">
                   Battle in progress...</v-btn>
-                <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">
+                <v-btn v-else-if="info.serverStatus == 400" dark color="primary_battle_tab" @click="payoutInProgress">
                   Payout in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over
                 </v-btn>
@@ -223,7 +223,7 @@
       <!-- My latest bets -->
       <v-flex xs12 md6>
         <v-card>
-          <v-toolbar color="primary_next_tab" dark>
+          <v-toolbar color="primary_battle_tab" dark>
             <v-toolbar-title>My Latest Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
@@ -281,7 +281,7 @@
 
                 <v-container v-if="myBets.length > 10">
                   <v-pagination v-model="currentMyBetPagination" :length="Math.ceil(myBets.length/10)"
-                    color="primary_next_tab"></v-pagination>
+                    color="primary_battle_tab"></v-pagination>
                 </v-container>
               </v-container>
 
@@ -294,7 +294,7 @@
       <!-- Latest bets -->
       <v-flex xs12 md6>
         <v-card>
-          <v-toolbar color="primary_next_tab" dark>
+          <v-toolbar color="primary_battle_tab" dark>
             <v-toolbar-title>Latest Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
@@ -341,7 +341,7 @@
               </v-container>
               <v-container v-if="latestBets.length > 10">
                 <v-pagination v-model="currentLatestBetPagination" :length="Math.ceil(latestBets.length/10)"
-                  color="primary_next_tab">
+                  color="primary_battle_tab">
                 </v-pagination>
               </v-container>
             </v-layout>
@@ -411,7 +411,7 @@
 
               <v-container v-if="latestBets.length > 10">
                 <v-pagination v-model="currentLatestBetPagination" :length="Math.ceil(latestBets.length/10)"
-                  color="primary_next_tab"></v-pagination>
+                  color="primary_battle_tab"></v-pagination>
               </v-container>
 
             </v-layout>
@@ -593,7 +593,9 @@
         }, 500)
       },
       toggle_country: function (country, choice) {
-        this.currentCountry = country
+        if(country < 240){
+          this.currentCountry = country
+        }
         this.currentChoice = choice
       },
       compare: function(a,b){
@@ -636,22 +638,16 @@
         return this.bets.sort(this.compare)
       },
       winChance: function () {
-        let country = this.currentCountry
-        if (country == null) return 0;
-        let p = this.history[0].next.probabilities[this.currentChoice]
-        return p
+        if (this.currentChoice == null) return 0;
+        return this.history[0].next.probabilities[this.currentChoice]
       },
       multiplier: function () {
-        let country = this.currentCountry
-        if (country == null) return 0;
-        let m = this.history[0].next.quotes[this.currentChoice]
-        return m
+        if (this.currentChoice == null) return 0;
+        return this.history[0].next.quotes[this.currentChoice]
       },
       potentialWin: function () {
 
-        let multiplier = this.multiplier;
-        let win = (this.betAmount * multiplier).toFixed(3);
-
+        let win = (this.betAmount * this.multiplier).toFixed(3);
         if (win == Infinity) return 0 + " TRX";
         else return win + " TRX";
       },

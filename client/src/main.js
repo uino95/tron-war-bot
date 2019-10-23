@@ -5,12 +5,14 @@ import './plugins/firebase'
 import router from './router'
 import store from './store'
 import mapping from './assets/mapping.js'
+import '@fortawesome/fontawesome-free/css/all.css'
 
 import App from './App.vue'
-import '@fortawesome/fontawesome-free/css/all.css'
 import VueAnalytics from 'vue-analytics'
 
 Vue.config.productionTip = false;
+
+// Remember to comment or switch to false before running into production
 Vue.config.devtools = true;
 
 Vue.use(VueAnalytics, {

@@ -1,7 +1,6 @@
 <template>
     <v-app id="keep">
-        <loading :active.sync="
-        loading"
+        <loading :active.sync="loading"
                  color="#ffffff"
                  :opacity="1"
                  background-color="#001537"
@@ -94,7 +93,7 @@
             <v-container fluid fill-height fill-width class="grey pa-0 ma-0">
                 <v-layout justify-center align-center>
                     <v-flex>
-                        <div class="btn-mobile" v-if="this.$store.state.isMobile && noShowMap">
+                        <div class="btn-mobile" round v-if="this.$store.state.isMobile && noShowMap">
                             <v-btn v-on:click="showMobileMap()"> Load Map</v-btn>
                         </div>
                         <div v-else-if="!noShowMap">
@@ -121,14 +120,11 @@
         components: {Loading},
         data: () => ({
             loading: true,
-            loadingOverlay: false,
             noShowMap: true,
             toDisplay: 'none',
             drawer: null,
             isModalVisible: false,
             itemClicked: 4,
-            tronLinkStatus: null,
-            selected_country: null,
             menuItems: [
                 {
                     heading: 'My Info'
@@ -221,9 +217,6 @@
             closeModal() {
                 this.isModalVisible = false;
             },
-            selectedCountryChild(country) {
-                this.selected_country = country;
-            },
             openLink(link) {
                 window.open(link, "_blank")
             },
@@ -239,7 +232,7 @@
                 setTimeout(() => {
                     this.loading = false;
                     this.toDisplay = "flex"
-                }, this.$store.state.isMobile ? 8000 : 4000)
+                }, this.$store.state.isMobile ? 4000 : 4000)
             },
             isMobile() {
                 var check = false;
@@ -261,7 +254,9 @@
             if (!this.$store.state.isMobile) {
                 this.noShowMap = false
             }
-            //this.startLoading()
+            this.track()
+            // to be implemented for mobile
+            this.startLoading()
         }
     }
 </script>
