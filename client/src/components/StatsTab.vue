@@ -38,7 +38,7 @@
               hide-details></v-text-field>
           </v-toolbar>
 
-          <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
+
             <v-data-table :search="searchStats" :headers="headersStats" :items="countryStatus" :item-key="'idx'"
               class="elevation-1" :pagination.sync="paginationStats" :rows-per-page-items="[10,20,50]">
               <template v-slot:items="props">
@@ -50,7 +50,7 @@
                 </td>
                 <td class="text-xs-right && font-weight-bold text-truncate">{{props.item.idx}}</td>
                 <td class="text-xs-right">{{ props.item.territories }}</td>
-                <td class="text-xs-right">{{ (props.item.cohesion * 100).toFixed(2) + ' %'}}</td>
+                <td class="text-xs-right text-truncate">{{ (props.item.cohesion * 100).toFixed(1) + ' %'}}</td>
                 <td class="text-xs-right hidden-xs-only">
                   <v-btn class="white--text" color="primary_final_tab"
                     v-on:click="goToBet('betfinal',universalMap(props.item.idx, 'numberId'))">
@@ -79,7 +79,7 @@
                 </v-alert>
               </template>
             </v-data-table>
-          </v-container>
+
         </v-card>
       </v-flex>
     <v-layout row justify-center>
@@ -218,40 +218,40 @@
           value: 'idx',
           sortable: false,
           align: 'right',
-          class: 'title'
+          class: 'body-1'
         }, {
-          text: 'Territories',
+          text: 'Owned',
           value: 'territories',
           sortable: true,
           align: 'right',
-          class: 'title'
+          class: 'body-1'
         }, {
           text: 'Cohesion',
           value: 'cohesion',
           sortable: true,
           align: 'right',
-          class: 'title'
+          class: 'body-1'
         },
         {
           text: 'Final Conquer Quote',
           value: 'finalQuote',
           sortable: true,
           align: 'right',
-          class: 'title hidden-xs-only'
+          class: 'body-1 hidden-xs-only'
         },
         {
           text: 'Next Conquer %',
           value: 'probability',
           sortable: true,
           align: 'right',
-          class: 'title hidden-xs-only'
+          class: 'body-1 hidden-xs-only'
         },
         {
           text: '',
           value: 'no-value',
           sortable: false,
           align: 'left',
-          class: 'title'
+          class: 'body-1'
         }
       ],
       paginationStats: {

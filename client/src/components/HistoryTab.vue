@@ -1,7 +1,7 @@
 <template>
   <v-container grid-list-md text-xs-center class="outerTabContainer">
     <!-- History -->
-    <v-flex sm12 md12 lg12 shrink>
+    <v-flex sm12 md12 lg12 >
       <v-card>
         <v-toolbar color="primary_history_tab" dark>
           <v-toolbar-title>Recent History</v-toolbar-title>
@@ -9,15 +9,13 @@
           <v-text-field class="pa-2" v-model="searchHistory" append-icon="search" label="Search for a turn" single-line
             hide-details></v-text-field>
         </v-toolbar>
-        <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
+        
           <v-data-table :search="searchHistory" :headers="headersHistory" :items="history" :item-key="'turn'"
             class="elevation-1" :pagination.sync="paginationHistory">
             <template v-slot:items="props">
               <td class="text-xs-center">{{ props.item.turn }}</td>
               <td class="text-xs-center">
-
-                  <v-container>
-                    <v-layout align-center justify-space-around row fill-height>
+                    <v-layout align-center justify-space-around row >
                       <v-tooltip open-delay="600" top>
                         <template v-slot:activator="{ on }">
                           <v-flex xs5 class="greenText text-truncate" v-on="on"> {{universalMap(props.item.battle.o)}}
@@ -39,8 +37,6 @@
                         </span>
                       </v-tooltip>
                     </v-layout>
-                  </v-container>
-
               </td>
               <td class="text-xs-center">{{ props.item.battle.result | result}}</td>
               <td class="text-xs-right hidden-xs-only">
@@ -51,7 +47,7 @@
               <v-btn round flat dark color="primary_history_tab" v-on:click="loadAll"> Load all data </v-btn>
             </template>
           </v-data-table>
-        </v-container>
+
       </v-card>
     </v-flex>
 
@@ -89,7 +85,7 @@
           class: 'title'
         },
         {
-          text: '',
+          text: 'Description',
           value: 'battlefield',
           sortable: false,
           align: 'right',
