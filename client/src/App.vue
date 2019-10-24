@@ -133,8 +133,8 @@ export default {
       {
         icon: 'assignment',
         text: 'Whitepaper',
-        link: false,
-        body: 'WIP'
+        link: true,
+        body: '/files/WhitePaper.pdf'
       },
       {
         divider: true
