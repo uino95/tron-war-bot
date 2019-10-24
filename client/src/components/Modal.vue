@@ -324,14 +324,20 @@
                                         </v-layout>
                                     </v-container>
 
-                                    <v-card mt-3>
-                                        <v-card-text style="text-align:center;">
+                                    <v-card sm12>
+                                        <v-card-title text-xs-centered>
                                             If you want to check the correctness of the hash, we suggest to use the
                                             following sha256 online calculator, but you can whatever tool you prefer.
-                                        </v-card-text>
-                                        <v-chip label outline color="primary" style="margin-left:4.5em;">
-                                            <a href="https://emn178.github.io/online-tools/sha256.html" target="_blank">https://emn178.github.io/online-tools/sha256.html</a>
-                                        </v-chip>
+                                        </v-card-title>
+                                        <v-layout justify-center>
+                                            <v-card-actions>
+                                                <v-chip label outline color="primary">
+                                                    <a href="https://emn178.github.io/online-tools/sha256.html"
+                                                       target="_blank">SHA256 Online Tool</a>
+                                                </v-chip>
+                                            </v-card-actions>
+                                        </v-layout>
+
                                     </v-card>
                                 </v-card-text>
                             </v-card>
