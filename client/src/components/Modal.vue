@@ -89,7 +89,8 @@
                     We want to build this game together with our users, and that's why 100% of TronWarBot profits are
                     shared back
                     to token holders! (..but yes we detain around 50% of the current
-                    token supply). After every stage you will need 50 more TRX to mine one WAR. WAR will be used in the future runs.
+                    token supply). After every stage you will need 50 more TRX to mine one WAR. WAR will be used in the
+                    future runs.
                     <br/>
                     <v-divider mt-3/>
                     <br/>
@@ -215,7 +216,8 @@
                                     Bot will hash (sha256) the name of the winner + a random string (called seed or salt
                                     in cryptography). You can find that hash in the box under Next Turn.<br>
                                     Once the timer runs out, the battle takes place and the conqueror is revealed
-                                    alongside that seed used to compute the hash. You will then find the initial hash and
+                                    alongside that seed used to compute the hash. You will then find the initial hash
+                                    and
                                     the Conqueror and its seed under Previous Turn.
                                     <br/><br/>
                                     This way we prove the Bot truly picks the countries in a random manner and doesn't
@@ -227,34 +229,100 @@
                                     <br/>
                                     <span class="title">Previous Turn: {{data.turn - 1}} </span>
                                     <br/>
-
-                                    <v-flex>
-                                        <v-text-field ref='previousMagicHash' :append-icon="'content_copy'"
-                                                      @click:append="copyToClipBoard(fairness.previousMagicHash, 'previousMagicHash')"
-                                                      :value="fairness.previousMagicHash"
-                                                      :label="'Hash of WINNER + SEED '" outline readonly>
-                                        </v-text-field>
-                                    </v-flex>
-
-                                    <v-flex>
-                                        <v-text-field ref='magicHashRevealed' :append-icon="'content_copy'"
-                                                      @click:append="copyToClipBoard(fairness.magicHashRevealed, 'magicHashRevealed')"
-                                                      :value="fairness.magicHashRevealed"
-                                                      :label="'WINNER + SEED '" outline readonly>
-                                        </v-text-field>
-                                    </v-flex>
+                                    <v-container fluid grid-list-sm>
+                                        <v-flex sm 16>
+                                            <v-text-field ref='previousCountriesMap' append-icon="content_copy"
+                                                          @click:append="copyToClipBoard(fairness.previous.mapState, 'previousMapState')"
+                                                          :value="fairness.previous.mapState"
+                                                          label="Countries Map" outline readonly>
+                                            </v-text-field>
+                                        </v-flex>
+                                        <v-layout row wrap>
+                                            <v-flex sm6>
+                                                <v-text-field ref='previousMagicNumber' append-icon="content_copy"
+                                                              @click:append="copyToClipBoard(fairness.previous.magic, 'previousMagic')"
+                                                              :value="fairness.previous.magic"
+                                                              label="Magic Number" outline readonly>
+                                                </v-text-field>
+                                            </v-flex>
+                                            <v-flex sm6>
+                                                <v-text-field ref='previousMagicHash' append-icon="content_copy"
+                                                              @click:append="copyToClipBoard(fairness.previous.magicHash, 'previousMagicHash')"
+                                                              :value="fairness.previous.magicHash"
+                                                              label="Magic Hash" outline readonly>
+                                                </v-text-field>
+                                            </v-flex>
+                                        </v-layout>
+                                        <v-layout row wrap>
+                                            <v-flex sm6>
+                                                <v-text-field ref='previousBlockHash' append-icon="content_copy"
+                                                              @click:append="copyToClipBoard(fairness.previousBlockHash, 'previousBlockHash')"
+                                                              :value="fairness.previous.blockHash"
+                                                              label="Block Hash" outline readonly>
+                                                </v-text-field>
+                                            </v-flex>
+                                            <v-flex sm6>
+                                                <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
+                                                              @click:append="copyToClipBoard(fairness.previous.nextTurnBlock, 'nextTurnBlock')"
+                                                              :value="fairness.previous.nextTurnBlock"
+                                                              label="Block Number" outline readonly>
+                                                </v-text-field>
+                                            </v-flex>
+                                        </v-layout>
+                                    </v-container>
 
                                     <v-divider/>
                                     <br/>
                                     <span class="title">Next Turn: {{data.turn }} </span>
                                     <br/>
-                                    <v-flex>
-                                        <v-text-field ref='nextMagicHash' :append-icon="'content_copy'"
-                                                      @click:append="copyToClipBoard(fairness.nextMagicHash, 'nextMagicHash')"
-                                                      :value="fairness.nextMagicHash"
-                                                      :label="'Hash of WINNER + SEED '" outline readonly>
-                                        </v-text-field>
-                                    </v-flex>
+
+                                    <v-container fluid grid-list-sm>
+                                        <v-flex sm 16>
+                                            <v-text-field ref='nextCountriesMap' append-icon="content_copy"
+                                                          @click:append="copyToClipBoard(fairness.next.mapState, 'nextMapState')"
+                                                          :value="fairness.next.mapState"
+                                                          label="Countries Map" outline readonly>
+                                            </v-text-field>
+                                        </v-flex>
+                                        <v-layout row wrap>
+                                            <v-flex sm6>
+                                                <v-text-field ref='nextMagicNumber' value="*Hidden*"
+                                                              label="Magic Number" outline readonly>
+                                                    <v-tooltip slot="append" bottom>
+                                                        <v-icon slot="activator" color="primary" dark>info</v-icon>
+                                                        <span>This will be revealed when current turn is ended</span>
+                                                    </v-tooltip>
+
+                                                </v-text-field>
+                                            </v-flex>
+                                            <v-flex sm6>
+                                                <v-text-field ref='nextMagicHash' append-icon="content_copy"
+                                                              @click:append="copyToClipBoard(fairness.next.magicHash, 'nextMagicHash')"
+                                                              :value="fairness.next.magicHash"
+                                                              label="Magic Hash" outline readonly>
+                                                </v-text-field>
+                                            </v-flex>
+                                        </v-layout>
+                                        <v-layout row wrap>
+                                            <v-flex sm6>
+                                                <v-text-field ref='nextBlockHash' append-icon="info"
+                                                              value="*Hidden*"
+                                                              label="Block Hash" outline readonly>
+                                                    <v-tooltip slot="append" bottom>
+                                                        <v-icon slot="activator" color="primary" dark>info</v-icon>
+                                                        <span>This will be revealed when current turn is ended</span>
+                                                    </v-tooltip>
+                                                </v-text-field>
+                                            </v-flex>
+                                            <v-flex sm6>
+                                                <v-text-field ref='nextNextBlockNumber' append-icon="content_copy"
+                                                              @click:append="copyToClipBoard(fairness.next.nextTurnBlock, 'nextTurnBlock')"
+                                                              :value="fairness.next.nextTurnBlock"
+                                                              label="Block Number" outline readonly>
+                                                </v-text-field>
+                                            </v-flex>
+                                        </v-layout>
+                                    </v-container>
 
                                     <v-card mt-3>
                                         <v-card-text style="text-align:center;">
@@ -281,15 +349,16 @@
 
                 <v-card-text v-if="headerTile === 'Partners'">
                     <v-container fluid grid-list-xl>
-                        <v-layout row wrap>
-                            <v-flex v-for="partner in partners" :key="partner.name" xs6>
+                        <v-layout wrap>
+                            <v-flex v-for="partner in partners" :key="partner.name" sm6>
                                 <v-card>
                                     <v-img :src="'/img/partners/'+partner.img" class="image"
                                            :alt="partner.name" height="150px" contain>
                                     </v-img>
                                     <v-card-title primary-title>
                                         <div>
-                                            <a class="title text-truncate" :href="partner.link" target="_blank" style="text-decoration: none;">{{partner.name}}</a>
+                                            <a class="title text-truncate" :href="partner.link" target="_blank"
+                                               style="text-decoration: none;">{{partner.name}}</a>
                                         </div>
                                     </v-card-title>
                                 </v-card>
@@ -304,27 +373,28 @@
           </div>
         </v-card-text>-->
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on">Claim your Dividends
-              </v-btn>
-            </template>
-            <span>It will be available when the run is finished</span>
-          </v-tooltip>
-          <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
-        </v-card-actions>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on">Claim
+                                your Dividends
+                            </v-btn>
+                        </template>
+                        <span>It will be available when the run is finished</span>
+                    </v-tooltip>
+                    <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
+                </v-card-actions>
 
-      </v-card>
-    </v-dialog>
-    <v-snackbar v-model="snackbar" :color="'info'" :timeout="3000" vertical bottom>
-      <span class="title"> Copied to clipboard</span>
-      <v-btn dark flat @click="snackbar = false">
-        Close
-      </v-btn>
-    </v-snackbar>
-  </v-layout>
+            </v-card>
+        </v-dialog>
+        <v-snackbar v-model="snackbar" :color="'info'" :timeout="3000" vertical bottom>
+            <span class="title"> Copied to clipboard</span>
+            <v-btn dark flat @click="snackbar = false">
+                Close
+            </v-btn>
+        </v-snackbar>
+    </v-layout>
 </template>
 
 <script>
@@ -352,9 +422,9 @@
             }
         },
 
-        watch:{
-            isVisible: function(){
-                if(this.isVisible && this.headerTile == "WAR Supply"){
+        watch: {
+            isVisible: function () {
+                if (this.isVisible && this.headerTile == "WAR Supply") {
                     this.$store.commit("setPollWar", false)
                     pollMyWar(1000)
                 } else {
@@ -411,7 +481,7 @@
                 return this.$store.state.totalWARSupply;
             },
             dividendStage() {
-                return this.totalWARSupply != 0 ? parseInt(this.totalWARSupply.div("1000000000000000000").mod(1000000).div(100).toString()) : 0 
+                return this.totalWARSupply != 0 ? parseInt(this.totalWARSupply.div("1000000000000000000").mod(1000000).div(100).toString()) : 0
             }
         },
         firebase: {
