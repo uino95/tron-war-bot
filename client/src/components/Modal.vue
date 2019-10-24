@@ -447,7 +447,7 @@
         },
         {
           question: "Couldn't find your answer?",
-          answer: "Please reach us out on the telegram group (please find the link on the bottom side of the menu)! We would be very happy to answer your questions :)"
+          answer: "<a href=\"/files/WhitePaper.pdf\" target=\"_blank\">Click here to view the whitepaper<a/>"
         },
       ]
     })
