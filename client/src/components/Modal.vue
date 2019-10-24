@@ -202,6 +202,7 @@
 
                 <v-card-text v-if="headerTile === 'FAQ'">
                     <v-expansion-panel>
+                        <!--Fairness-->
                         <v-expansion-panel-content>
                             <template v-slot:header>
                                 <div>How are we PROVABLY FAIR?</div>
@@ -269,11 +270,27 @@
                                                 </v-text-field>
                                             </v-flex>
                                         </v-layout>
+                                        <v-layout row wrap>
+                                            <v-flex sm6>
+                                                <v-text-field ref='betNext' append-icon="content_copy"
+                                                              @click:append="copyToClipBoard('TODO', 'previousBlockHash')"
+                                                              :value="'TODO'"
+                                                              label="Bet Next" outline readonly>
+                                                </v-text-field>
+                                            </v-flex>
+                                            <v-flex sm6>
+                                                <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
+                                                              @click:append="copyToClipBoard('TODO', 'nextTurnBlock')"
+                                                              :value="'TODO'"
+                                                              label="Bet Battle" outline readonly>
+                                                </v-text-field>
+                                            </v-flex>
+                                        </v-layout>
                                     </v-container>
 
                                     <v-divider/>
                                     <br/>
-                                    <span class="title">Next Turn: {{data.turn }} </span>
+                                    <span class="title">Next Turn: {{data.turn}} </span>
                                     <br/>
 
                                     <v-container fluid grid-list-sm>
@@ -372,12 +389,6 @@
                         </v-layout>
                     </v-container>
                 </v-card-text>
-
-                <!--<v-card-text class="display-1" v-if="headerTile === 'Whitepaper'">
-          <div class="title">
-            We are updating it. It will be available in a few days
-          </div>
-        </v-card-text>-->
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -579,7 +590,7 @@
                 },
                 {
                     question: "Is there a whitepaper?",
-                    answer: "We're updating it. It'll became available soon."
+                    answer: "<a href=\"/files/WhitePaper.pdf\" target=\"_blank\">Click here to view the whitepaper<a/>"
                 }
             ],
             partners: [
