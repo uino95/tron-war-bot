@@ -172,3 +172,29 @@ module.exports.battleUpdate = async (cmap, td) => {
 
   await telegram.sendOrUpdate(n, s, {parse_mode: "HTML", disable_web_page_preview: true, disable_notification:true}).catch(console.error);
 }
+
+
+module.exports.endWar = async ()=>{
+  let winner = wwb.winner();
+  let t="🎉 <b>"+utils.universalMap(winner, "full")+" conquered the world!</b> 🎉\n\n<b>Years of dictatorship ahead!!!\n🍀 Good luck!</b>\n\n<i>The game is f***ing over...</i>";
+  let f="🎉 "+utils.universalMap(winner, "full").toUpperCase() +" CONQUERED THE WORLD! 🎉\n\nYears of dictatorship ahead!!!\n🍀 Good luck!\n\nThe game is f***ing over...";
+  await facebook.post(f).catch(console.error);
+  await telegram.sendMessage(t, {parse_mode: "HTML", disable_web_page_preview: true}).catch(console.error);
+  await utils.sleep(config.test ? 1000 : 60000);
+  t = "...or maybe...\n🤔🤔🤔"
+  f = "...or maybe...\n🤔🤔🤔"
+  await telegram.sendMessage(t, {parse_mode: "HTML", disable_web_page_preview: true}).catch(console.error);
+  await facebook.post(f).catch(console.error);
+  await utils.sleep(config.test ? 1000 : 60000);
+  // THANKS FOR WATCHING
+  t = '...the next <b>rebellion</b> might be just around the corner!\n\nAfter all...\n<a href="https://www.youtube.com/watch?v=NHWjlCaIrQo">...the only winning move is not to play!</a>'
+  f = "...the next rebellion might be just around the corner!\n\nAfter all...\n...the only winning move is not to play!\n\nhttps://www.youtube.com/watch?v=NHWjlCaIrQo"
+  await telegram.sendMessage(t, {parse_mode: "HTML", disable_web_page_preview: true}).catch(console.error);
+  await facebook.post(f).catch(console.error);
+  await utils.sleep(config.test ? 1000 : 60000);
+  t = '<b>🎉 Thanks for watching! 🎉</b>'
+  f = "🎉 Thanks for watching! 🎉\n⚔️Tron World War⚔️\n\nStay tuned!\n———————-\n\nhttps://tronwarbot.com\n\nTelegram: t.me/Tron_WarBot\nTwitter: twitter.com/TronWarBot_\nFacebook: facebook.com/TronWarBot/\nInstagram: instagram.com/tronwarbot/\n\n#tron #world #war #gaming #simulation #bot"
+  let m = { 'inline_keyboard': [[{'text': '🌎 Stay tuned', 'url': 'https://tronwarbot.com'}]]};
+  await telegram.sendMessage(t, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true}).catch(console.error);
+  await facebook.post(f).catch(console.error);
+}
