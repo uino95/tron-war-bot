@@ -19,7 +19,6 @@
               hide-details></v-text-field>
           </v-toolbar>
 
-          <v-container grid-list-md text-xs-center class="font-weight-regular gameTab">
             <v-data-table :search="searchCohesion" :headers="headers" :items="cohesionHistory" :item-key="'turn'"
               :custom-sort="customSort" class="elevation-1" :pagination.sync="pagination"
               :rows-per-page-items="[10,20,50]">
@@ -29,20 +28,6 @@
                   <v-avatar size="32">
                     <v-img :src="getInteractionImg(props.item.update_type)" />
                   </v-avatar>
-                </td>
-                <!-- Content -->
-                <td class="text-xs-left text-truncate">
-                  <div v-if="props.item.update_type == 'BATTLE'" v-html="computePhrase(props.item.battle)">
-                  </div>
-                  <div v-else>
-                    <v-tooltip open-delay="600" bottom>
-                      <template v-slot:activator="{ on }">
-                        <a :href="props.item.link" target="blank" v-on="on"> {{props.item.text | truncate}}</a>
-                      </template>
-                      <span> {{props.item.text}}
-                      </span>
-                    </v-tooltip>
-                  </div>
                 </td>
                 <!-- Flag -->
                 <td class="text-xs-left">
@@ -68,6 +53,20 @@
                     <v-flex xs5> {{(props.item.old * 100).toFixed(1) + '%'}} </v-flex>
                   </v-layout>
                 </td>
+                <!-- Content -->
+                <td class="text-xs-left text-truncate">
+                  <div v-if="props.item.update_type == 'BATTLE'" v-html="computePhrase(props.item.battle)">
+                  </div>
+                  <div v-else>
+                    <v-tooltip open-delay="600" bottom>
+                      <template v-slot:activator="{ on }">
+                        <a :href="props.item.link" target="blank" v-on="on"> {{props.item.text | truncate}}</a>
+                      </template>
+                      <span> {{props.item.text}}
+                      </span>
+                    </v-tooltip>
+                  </div>
+                </td>
                 <!-- Turn -->
                 <td class="text-xs-right">{{ props.item.turn }}</td>
               </template>
@@ -80,7 +79,6 @@
                <v-btn round flat dark color="primary_cohesion_tab" v-on:click="loadAll"> Load all data </v-btn>
               </template>  
             </v-data-table>
-          </v-container>
         </v-card>
       </v-flex>
   </v-container>
@@ -115,13 +113,6 @@
           class: 'title hidden-xs-only',
         },
         {
-          text: 'Content',
-          value: 'content',
-          sortable: false,
-          align: 'left',
-          class: 'title'
-        },
-        {
           text: '',
           value: 'no-value',
           sortable: false,
@@ -132,6 +123,13 @@
           value: 'cohesion',
           sortable: true,
           align: 'center',
+          class: 'title'
+        },
+        {
+          text: 'Content',
+          value: 'content',
+          sortable: false,
+          align: 'left',
           class: 'title'
         },
         {

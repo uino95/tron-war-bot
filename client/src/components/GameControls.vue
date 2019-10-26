@@ -8,7 +8,7 @@
       </v-tabs>
     </v-toolbar>
 
-    <v-tabs v-if="activeMainTab == 'stats' " dark color="secondary" show-arrows fixed-tabs hide-slider>
+    <v-tabs v-if="activeMainTab == 'stats' " dark color="light_secondary" show-arrows fixed-tabs hide-slider>
       <v-tab flat replace to="/cohesion">
         <v-icon color="primary_cohesion_tab">control_point</v-icon> Cohesion
       </v-tab>
@@ -20,7 +20,7 @@
       </v-tab>
     </v-tabs>
 
-    <v-tabs v-else dark color="secondary" show-arrows fixed-tabs hide-slider>
+    <v-tabs v-else dark color="light_secondary" show-arrows fixed-tabs hide-slider>
       <v-tab flat replace to="/betfinal">
         <v-icon color="primary_final_tab">public</v-icon> Final
       </v-tab>
@@ -28,7 +28,7 @@
         <v-icon color="primary_battle_tab">games</v-icon> Battle
       </v-tab>
       <v-tab flat replace to="/betnext">
-        <v-icon color="primary_next_tab">attach_money</v-icon> Next
+        <v-icon color="primary_next_tab">skip_next</v-icon> Next
       </v-tab>
     </v-tabs>
 
@@ -66,7 +66,6 @@
           return this.tabs[1].path
         },
         set(value){
-          // console.log(value)
         }
       }
     }

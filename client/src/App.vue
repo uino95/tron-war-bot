@@ -81,7 +81,7 @@
                     </v-list>
                 </v-menu>
             </v-toolbar-items>
-            <v-toolbar-items v-else>
+            <v-toolbar-items v-else class="hidden-sm-and-down">
                 <v-btn @click.stop="showModal(1)" flat dark>
                     Login
                 </v-btn>
@@ -232,7 +232,7 @@
                 setTimeout(() => {
                     this.loading = false;
                     this.toDisplay = "flex"
-                }, this.$store.state.isMobile ? 4000 : 4000)
+                }, 4000)
             },
             isMobile() {
                 var check = false;
@@ -253,10 +253,11 @@
             });
             if (!this.$store.state.isMobile) {
                 this.noShowMap = false
+            } else {
+                this.startLoading()
             }
             this.track()
             // to be implemented for mobile
-            this.startLoading()
         }
     }
 </script>
