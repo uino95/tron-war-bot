@@ -24,7 +24,8 @@ const out = {
   fairness : db.ref('public/fairness'),
   cohesion : db.ref('public/cohesion'),
   referral: db.ref('public/referral'),
-  countriesMap : db.ref('public/countriesMap')
+  countriesMap : db.ref('public/countriesMap'),
+  timelapseMap : db.ref('public/timelapseMap')
 }
 
 
