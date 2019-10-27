@@ -37,6 +37,7 @@ module.exports.checkCbQueryPermissions = (ctx, next)=>{
 }
 
 module.exports.checkStartPermissions = (ctx, next)=>{
+  if (config.test) return next(ctx)
   if (ctx.mode != 'PRIVATE') return reject(ctx)
   return next(ctx);
 }

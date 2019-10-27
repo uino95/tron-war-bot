@@ -173,6 +173,20 @@ module.exports.battleUpdate = async (cmap, td) => {
   await telegram.sendOrUpdate(n, s, {parse_mode: "HTML", disable_web_page_preview: true, disable_notification:true}).catch(console.error);
 }
 
+module.exports.startWar = async (td)=>{
+  let t="🎉 <b>Welcome to TronWarBot 2.0</b> 🎉\n\n<i>It's the year 2140 and after a century of forced peace treaties among nations, resources are slowly exhausting. "
+  t += "Fear is in the air and the only hope for a brighter future lies in the neighbor country.</i>\n\n"
+  t += "This is when <b>" + utils.universalMap(td.next.o) + "</b> decided to invade <b>" + utils.universalMap(td.next.dt) + "</b>.\n"
+  t += "This is the begin of a long lasting world conflict.\n\n"
+  t += "⚔️ This is the <b>Tron World War</b> ⚔️";
+  let f = "🎉 Welcome to TronWarBot 2.0 🎉\n\nIt's the year 2140 and after a century of forced peace treaties among nations, resources are slowly exhausting. "
+  f += "Fear is in the air and the only hope for a brighter future lies in the neighbor country.\n\n"
+  f += "This is when " + utils.universalMap(td.next.o) + " decided to invade " + utils.universalMap(td.next.dt) + ".\n"
+  f += "This is the begin of a long lasting world conflict.\n\n"
+  f += "⚔️ This is the Tron World War ⚔️";
+  await facebook.post(f).catch(console.error);
+  await telegram.sendMessage(t, {parse_mode: "HTML", disable_web_page_preview: true}).catch(console.error);
+}
 
 module.exports.endWar = async ()=>{
   let winner = wwb.winner();

@@ -12,7 +12,6 @@ const saveTimelapseState = () => {
 const fetchData = async () => {
   let history = await firebase.history.once('value').then(r=>r.val());
   let cohesion = await firebase.cohesion.once('value').then(r=>r.val());
-  // cohesion = Object.values(cohesion).map(e=>!!e.delta)
   return Object.values(history)
     .concat(Object.values(cohesion))
     .sort((a,b)=>(a.turn-b.turn) || (!!b.delta - !!a.delta));

@@ -34,9 +34,13 @@ const getCbData = (e)=>{
 }
 
 const pickCountry = (cmap, td) => {
-  let total = cmap.reduce((acc, v)=>acc+v.cohesion,0)
+  const COUNTRIES = cmap.length;
+  const getImpact = (e) => {
+    return (1 + e.cohesion + (e.territories/COUNTRIES))**2
+  }
+  let total = cmap.reduce((acc, v)=>acc+getImpact(v),0)
   let acc = 0;
-  let cpdf = cmap.map(e=>acc+=(e.cohesion/total))
+  let cpdf = cmap.map(e=>acc+=(getImpact(e)/total))
   let random = utils.random();
   for (var i=0; i < cpdf.length; i++) {
     if (random > cpdf[i]) continue;
