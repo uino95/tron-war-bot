@@ -103,9 +103,6 @@
       loaded: false
     }),
     firebase: function () {
-      // db.ref('public/history').orderByChild('turn').limitToLast(this.limit).once('value', snap =>{
-      //   console.log("ALALALALALALAL DONNENENENEN")
-      // })
       return {
         history: db.ref('public/history').orderByChild('turn').limitToLast(this.limit)
       }

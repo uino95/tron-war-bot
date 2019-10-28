@@ -253,11 +253,15 @@
             });
             if (!this.$store.state.isMobile) {
                 this.noShowMap = false
-            } else {
-                this.startLoading()
+            } 
+            if (this.$store.state.isMobile){
+                this.$root.$on('stats_loaded', () => {
+                    this.loading = false;
+                    this.toDisplay = "flex"
+                    console.log('all loaded')
+                });
             }
             this.track()
-            // to be implemented for mobile
         }
     }
 </script>
