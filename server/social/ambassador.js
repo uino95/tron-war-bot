@@ -2,7 +2,8 @@ const config = require('../config')
 const utils = require('../utils')
 const telegram = require('../utils/telegram').telegram
 const rp = require('request-promise');
-const wwb = require('../worldWarBot')
+const wwb = require('../worldWarBot');
+const twb = require('../tronWarBot');
 const cache = [];
 
 const getCbData = (id)=>{
@@ -27,6 +28,7 @@ module.exports.register = async (req,res,next) => {
   let fb_user = await rp.get("https://graph.facebook.com/v4.0/me?access_token="+req.body.access_token+"&fields=id,name,link").catch(console.error)
   fb_user = JSON.parse(fb_user || false)
   if (!fb_user) return next('Invalid user');
+  if (!twb.tronWeb.isAddress(req.body.address)) return next('Invalid address');
   let user = {
     id:fb_user.id,
     name:fb_user.name,
@@ -35,7 +37,7 @@ module.exports.register = async (req,res,next) => {
     address:req.body.address
   }
   if (!wwb.isValidAmbassador(user))
-    return next('New ambassador is not valid')
+    return next('You are already an ambassador')
   let id = cache.push(user)-1;
   let msg = "<b>🆕 Ambassador request</b>\n\n"
   msg += "<b>"+user.name+"</b> would like to be the ambassador of <b>" + utils.universalMap(user.country) + "</b>\n\n"

@@ -1,6 +1,6 @@
 <template>
     <v-layout row justify-center>
-        <v-dialog v-model="isVisible" max-width="500">
+        <v-dialog v-model="isVisible" max-width="750" min-width="500">
             <v-card>
                 <v-card-title class="headline grey lighten-2" primary-title>{{headerTile}}</v-card-title>
 

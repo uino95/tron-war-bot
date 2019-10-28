@@ -50,7 +50,7 @@
                     <v-flex xs2>
                       <v-icon small> keyboard_arrow_right </v-icon>
                     </v-flex>
-                    <v-flex xs5> {{(props.item.old * 100).toFixed(1) + '%'}} </v-flex>
+                    <v-flex xs5> {{(props.item.new * 100).toFixed(1) + '%'}} </v-flex>
                   </v-layout>
                 </td>
                 <!-- Content -->

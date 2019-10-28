@@ -33,7 +33,7 @@
                         <v-tooltip open-delay="600" bottom>
                           <template v-slot:activator="{ on }">
                             <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
-                              class="title pb-2 truncate">{{universalMap(history[0].next.o)}} </div>
+                          class="title pb-2 text-truncate">{{universalMap(history[0].next.o)}} </div>
                           </template>
                           <span>{{universalMap(history[0].next.o)}}</span>
                         </v-tooltip>
@@ -686,11 +686,5 @@
   .info {
     width: 100%;
     height: 300px;
-  }
-
-  .truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 </style>

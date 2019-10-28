@@ -119,7 +119,6 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
   return [battleData, [rand0]];
 }
 
-
 // returns [newCountriesMap, nextData]
 const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntropy) => {
   if (winner(countriesMap)!=null) return [undefined, undefined];

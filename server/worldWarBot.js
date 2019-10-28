@@ -67,7 +67,7 @@ const init = async (restart) => {
       occupiedBy: idx,
       cohesion: 0.5,
       nextCohesion: 0.5,
-      finalQuote: 50, // PRICE OF FINAL BET
+      finalQuote: 25, // PRICE OF FINAL BET
       nextQuote: 200, // MULTIPLIER FOR BET ON NEXT CONQUERER
       territories: 1,
       probability: (1/COUNTRIES)
@@ -155,7 +155,7 @@ const postTurn = async (turnData) => {
     countriesMap[i].probability = e;
     let pf = countriesMap[i].territories/COUNTRIES;
     countriesMap[i].nextQuote = utils.quoteFromProbability(e);
-    countriesMap[i].finalQuote = Math.round(((jackpot * pf)/(betsPerCountry[i]+1)) + 50 + (turn/100));
+    countriesMap[i].finalQuote = Math.round(((jackpot * pf)/(betsPerCountry[i]+1)) + 25 + (turn/100));
   })
   turnData.next.quotes = turnData.next.probabilities.map(e=>utils.quoteFromProbability(e));
   //CALL EXTERNAL SCHEDULED FUNCTIONS

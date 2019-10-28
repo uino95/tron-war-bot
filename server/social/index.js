@@ -1,4 +1,4 @@
-
+const wwb = require('../worldWarBot')
 const config = require('../config')
 const updates = require('./updates')
 const russianRoulette = require('./russianRoulette')
@@ -7,8 +7,10 @@ const ambassador = require('./ambassador')
 const telegram = require('../utils/telegram')
 
 module.exports.runUpdate = async (cmap, td) => {
-  if (!(td.turn % config.social.updates.statsFreq)) updates.stats(td);
-  if (!(td.turn % config.social.updates.quotesFreq)) updates.quotes(td);
+  if (wwb.winner()) return updates.endWar();
+  if (td.turn == 1) await updates.startWar(td);
+  if (!(td.turn % config.social.updates.statsFreq)) await updates.stats(td).catch(console.error);
+  if (!(td.turn % config.social.updates.quotesFreq)) await updates.quotes(td);
   if (!(td.turn % config.social.updates.rouletteFreq)) russianRoulette.next(cmap, td);
   updates.battleUpdate(cmap, td);
 }
@@ -20,12 +22,6 @@ module.exports.runUpdate = async (cmap, td) => {
 module.exports.init = async () =>{
   // LOAD STATUS
   await russianRoulette.init();
-  // // CONFIGURE TELEGRAM BOT
-  // const bot = new Telegraf(config.telegram.token)
-  // bot.use(telegram.auth)
-  // bot.on('callback_query', russianRoulette.onUpdate)
-  // bot.catch(console.error)
-  // bot.launch()
 }
 
 module.exports.shares = shares;
