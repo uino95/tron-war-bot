@@ -206,7 +206,21 @@
                     text: 'Instagram',
                     link: true,
                     body: "https://www.instagram.com/tronwarbot"
-                }
+                },
+                {
+                    divider: true
+                },
+                {
+                    heading: 'Social'
+                },
+                {
+                    icon: 'fab fa-facebook-square',
+                    text: 'Become an Ambassador',
+                    link: false,
+                    body: "WIP"
+                },
+
+
             ]
         }),
         methods: {
