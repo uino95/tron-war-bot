@@ -70,6 +70,7 @@ out.reset = async () => {
   await out.fairness.set({})
   await out.countriesMap.set({})
   await out.cohesion.set({})
+  await out.history.set([])
 }
 
 module.exports = out;

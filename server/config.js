@@ -96,7 +96,7 @@ const config = {
   wwb:{
     battleWeight: [0.15, 0.56, 0.29],
     civilWarLikelihood: 0.02,
-    restart: false
+    restart: JSON.parse(process.env.RESTART || false)
   }
 }
 
