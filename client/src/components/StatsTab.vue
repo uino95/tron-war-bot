@@ -39,7 +39,7 @@
           </v-toolbar>
 
 
-            <v-data-table :search="searchStats" :headers="headersStats" :items="countryStatus" :item-key="'idx'"
+            <v-data-table :search="searchStats" :headers="headersStats" :items="countryStatus" :item-key="'name'"
               class="elevation-1" :pagination.sync="paginationStats" :rows-per-page-items="[10,20,50]">
               <template v-slot:items="props">
                 <td class="text-xs-right">
@@ -48,24 +48,24 @@
                       :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
                   </v-avatar>
                 </td>
-                <td class="text-xs-right && font-weight-bold text-truncate">{{props.item.idx}}</td>
+                <td class="text-xs-right && font-weight-bold text-truncate">{{props.item.name}}</td>
                 <td class="text-xs-right">{{ props.item.territories }}</td>
                 <td class="text-xs-right text-truncate">{{ (props.item.cohesion * 100).toFixed(1) + ' %'}}</td>
                 <td class="text-xs-right hidden-xs-only">
                   <v-btn class="white--text" color="primary_final_tab"
-                    v-on:click="goToBet('betfinal',universalMap(props.item.idx, 'numberId'))">
+                    v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
                     {{ (props.item.finalQuote + ' TRX')}}
                   </v-btn>
                 </td>
                 <td class="text-xs-right hidden-xs-only">
                   <v-btn class="white--text" color="primary_next_tab"
-                    v-on:click="goToBet('betnext',universalMap(props.item.idx, 'numberId'))">
+                    v-on:click="goToBet('betnext',universalMap(props.item.name, 'numberId'))">
                     {{ (props.item.probability * 100).toFixed(2) + ' %'}}
                   </v-btn>
                 </td>
                 <td class="text-xs-right ">
                   <v-btn color="facebook" class="white--text"
-                    v-on:click="openModal(universalMap(props.item.idx, 'numberId'))">
+                    v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
                     <v-icon class="mr-2" small color="white">
                       fab fa-facebook-square
                     </v-icon>
@@ -215,7 +215,7 @@
         },
         {
           text: 'Country',
-          value: 'idx',
+          value: 'name',
           sortable: false,
           align: 'right',
           class: 'body-1'
@@ -330,7 +330,7 @@
     computed: {
       countryStatus: function () {
         return this.mapStatus.map(country => {
-          country.idx = this.universalMap(country.idx)
+          country.name = this.universalMap(country['.key'])
           return country
         })
       },
@@ -338,6 +338,11 @@
         let random = Math.floor(Math.random() * this.phrases.length);
         return this.phrases[random].replace("<placeholder>", this.universalMap(this.$store.state.selectedCountry));
       },
+    },
+    mounted() {
+      db.ref('public/mapStatus').orderByChild('territories').once('value', snap =>{
+        this.$root.$emit('stats_loaded', true);
+      })
     }
   }
 </script>

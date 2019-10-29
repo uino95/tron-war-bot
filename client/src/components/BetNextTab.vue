@@ -34,7 +34,7 @@
                 <v-layout row wrap align-center justify-center>
                   <v-flex md8>
                     <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
-                      :loading="isLoading" item-value="numberId" hide-no-data hide-selected label="Select Country"
+                      item-value="numberId" hide-no-data hide-selected label="Select Country"
                       placeholder="Type in or pick from map"></v-autocomplete>
                   </v-flex>
 
@@ -322,7 +322,6 @@
       currentMyBetPagination: 1,
       currentLatestBetPagination: 1,
       showBetNextTab: false,
-      isLoading: false,
       valid: false,
       snackbar: false,
       snackbarText: "",

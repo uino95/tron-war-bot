@@ -28,7 +28,8 @@ export default new Vuex.Store({
       betNextParams: null,
       betBattleParams: null
     },
-    pollWarEndend: false
+    pollWarEndend: false,
+    statsLoaded: false
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -70,6 +71,9 @@ export default new Vuex.Store({
     },
     setPollWar(state, payload){
       state.pollWarEndend = payload
+    },
+    setStatsLoaded(state, payload){
+      state.statsLoaded = payload
     }
   },
   actions: {

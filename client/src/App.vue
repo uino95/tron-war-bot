@@ -206,7 +206,21 @@
                     text: 'Instagram',
                     link: true,
                     body: "https://www.instagram.com/tronwarbot"
-                }
+                },
+                {
+                    divider: true
+                },
+                {
+                    heading: 'Social'
+                },
+                {
+                    icon: 'fab fa-facebook-square',
+                    text: 'Become an Ambassador',
+                    link: false,
+                    body: "WIP"
+                },
+
+
             ]
         }),
         methods: {
@@ -253,11 +267,15 @@
             });
             if (!this.$store.state.isMobile) {
                 this.noShowMap = false
-            } else {
-                this.startLoading()
+            } 
+            if (this.$store.state.isMobile){
+                this.$root.$on('stats_loaded', () => {
+                    this.loading = false;
+                    this.toDisplay = "flex"
+                    console.log('all loaded')
+                });
             }
             this.track()
-            // to be implemented for mobile
         }
     }
 </script>
