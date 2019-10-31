@@ -18,7 +18,7 @@
                         </v-flex>
                     </v-layout>
                     <v-divider v-else-if="item.divider" :key="i" dark class="my-3"></v-divider>
-                    <v-list-tile v-else-if="!item.link && i !== 1" :key="i" @click.stop="showModal(i)">
+                    <v-list-tile v-else-if="!item.link" :key="i" @click.stop="showModal(item.text)">
                         <v-list-tile-action>
                             <v-icon>{{ item.icon }}</v-icon>
                         </v-list-tile-action>
@@ -28,7 +28,7 @@
                             </v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>
-                    <v-list-tile v-else-if="i !== 1" :key="i" @click="openLink(item.body)">
+                    <v-list-tile v-else :key="i" @click="openLink(item.body)">
                         <v-list-tile-action>
                             <v-icon>{{ item.icon }}</v-icon>
                         </v-list-tile-action>
@@ -52,8 +52,8 @@
             <span class="headline ml-3 mr-5" style="color: white">Tron<span class="font-weight-light"
                                                                             style="color: white">WarBot</span></span>
             <v-spacer></v-spacer>
-            <v-toolbar-items v-if="$store.state.loggedInAccount!=null">
-                <v-menu offset-y>
+            <v-toolbar-items>
+                <v-menu v-if="$store.state.loggedInAccount!=null" offset-y>
                     <template v-slot:activator="{ on }" class="hidden-sm-and-down">
                         <v-btn flat dark v-on="on">
                             Account
@@ -80,10 +80,14 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-            </v-toolbar-items>
-            <v-toolbar-items v-else class="hidden-sm-and-down">
-                <v-btn @click.stop="showModal(1)" flat dark>
+                <v-btn v-else class="hidden-sm-and-down" @click.stop="showModal('Login With Tronlink')" flat dark>
                     Login
+                </v-btn>
+                <v-btn class="hidden-sm-and-down" flat dark @click.stop="showModal('News')">
+                    <v-badge>
+                        <template v-slot:badge>{{newsCount}}</template>
+                        News
+                    </v-badge>
                 </v-btn>
             </v-toolbar-items>
         </v-toolbar>
@@ -99,9 +103,8 @@
                         <div v-else-if="!noShowMap">
                             <core-game-map v-bind:style="{ display: toDisplay }"></core-game-map>
                         </div>
-                        <core-game-controls @showModal="showModal(1)"></core-game-controls>
-                        <core-modal v-model="isModalVisible" :header-tile="menuItems[itemClicked].text"
-                                    :body-tile="menuItems[itemClicked].body"></core-modal>
+                        <core-game-controls @showModal="showModal('Login With Tronlink')"></core-game-controls>
+                        <core-modal v-model="isModalVisible" :header-tile="itemClicked"></core-modal>
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -120,20 +123,15 @@
         components: {Loading},
         data: () => ({
             loading: true,
+            newsCount: 4,
             noShowMap: true,
             toDisplay: 'none',
             drawer: null,
             isModalVisible: false,
-            itemClicked: 4,
+            itemClicked: "",
             menuItems: [
                 {
                     heading: 'My Info'
-                },
-                {
-                    icon: 'fa-paper-plane',
-                    text: 'Login With Tronlink',
-                    link: false,
-                    login: true
                 },
                 {
                     icon: 'people',
