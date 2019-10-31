@@ -1,87 +1,87 @@
 <template>
   <v-container grid-list-md text-xs-center class="outerTabContainer">
-      <!-- Countries -->
-      <v-flex sm12 md12 lg12 shrink>
-        <v-card>
-          <v-toolbar color="primary_stats_tab" dark>
-            <v-toolbar-title>Current Run Status</v-toolbar-title>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on }">
-                <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
-              </template>
-              <span>
-                - Territories:
-                It represents the number of national territories controlled by the conquerer country. There are 241
-                countries in the map, once a country controls them all it is declared the winner of the current run.<br>
+    <!-- Countries -->
+    <v-flex sm12 md12 lg12 shrink>
+      <v-card>
+        <v-toolbar color="primary_stats_tab" dark>
+          <v-toolbar-title>Current Run Status</v-toolbar-title>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
+            </template>
+            <span>
+              - Territories:
+              It represents the number of national territories controlled by the conquerer country. There are 241
+              countries in the map, once a country controls them all it is declared the winner of the current run.<br>
 
-                - Cohesion:
-                It represents the level of welfare and patriotism of a specific national territory. The higher the
-                cohesion, the more united is the country and the higher is the chance for that country to keep
-                conquering territories. The cohesion gets updated.<br>
+              - Cohesion:
+              It represents the level of welfare and patriotism of a specific national territory. The higher the
+              cohesion, the more united is the country and the higher is the chance for that country to keep
+              conquering territories. The cohesion gets updated.<br>
 
-                - Final conquer quote:
-                It represents the price for a single bet on the final winner which allows to redeem the final jackpot.
-                The price varies depending on jackpot size and the probability of the chosen country to win the full
-                run. The higher the probability or the jackpot, the higher the cost of a single bet. Prices steadily
-                increase over turns, the sooner the bets get placed the higher will be the reward in case of
-                victory.<br>
+              - Final conquer quote:
+              It represents the price for a single bet on the final winner which allows to redeem the final jackpot.
+              The price varies depending on jackpot size and the probability of the chosen country to win the full
+              run. The higher the probability or the jackpot, the higher the cost of a single bet. Prices steadily
+              increase over turns, the sooner the bets get placed the higher will be the reward in case of
+              victory.<br>
 
-                - Next conquer %:
-                It represents the exact likelihood for a country to conquer a territory in the upcoming turn. It is
-                calculated considering the size of the conquered borders for a given country times its cohesion index.
-                The more cohesive the country is the higher the chance it keeps on conquering territories. Similarly,
-                the cohesion index affects also the probability for a given territory to rebel on the dominating
-                country.<br></span>
-            </v-tooltip>
-            <v-spacer />
-            <v-text-field class="pa-2" v-model="searchStats" append-icon="search" label="Search" single-line
-              hide-details></v-text-field>
-          </v-toolbar>
+              - Next conquer %:
+              It represents the exact likelihood for a country to conquer a territory in the upcoming turn. It is
+              calculated considering the size of the conquered borders for a given country times its cohesion index.
+              The more cohesive the country is the higher the chance it keeps on conquering territories. Similarly,
+              the cohesion index affects also the probability for a given territory to rebel on the dominating
+              country.<br></span>
+          </v-tooltip>
+          <v-spacer />
+          <v-text-field class="pa-2" v-model="searchStats" append-icon="search" label="Search" single-line hide-details>
+          </v-text-field>
+        </v-toolbar>
 
 
-            <v-data-table :search="searchStats" :headers="headersStats" :items="countryStatus" :item-key="'name'"
-              class="elevation-1" :pagination.sync="paginationStats" :rows-per-page-items="[10,20,50]">
-              <template v-slot:items="props">
-                <td class="text-xs-right">
-                  <v-avatar>
-                    <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                      :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
-                  </v-avatar>
-                </td>
-                <td class="text-xs-right && font-weight-bold text-truncate">{{props.item.name}}</td>
-                <td class="text-xs-right">{{ props.item.territories }}</td>
-                <td class="text-xs-right text-truncate">{{ (props.item.cohesion * 100).toFixed(1) + ' %'}}</td>
-                <td class="text-xs-right hidden-xs-only">
-                  <v-btn class="white--text" color="primary_final_tab"
-                    v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
-                    {{ (props.item.finalQuote + ' TRX')}}
-                  </v-btn>
-                </td>
-                <td class="text-xs-right hidden-xs-only">
-                  <v-btn class="white--text" color="primary_next_tab"
-                    v-on:click="goToBet('betnext',universalMap(props.item.name, 'numberId'))">
-                    {{ (props.item.probability * 100).toFixed(2) + ' %'}}
-                  </v-btn>
-                </td>
-                <td class="text-xs-right ">
-                  <v-btn color="facebook" class="white--text"
-                    v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
-                    <v-icon class="mr-2" small color="white">
-                      fab fa-facebook-square
-                    </v-icon>
-                    Support
-                  </v-btn>
-                </td>
-              </template>
-              <template v-slot:no-results>
-                <v-alert :value="true" color="error" icon="warning">
-                  Your search for "{{ searchStats }}" found no results.
-                </v-alert>
-              </template>
-            </v-data-table>
+        <v-data-table :search="searchStats" :headers="headersStats" :items="countryStatus" :item-key="'name'"
+          class="elevation-1" :pagination.sync="paginationStats" :rows-per-page-items="[10,20,50]">
+          <template v-slot:items="props">
+            <td class="text-xs-right">
+              <v-avatar>
+                <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                  :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
+              </v-avatar>
+            </td>
+            <td class="text-xs-right && font-weight-bold text-truncate">{{props.item.name}}</td>
+            <td class="text-xs-right">{{ props.item.territories }}</td>
+            <td class="text-xs-right text-truncate">{{ (props.item.cohesion * 100).toFixed(1) + ' %'}}</td>
+            <td class="text-xs-right hidden-xs-only">
+              <v-btn class="white--text" color="primary_final_tab"
+                v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
+                {{ (props.item.finalQuote + ' TRX')}}
+              </v-btn>
+            </td>
+            <td class="text-xs-right hidden-xs-only">
+              <v-btn class="white--text" color="primary_next_tab"
+                v-on:click="goToBet('betnext',universalMap(props.item.name, 'numberId'))">
+                {{ (props.item.probability * 100).toFixed(2) + ' %'}}
+              </v-btn>
+            </td>
+            <td class="text-xs-right ">
+              <v-btn color="facebook" class="white--text"
+                v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
+                <v-icon class="mr-2" small color="white">
+                  fab fa-facebook-square
+                </v-icon>
+                Support
+              </v-btn>
+            </td>
+          </template>
+          <template v-slot:no-results>
+            <v-alert :value="true" color="error" icon="warning">
+              Your search for "{{ searchStats }}" found no results.
+            </v-alert>
+          </template>
+        </v-data-table>
 
-        </v-card>
-      </v-flex>
+      </v-card>
+    </v-flex>
     <v-layout row justify-center>
       <v-dialog max-width="800" v-model="isVisible">
         <v-card>
@@ -300,19 +300,16 @@
         this.snackbar = true
       },
       shareOnFb: async function () {
-        // FB.logout(function (response) {
-        //   // Person is now logged out
-        //   console.log(response)
-        // });
-        await FB.getLoginStatus(function (response) {
-          console.log(response)
+        await FB.getLoginStatus((response) => {
           if (response.status != 'connected') {
-            FB.login(function (response) {
+            FB.login((response) => {
               if (response.authResponse) {
                 console.log('Welcome!  Fetching your information.... ');
-                FB.api('/me', function (response) {
+                FB.api('/me',  (response) => {
                   console.log('Good to see you, ' + response.name + '.');
+                  this.$store.commit('setFbUserName', response.name)  
                 });
+                this.$store.commit('setFbAcessToken', response.authResponse.accessToken)
               } else {
                 console.log('User cancelled login or did not fully authorize.');
               }
@@ -340,7 +337,7 @@
       },
     },
     mounted() {
-      db.ref('public/mapStatus').orderByChild('territories').once('value', snap =>{
+      db.ref('public/mapStatus').orderByChild('territories').once('value', snap => {
         this.$root.$emit('stats_loaded', true);
       })
     }

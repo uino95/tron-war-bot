@@ -29,7 +29,9 @@ export default new Vuex.Store({
       betBattleParams: null
     },
     pollWarEndend: false,
-    statsLoaded: false
+    statsLoaded: false,
+    fbAcessToken: null,
+    fbUserName: null
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -74,6 +76,12 @@ export default new Vuex.Store({
     },
     setStatsLoaded(state, payload){
       state.statsLoaded = payload
+    },
+    setFbAcessToken(state, payload){
+      state.fbAcessToken = payload
+    },
+    setFbUserName(state, payload){
+      state.fbUserName = payload
     }
   },
   actions: {

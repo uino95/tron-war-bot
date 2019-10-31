@@ -388,8 +388,9 @@
                 </v-card-text>
 
                 <v-card-text v-if="headerTile === 'Become an Ambassador'">
-
-
+                    <div v-if="fbUserName != null"> 
+                        Hi {{this.fbUserName}}
+                    </div>
                     <div>
                         Here there will be the explanation
                     </div>
@@ -524,6 +525,9 @@
                     this.$store.commit('setSelectedCountry', value)
                 }
             },
+            fbUserName() {
+                return this.$store.state.fbUserName
+            }
         },
         firebase: {
             referrals: db.ref("public/referral"),
@@ -558,15 +562,16 @@
                     return
                 }
                 await FB.getLoginStatus(async response => {
-                    console.log(response)
                     if (response.status != 'connected') {
-                        FB.login(function (response) {
-                            console.log(response)
+                        FB.login((response) => {
                             if (response.authResponse) {
                                 console.log('Welcome!  Fetching your information.... ');
-                                FB.api('/me', function (response) {
-                                    console.log('Good to see you, ' + response.name + '.');
+                                FB.api('/me', (response) => {
+                                    console.log('Good to see you, ' + response.name +
+                                        '.');
+                                    this.$store.commit('setFbUserName', response.name) 
                                 });
+                                this.$store.commit('setFbResponse', response)
                             } else {
                                 console.log('User cancelled login or did not fully authorize.');
                             }
@@ -575,7 +580,7 @@
                     try {
                         await axios.post(this.$store.state.test ? `http://localhost:3000/ambassador` :
                             `https://api.tronwarbot.com/ambassador`, {
-                                access_token: response.authResponse.accessToken,
+                                access_token: this.$store.state.fbAcessToken,
                                 country: this.currentCountry,
                                 address: this.account
                             })
@@ -588,7 +593,8 @@
                             this.snackbar = true;
                         } catch (err) {
                             console.log(err)
-                            this.snackbarText = "[AMBASSADOR] Connection error. Ambassador not registered"
+                            this.snackbarText =
+                                "[AMBASSADOR] Connection error. Ambassador not registered"
                             this.snackbarColor = "error";
                             this.snackbarTimeout = 10000;
                             this.snackbar = true;
