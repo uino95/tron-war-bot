@@ -7,16 +7,16 @@
                 <v-card-text v-if="headerTile === 'Login With Tronlink'">
                     <div v-if="this.$store.state.loggedInAccount!=null">
                         Already logged in with account address: {{this.$store.state.loggedInAccount}}
-                        <br />
-                        <br />
+                        <br/>
+                        <br/>
                         {{footerTile}}
                     </div>
                     <div v-else>
                         Please, login to your TRONLink wallet.
-                        <br />If you do not have TRONLink wallet installed, please visit
+                        <br/>If you do not have TRONLink wallet installed, please visit
                         <a href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.
-                        <br />
-                        <br />
+                        <br/>
+                        <br/>
                         <v-alert :value="true" type="warning">Tron War Bot is only available on Google Chrome or on
                             TronLink mobile
                             app for the time being.
@@ -26,20 +26,20 @@
 
                 <v-card-text v-if="headerTile === 'Referral'">
                     Refer a friend by sharing your referral link with him.
-                    <br />Here is your referral link:
+                    <br/>Here is your referral link:
                     <v-chip v-if="this.$store.state.loggedInAccount != null" label outline color="primary">
                         https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}
                     </v-chip>
                     <v-chip v-else label outline color="red">Login First</v-chip>
-                    <br />
-                    <br />You'll earn
+                    <br/>
+                    <br/>You'll earn
                     <b>{{percentage}} % </b> out of each of his bets
                     <b>forever</b>!
-                    <br />
-                    <br />Once an address starts using a referral link, that can't change and it will always provide you
+                    <br/>
+                    <br/>Once an address starts using a referral link, that can't change and it will always provide you
                     that
                     {{percentage}} %
-                    <br />Every 50TRX piled up you will automatically receive the earned TRX. Below you can see how much
+                    <br/>Every 50TRX piled up you will automatically receive the earned TRX. Below you can see how much
                     your
                     referred links are earning you
                     <v-container grid-list-md style="padding: 0px;" mt-2>
@@ -91,20 +91,20 @@
                     to token holders! (..but yes we detain around 50% of the current
                     token supply). After every stage you will need 50 more TRX to mine one WAR. WAR will be used in the
                     future runs.
-                    <br />
-                    <v-divider mt-3 />
-                    <br />
+                    <br/>
+                    <v-divider mt-3/>
+                    <br/>
                     <span class="headling">We are in stage 1 of 100. You need to play 500 TRX to mine 1 WAR</span>
                     <v-progress-linear color="primary" height="30" v-model="dividendStage"></v-progress-linear>
-                    <v-divider mt-8 />
-                    <br />
+                    <v-divider mt-8/>
+                    <br/>
                     <v-layout row wrap>
                         <v-flex xs12 sm5>
                             <v-text-field v-if="account == null" :value="'Login First'" background-color="red"
-                                label="You have mined" outline readonly>
+                                          label="You have mined" outline readonly>
                                 <template v-slot:append>
                                     <v-avatar class="pb-2" tile size="40">
-                                        <img src="/img/logo.png" />
+                                        <img src="/img/logo.png"/>
                                     </v-avatar>
                                 </template>
                             </v-text-field>
@@ -112,7 +112,7 @@
                             <v-text-field v-else :value="myWAR | WAR" label="You have mined" outline readonly>
                                 <template v-slot:append>
                                     <v-avatar class="pb-2" tile size="40">
-                                        <img src="/img/logo.png" />
+                                        <img src="/img/logo.png"/>
                                     </v-avatar>
                                 </template>
                             </v-text-field>
@@ -128,20 +128,20 @@
                             </v-text-field>
                         </v-flex> -->
 
-                        <v-spacer />
+                        <v-spacer/>
 
                         <v-flex xs12 sm5>
                             <v-text-field :value="totalWARSupply | WAR" label="Total WAR mined" outline readonly>
                                 <template v-slot:append>
                                     <v-avatar class="pb-2" tile size="40">
-                                        <img src="/img/logo.png" />
+                                        <img src="/img/logo.png"/>
                                     </v-avatar>
                                 </template>
                             </v-text-field>
                         </v-flex>
                     </v-layout>
 
-                    <v-divider />
+                    <v-divider/>
 
                     <!-- <v-card mt-3>
                         <v-card-text style="text-align:center;">
@@ -165,7 +165,7 @@
                 <v-card-text v-if="headerTile === 'How To Play'">
                     The game is inspired from the popular WorldWarBot 2020
                     <a href="https://www.facebook.com/worldwarbot/" target="_blank">Facebook Game</a>
-                    <br />The bot simulates a world war: every turn, one every 5 minutes, a state (randomly chosen)
+                    <br/>The bot simulates a world war: every turn, one every 5 minutes, a state (randomly chosen)
                     conquers
                     another country.
                     The conquest probability is proportional to the number of conquered countries and the cohesion index
@@ -173,29 +173,29 @@
                     country.
                     A World War run lasts on average 40 days.
 
-                    <br />
+                    <br/>
                     <br>
                     <b>What do I need to play?</b>
                     <br>In order to play, you must own TRX, the underlying cryptocurrency of TRON’s network. Make sure
                     you have a
                     TronLink Wallet.
                     For more information on how to create one, <a target="_blank"
-                        href="https://chrome.google.com/webstore/detail/tronlink%EF%BC%88%E6%B3%A2%E5%AE%9D%E9%92%B1%E5%8C%85%EF%BC%89/ibnejdfjmmkpcnlpebklmnkoeoihofec">
-                        click here </a>
+                                                                  href="https://chrome.google.com/webstore/detail/tronlink%EF%BC%88%E6%B3%A2%E5%AE%9D%E9%92%B1%E5%8C%85%EF%BC%89/ibnejdfjmmkpcnlpebklmnkoeoihofec">
+                    click here </a>
                     <br>To play on mobile devices, please use <a target="_blank"
-                        href="https://www.tronwallet.me/">TronWallet</a>.
+                                                                 href="https://www.tronwallet.me/">TronWallet</a>.
 
                     <br>
                     <br>
 
                     <b>How to get TRX</b>
                     <br>Are you running out of your skin to start gaming?
-                    <br />Jump into the crypto world now!
-                    <br />
-                    <br />
+                    <br/>Jump into the crypto world now!
+                    <br/>
+                    <br/>
                     <v-btn round color="primary" href="https://changelly.com/" target="_blank" dark pa-2>BUY TRX</v-btn>
-                    <br />
-                    <br />Once you start playing, your TRX are safe because you don’t move them on our website. They
+                    <br/>
+                    <br/>Once you start playing, your TRX are safe because you don’t move them on our website. They
                     remain in your secure wallet and moved out whenever you place a bet. So no need to trust us or
                     anyone, you
                     control your crypto assets. That's one of the nice things about using the blockchain.
@@ -212,8 +212,8 @@
                                 <v-card-text>
                                     We are crystal clear. We care about making things right. Here is how we provide the
                                     details to check that we are <a href="https://en.wikipedia.org/wiki/Provably_fair"
-                                        targte="_blank">provably fair</a>.
-                                    <br /><br />
+                                                                    targte="_blank">provably fair</a>.
+                                    <br/><br/>
                                     At the very beginning of a turn the Bot decides which country will conquer next. The
                                     Bot will hash (sha256) the name of the winner + a random string (called seed or salt
                                     in cryptography). You can find that hash in the box under Next Turn.<br>
@@ -221,88 +221,94 @@
                                     alongside that seed used to compute the hash. You will then find the initial hash
                                     and
                                     the Conqueror and its seed under Previous Turn.
-                                    <br /><br />
+                                    <br/><br/>
                                     This way we prove the Bot truly picks the countries in a random manner and doesn't
                                     "change its mind" on the way! And this is done in a way you can easily check, that
                                     is use any sha256 online tool like the one suggested below.
-                                    <br />
-                                    <br />
-                                    <v-divider mt-3 />
-                                    <br />
+                                    <br/>
+                                    <br/>
+                                    <v-divider mt-3/>
+                                    <br/>
                                     <span class="title">Previous Turn: {{data.turn - 1}} </span>
-                                    <br />
+                                    <br/>
                                     <v-container fluid grid-list-sm>
                                         <v-flex sm 16>
                                             <v-text-field ref='previousCountriesMap' append-icon="content_copy"
-                                                @click:append="copyToClipBoard(fairness.previous.mapState, 'previousMapState')"
-                                                :value="fairness.previous.mapState" label="Countries Map" outline
-                                                readonly>
+                                                          @click:append="copyToClipBoard(fairness.previous.mapState, 'previousMapState')"
+                                                          :value="fairness.previous.mapState" label="Countries Map"
+                                                          outline
+                                                          readonly>
                                             </v-text-field>
                                         </v-flex>
                                         <v-layout row wrap>
                                             <v-flex sm6>
                                                 <v-text-field ref='previousMagicNumber' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.previous.magic, 'previousMagic')"
-                                                    :value="fairness.previous.magic" label="Magic Number" outline
-                                                    readonly>
+                                                              @click:append="copyToClipBoard(fairness.previous.magic, 'previousMagic')"
+                                                              :value="fairness.previous.magic" label="Magic Number"
+                                                              outline
+                                                              readonly>
                                                 </v-text-field>
                                             </v-flex>
                                             <v-flex sm6>
                                                 <v-text-field ref='previousMagicHash' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.previous.magicHash, 'previousMagicHash')"
-                                                    :value="fairness.previous.magicHash" label="Magic Hash" outline
-                                                    readonly>
+                                                              @click:append="copyToClipBoard(fairness.previous.magicHash, 'previousMagicHash')"
+                                                              :value="fairness.previous.magicHash" label="Magic Hash"
+                                                              outline
+                                                              readonly>
                                                 </v-text-field>
                                             </v-flex>
                                         </v-layout>
                                         <v-layout row wrap>
                                             <v-flex sm6>
                                                 <v-text-field ref='previousBlockHash' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.previousBlockHash, 'previousBlockHash')"
-                                                    :value="fairness.previous.blockHash" label="Block Hash" outline
-                                                    readonly>
+                                                              @click:append="copyToClipBoard(fairness.previousBlockHash, 'previousBlockHash')"
+                                                              :value="fairness.previous.blockHash" label="Block Hash"
+                                                              outline
+                                                              readonly>
                                                 </v-text-field>
                                             </v-flex>
                                             <v-flex sm6>
                                                 <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.previous.nextTurnBlock, 'nextTurnBlock')"
-                                                    :value="fairness.previous.nextTurnBlock" label="Block Number"
-                                                    outline readonly>
+                                                              @click:append="copyToClipBoard(fairness.previous.nextTurnBlock, 'nextTurnBlock')"
+                                                              :value="fairness.previous.nextTurnBlock"
+                                                              label="Block Number"
+                                                              outline readonly>
                                                 </v-text-field>
                                             </v-flex>
                                         </v-layout>
                                         <v-layout row wrap>
                                             <v-flex sm6>
                                                 <v-text-field ref='betNext' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard('TODO', 'previousBlockHash')"
-                                                    :value="'TODO'" label="Bet Next" outline readonly>
+                                                              @click:append="copyToClipBoard('TODO', 'previousBlockHash')"
+                                                              :value="'TODO'" label="Bet Next" outline readonly>
                                                 </v-text-field>
                                             </v-flex>
                                             <v-flex sm6>
                                                 <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard('TODO', 'nextTurnBlock')"
-                                                    :value="'TODO'" label="Bet Battle" outline readonly>
+                                                              @click:append="copyToClipBoard('TODO', 'nextTurnBlock')"
+                                                              :value="'TODO'" label="Bet Battle" outline readonly>
                                                 </v-text-field>
                                             </v-flex>
                                         </v-layout>
                                     </v-container>
 
-                                    <v-divider />
-                                    <br />
+                                    <v-divider/>
+                                    <br/>
                                     <span class="title">Next Turn: {{data.turn}} </span>
-                                    <br />
+                                    <br/>
 
                                     <v-container fluid grid-list-sm>
                                         <v-flex sm 16>
                                             <v-text-field ref='nextCountriesMap' append-icon="content_copy"
-                                                @click:append="copyToClipBoard(fairness.next.mapState, 'nextMapState')"
-                                                :value="fairness.next.mapState" label="Countries Map" outline readonly>
+                                                          @click:append="copyToClipBoard(fairness.next.mapState, 'nextMapState')"
+                                                          :value="fairness.next.mapState" label="Countries Map" outline
+                                                          readonly>
                                             </v-text-field>
                                         </v-flex>
                                         <v-layout row wrap>
                                             <v-flex sm6>
                                                 <v-text-field ref='nextMagicNumber' value="*Hidden*"
-                                                    label="Magic Number" outline readonly>
+                                                              label="Magic Number" outline readonly>
                                                     <v-tooltip slot="append" bottom>
                                                         <v-icon slot="activator" color="primary" dark>info</v-icon>
                                                         <span>This will be revealed when current turn is ended</span>
@@ -312,16 +318,17 @@
                                             </v-flex>
                                             <v-flex sm6>
                                                 <v-text-field ref='nextMagicHash' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.next.magicHash, 'nextMagicHash')"
-                                                    :value="fairness.next.magicHash" label="Magic Hash" outline
-                                                    readonly>
+                                                              @click:append="copyToClipBoard(fairness.next.magicHash, 'nextMagicHash')"
+                                                              :value="fairness.next.magicHash" label="Magic Hash"
+                                                              outline
+                                                              readonly>
                                                 </v-text-field>
                                             </v-flex>
                                         </v-layout>
                                         <v-layout row wrap>
                                             <v-flex sm6>
                                                 <v-text-field ref='nextBlockHash' append-icon="info" value="*Hidden*"
-                                                    label="Block Hash" outline readonly>
+                                                              label="Block Hash" outline readonly>
                                                     <v-tooltip slot="append" bottom>
                                                         <v-icon slot="activator" color="primary" dark>info</v-icon>
                                                         <span>This will be revealed when current turn is ended</span>
@@ -330,9 +337,10 @@
                                             </v-flex>
                                             <v-flex sm6>
                                                 <v-text-field ref='nextNextBlockNumber' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.next.nextTurnBlock, 'nextTurnBlock')"
-                                                    :value="fairness.next.nextTurnBlock" label="Block Number" outline
-                                                    readonly>
+                                                              @click:append="copyToClipBoard(fairness.next.nextTurnBlock, 'nextTurnBlock')"
+                                                              :value="fairness.next.nextTurnBlock" label="Block Number"
+                                                              outline
+                                                              readonly>
                                                 </v-text-field>
                                             </v-flex>
                                         </v-layout>
@@ -347,7 +355,7 @@
                                             <v-card-actions>
                                                 <v-chip label outline color="primary">
                                                     <a href="https://emn178.github.io/online-tools/sha256.html"
-                                                        target="_blank">SHA256 Online Tool</a>
+                                                       target="_blank">SHA256 Online Tool</a>
                                                 </v-chip>
                                             </v-card-actions>
                                         </v-layout>
@@ -373,12 +381,12 @@
                             <v-flex v-for="partner in partners" :key="partner.name" sm6>
                                 <v-card>
                                     <v-img :src="'/img/partners/'+partner.img" class="image" :alt="partner.name"
-                                        height="150px" contain>
+                                           height="150px" contain>
                                     </v-img>
                                     <v-card-title primary-title>
                                         <div>
                                             <a class="title text-truncate" :href="partner.link" target="_blank"
-                                                style="text-decoration: none;">{{partner.name}}</a>
+                                               style="text-decoration: none;">{{partner.name}}</a>
                                         </div>
                                     </v-card-title>
                                 </v-card>
@@ -394,11 +402,21 @@
                         Here there will be the explanation
                     </div>
                     <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
-                        item-value="numberId" hide-no-data hide-selected label="Select Country"
-                        placeholder="Type in to select a country">
+                                    item-value="numberId" hide-no-data hide-selected label="Select Country"
+                                    placeholder="Type in to select a country">
                     </v-autocomplete>
-                    <v-btn v-on:click="becomeAnAmbassador"> Become an Ambassador </v-btn>
+                    <v-btn v-on:click="becomeAnAmbassador"> Become an Ambassador</v-btn>
 
+                </v-card-text>
+
+                <v-card-text v-if="headerTile === 'News'">
+                    <v-carousel>
+                        <v-carousel-item
+                                v-for="(n,i) in news"
+                                :key="i"
+                                :src="n.src">
+                        </v-carousel-item>
+                    </v-carousel>
                 </v-card-text>
 
                 <v-card-actions>
@@ -575,10 +593,10 @@
                     try {
                         await axios.post(this.$store.state.test ? `http://localhost:3000/ambassador` :
                             `https://api.tronwarbot.com/ambassador`, {
-                                access_token: response.authResponse.accessToken,
-                                country: this.currentCountry,
-                                address: this.account
-                            })
+                            access_token: response.authResponse.accessToken,
+                            country: this.currentCountry,
+                            address: this.account
+                        })
                     } catch (e) {
                         console.log(e)
                         try {
@@ -604,11 +622,11 @@
             snackbarTimeout: 6000,
             mapping: mapping,
             faq: [{
-                    question: "What even is TronWarBot?",
-                    answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
-                        "<br><br>Basically we have a bot which decides one country every to conquer another country. It goes on like that until one country takes the whole world. It’s super addictive to keep an eye on the updates, we tried it on our own skin!!\n" +
-                        "What we do is to allow betting on it! We bet using cryptocurrencies, TRX. Please read further if you wanna know more."
-                },
+                question: "What even is TronWarBot?",
+                answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
+                    "<br><br>Basically we have a bot which decides one country every to conquer another country. It goes on like that until one country takes the whole world. It’s super addictive to keep an eye on the updates, we tried it on our own skin!!\n" +
+                    "What we do is to allow betting on it! We bet using cryptocurrencies, TRX. Please read further if you wanna know more."
+            },
                 {
                     question: "Bets? How?",
                     answer: "Glad you asked! We currently support two types of bets.\n" +
@@ -677,10 +695,10 @@
                 }
             ],
             partners: [{
-                    name: 'CHIPS Token',
-                    link: 'https://chipstoken.io/',
-                    img: 'chips.png'
-                },
+                name: 'CHIPS Token',
+                link: 'https://chipstoken.io/',
+                img: 'chips.png'
+            },
                 {
                     name: 'Tron Game Center',
                     link: 'https://trongamecenter.org/',
@@ -702,6 +720,20 @@
                     link: '',
                     img: 'bingtron.jpg'
                 }*/
+            ],
+            news: [
+                {
+                    src: 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg'
+                },
+                {
+                    src: 'https://cdn.vuetifyjs.com/images/carousel/sky.jpg'
+                },
+                {
+                    src: 'https://cdn.vuetifyjs.com/images/carousel/bird.jpg'
+                },
+                {
+                    src: 'https://cdn.vuetifyjs.com/images/carousel/planet.jpg'
+                }
             ]
         })
     };
