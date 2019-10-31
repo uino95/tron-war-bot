@@ -51,11 +51,11 @@
             <td class="text-xs-right && font-weight-bold text-truncate">
               <v-layout row>
                 <div> {{props.item.name}} </div>
-                <v-tooltip v-if="props.item.ambassador" bottom>
+                <v-tooltip v-if="props.item.ambassador" close-delay="3000" bottom>
                   <template v-slot:activator="{ on }">
                     <div class="ml-2 " v-on="on">🎖</div>
                   </template>
-                  <span>The ambassador of this country it is <a :href="props.item.ambassador.link" target="blank" v-on="on"> {{props.item.ambassador.name}}</a></span>. If you want to become an ambassador of your country, check the instructions in the become an ambassador menu on the left!
+                  <span>The ambassador of this country it is <a style="color: white" :href="props.item.ambassador.link" target="blank"> {{props.item.ambassador.name}}</a></span>. If you want to become an ambassador of your country, check the instructions in the become an ambassador menu on the left!
                 </v-tooltip>
               </v-layout>
             </td>
