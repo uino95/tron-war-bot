@@ -19,10 +19,12 @@
                       <v-tooltip open-delay="600" top>
                         <template v-slot:activator="{ on }">
                           <v-flex xs5 class="greenText text-truncate" v-on="on"> {{universalMap(props.item.battle.o)}}
-                            {{props.item.battle.cohesion.o | cohesion}} </v-flex>
+                            {{props.item.battle.cohesion.o | cohesion}}
+                            </v-flex> 
                         </template>
                         <span>
-                          {{universalMap(props.item.battle.o)}} {{props.item.battle.cohesion.o | cohesion}}
+                          {{universalMap(props.item.battle.o)}} 
+                          {{props.item.battle.cohesion.o | cohesion}}
                         </span>
                       </v-tooltip>
                       <v-flex xs2 v-if="props.item.battle.civilWar == 0"><b> VS </b></v-flex>
@@ -30,10 +32,12 @@
                       <v-tooltip open-delay="600" top>
                         <template v-slot:activator="{ on }">
                           <v-flex xs5 class="redText text-truncate" v-on="on">{{universalMap(props.item.battle.d)}}
-                            {{props.item.battle.cohesion.d | cohesion}}</v-flex>
+                            {{props.item.battle.cohesion.d | cohesion}}
+                            </v-flex>
                         </template>
                         <span>
-                          {{universalMap(props.item.battle.d)}} {{props.item.battle.cohesion.d | cohesion}}
+                          {{universalMap(props.item.battle.d)}} 
+                          {{props.item.battle.cohesion.d | cohesion}}
                         </span>
                       </v-tooltip>
                     </v-layout>

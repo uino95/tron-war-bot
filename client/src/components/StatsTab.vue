@@ -51,7 +51,12 @@
             <td class="text-xs-right && font-weight-bold text-truncate">
               <v-layout row>
                 <div> {{props.item.name}} </div>
-                <div v-if="props.item.ambassador" class="ml-2 ">🎖</div>
+                <v-tooltip v-if="props.item.ambassador" bottom>
+                  <template v-slot:activator="{ on }">
+                    <div class="ml-2 " v-on="on">🎖</div>
+                  </template>
+                  <span>The ambassador of this country it is <a :href="props.item.ambassador.link" target="blank" v-on="on"> {{props.item.ambassador.name}}</a></span>. If you want to become an ambassador of your country, check the instructions in the become an ambassador menu on the left!
+                </v-tooltip>
               </v-layout>
             </td>
             <td class="text-xs-right">{{ props.item.territories }}</td>
@@ -310,9 +315,9 @@
             FB.login((response) => {
               if (response.authResponse) {
                 console.log('Welcome!  Fetching your information.... ');
-                FB.api('/me',  (response) => {
+                FB.api('/me', (response) => {
                   console.log('Good to see you, ' + response.name + '.');
-                  this.$store.commit('setFbUserName', response.name)  
+                  this.$store.commit('setFbUserName', response.name)
                 });
                 this.$store.commit('setFbAcessToken', response.authResponse.accessToken)
               } else {
