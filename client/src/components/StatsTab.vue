@@ -48,7 +48,12 @@
                   :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
               </v-avatar>
             </td>
-            <td class="text-xs-right && font-weight-bold text-truncate">{{props.item.name}}</td>
+            <td class="text-xs-right && font-weight-bold text-truncate">
+              <v-layout row>
+                <div> {{props.item.name}} </div>
+                <div v-if="props.item.ambassador" class="ml-2 ">🎖</div>
+              </v-layout>
+            </td>
             <td class="text-xs-right">{{ props.item.territories }}</td>
             <td class="text-xs-right text-truncate">{{ (props.item.cohesion * 100).toFixed(1) + ' %'}}</td>
             <td class="text-xs-right hidden-xs-only">
