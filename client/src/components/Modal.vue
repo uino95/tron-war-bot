@@ -388,17 +388,25 @@
                 </v-card-text>
 
                 <v-card-text v-if="headerTile === 'Become an Ambassador'">
-
-
+                    <div v-if="fbUserName != null">
+                        Hi {{this.fbUserName}}
+                    </div>
                     <div>
                         Here there will be the explanation
                     </div>
-                    <v-autocomplete outline v-model="currentCountry" :items="mapping" item-text="name"
-                        item-value="numberId" hide-no-data hide-selected label="Select Country"
-                        placeholder="Type in to select a country">
+                    <v-autocomplete outline v-model="currentCountry" :items="computedMapping" 
+                        item-text="name" item-value="numberId" hide-no-data hide-selected
+                        label="Select Country" placeholder="Type in to select a country">
                     </v-autocomplete>
-                    <v-btn v-on:click="becomeAnAmbassador"> Become an Ambassador </v-btn>
+                    <v-btn v-on:click="becomeAnAmbassador"> Become an Ambassador</v-btn>
 
+                </v-card-text>
+
+                <v-card-text v-if="headerTile === 'News'">
+                    <v-carousel>
+                        <v-carousel-item v-for="(n,i) in news" :key="i" :src="n.src">
+                        </v-carousel-item>
+                    </v-carousel>
                 </v-card-text>
 
                 <v-card-actions>
@@ -466,6 +474,13 @@
         },
 
         computed: {
+            computedMapping() {
+                return this.mapping.filter((el,index) => {
+                    console.log(index)
+                    console.log(this.mapStatus[index])
+                    return !this.mapStatus[index].hasOwnProperty('ambassador')
+                })
+            },
             percentage: function () {
                 if (this.referrals.percentages[this.$store.state.loggedInAccount]) {
                     return this.referrals.percentages[this.$store.state.loggedInAccount] * 100
@@ -524,11 +539,15 @@
                     this.$store.commit('setSelectedCountry', value)
                 }
             },
+            fbUserName() {
+                return this.$store.state.fbUserName
+            }
         },
         firebase: {
             referrals: db.ref("public/referral"),
             data: db.ref("public/data"),
             fairness: db.ref("public/fairness"),
+            mapStatus: db.ref("public/countriesMap"),
         },
         methods: {
             copyToClipBoard(value, ref) {
@@ -558,15 +577,16 @@
                     return
                 }
                 await FB.getLoginStatus(async response => {
-                    console.log(response)
                     if (response.status != 'connected') {
-                        FB.login(function (response) {
-                            console.log(response)
+                        FB.login((response) => {
                             if (response.authResponse) {
                                 console.log('Welcome!  Fetching your information.... ');
-                                FB.api('/me', function (response) {
-                                    console.log('Good to see you, ' + response.name + '.');
+                                FB.api('/me', (response) => {
+                                    console.log('Good to see you, ' + response.name +
+                                        '.');
+                                    this.$store.commit('setFbUserName', response.name)
                                 });
+                                this.$store.commit('setFbResponse', response)
                             } else {
                                 console.log('User cancelled login or did not fully authorize.');
                             }
@@ -575,7 +595,7 @@
                     try {
                         await axios.post(this.$store.state.test ? `http://localhost:3000/ambassador` :
                             `https://api.tronwarbot.com/ambassador`, {
-                                access_token: response.authResponse.accessToken,
+                                access_token: this.$store.state.fbAcessToken,
                                 country: this.currentCountry,
                                 address: this.account
                             })
@@ -588,7 +608,8 @@
                             this.snackbar = true;
                         } catch (err) {
                             console.log(err)
-                            this.snackbarText = "[AMBASSADOR] Connection error. Ambassador not registered"
+                            this.snackbarText =
+                                "[AMBASSADOR] Connection error. Ambassador not registered"
                             this.snackbarColor = "error";
                             this.snackbarTimeout = 10000;
                             this.snackbar = true;
@@ -603,6 +624,7 @@
             snackbarColor: "",
             snackbarTimeout: 6000,
             mapping: mapping,
+            mapStatus: [],
             faq: [{
                     question: "What even is TronWarBot?",
                     answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
@@ -702,6 +724,19 @@
                     link: '',
                     img: 'bingtron.jpg'
                 }*/
+            ],
+            news: [{
+                    src: 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg'
+                },
+                {
+                    src: 'https://cdn.vuetifyjs.com/images/carousel/sky.jpg'
+                },
+                {
+                    src: 'https://cdn.vuetifyjs.com/images/carousel/bird.jpg'
+                },
+                {
+                    src: 'https://cdn.vuetifyjs.com/images/carousel/planet.jpg'
+                }
             ]
         })
     };
