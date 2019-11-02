@@ -67,13 +67,13 @@ const config = {
     updates:{
       statsFreq  : 100,
       battleFreq : 100,
-      quotesFreq : 319,
+      quotesFreq : 419,
       rouletteFreq : 72
     },
     roulette: {
       superVote:0.5,
       vote: 0.1,
-      bonus: 5
+      bonus: 10
     },
     shares:{
       comment: 0.1,

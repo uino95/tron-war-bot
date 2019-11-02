@@ -42,12 +42,12 @@ const webhooks = async (req, res, next) => {
   let bd = req.body;
   // IF MULTIPLE ENTRIES
   for (var el of bd.entries) {
-    let text = el.text;
-    let user_id = el.user_id;
-    let user_name = el.user_name;
-    let update_type = el.update_type;
-    let link = el.link;
-    await shares.update(text, user_id, user_name, update_type, "FB", link)
+    // let text = el.text;
+    // let user_id = el.user_id;
+    // let user_name = el.user_name;
+    // let update_type = el.update_type;
+    // let link = el.link;
+    // await shares.update(text, user_id, user_name, update_type, "FB", link)
   }
   return res.send("");
 }

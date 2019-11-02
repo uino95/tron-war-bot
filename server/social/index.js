@@ -15,9 +15,6 @@ module.exports.runUpdate = async (cmap, td) => {
   updates.battleUpdate(cmap, td);
 }
 
-// const callbackResponseHandler = (err, ctx, next) => {
-//   return telegram.answerCbQuery(ctx.update.callback_query.id, "You already voted this" ,false)
-// }
 
 module.exports.init = async () =>{
   // LOAD STATUS
