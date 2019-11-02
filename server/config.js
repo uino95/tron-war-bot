@@ -70,6 +70,9 @@ const config = {
       quotesFreq : 419,
       rouletteFreq : 72
     },
+    promotions : {
+      ambassadorFreq: 987
+    },
     roulette: {
       superVote:0.5,
       vote: 0.1,

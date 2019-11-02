@@ -10,16 +10,18 @@ if (!config.telegram.token) throw "[TELEGRAM]: Bot token not configured.";
 const telegram = new Telegram(config.telegram.token)
 const chatId = config.telegram.group;
 
-var mxCache = {};
+var mxCache;
 
 const init = async ()=>{
+  if (config.wwb.restart) return mxCache = {}
   mxCache = await firebase.data.once("value").then(r=>r.val()['tgMessageCache']);
+  if (!mxCache) mxCache = {}
 }
-init();
 
 const sendMessage = async (...d) => {return await telegram.sendMessage(chatId, ...d).catch(console.error);};
 
 const sendOrUpdate = async (...d) => {
+  if (!mxCache) await init();
   let idx = d.shift();
   if (!idx) return await sendMessage(...d);
   if (idx && mxCache[idx]) {
