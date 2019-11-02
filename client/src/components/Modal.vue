@@ -140,11 +140,10 @@
 
           <v-card mt-3>
             <v-card-text style="text-align:center;">
-              At the end of the run you will be eligible to get your share of dividends by clicking the button "Claim
-              your dividends".
+              
               <br />Currently, for every
               <b>100 WAR you get {{availableTRX.div(totalWARSupply.div("1000000000000000000")).times('100') | TRX}}</b>
-            </v-card-text>
+            </v-card-text>Run is over! Post your address followed by #divs on the official telegram group to claim your divs. You have time until 8 Nov 2019
             <v-chip v-if="account != null" label outline color="primary" style="margin-left:4.5em;">
               With your current WARs you will receive:
               {{availableTRX.times(myWAR.div(totalWARSupply).toString()) | TRX }}
@@ -269,10 +268,10 @@
           <v-spacer></v-spacer>
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-              <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on">Claim your Dividends
+              <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on" v-on:click="goToTelegram">Claim your Dividends
               </v-btn>
             </template>
-            <span>It will be available when the run is finished</span>
+            <span>Run is over! Post your address followed by #divs on the official telegram group to claim your divs. You have time until 8 Nov 2019</span>
           </v-tooltip>
           <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
         </v-card-actions>
@@ -375,6 +374,9 @@
         this.copied = document.execCommand('copy');
         this.snackbar = true
       },
+      goToTelegram(){
+        window.open("https://t.me/joinchat/J8ocIxZoXsD4stn4nxg24A")
+      }
     },
     data: () => ({
       snackbar: false,
