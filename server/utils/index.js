@@ -2,7 +2,7 @@ const mapping = require( '../map-utilities/mapping');
 const crypto = require('crypto');
 
 const utils = {
-    map: mapping,
+    map: JSON.parse(JSON.stringify(mapping)),
     universalMap: function(id,to){
 		switch(to){
 			case 'name':

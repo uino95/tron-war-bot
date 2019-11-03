@@ -5,8 +5,9 @@ const utils = require('./utils')
 const vader = require('vader-sentiment');
 const fuzz = require('fuzzball');
 
-const REGEXPMATCHER = utils.map.sort((a,b)=>{return b.name.split(/ |-/g).length - a.name.split(/ |-/g).length}).map(e=>e.name.toLowerCase().replace(/ |-/g,"")).toString().replace(/,/g,"|")
-const FUZZYMATCHER = utils.map.map(e=>e.name).map(e=>e.toLowerCase()).map(e=>e.replace(/-/g," "))
+let map = JSON.parse(JSON.stringify(utils.map))
+const REGEXPMATCHER = map.sort((a,b)=>{return b.name.split(/ |-/g).length - a.name.split(/ |-/g).length}).map(e=>e.name.toLowerCase().replace(/ |-/g,"")).toString().replace(/,/g,"|")
+const FUZZYMATCHER = map.map(e=>e.name).map(e=>e.toLowerCase()).map(e=>e.replace(/-/g," "))
 
 const analyze = (txt) => {
   if (typeof txt != "string") return;

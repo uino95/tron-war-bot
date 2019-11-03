@@ -19,10 +19,7 @@ const social = require('./social');
 app.use(cors());
 app.use(xhub({ algorithm: 'sha1', secret: config.facebook.appSecret }));
 app.use(bodyParser.json());
-app.use(function (err, req, res, next) {
-  console.error(err)
-  return res.status(err.status || 500).json({error:err})
-})
+
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// Endpoints //////////////////////////////////////
 
@@ -60,6 +57,11 @@ const init = async () => {
   }
   backendLogic.start();
 }
+
+app.use(function (err, req, res, next) {
+  console.error(err)
+  return res.status(err.status || 500).json({message:err})
+})
 
 var PORT = process.env.PORT || 3000;
 app.listen(PORT, function() {

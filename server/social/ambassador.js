@@ -57,7 +57,7 @@ module.exports.approve = async (ctx,next) => {
     let user = cache[ctx.body.id]
     wwb.addAmbassador(user)
     let msg = "<b> 🎖 Hooray for a 🆕 Ambassador 🎖</b>\n\n"
-    msg += "Please welcome <b><a href='"+user.link+"'>"+user.name+"</a></b> as the new ambassador of <b>" + utils.universalMap(user.country) + "</b>\n\n"
+    msg += "Please welcome <a href='"+user.link+"'>"+user.name+"</a> as the new ambassador of <b>" + utils.universalMap(user.country) + "</b>\n\n"
     let q = quotesSample(utils.universalMap(user.country))
     msg += q[utils.randomInt(q.length)];
     let r = await telegram.sendMessage(config.telegram.group, msg, {parse_mode: "HTML", disable_web_page_preview: true})
