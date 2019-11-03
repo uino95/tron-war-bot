@@ -460,7 +460,8 @@
       </v-card>
     </v-dialog>
     <v-snackbar v-model="snackbar" :color="this.snackbarColor" :timeout="this.snackbarTimeout" vertical bottom>
-      <span class="title"> {{this.snackbarText}}</span>
+      <span v-if="htmlText" class="title" v-html="this.snackbarText"> </span>
+      <span v-else class="title"> {{this.snackbarText}} </span>
       <v-btn dark flat @click="snackbar = false">
         Close
       </v-btn>
@@ -635,15 +636,17 @@
           this.allDone=true
         } catch (e) {
           console.log(e)
+          console.log(e.response)
           try {
-            this.snackbarText = "[AMBASSADOR] " + e.response.data.message
+            this.htmlText = true
+            this.snackbarText = e.response.data
             this.snackbarColor = "error";
             this.snackbarTimeout = 10000;
             this.snackbar = true;
           } catch (err) {
             console.log(err)
             this.snackbarText =
-              "[AMBASSADOR] Connection error. Ambassador not registered"
+              "Connection error. Ambassador not registered"
             this.snackbarColor = "error";
             this.snackbarTimeout = 10000;
             this.snackbar = true;
@@ -660,6 +663,7 @@
       mapStatus: [],
       terms: false,
       allDone: false,
+      htmlText: false,
       faq: [{
           question: "What even is TronWarBot?",
           answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
