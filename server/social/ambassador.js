@@ -46,13 +46,32 @@ module.exports.register = async (req,res,next) => {
   msg += "Shall we let him in?"
   let m = { 'inline_keyboard': [getCbData(id)]};
   let r = await telegram.sendMessage(config.telegram.adminGroup, msg, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true})
+  return res.json({})
 }
+
 
 module.exports.approve = async (ctx,next) => {
   let m = ctx.update.callback_query.message;
   let msg = m.text;
-  if (ctx.body.approve) wwb.addAmbassador(cache[ctx.body.id])
+  if (ctx.body.approve) {
+    let user = cache[ctx.body.id]
+    wwb.addAmbassador(user)
+    let msg = "<b> 🎖 Hooray for a 🆕 Ambassador 🎖</b>\n\n"
+    msg += "Please welcome <b><a href='"+user.link+"'>"+user.name+"</a></b> as the new ambassador of <b>" + utils.universalMap(user.country) + "</b>\n\n"
+    let q = quotesSample(utils.universalMap(user.country))
+    msg += q[utils.randomInt(q.length)];
+    let r = await telegram.sendMessage(config.telegram.group, msg, {parse_mode: "HTML", disable_web_page_preview: true})
+  }
   cache[ctx.body.id] = undefined
   msg += '\n\n' + (ctx.body.approve ? '✅ <b>APPROVED</b>':'❌ <b>REJECTED</b>');
   await telegram.editMessageText(m.chat.id, m.message_id, undefined, msg,  {parse_mode: "HTML", reply_markup: { 'inline_keyboard': [[]]}});
+  if (!ctx.body.approve) return;
 }
+
+const quotesSample =  (c) =>[
+  "<i>🙌🙌 Now raise your hands for " + c + " and make some noise! 🙌🙌</i>\n",
+  "<i>🔥🔥 Come on, unleash hell for " + c +" 🔥🔥</i>\n",
+  "<i>⚔️ Well then I guess there's only one thing left to do. Win the Tron World War in the name of " + c + " ⚔️</i>\n",
+  "<i>🍀 We will not go quietly into the night! We will not vanish without a fight! We're going to live on! Today we celebrate " + c + "'s Day! 🍀</i>\n",
+  "<i>🌟 Soldiers! Don't fight for slavery, fight for liberty! You the people have the power to make this life free and wonderful! Then in the name of " + c + " let us use that power! Let us all unite! 🌟</i>\n"
+]
