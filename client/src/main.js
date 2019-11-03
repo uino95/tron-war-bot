@@ -22,7 +22,7 @@ Vue.use(VueAnalytics, {
 Vue.mixin({
   methods: {
     universalMap(id, to) {
-      try{
+      try {
         switch (to) {
           case 'name':
             return mapping[id]['name'];
@@ -38,9 +38,9 @@ Vue.mixin({
           default:
             return mapping[id]['name'];
         }
-      } catch(error) {
-      }
+      } catch (error) {}
     },
+
     async loginToFb() {
       await FB.getLoginStatus((response) => {
         if (response.status != 'connected') {
@@ -55,11 +55,19 @@ Vue.mixin({
             }
           })
         }
-      });
+        if (response.status == 'connected') {
+          if (response.authResponse && (store.state.fbUserName == null || store.state.fbAcessToken == null)) {
+            FB.api('/me', (response) => {
+              store.commit('setFbUserName', response.name)
+            });
+            store.commit('setFbAcessToken', response.authResponse.accessToken)
+          }
+        }
+      })
     },
-    logoutFb(){
+    logoutFb() {
       console.log("logging out")
-      FB.logout(function(response) {
+      FB.logout(function (response) {
         console.log("logged out")
         store.commit('setFbUserName', null)
         store.commit('setFbAcessToken', null)
