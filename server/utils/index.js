@@ -58,7 +58,8 @@ const utils = {
     return Math.floor(w *100)/100;
   },
   toPercent : (n) =>(n * 100).toFixed(1) + "%",
-  truncate: (s, n)=> (s.length > n) ? s.substr(0, n-2) + '..' : s
+  truncate: (s, n)=> (s.length > n) ? s.substr(0, n-2) + '..' : s,
+  feImgUrl: (s)=> 'https://tronwarbot.com/img/' + s
 }
 
 module.exports = utils;

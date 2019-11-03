@@ -4,6 +4,8 @@ const Telegram = require('telegraf/telegram')
 const config = require('../config')
 const utils = require('../utils')
 const firebase = require('../firebase')
+const fs = require('fs')
+
 
 if (!config.telegram.token) throw "[TELEGRAM]: Bot token not configured.";
 
@@ -36,9 +38,17 @@ const sendOrUpdate = async (...d) => {
   return m;
 };
 
+const sendMessageWithPhoto = async (path, message, options={})=>{
+  let img = path
+  if (fs.existsSync(path)) img = {source: path}
+  options.caption = options.caption || message;
+  return await telegram.sendPhoto(chatId, img, options).catch(console.error);
+}
+
 module.exports.chatId = chatId;
 module.exports.sendOrUpdate = sendOrUpdate;
 module.exports.sendMessage = sendMessage;
+module.exports.sendMessageWithPhoto = sendMessageWithPhoto;
 module.exports.editMessageReplyMarkup = async (...d) => {return await telegram.editMessageReplyMarkup(chatId, ...d).catch(console.error);};
 module.exports.editMessageText = async (...d) => {return await telegram.editMessageText(chatId, ...d).catch(console.error);};
 module.exports.answerCbQuery = async (...d) => {return await telegram.answerCbQuery(...d).catch(console.error);};

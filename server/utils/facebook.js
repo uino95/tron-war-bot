@@ -1,6 +1,7 @@
 const config = require("../config");
 const shares = require("../social/shares")
 const FB = require('fb').default;
+const fs = require('fs');
 
 if (!config.facebook.token) throw "[FACEBOOK]: Access token is not set in environment variables!"
 
@@ -23,6 +24,13 @@ const post = async (body)=>{
   if (config.test) return console.log("[FACEBOOK]: Not posting in test mode. Preview:\n\n" + body);
   let r = await FB.api('me/feed', 'post', { message: body });
   console.log("[FACEBOOK]: Post published successfully with id: " + r.id);
+}
+
+const postWithPhoto = async (path, body)=>{
+  if (config.test) return console.log("[FACEBOOK]: Not posting in test mode. Preview:\n\n" + body);
+  if (fs.existsSync(path)) return console.error('[FB]: Image upload unsupported at the moment. Use url instead')
+  let r = await FB.api('me/photos', 'post', { caption: body, url: path });
+  console.log("[FACEBOOK]: Post published successfully with id: " + r.post_id);
 }
 
 
@@ -56,6 +64,7 @@ const webhooks = async (req, res, next) => {
 module.exports = {
   me,
   post,
+  postWithPhoto,
   webhooksVerification,
   webhooks
 };
