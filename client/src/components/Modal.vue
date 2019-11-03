@@ -428,6 +428,12 @@
               </v-layout>
             </v-stepper-content>
 
+            <v-stepper-step :complete="ambStep > 4" step="4">Wait to be approved</v-stepper-step>
+
+            <v-stepper-content step="4">
+              <div> Your request has been accepted. Now we will review your information and if everithing is fine we will get back to you! </div>
+            </v-stepper-content>
+
           </v-stepper>
         </v-card-text>
 
@@ -505,6 +511,7 @@
     computed: {
       ambStep: {
         get() {
+          if (this.allDone) return 4;
           if (this.$store.state.fbAcessToken != null && this.$store.state.loggedInAccount != null) return 3;
           if (this.$store.state.loggedInAccount != null) return 2;
           return 1;
@@ -625,6 +632,7 @@
               country: this.currentCountry,
               address: this.account
             })
+          this.allDone=true
         } catch (e) {
           console.log(e)
           try {
@@ -639,7 +647,7 @@
             this.snackbarColor = "error";
             this.snackbarTimeout = 10000;
             this.snackbar = true;
-          }
+          }     
         }
       }
     },
@@ -651,6 +659,7 @@
       mapping: mapping,
       mapStatus: [],
       terms: false,
+      allDone: false,
       faq: [{
           question: "What even is TronWarBot?",
           answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
