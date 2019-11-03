@@ -40,6 +40,30 @@ Vue.mixin({
         }
       } catch(error) {
       }
+    },
+    async loginToFb() {
+      await FB.getLoginStatus((response) => {
+        if (response.status != 'connected') {
+          FB.login((response) => {
+            if (response.authResponse) {
+              FB.api('/me', (response) => {
+                store.commit('setFbUserName', response.name)
+              });
+              store.commit('setFbAcessToken', response.authResponse.accessToken)
+            } else {
+              throw ("User not logged in with facebook")
+            }
+          })
+        }
+      });
+    },
+    logoutFb(){
+      console.log("logging out")
+      FB.logout(function(response) {
+        console.log("logged out")
+        store.commit('setFbUserName', null)
+        store.commit('setFbAcessToken', null)
+      });
     }
   }
 });

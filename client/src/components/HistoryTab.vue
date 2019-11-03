@@ -13,7 +13,7 @@
           <v-data-table :search="searchHistory" :headers="headersHistory" :items="history" :item-key="'turn'"
             class="elevation-1" :pagination.sync="paginationHistory">
             <template v-slot:items="props">
-              <td class="text-xs-center">{{ props.item.turn }}</td>
+              <td class="text-xs-center">{{ props.item.turn - 1 }}</td>
               <td class="text-xs-center">
                     <v-layout align-center justify-space-around row >
                       <v-tooltip open-delay="600" top>

@@ -53,40 +53,54 @@
                                                                             style="color: white">WarBot</span></span>
             <v-spacer></v-spacer>
             <v-toolbar-items>
-                <v-menu v-if="$store.state.loggedInAccount!=null" offset-y>
+                <v-menu offset-y>
                     <template v-slot:activator="{ on }" class="hidden-sm-and-down">
                         <v-btn flat dark v-on="on">
                             Account
                         </v-btn>
                     </template>
                     <v-list class="secondary" dark>
-                        <v-list-tile>
+                        <v-list-tile v-if="$store.state.loggedInAccount!=null" >
                             <v-list-tile-avatar>
                                 <v-icon>fa-paper-plane</v-icon>
                             </v-list-tile-avatar>
                             <v-list-tile-title v-text="this.$store.state.loggedInAccount"></v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile>
+                        <v-list-tile v-if="$store.state.loggedInAccount!=null" >
                             <v-list-tile-avatar tile>
                                 <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" alt="trx">
                             </v-list-tile-avatar>
                             <v-list-tile-title v-text="this.$store.state.accountBalance"></v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile>
+                        <v-list-tile v-if="$store.state.loggedInAccount!=null" >
                             <v-list-tile-avatar>
                                 <img src="/img/logo.png" alt="war"/>
                             </v-list-tile-avatar>
                             <v-list-tile-title v-text="this.$store.state.currentAddressWarBalance"></v-list-tile-title>
                         </v-list-tile>
+                        <v-list-tile>
+                            <v-list-tile-avatar>
+                                <v-icon>fab fa-facebook-square</v-icon>
+                            </v-list-tile-avatar>
+                            <v-list-tile-title v-text="this.$store.state.fbUserName" >
+                            </v-list-tile-title>
+                        <v-list-tile-action class="mr-4">
+                              <v-btn flat @click="logoutFb" v-if="this.$store.state.fbUserName != null"> Logout </v-btn>
+                              <v-btn flat @click="loginToFb" v-else> Login </v-btn>
+                        </v-list-tile-action>
+                        </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-btn v-else class="hidden-sm-and-down" @click.stop="showModal('Login With Tronlink')" flat dark>
-                    Login
-                </v-btn>
-                <v-btn class="hidden-sm-and-down" flat dark @click.stop="showModal('News')">
+                <v-btn class="hidden-xs" flat dark @click.stop="showModal('News')">
                     <v-badge>
                         <template v-slot:badge>{{newsCount}}</template>
                         News
+                    </v-badge>
+                </v-btn>
+                <v-btn  flat dark @click.stop="showModal('Become an Ambassador')">
+                    <v-badge color="transparent">
+                        <template v-slot:badge ><span>🎖</span></template>
+                        Ambassador
                     </v-badge>
                 </v-btn>
             </v-toolbar-items>
@@ -205,20 +219,6 @@
                     link: true,
                     body: "https://www.instagram.com/tronwarbot"
                 },
-                {
-                    divider: true
-                },
-                {
-                    heading: 'Social'
-                },
-                {
-                    icon: 'fab fa-facebook-square',
-                    text: 'Become an Ambassador',
-                    link: false,
-                    body: "WIP"
-                },
-
-
             ]
         }),
         methods: {
