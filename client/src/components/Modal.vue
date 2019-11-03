@@ -1,123 +1,123 @@
 <template>
-    <v-layout row justify-center>
-        <v-dialog v-model="isVisible" max-width="750" min-width="500">
-            <v-card>
-                <v-card-title class="headline grey lighten-2" primary-title>{{headerTile}}</v-card-title>
+  <v-layout row justify-center>
+    <v-dialog v-model="isVisible" max-width="750" min-width="500">
+      <v-card>
+        <v-card-title class="headline grey lighten-2" primary-title>{{headerTile}}</v-card-title>
 
-                <v-card-text v-if="headerTile === 'Login With Tronlink'">
-                    <div v-if="this.$store.state.loggedInAccount!=null">
-                        Already logged in with account address: {{this.$store.state.loggedInAccount}}
-                        <br />
-                        <br />
-                        {{footerTile}}
-                    </div>
-                    <div v-else>
-                        Please, login to your TRONLink wallet.
-                        <br />If you do not have TRONLink wallet installed, please visit
-                        <a href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.
-                        <br />
-                        <br />
-                        <v-alert :value="true" type="warning">Tron War Bot is only available on Google Chrome or on
-                            TronLink mobile
-                            app for the time being.
-                        </v-alert>
-                    </div>
-                </v-card-text>
+        <v-card-text v-if="headerTile === 'Login With Tronlink'">
+          <div v-if="this.$store.state.loggedInAccount!=null">
+            Already logged in with account address: {{this.$store.state.loggedInAccount}}
+            <br />
+            <br />
+            {{footerTile}}
+          </div>
+          <div v-else>
+            Please, login to your TRONLink wallet.
+            <br />If you do not have TRONLink wallet installed, please visit
+            <a target="blank" href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.
+            <br />
+            <br />
+            <v-alert :value="true" type="warning">Tron War Bot is only available on Google Chrome or on
+              TronLink mobile
+              app for the time being.
+            </v-alert>
+          </div>
+        </v-card-text>
 
-                <v-card-text v-if="headerTile === 'Referral'">
-                    Refer a friend by sharing your referral link with him.
-                    <br />Here is your referral link:
-                    <v-chip v-if="this.$store.state.loggedInAccount != null" label outline color="primary">
-                        https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}
-                    </v-chip>
-                    <v-chip v-else label outline color="red">Login First</v-chip>
-                    <br />
-                    <br />You'll earn
-                    <b>{{percentage}} % </b> out of each of his bets
-                    <b>forever</b>!
-                    <br />
-                    <br />Once an address starts using a referral link, that can't change and it will always provide you
-                    that
-                    {{percentage}} %
-                    <br />Every 50TRX piled up you will automatically receive the earned TRX. Below you can see how much
-                    your
-                    referred links are earning you
-                    <v-container grid-list-md style="padding: 0px;" mt-2>
-                        <v-layout row>
-                            <v-flex xs12 style="text-align: center">
-                                <v-card color="primary" dark>
-                                    <v-card-text class="title">Your Referrals</v-card-text>
-                                </v-card>
-                            </v-flex>
-                        </v-layout>
+        <v-card-text v-if="headerTile === 'Referral'">
+          Refer a friend by sharing your referral link with him.
+          <br />Here is your referral link:
+          <v-chip v-if="this.$store.state.loggedInAccount != null" label outline color="primary">
+            https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}
+          </v-chip> 
+          <v-chip v-else label outline color="red">Login First</v-chip>
+          <br />
+          <br />You'll earn
+          <b>{{percentage}} % </b> out of each of his bets
+          <b>forever</b>!
+          <br />
+          <br />Once an address starts using a referral link, that can't change and it will always provide you
+          that
+          {{percentage}} %
+          <br />Every 50TRX piled up you will automatically receive the earned TRX. Below you can see how much
+          your
+          referred links are earning you
+          <v-container grid-list-md style="padding: 0px;" mt-2>
+            <v-layout row>
+              <v-flex xs12 style="text-align: center">
+                <v-card color="primary" dark>
+                  <v-card-text class="title">Your Referrals</v-card-text>
+                </v-card>
+              </v-flex>
+            </v-layout>
 
-                        <v-container v-if="this.$store.state.loggedInAccount == null" class="text-md-center">
-                            <v-chip label outline color="red">Login First</v-chip>
-                        </v-container>
+            <v-container v-if="this.$store.state.loggedInAccount == null" class="text-md-center">
+              <v-chip label outline color="red">Login First</v-chip>
+            </v-container>
 
-                        <v-container v-else-if="myReferrals.length > 0">
-                            <v-layout row wrap style="padding: 16px 16px 0 16px;">
-                                <v-flex xs6 class="title">Address</v-flex>
-                                <v-flex xs6 class="title" style="text-align: end;">Amount</v-flex>
-                            </v-layout>
+            <v-container v-else-if="myReferrals.length > 0">
+              <v-layout row wrap style="padding: 16px 16px 0 16px;">
+                <v-flex xs6 class="title">Address</v-flex>
+                <v-flex xs6 class="title" style="text-align: end;">Amount</v-flex>
+              </v-layout>
 
-                            <v-divider></v-divider>
-                            <v-container style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
-                                <v-layout row wrap v-for="referral in myReferrals" :key="referral.user_addr">
-                                    <v-flex xs6 class="subheading">
-                                        <v-tooltip bottom>
-                                            <template v-slot:activator="{ on }">
-                                                <div class="text-truncate" v-on="on">{{referral.user_addr}}</div>
-                                            </template>
-                                            <span>{{referral.user_addr}}</span>
-                                        </v-tooltip>
-                                    </v-flex>
-                                    <v-flex xs6 class="subheading" style="text-align: end">
-                                        {{referral.amount.toFixed(3)}} TRX
-                                    </v-flex>
-                                </v-layout>
-                            </v-container>
-                        </v-container>
+              <v-divider></v-divider>
+              <v-container style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
+                <v-layout row wrap v-for="referral in myReferrals" :key="referral.user_addr">
+                  <v-flex xs6 class="subheading">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on }">
+                        <div class="text-truncate" v-on="on">{{referral.user_addr}}</div>
+                      </template>
+                      <span>{{referral.user_addr}}</span>
+                    </v-tooltip>
+                  </v-flex>
+                  <v-flex xs6 class="subheading" style="text-align: end">
+                    {{referral.amount.toFixed(3)}} TRX
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-container> 
 
-                        <v-container v-else class="text-md-center">
-                            <v-chip label outline color="red">Still no one played with your link... :(</v-chip>
-                        </v-container>
-                    </v-container>
-                </v-card-text>
+            <v-container v-else class="text-md-center">
+              <v-chip label outline color="red">Still no one played with your link... :(</v-chip>
+            </v-container> -->
+          </v-container> 
+        </v-card-text>
 
-                <v-card-text v-if="headerTile === 'WAR Supply'">
-                    We want to build this game together with our users, and that's why 100% of TronWarBot profits are
-                    shared back
-                    to token holders! (..but yes we detain around 50% of the current
-                    token supply). After every stage you will need 50 more TRX to mine one WAR. WAR will be used in the
-                    future runs.
-                    <br />
-                    <v-divider mt-3 />
-                    <br />
-                    <span class="headling">We are in stage 1 of 100. You need to play 500 TRX to mine 1 WAR</span>
-                    <v-progress-linear color="primary" height="30" v-model="dividendStage"></v-progress-linear>
-                    <v-divider mt-8 />
-                    <br />
-                    <v-layout row wrap>
-                        <v-flex xs12 sm5>
-                            <v-text-field v-if="account == null" :value="'Login First'" background-color="red"
-                                label="You have mined" outline readonly>
-                                <template v-slot:append>
-                                    <v-avatar class="pb-2" tile size="40">
-                                        <img src="/img/logo.png" />
-                                    </v-avatar>
-                                </template>
-                            </v-text-field>
+        <v-card-text v-if="headerTile === 'WAR Supply'">
+          We want to build this game together with our users, and that's why 100% of TronWarBot profits are
+          shared back
+          to token holders! (..but yes we detain around 50% of the current
+          token supply). After every stage you will need 50 more TRX to mine one WAR. WAR will be used in the
+          future runs.
+          <br />
+          <v-divider mt-3 />
+          <br />
+          <span class="headling">We are in stage 1 of 100. You need to play 500 TRX to mine 1 WAR</span>
+          <v-progress-linear color="primary" height="30" v-model="dividendStage"></v-progress-linear>
+          <v-divider mt-8 />
+          <br />
+          <v-layout row wrap>
+            <v-flex xs12 sm5>
+              <v-text-field v-if="account == null" :value="'Login First'" background-color="red" label="You have mined"
+                outline readonly>
+                <template v-slot:append>
+                  <v-avatar class="pb-2" tile size="40">
+                    <img src="/img/logo.png" />
+                  </v-avatar>
+                </template>
+              </v-text-field>
 
-                            <v-text-field v-else :value="myWAR | WAR" label="You have mined" outline readonly>
-                                <template v-slot:append>
-                                    <v-avatar class="pb-2" tile size="40">
-                                        <img src="/img/logo.png" />
-                                    </v-avatar>
-                                </template>
-                            </v-text-field>
-                        </v-flex>
-                        <!-- <v-flex xs12 sm5>
+              <v-text-field v-else :value="myWAR | WAR" label="You have mined" outline readonly>
+                <template v-slot:append>
+                  <v-avatar class="pb-2" tile size="40">
+                    <img src="/img/logo.png" />
+                  </v-avatar>
+                </template>
+              </v-text-field>
+            </v-flex>
+            <!-- <v-flex xs12 sm5>
                             <v-text-field :value="availableTRX | TRX" label=" Estimate Available Dividends" outline
                                           readonly>
                                 <template v-slot:append>
@@ -128,22 +128,22 @@
                             </v-text-field>
                         </v-flex> -->
 
-                        <v-spacer />
+            <v-spacer />
 
-                        <v-flex xs12 sm5>
-                            <v-text-field :value="totalWARSupply | WAR" label="Total WAR mined" outline readonly>
-                                <template v-slot:append>
-                                    <v-avatar class="pb-2" tile size="40">
-                                        <img src="/img/logo.png" />
-                                    </v-avatar>
-                                </template>
-                            </v-text-field>
-                        </v-flex>
-                    </v-layout>
+            <v-flex xs12 sm5>
+              <v-text-field :value="totalWARSupply | WAR" label="Total WAR mined" outline readonly>
+                <template v-slot:append>
+                  <v-avatar class="pb-2" tile size="40">
+                    <img src="/img/logo.png" />
+                  </v-avatar>
+                </template>
+              </v-text-field>
+            </v-flex>
+          </v-layout>
 
-                    <v-divider />
+          <v-divider />
 
-                    <!-- <v-card mt-3>
+          <!-- <v-card mt-3>
                         <v-card-text style="text-align:center;">
                             At the end of the run you will be eligible to get your share of dividends by clicking the
                             button "Claim
@@ -158,522 +158,538 @@
                         </v-chip>
                     </v-card> -->
 
-                    <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
+          <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
                     (end of the run)-->
+        </v-card-text>
+
+        <v-card-text v-if="headerTile === 'How To Play'">
+          The game is inspired from the popular WorldWarBot 2020
+          <a href="https://www.facebook.com/worldwarbot/" target="_blank">Facebook Game</a>
+          <br />The bot simulates a world war: every turn, one every 5 minutes, a state (randomly chosen)
+          conquers
+          another country.
+          The conquest probability is proportional to the number of conquered countries and the cohesion index
+          of that
+          country.
+          A World War run lasts on average 40 days.
+
+          <br />
+          <br>
+          <b>What do I need to play?</b>
+          <br>In order to play, you must own TRX, the underlying cryptocurrency of TRON’s network. Make sure
+          you have a
+          TronLink Wallet.
+          For more information on how to create one, <a target="_blank"
+            href="https://chrome.google.com/webstore/detail/tronlink%EF%BC%88%E6%B3%A2%E5%AE%9D%E9%92%B1%E5%8C%85%EF%BC%89/ibnejdfjmmkpcnlpebklmnkoeoihofec">
+            click here </a>
+          <br>To play on mobile devices, please use <a target="_blank" href="https://www.tronwallet.me/">TronWallet</a>.
+
+          <br>
+          <br>
+
+          <b>How to get TRX</b>
+          <br>Are you running out of your skin to start gaming?
+          <br />Jump into the crypto world now!
+          <br />
+          <br />
+          <v-btn round color="primary" href="https://changelly.com/" target="_blank" dark pa-2>BUY TRX</v-btn>
+          <br />
+          <br />Once you start playing, your TRX are safe because you don’t move them on our website. They
+          remain in your secure wallet and moved out whenever you place a bet. So no need to trust us or
+          anyone, you
+          control your crypto assets. That's one of the nice things about using the blockchain.
+        </v-card-text>
+
+        <v-card-text v-if="headerTile === 'FAQ'">
+          <v-expansion-panel>
+            <!--Fairness-->
+            <v-expansion-panel-content>
+              <template v-slot:header>
+                <div>How are we PROVABLY FAIR?</div>
+              </template>
+              <v-card>
+                <v-card-text>
+                  We are crystal clear. We care about making things right. Here is how we provide the
+                  details to check that we are <a href="https://en.wikipedia.org/wiki/Provably_fair"
+                    targte="_blank">provably fair</a>.
+                  <br /><br />
+                  At the very beginning of a turn the Bot decides which country will conquer next. The
+                  Bot will hash (sha256) the name of the winner + a random string (called seed or salt
+                  in cryptography). You can find that hash in the box under Next Turn.<br>
+                  Once the timer runs out, the battle takes place and the conqueror is revealed
+                  alongside that seed used to compute the hash. You will then find the initial hash
+                  and
+                  the Conqueror and its seed under Previous Turn.
+                  <br /><br />
+                  This way we prove the Bot truly picks the countries in a random manner and doesn't
+                  "change its mind" on the way! And this is done in a way you can easily check, that
+                  is use any sha256 online tool like the one suggested below.
+                  <br />
+                  <br />
+                  <v-divider mt-3 />
+                  <br />
+                  <span class="title">Previous Turn: {{data.turn - 1}} </span>
+                  <br />
+                  <v-container fluid grid-list-sm>
+                    <v-flex sm 16>
+                      <v-text-field ref='previousCountriesMap' append-icon="content_copy"
+                        @click:append="copyToClipBoard(fairness.previous.mapState, 'previousMapState')"
+                        :value="fairness.previous.mapState" label="Countries Map" outline readonly>
+                      </v-text-field>
+                    </v-flex>
+                    <v-layout row wrap>
+                      <v-flex sm6>
+                        <v-text-field ref='previousMagicNumber' append-icon="content_copy"
+                          @click:append="copyToClipBoard(fairness.previous.magic, 'previousMagic')"
+                          :value="fairness.previous.magic" label="Magic Number" outline readonly>
+                        </v-text-field>
+                      </v-flex>
+                      <v-flex sm6>
+                        <v-text-field ref='previousMagicHash' append-icon="content_copy"
+                          @click:append="copyToClipBoard(fairness.previous.magicHash, 'previousMagicHash')"
+                          :value="fairness.previous.magicHash" label="Magic Hash" outline readonly>
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex sm6>
+                        <v-text-field ref='previousBlockHash' append-icon="content_copy"
+                          @click:append="copyToClipBoard(fairness.previousBlockHash, 'previousBlockHash')"
+                          :value="fairness.previous.blockHash" label="Block Hash" outline readonly>
+                        </v-text-field>
+                      </v-flex>
+                      <v-flex sm6>
+                        <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
+                          @click:append="copyToClipBoard(fairness.previous.nextTurnBlock, 'nextTurnBlock')"
+                          :value="fairness.previous.nextTurnBlock" label="Block Number" outline readonly>
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex sm6>
+                        <v-text-field ref='betNext' append-icon="content_copy"
+                          @click:append="copyToClipBoard('TODO', 'previousBlockHash')" :value="'TODO'" label="Bet Next"
+                          outline readonly>
+                        </v-text-field>
+                      </v-flex>
+                      <v-flex sm6>
+                        <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
+                          @click:append="copyToClipBoard('TODO', 'nextTurnBlock')" :value="'TODO'" label="Bet Battle"
+                          outline readonly>
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                  </v-container>
+
+                  <v-divider />
+                  <br />
+                  <span class="title">Next Turn: {{data.turn}} </span>
+                  <br />
+
+                  <v-container fluid grid-list-sm>
+                    <v-flex sm 16>
+                      <v-text-field ref='nextCountriesMap' append-icon="content_copy"
+                        @click:append="copyToClipBoard(fairness.next.mapState, 'nextMapState')"
+                        :value="fairness.next.mapState" label="Countries Map" outline readonly>
+                      </v-text-field>
+                    </v-flex>
+                    <v-layout row wrap>
+                      <v-flex sm6>
+                        <v-text-field ref='nextMagicNumber' value="*Hidden*" label="Magic Number" outline readonly>
+                          <v-tooltip slot="append" bottom>
+                            <v-icon slot="activator" color="primary" dark>info</v-icon>
+                            <span>This will be revealed when current turn is ended</span>
+                          </v-tooltip>
+
+                        </v-text-field>
+                      </v-flex>
+                      <v-flex sm6>
+                        <v-text-field ref='nextMagicHash' append-icon="content_copy"
+                          @click:append="copyToClipBoard(fairness.next.magicHash, 'nextMagicHash')"
+                          :value="fairness.next.magicHash" label="Magic Hash" outline readonly>
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex sm6>
+                        <v-text-field ref='nextBlockHash' append-icon="info" value="*Hidden*" label="Block Hash" outline
+                          readonly>
+                          <v-tooltip slot="append" bottom>
+                            <v-icon slot="activator" color="primary" dark>info</v-icon>
+                            <span>This will be revealed when current turn is ended</span>
+                          </v-tooltip>
+                        </v-text-field>
+                      </v-flex>
+                      <v-flex sm6>
+                        <v-text-field ref='nextNextBlockNumber' append-icon="content_copy"
+                          @click:append="copyToClipBoard(fairness.next.nextTurnBlock, 'nextTurnBlock')"
+                          :value="fairness.next.nextTurnBlock" label="Block Number" outline readonly>
+                        </v-text-field>
+                      </v-flex>
+                    </v-layout>
+                  </v-container>
+
+                  <v-card sm12>
+                    <v-card-title text-xs-centered>
+                      If you want to check the correctness of the hash, we suggest to use the
+                      following sha256 online calculator, but you can whatever tool you prefer.
+                    </v-card-title>
+                    <v-layout justify-center>
+                      <v-card-actions>
+                        <v-chip label outline color="primary">
+                          <a href="https://emn178.github.io/online-tools/sha256.html" target="_blank">SHA256 Online
+                            Tool</a>
+                        </v-chip>
+                      </v-card-actions>
+                    </v-layout>
+
+                  </v-card>
                 </v-card-text>
+              </v-card>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content v-for="question in faq" :key="question.question">
+              <template v-slot:header>
+                <div>{{question.question}}</div>
+              </template>
+              <v-card>
+                <v-card-text v-html="question.answer"></v-card-text>
+              </v-card>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-card-text>
 
-                <v-card-text v-if="headerTile === 'How To Play'">
-                    The game is inspired from the popular WorldWarBot 2020
-                    <a href="https://www.facebook.com/worldwarbot/" target="_blank">Facebook Game</a>
-                    <br />The bot simulates a world war: every turn, one every 5 minutes, a state (randomly chosen)
-                    conquers
-                    another country.
-                    The conquest probability is proportional to the number of conquered countries and the cohesion index
-                    of that
-                    country.
-                    A World War run lasts on average 40 days.
-
-                    <br />
-                    <br>
-                    <b>What do I need to play?</b>
-                    <br>In order to play, you must own TRX, the underlying cryptocurrency of TRON’s network. Make sure
-                    you have a
-                    TronLink Wallet.
-                    For more information on how to create one, <a target="_blank"
-                        href="https://chrome.google.com/webstore/detail/tronlink%EF%BC%88%E6%B3%A2%E5%AE%9D%E9%92%B1%E5%8C%85%EF%BC%89/ibnejdfjmmkpcnlpebklmnkoeoihofec">
-                        click here </a>
-                    <br>To play on mobile devices, please use <a target="_blank"
-                        href="https://www.tronwallet.me/">TronWallet</a>.
-
-                    <br>
-                    <br>
-
-                    <b>How to get TRX</b>
-                    <br>Are you running out of your skin to start gaming?
-                    <br />Jump into the crypto world now!
-                    <br />
-                    <br />
-                    <v-btn round color="primary" href="https://changelly.com/" target="_blank" dark pa-2>BUY TRX</v-btn>
-                    <br />
-                    <br />Once you start playing, your TRX are safe because you don’t move them on our website. They
-                    remain in your secure wallet and moved out whenever you place a bet. So no need to trust us or
-                    anyone, you
-                    control your crypto assets. That's one of the nice things about using the blockchain.
-                </v-card-text>
-
-                <v-card-text v-if="headerTile === 'FAQ'">
-                    <v-expansion-panel>
-                        <!--Fairness-->
-                        <v-expansion-panel-content>
-                            <template v-slot:header>
-                                <div>How are we PROVABLY FAIR?</div>
-                            </template>
-                            <v-card>
-                                <v-card-text>
-                                    We are crystal clear. We care about making things right. Here is how we provide the
-                                    details to check that we are <a href="https://en.wikipedia.org/wiki/Provably_fair"
-                                        targte="_blank">provably fair</a>.
-                                    <br /><br />
-                                    At the very beginning of a turn the Bot decides which country will conquer next. The
-                                    Bot will hash (sha256) the name of the winner + a random string (called seed or salt
-                                    in cryptography). You can find that hash in the box under Next Turn.<br>
-                                    Once the timer runs out, the battle takes place and the conqueror is revealed
-                                    alongside that seed used to compute the hash. You will then find the initial hash
-                                    and
-                                    the Conqueror and its seed under Previous Turn.
-                                    <br /><br />
-                                    This way we prove the Bot truly picks the countries in a random manner and doesn't
-                                    "change its mind" on the way! And this is done in a way you can easily check, that
-                                    is use any sha256 online tool like the one suggested below.
-                                    <br />
-                                    <br />
-                                    <v-divider mt-3 />
-                                    <br />
-                                    <span class="title">Previous Turn: {{data.turn - 1}} </span>
-                                    <br />
-                                    <v-container fluid grid-list-sm>
-                                        <v-flex sm 16>
-                                            <v-text-field ref='previousCountriesMap' append-icon="content_copy"
-                                                @click:append="copyToClipBoard(fairness.previous.mapState, 'previousMapState')"
-                                                :value="fairness.previous.mapState" label="Countries Map" outline
-                                                readonly>
-                                            </v-text-field>
-                                        </v-flex>
-                                        <v-layout row wrap>
-                                            <v-flex sm6>
-                                                <v-text-field ref='previousMagicNumber' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.previous.magic, 'previousMagic')"
-                                                    :value="fairness.previous.magic" label="Magic Number" outline
-                                                    readonly>
-                                                </v-text-field>
-                                            </v-flex>
-                                            <v-flex sm6>
-                                                <v-text-field ref='previousMagicHash' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.previous.magicHash, 'previousMagicHash')"
-                                                    :value="fairness.previous.magicHash" label="Magic Hash" outline
-                                                    readonly>
-                                                </v-text-field>
-                                            </v-flex>
-                                        </v-layout>
-                                        <v-layout row wrap>
-                                            <v-flex sm6>
-                                                <v-text-field ref='previousBlockHash' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.previousBlockHash, 'previousBlockHash')"
-                                                    :value="fairness.previous.blockHash" label="Block Hash" outline
-                                                    readonly>
-                                                </v-text-field>
-                                            </v-flex>
-                                            <v-flex sm6>
-                                                <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.previous.nextTurnBlock, 'nextTurnBlock')"
-                                                    :value="fairness.previous.nextTurnBlock" label="Block Number"
-                                                    outline readonly>
-                                                </v-text-field>
-                                            </v-flex>
-                                        </v-layout>
-                                        <v-layout row wrap>
-                                            <v-flex sm6>
-                                                <v-text-field ref='betNext' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard('TODO', 'previousBlockHash')"
-                                                    :value="'TODO'" label="Bet Next" outline readonly>
-                                                </v-text-field>
-                                            </v-flex>
-                                            <v-flex sm6>
-                                                <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard('TODO', 'nextTurnBlock')"
-                                                    :value="'TODO'" label="Bet Battle" outline readonly>
-                                                </v-text-field>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-container>
-
-                                    <v-divider />
-                                    <br />
-                                    <span class="title">Next Turn: {{data.turn}} </span>
-                                    <br />
-
-                                    <v-container fluid grid-list-sm>
-                                        <v-flex sm 16>
-                                            <v-text-field ref='nextCountriesMap' append-icon="content_copy"
-                                                @click:append="copyToClipBoard(fairness.next.mapState, 'nextMapState')"
-                                                :value="fairness.next.mapState" label="Countries Map" outline readonly>
-                                            </v-text-field>
-                                        </v-flex>
-                                        <v-layout row wrap>
-                                            <v-flex sm6>
-                                                <v-text-field ref='nextMagicNumber' value="*Hidden*"
-                                                    label="Magic Number" outline readonly>
-                                                    <v-tooltip slot="append" bottom>
-                                                        <v-icon slot="activator" color="primary" dark>info</v-icon>
-                                                        <span>This will be revealed when current turn is ended</span>
-                                                    </v-tooltip>
-
-                                                </v-text-field>
-                                            </v-flex>
-                                            <v-flex sm6>
-                                                <v-text-field ref='nextMagicHash' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.next.magicHash, 'nextMagicHash')"
-                                                    :value="fairness.next.magicHash" label="Magic Hash" outline
-                                                    readonly>
-                                                </v-text-field>
-                                            </v-flex>
-                                        </v-layout>
-                                        <v-layout row wrap>
-                                            <v-flex sm6>
-                                                <v-text-field ref='nextBlockHash' append-icon="info" value="*Hidden*"
-                                                    label="Block Hash" outline readonly>
-                                                    <v-tooltip slot="append" bottom>
-                                                        <v-icon slot="activator" color="primary" dark>info</v-icon>
-                                                        <span>This will be revealed when current turn is ended</span>
-                                                    </v-tooltip>
-                                                </v-text-field>
-                                            </v-flex>
-                                            <v-flex sm6>
-                                                <v-text-field ref='nextNextBlockNumber' append-icon="content_copy"
-                                                    @click:append="copyToClipBoard(fairness.next.nextTurnBlock, 'nextTurnBlock')"
-                                                    :value="fairness.next.nextTurnBlock" label="Block Number" outline
-                                                    readonly>
-                                                </v-text-field>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-container>
-
-                                    <v-card sm12>
-                                        <v-card-title text-xs-centered>
-                                            If you want to check the correctness of the hash, we suggest to use the
-                                            following sha256 online calculator, but you can whatever tool you prefer.
-                                        </v-card-title>
-                                        <v-layout justify-center>
-                                            <v-card-actions>
-                                                <v-chip label outline color="primary">
-                                                    <a href="https://emn178.github.io/online-tools/sha256.html"
-                                                        target="_blank">SHA256 Online Tool</a>
-                                                </v-chip>
-                                            </v-card-actions>
-                                        </v-layout>
-
-                                    </v-card>
-                                </v-card-text>
-                            </v-card>
-                        </v-expansion-panel-content>
-                        <v-expansion-panel-content v-for="question in faq" :key="question.question">
-                            <template v-slot:header>
-                                <div>{{question.question}}</div>
-                            </template>
-                            <v-card>
-                                <v-card-text v-html="question.answer"></v-card-text>
-                            </v-card>
-                        </v-expansion-panel-content>
-                    </v-expansion-panel>
-                </v-card-text>
-
-                <v-card-text v-if="headerTile === 'Partners'">
-                    <v-container fluid grid-list-xl>
-                        <v-layout wrap>
-                            <v-flex v-for="partner in partners" :key="partner.name" sm6>
-                                <v-card>
-                                    <v-img :src="'/img/partners/'+partner.img" class="image" :alt="partner.name"
-                                        height="150px" contain>
-                                    </v-img>
-                                    <v-card-title primary-title>
-                                        <div>
-                                            <a class="title text-truncate" :href="partner.link" target="_blank"
-                                                style="text-decoration: none;">{{partner.name}}</a>
-                                        </div>
-                                    </v-card-title>
-                                </v-card>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
-                </v-card-text>
-
-                <v-card-text v-if="headerTile === 'Become an Ambassador'">
-                    <div v-if="fbUserName != null">
-                        Hi {{this.fbUserName}}
-                    </div>
+        <v-card-text v-if="headerTile === 'Partners'">
+          <v-container fluid grid-list-xl>
+            <v-layout wrap>
+              <v-flex v-for="partner in partners" :key="partner.name" sm6>
+                <v-card>
+                  <v-img :src="'/img/partners/'+partner.img" class="image" :alt="partner.name" height="150px" contain>
+                  </v-img>
+                  <v-card-title primary-title>
                     <div>
-                        Here there will be the explanation
+                      <a class="title text-truncate" :href="partner.link" target="_blank"
+                        style="text-decoration: none;">{{partner.name}}</a>
                     </div>
-                    <v-autocomplete outline v-model="currentCountry" :items="computedMapping" 
-                        item-text="name" item-value="numberId" hide-no-data hide-selected
-                        label="Select Country" placeholder="Type in to select a country">
-                    </v-autocomplete>
-                    <v-btn v-on:click="becomeAnAmbassador"> Become an Ambassador</v-btn>
+                  </v-card-title>
+                </v-card>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
 
-                </v-card-text>
+        <v-card-text v-if="headerTile === 'Become an Ambassador'">
+          <div v-if="fbUserName != null">
+            Hi {{this.fbUserName}}
+          </div>
+          <div>
+            Here there will be the explanation
+          </div>
+          <v-stepper v-model="ambStep" vertical>
+            <v-stepper-step :complete="ambStep > 1" step="1">
+              Login with a wallet
+            </v-stepper-step>
 
-                <v-card-text v-if="headerTile === 'News'">
-                    <v-carousel>
-                        <v-carousel-item v-for="(n,i) in news" :key="i" :src="n.src">
-                        </v-carousel-item>
-                    </v-carousel>
-                </v-card-text>
+            <v-stepper-content step="1">
+              <div>
+                Please, login to your TRONLink wallet.
+                <br />If you do not have TRONLink wallet installed, please visit
+                <a target="blank" href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.
+                <br />
+                <br />
+                <v-alert :value="true" type="warning">Tron War Bot is only available on Google Chrome or on
+                  TronLink mobile
+                  app for the time being.
+                </v-alert>
+              </div>
+            </v-stepper-content>
 
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on">Claim
-                                your Dividends
-                            </v-btn>
-                        </template>
-                        <span>It will be available when the run is finished</span>
-                    </v-tooltip>
-                    <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
-                </v-card-actions>
+            <v-stepper-step :complete="ambStep > 2" step="2">Login to Facebook</v-stepper-step>
 
-            </v-card>
-        </v-dialog>
-        <v-snackbar v-model="snackbar" :color="this.snackbarColor" :timeout="this.snackbarTimeout" vertical bottom>
-            <span class="title"> {{this.snackbarText}}</span>
-            <v-btn dark flat @click="snackbar = false">
-                Close
-            </v-btn>
-        </v-snackbar>
-    </v-layout>
+            <v-stepper-content step="2">
+              <v-btn color="facebook" class="white--text" @click="loginToFb">Login with Facebook</v-btn>
+            </v-stepper-content>
+
+            <v-stepper-step :complete="ambStep > 3" step="3">Select a country</v-stepper-step>
+
+            <v-stepper-content step="3">
+              <v-autocomplete outline v-model="currentCountry" :items="computedMapping" item-text="name"
+                item-value="numberId" hide-no-data hide-selected label="Select Country"
+                placeholder="Type in to select a country">
+              </v-autocomplete>
+              <v-btn color="primary" @click="becomeAnAmbassador">Become an ambassador</v-btn>
+            </v-stepper-content>
+
+          </v-stepper>
+        </v-card-text>
+
+        <v-card-text v-if="headerTile === 'News'">
+          <v-carousel>
+            <v-carousel-item v-for="(n,i) in news" :key="i" :src="n.src">
+            </v-carousel-item>
+          </v-carousel>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on">Claim
+                your Dividends
+              </v-btn>
+            </template>
+            <span>It will be available when the run is finished</span>
+          </v-tooltip>
+          <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
+        </v-card-actions>
+
+      </v-card>
+    </v-dialog>
+    <v-snackbar v-model="snackbar" :color="this.snackbarColor" :timeout="this.snackbarTimeout" vertical bottom>
+      <span class="title"> {{this.snackbarText}}</span>
+      <v-btn dark flat @click="snackbar = false">
+        Close
+      </v-btn>
+    </v-snackbar>
+  </v-layout>
 </template>
 
 <script>
-    import {
-        db
-    } from "../plugins/firebase";
-    import tronweb from 'tronweb'
-    import mapping from '../assets/mapping'
-    import axios from 'axios'
-    import {
-        pollMyWar
-    } from '../utils/pollForUpdate'
+  import {
+    db
+  } from "../plugins/firebase";
+  import tronweb from 'tronweb'
+  import mapping from '../assets/mapping'
+  import axios from 'axios'
+  import {
+    pollMyWar
+  } from '../utils/pollForUpdate'
 
-    export default {
-        name: "Modal",
-        props: {
-            value: Boolean,
-            headerTile: String,
-            footerTile: String,
-            bodyTile: String
-        },
+  export default {
+    name: "Modal",
+    props: {
+      value: Boolean,
+      headerTile: String,
+      footerTile: String,
+      bodyTile: String
+    },
 
-        filters: {
-            TRX: (amount) => {
-                return tronweb.fromSun(amount).toFixed(3) + ' TRX'
-            },
-            WAR: (amount) => {
-                return amount != 0 ? amount.div("1000000000000000000").toFixed(3) + ' WAR' : 0 + ' WAR'
-            }
-        },
+    filters: {
+      TRX: (amount) => {
+        return tronweb.fromSun(amount).toFixed(3) + ' TRX'
+      },
+      WAR: (amount) => {
+        return amount != 0 ? amount.div("1000000000000000000").toFixed(3) + ' WAR' : 0 + ' WAR'
+      }
+    },
 
-        watch: {
-            isVisible: function () {
-                if (this.isVisible && this.headerTile == "WAR Supply") {
-                    this.$store.commit("setPollWar", false)
-                    pollMyWar(1000)
-                } else {
-                    this.$store.commit("setPollWar", true)
-                }
-            }
-        },
+    watch: {
+      isVisible: function () {
+        if (this.isVisible && this.headerTile == "WAR Supply") {
+          this.$store.commit("setPollWar", false)
+          pollMyWar(1000)
+        } else {
+          this.$store.commit("setPollWar", true)
+        }
+      }
+    },
 
-        computed: {
-            computedMapping() {
-                return this.mapping.filter((el,index) => {
-                    console.log(index)
-                    console.log(this.mapStatus[index])
-                    return !this.mapStatus[index].hasOwnProperty('ambassador')
-                })
-            },
-            percentage: function () {
-                if (this.referrals.percentages[this.$store.state.loggedInAccount]) {
-                    return this.referrals.percentages[this.$store.state.loggedInAccount] * 100
-                }
-                return this.referrals.percentages.default * 100
-            },
-            isVisible: {
-                get() {
-                    return this.value;
-                },
-                set(value) {
-                    this.$emit("input", value);
-                }
-            },
-            myReferrals: function () {
-                let keys = Object.keys(this.referrals.map);
-                let myReferrals = [];
-                for (var i = keys.length - 1; i >= 0; i--) {
-                    if (
-                        this.account != null &&
-                        this.referrals.map[keys[i]].referrer_addr === this.account
-                    ) {
-                        myReferrals.push({
-                            user_addr: keys[i],
-                            amount: this.referrals.map[keys[i]].amount
-                        });
-                    }
-                }
-                return myReferrals;
-            },
-            account() {
-                return this.$store.state.loggedInAccount;
-            },
-            // availableTRX() {
-            //     // BetFinal Jackpot + max((BetNext - deposit),0)
-            //     const BetFinal = tronweb.BigNumber(tronweb.toSun(this.data.jackpot * this.$store.state.gameParams.finalBetParams.houseEdge))
-            //     const BetNext = this.$store.state.availableDividends
-            //     const deposit = tronweb.toSun(this.data.deposit)
-            //     return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
-            // },
-            myWAR() {
-                return this.$store.state.currentAddressWarBalance;
-            },
-            totalWARSupply() {
-                return this.$store.state.totalWARSupply;
-            },
-            dividendStage() {
-                return this.totalWARSupply != 0 ? parseInt(this.totalWARSupply.div("1000000000000000000").mod(1000000)
-                    .div(100).toString()) : 0
-            },
-            currentCountry: {
-                get() {
-                    return this.$store.state.selectedCountry
-                },
-                set(value) {
-                    this.$store.commit('setSelectedCountry', value)
-                }
-            },
-            fbUserName() {
-                return this.$store.state.fbUserName
-            }
+    computed: {
+      ambStep: {
+        get() {
+          if (this.$store.state.fbAcessToken != null && this.$store.state.loggedInAccount != null) return 3;
+          if (this.$store.state.loggedInAccount != null) return 2;
+          return 1;
         },
-        firebase: {
-            referrals: db.ref("public/referral"),
-            data: db.ref("public/data"),
-            fairness: db.ref("public/fairness"),
-            mapStatus: db.ref("public/countriesMap"),
+        set() {
+
+        }
+      },
+      computedMapping() {
+        return this.mapping.filter((el, index) => {
+          return !this.mapStatus[index].hasOwnProperty('ambassador')
+        })
+      },
+      percentage: function () {
+        if (this.referrals.percentages[this.$store.state.loggedInAccount]) {
+          return this.referrals.percentages[this.$store.state.loggedInAccount] * 100
+        }
+        return this.referrals.percentages.default * 100
+      },
+      isVisible: {
+        get() {
+          return this.value;
         },
-        methods: {
-            copyToClipBoard(value, ref) {
-                const input = this.$refs[ref];
-                input.focus();
-                document.execCommand('selectAll');
-                this.copied = document.execCommand('copy');
-                this.snackbarText = 'Copied to Clipboard'
-                this.snackbarColor = "info";
-                this.snackbarTimeout = 3000;
-                this.snackbar = true
-            },
-            async becomeAnAmbassador() {
-                // First login with Facebook
-                if (this.$store.state.loggedInAccount == null) {
-                    this.snackbarText = "Login First";
-                    this.snackbarColor = "error";
-                    this.snackbar = true;
-                    this.isWaitingForConfirm = false
-                    return
-                }
-                if (this.currentCountry == null) {
-                    this.snackbarText = "Select a country first";
-                    this.snackbarColor = "error";
-                    this.snackbar = true;
-                    this.isWaitingForConfirm = false
-                    return
-                }
-                await FB.getLoginStatus(async response => {
-                    if (response.status != 'connected') {
-                        FB.login((response) => {
-                            if (response.authResponse) {
-                                console.log('Welcome!  Fetching your information.... ');
-                                FB.api('/me', (response) => {
-                                    console.log('Good to see you, ' + response.name +
-                                        '.');
-                                    this.$store.commit('setFbUserName', response.name)
-                                });
-                                this.$store.commit('setFbResponse', response)
-                            } else {
-                                console.log('User cancelled login or did not fully authorize.');
-                            }
-                        });
-                    }
-                    try {
-                        await axios.post(this.$store.state.test ? `http://localhost:3000/ambassador` :
-                            `https://api.tronwarbot.com/ambassador`, {
-                                access_token: this.$store.state.fbAcessToken,
-                                country: this.currentCountry,
-                                address: this.account
-                            })
-                    } catch (e) {
-                        console.log(e)
-                        try {
-                            this.snackbarText = "[AMBASSADOR] " + e.response.data.message
-                            this.snackbarColor = "error";
-                            this.snackbarTimeout = 10000;
-                            this.snackbar = true;
-                        } catch (err) {
-                            console.log(err)
-                            this.snackbarText =
-                                "[AMBASSADOR] Connection error. Ambassador not registered"
-                            this.snackbarColor = "error";
-                            this.snackbarTimeout = 10000;
-                            this.snackbar = true;
-                        }
-                    }
-                });
-            }
+        set(value) {
+          this.$emit("input", value);
+        }
+      },
+      myReferrals: function () {
+        let keys = Object.keys(this.referrals.map);
+        let myReferrals = [];
+        for (var i = keys.length - 1; i >= 0; i--) {
+          if (
+            this.account != null &&
+            this.referrals.map[keys[i]].referrer_addr === this.account
+          ) {
+            myReferrals.push({
+              user_addr: keys[i],
+              amount: this.referrals.map[keys[i]].amount
+            });
+          }
+        }
+        return myReferrals;
+      },
+      account() {
+        return this.$store.state.loggedInAccount;
+      },
+      // availableTRX() {
+      //     // BetFinal Jackpot + max((BetNext - deposit),0)
+      //     const BetFinal = tronweb.BigNumber(tronweb.toSun(this.data.jackpot * this.$store.state.gameParams.finalBetParams.houseEdge))
+      //     const BetNext = this.$store.state.availableDividends
+      //     const deposit = tronweb.toSun(this.data.deposit)
+      //     return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
+      // },
+      myWAR() {
+        return this.$store.state.currentAddressWarBalance;
+      },
+      totalWARSupply() {
+        return this.$store.state.totalWARSupply;
+      },
+      dividendStage() {
+        return this.totalWARSupply != 0 ? parseInt(this.totalWARSupply.div("1000000000000000000").mod(1000000)
+          .div(100).toString()) : 0
+      },
+      currentCountry: {
+        get() {
+          return this.$store.state.selectedCountry
         },
-        data: () => ({
-            snackbar: false,
-            snackbarText: "",
-            snackbarColor: "",
-            snackbarTimeout: 6000,
-            mapping: mapping,
-            mapStatus: [],
-            faq: [{
-                    question: "What even is TronWarBot?",
-                    answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
-                        "<br><br>Basically we have a bot which decides one country every to conquer another country. It goes on like that until one country takes the whole world. It’s super addictive to keep an eye on the updates, we tried it on our own skin!!\n" +
-                        "What we do is to allow betting on it! We bet using cryptocurrencies, TRX. Please read further if you wanna know more."
-                },
-                {
-                    question: "Bets? How?",
-                    answer: "Glad you asked! We currently support two types of bets.\n" +
-                        "<br><b>Final Bet</b>: you can bet on the final winner. It’s you vs the others.\n" +
-                        "<br><b>Next Conqueror Bet</b>: you can bet on who will conquer next turn. It’s you against us!\n" +
-                        "You need TronLink wallet filled in with some TRX in order to bet.\n" +
-                        "To know more read further.\n"
-                },
-                {
-                    question: "How does Final Bet work?",
-                    answer: "You can try to forecast the winner of the whole run, the country which will conquer the whole world.<br> 80% of the Final Jackpot is split among those who believed in that country and placed a bet on it, the remaining 20% goes into the Dividend Pool. The betting amount varies each turn depending on the probability a country has to win, so first movers have a huge advantage! We start with a fixed 50TRX at the beginning, then it keeps increasing as the run goes on! Please refer to the FAQ in you wanna have more details.\n"
-                },
-                {
-                    question: "How does Bet Next work?",
-                    answer: "You can bet that a state will conquer another country during the next turn. You choose how much to bet and your reward will be according to the probability of that country to be the actual conqueror next.\n" +
-                        "<br><b>Example</b>: I think Japan will conquer another country in the next turn (doesn’t matter which one, you only care about the conqueror) so I choose Japan in the box “select country”, I choose how much to bet, then I place the bet.<br> Let’s say you bet 100TRX and the percentage of Japan to conquer next was 50%, if you win you’ll take away 190TRX! What about those missing 10TRX for a fair payout? Well, we put that in the Dividends Pool and at the end of the run they will be shared back to token holders!\n"
-                },
-                {
-                    question: "How does the Bot work?",
-                    answer: "It uses a probability density function (PDF) to determine next conqueror state.\n" +
-                        "PDF is based on number of conquered neighbouring countries times the cohesion index.\n\n" +
-                        "<br><br><code>PDF = (NUMBER OF TERRITORIES CONQUERED ON THE BORDER) * (COHESION INDEX + PROBABILITY OF INSURRECTION BY THE FOREIGN STATE)</code>\n"
-                },
-                {
-                    question: "What is the cohesion index?",
-                    answer: "It indicates the welfare and the feeling good together of the people. It runs from 0, which means anarchy, to 1, which means patriotic state, with people which want to defend their identity.\n"
-                },
-                {
-                    question: "When the cohesion index is updated?",
-                    answer: "It is updated anytime there is a variation in the number of countries belonging to a state, both if conquering or losing a country. It is computed taking care of the cohesion index of the conquered state.\n" +
-                        "<br><b>Example</b>: France conquers a very patriotic Germany and then France will have a lower cohesion index, due to the German people that want to be independent!\n"
-                },
-                {
-                    question: "How long is a World War?\n",
-                    answer: "It has not a fixed deadline, it depends on the development of the war itself. On average it takes 40 days having one turn every 5 minutes.\n"
-                },
-                {
-                    question: "What do I do if I'm not able to place the bet?",
-                    answer: "Check if you have got enough Energy and Bandwidth."
-                },
-                {
-                    question: "What are Energy and Bandwidth?",
-                    answer: `<b>Bandwidth:</b> For each byte array, the network consumes an equal amount of bandwidth
+        set(value) {
+          this.$store.commit('setSelectedCountry', value)
+        }
+      },
+      fbUserName() {
+        return this.$store.state.fbUserName
+      }
+    },
+    firebase: {
+      referrals: db.ref("public/referral"),
+      data: db.ref("public/data"),
+      fairness: db.ref("public/fairness"),
+      mapStatus: db.ref("public/countriesMap"),
+    },
+    methods: {
+      copyToClipBoard(value, ref) {
+        const input = this.$refs[ref];
+        input.focus();
+        document.execCommand('selectAll');
+        this.copied = document.execCommand('copy');
+        this.snackbarText = 'Copied to Clipboard'
+        this.snackbarColor = "info";
+        this.snackbarTimeout = 3000;
+        this.snackbar = true
+      },
+      async becomeAnAmbassador() {
+        if(this.$store.state.fbAcessToken == null){
+          this.snackbarText = "Login to facebook First";
+          this.snackbarColor = "error";
+          this.snackbar = true;
+          this.isWaitingForConfirm = false
+          return
+        }
+        if (this.$store.state.loggedInAccount == null) {
+          this.snackbarText = "Login to your wallet first";
+          this.snackbarColor = "error";
+          this.snackbar = true;
+          this.isWaitingForConfirm = false
+          return
+        }
+        if (this.currentCountry == null) {
+          this.snackbarText = "Select a country first";
+          this.snackbarColor = "error";
+          this.snackbar = true;
+          this.isWaitingForConfirm = false
+          return
+        }
+        try {
+          await axios.post(`https://api.tronwarbot.com/ambassador`, {
+              access_token: this.$store.state.fbAcessToken,
+              country: this.currentCountry,
+              address: this.account
+            })
+        } catch (e) {
+          console.log(e)
+          try {
+            this.snackbarText = "[AMBASSADOR] " + e.response.data.message
+            this.snackbarColor = "error";
+            this.snackbarTimeout = 10000;
+            this.snackbar = true;
+          } catch (err) {
+            console.log(err)
+            this.snackbarText =
+              "[AMBASSADOR] Connection error. Ambassador not registered"
+            this.snackbarColor = "error";
+            this.snackbarTimeout = 10000;
+            this.snackbar = true;
+          }
+        }
+      }
+    },
+    data: () => ({
+      snackbar: false,
+      snackbarText: "",
+      snackbarColor: "",
+      snackbarTimeout: 6000,
+      mapping: mapping,
+      mapStatus: [],
+      faq: [{
+          question: "What even is TronWarBot?",
+          answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
+            "<br><br>Basically we have a bot which decides one country every to conquer another country. It goes on like that until one country takes the whole world. It’s super addictive to keep an eye on the updates, we tried it on our own skin!!\n" +
+            "What we do is to allow betting on it! We bet using cryptocurrencies, TRX. Please read further if you wanna know more."
+        },
+        {
+          question: "Bets? How?",
+          answer: "Glad you asked! We currently support two types of bets.\n" +
+            "<br><b>Final Bet</b>: you can bet on the final winner. It’s you vs the others.\n" +
+            "<br><b>Next Conqueror Bet</b>: you can bet on who will conquer next turn. It’s you against us!\n" +
+            "You need TronLink wallet filled in with some TRX in order to bet.\n" +
+            "To know more read further.\n"
+        },
+        {
+          question: "How does Final Bet work?",
+          answer: "You can try to forecast the winner of the whole run, the country which will conquer the whole world.<br> 80% of the Final Jackpot is split among those who believed in that country and placed a bet on it, the remaining 20% goes into the Dividend Pool. The betting amount varies each turn depending on the probability a country has to win, so first movers have a huge advantage! We start with a fixed 50TRX at the beginning, then it keeps increasing as the run goes on! Please refer to the FAQ in you wanna have more details.\n"
+        },
+        {
+          question: "How does Bet Next work?",
+          answer: "You can bet that a state will conquer another country during the next turn. You choose how much to bet and your reward will be according to the probability of that country to be the actual conqueror next.\n" +
+            "<br><b>Example</b>: I think Japan will conquer another country in the next turn (doesn’t matter which one, you only care about the conqueror) so I choose Japan in the box “select country”, I choose how much to bet, then I place the bet.<br> Let’s say you bet 100TRX and the percentage of Japan to conquer next was 50%, if you win you’ll take away 190TRX! What about those missing 10TRX for a fair payout? Well, we put that in the Dividends Pool and at the end of the run they will be shared back to token holders!\n"
+        },
+        {
+          question: "How does the Bot work?",
+          answer: "It uses a probability density function (PDF) to determine next conqueror state.\n" +
+            "PDF is based on number of conquered neighbouring countries times the cohesion index.\n\n" +
+            "<br><br><code>PDF = (NUMBER OF TERRITORIES CONQUERED ON THE BORDER) * (COHESION INDEX + PROBABILITY OF INSURRECTION BY THE FOREIGN STATE)</code>\n"
+        },
+        {
+          question: "What is the cohesion index?",
+          answer: "It indicates the welfare and the feeling good together of the people. It runs from 0, which means anarchy, to 1, which means patriotic state, with people which want to defend their identity.\n"
+        },
+        {
+          question: "When the cohesion index is updated?",
+          answer: "It is updated anytime there is a variation in the number of countries belonging to a state, both if conquering or losing a country. It is computed taking care of the cohesion index of the conquered state.\n" +
+            "<br><b>Example</b>: France conquers a very patriotic Germany and then France will have a lower cohesion index, due to the German people that want to be independent!\n"
+        },
+        {
+          question: "How long is a World War?\n",
+          answer: "It has not a fixed deadline, it depends on the development of the war itself. On average it takes 40 days having one turn every 5 minutes.\n"
+        },
+        {
+          question: "What do I do if I'm not able to place the bet?",
+          answer: "Check if you have got enough Energy and Bandwidth."
+        },
+        {
+          question: "What are Energy and Bandwidth?",
+          answer: `<b>Bandwidth:</b> For each byte array, the network consumes an equal amount of bandwidth
                             points depending on the length of the array. So, if you are transmitting a transaction with
                             a byte array length of 200, you need to have 200 Bandwidth points. This prevents malicious
                             spam transactions from clogging the network and causing delayed transaction confirmations.
@@ -688,56 +704,56 @@
                             select Energy instead of Bandwidth. If you are not going to be executing smart contracts,
                             there is no reason why you should select Energy. Those who are just TRX investors or users
                             should always select Bandwidth and not Energy when freezing their tokens.`
-                },
-                {
-                    question: "Couldn't find your answer?",
-                    answer: "Please reach us out on the telegram group (please find the link on the bottom side of the menu)! We would be very happy to answer your questions :)"
-                },
-                {
-                    question: "Is there a whitepaper?",
-                    answer: "<a href=\"/files/WhitePaper.pdf\" target=\"_blank\">Click here to view the whitepaper<a/>"
-                }
-            ],
-            partners: [{
-                    name: 'CHIPS Token',
-                    link: 'https://chipstoken.io/',
-                    img: 'chips.png'
-                },
-                {
-                    name: 'Tron Game Center',
-                    link: 'https://trongamecenter.org/',
-                    img: 'tgc.png'
-                },
-                {
-                    name: 'ECONEUARK',
-                    link: 'http://www.ecoearthcoin.com',
-                    img: 'econeuark.png'
-                },
-                {
-                    name: 'Cryptopress Casa',
-                    link: 'http://www.cryptopress.casa/',
-                    img: 'crypropress_casa.jpg'
-                }
-                /*
-                {
-                    name: 'BingTron',
-                    link: '',
-                    img: 'bingtron.jpg'
-                }*/
-            ],
-            news: [{
-                    src: 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg'
-                },
-                {
-                    src: 'https://cdn.vuetifyjs.com/images/carousel/sky.jpg'
-                },
-                {
-                    src: 'https://cdn.vuetifyjs.com/images/carousel/bird.jpg'
-                },
-                {
-                    src: 'https://cdn.vuetifyjs.com/images/carousel/planet.jpg'
-                }
-            ]
-        })
-    };
+        },
+        {
+          question: "Couldn't find your answer?",
+          answer: "Please reach us out on the telegram group (please find the link on the bottom side of the menu)! We would be very happy to answer your questions :)"
+        },
+        {
+          question: "Is there a whitepaper?",
+          answer: "<a href=\"/files/WhitePaper.pdf\" target=\"_blank\">Click here to view the whitepaper<a/>"
+        }
+      ],
+      partners: [{
+          name: 'CHIPS Token',
+          link: 'https://chipstoken.io/',
+          img: 'chips.png'
+        },
+        {
+          name: 'Tron Game Center',
+          link: 'https://trongamecenter.org/',
+          img: 'tgc.png'
+        },
+        {
+          name: 'ECONEUARK',
+          link: 'http://www.ecoearthcoin.com',
+          img: 'econeuark.png'
+        },
+        {
+          name: 'Cryptopress Casa',
+          link: 'http://www.cryptopress.casa/',
+          img: 'crypropress_casa.jpg'
+        }
+        /*
+        {
+            name: 'BingTron',
+            link: '',
+            img: 'bingtron.jpg'
+        }*/
+      ],
+      news: [{
+          src: 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg'
+        },
+        {
+          src: 'https://cdn.vuetifyjs.com/images/carousel/sky.jpg'
+        },
+        {
+          src: 'https://cdn.vuetifyjs.com/images/carousel/bird.jpg'
+        },
+        {
+          src: 'https://cdn.vuetifyjs.com/images/carousel/planet.jpg'
+        }
+      ]
+    })
+  };
 </script>

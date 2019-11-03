@@ -310,22 +310,7 @@
         this.snackbar = true
       },
       shareOnFb: async function () {
-        await FB.getLoginStatus((response) => {
-          if (response.status != 'connected') {
-            FB.login((response) => {
-              if (response.authResponse) {
-                console.log('Welcome!  Fetching your information.... ');
-                FB.api('/me', (response) => {
-                  console.log('Good to see you, ' + response.name + '.');
-                  this.$store.commit('setFbUserName', response.name)
-                });
-                this.$store.commit('setFbAcessToken', response.authResponse.accessToken)
-              } else {
-                console.log('User cancelled login or did not fully authorize.');
-              }
-            });
-          }
-        });
+        this.loginToFb()
         await FB.ui({
           method: 'feed',
           link: 'https://tronwarbot.com',
