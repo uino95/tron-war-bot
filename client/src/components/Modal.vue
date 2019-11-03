@@ -378,11 +378,12 @@
         </v-card-text>
 
         <v-card-text v-if="headerTile === 'Become an Ambassador'">
-          <div v-if="fbUserName != null">
-            Hi {{this.fbUserName}}
+          <div class="title" v-if="fbUserName != null">
+            Hi <b>{{this.fbUserName}}</b>
           </div>
-          <div>
-            Here there will be the explanation
+          <br v-if="fbUserName != null">
+          <div class="mb-2">
+            Have you ever dreamed to become the ambassador of your home country and lead it to conquer the whole world? Now you can! Just follow the steps listed below:
           </div>
           <v-stepper v-model="ambStep" vertical>
             <v-stepper-step :complete="ambStep > 1" step="1">
@@ -416,7 +417,15 @@
                 item-value="numberId" hide-no-data hide-selected label="Select Country"
                 placeholder="Type in to select a country">
               </v-autocomplete>
-              <v-btn color="primary" @click="becomeAnAmbassador">Become an ambassador</v-btn>
+              <v-layout row>
+              <v-btn color="primary" :disabled="(!terms) || (currentCountry == null)" @click="becomeAnAmbassador">Become an ambassador</v-btn>
+              <v-checkbox
+                color="primary"
+                class="ml-2" 
+                v-model="terms"
+                :label="'Accept our terms and conditions'" >
+              </v-checkbox>
+              </v-layout>
             </v-stepper-content>
 
           </v-stepper>
@@ -641,6 +650,7 @@
       snackbarTimeout: 6000,
       mapping: mapping,
       mapStatus: [],
+      terms: false,
       faq: [{
           question: "What even is TronWarBot?",
           answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
