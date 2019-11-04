@@ -438,10 +438,11 @@
         </v-card-text>
 
         <v-card-text v-if="headerTile === 'News'">
-          <v-carousel>
+          <v-carousel v-if="news.length !== 0">
             <v-carousel-item v-for="(n,i) in news" :key="i" :src="n.src">
             </v-carousel-item>
           </v-carousel>
+          <v-text-field v-else value="There're no recent news" outline readonly></v-text-field>
         </v-card-text>
 
         <v-card-actions>
