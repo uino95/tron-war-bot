@@ -43,20 +43,28 @@
           class="elevation-1" :pagination.sync="paginationStats" :rows-per-page-items="[10,20,50]">
           <template v-slot:items="props">
             <td class="text-xs-right">
-              <v-avatar>
-                <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                  :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
-              </v-avatar>
+                <v-avatar>
+                  <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                    :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
+                </v-avatar>
+            </td>
+            <td class="text-xs-center" style="font-size:18px; padding:0px 6px;">
+              <v-tooltip v-if="props.item.ambassador" close-delay="3000" bottom>
+                <template v-slot:activator="{ on }">
+                  <div class="text-right" v-on="on">🎖</div>
+                </template>
+                <span>The ambassador of {{props.item.name}} is
+                  <br /><b><a style="color: white" :href="props.item.ambassador.link" target="blank"> {{props.item.ambassador.name}}</a></b></span>
+                <br />
+                <i>If you would like to become an ambassador of your country,
+                <br />check out the rules in the <i>Ambassador</i> section in the menu.</i>
+              </v-tooltip>
             </td>
             <td class="text-xs-right && font-weight-bold text-truncate">
+
               <v-layout row>
+
                 <div> {{props.item.name}} </div>
-                <v-tooltip v-if="props.item.ambassador" close-delay="3000" bottom>
-                  <template v-slot:activator="{ on }">
-                    <div class="ml-2 " v-on="on">🎖</div>
-                  </template>
-                  <span>The ambassador of this country it is <a style="color: white" :href="props.item.ambassador.link" target="blank"> {{props.item.ambassador.name}}</a></span>. If you want to become an ambassador of your country, check the instructions in the become an ambassador menu on the left!
-                </v-tooltip>
               </v-layout>
             </td>
             <td class="text-xs-right">{{ props.item.territories }}</td>
@@ -224,10 +232,16 @@
           align: 'left'
         },
         {
+            text: '',
+            value: 'no-value',
+            sortable: false,
+            align: 'center'
+          },
+        {
           text: 'Country',
           value: 'name',
           sortable: false,
-          align: 'right',
+          align: 'left',
           class: 'body-1'
         }, {
           text: 'Owned',

@@ -97,7 +97,7 @@
                         News
                     </v-badge>
                 </v-btn>
-                <v-btn  flat dark @click.stop="showModal('Become an Ambassador')">
+                <v-btn  flat dark @click.stop="showModal('🎖 Become an Ambassador 🎖')">
                     <v-badge color="transparent">
                         <template v-slot:badge ><span>🎖</span></template>
                         Ambassador
@@ -265,7 +265,7 @@
             });
             if (!this.$store.state.isMobile) {
                 this.noShowMap = false
-            } 
+            }
             if (this.$store.state.isMobile){
                 this.$root.$on('stats_loaded', () => {
                     this.loading = false;

@@ -29,7 +29,7 @@
           <br />Here is your referral link:
           <v-chip v-if="this.$store.state.loggedInAccount != null" label outline color="primary">
             https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}
-          </v-chip> 
+          </v-chip>
           <v-chip v-else label outline color="red">Login First</v-chip>
           <br />
           <br />You'll earn
@@ -77,12 +77,12 @@
                   </v-flex>
                 </v-layout>
               </v-container>
-            </v-container> 
+            </v-container>
 
             <v-container v-else class="text-md-center">
               <v-chip label outline color="red">Still no one played with your link... :(</v-chip>
             </v-container> -->
-          </v-container> 
+          </v-container>
         </v-card-text>
 
         <v-card-text v-if="headerTile === 'WAR Supply'">
@@ -377,13 +377,24 @@
           </v-container>
         </v-card-text>
 
-        <v-card-text v-if="headerTile === 'Become an Ambassador'">
+        <v-card-text v-if="headerTile === '🎖 Become an Ambassador 🎖'">
           <div class="title" v-if="fbUserName != null">
             Hi <b>{{this.fbUserName}}</b>
           </div>
           <br v-if="fbUserName != null">
           <div class="mb-2">
-            Have you ever dreamed to become the ambassador of your home country and lead it to conquer the whole world? Now you can! Just follow the steps listed below:
+            <h4 class=" text-xs-center">
+              <i>Have you ever dreamt of becoming the leader of your home country and guide it to conquer the world?</i>
+              <br /> <b >Now you can!</b>
+            </h4>
+            <br />
+            <br />
+            If you succeed and your country wins the war, you will <b>win 10K TRX</b> and <b>20 WAR</b>.
+            All you have to do is register through the steps below, and support your country in winning the game.
+            <br />
+            <br />
+            <b>How?</b>
+            Motivate your cadets to engage through social media so that your country gain cohesion points and increase the odds of winning the war.
           </div>
           <v-stepper v-model="ambStep" vertical>
             <v-stepper-step :complete="ambStep > 1" step="1">
@@ -393,13 +404,11 @@
             <v-stepper-content step="1">
               <div>
                 Please, login to your TRONLink wallet.
-                <br />If you do not have TRONLink wallet installed, please visit
-                <a target="blank" href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.
+                <br />If you do not have it installed, please download it from
+                <a target="blank" href="https://www.tronlink.org/">TronLink</a> or get the <a target="blank" href="http://u6.gg/gmc5D">Chrome extension</a> or make sure to have any alternative proper Tron wallet unlocked.
                 <br />
                 <br />
-                <v-alert :value="true" type="warning">Tron War Bot is only available on Google Chrome or on
-                  TronLink mobile
-                  app for the time being.
+                <v-alert :value="true" type="warning">Tron War Bot can only be used with an active Tron wallet at the moment.
                 </v-alert>
               </div>
             </v-stepper-content>
@@ -410,28 +419,33 @@
               <v-btn color="facebook" class="white--text" @click="loginToFb">Login with Facebook</v-btn>
             </v-stepper-content>
 
-            <v-stepper-step :complete="ambStep > 3" step="3">Select a country</v-stepper-step>
+            <v-stepper-step :complete="ambStep > 3" step="3">Pick a country</v-stepper-step>
 
             <v-stepper-content step="3">
+              <div class="my-2">
+                Select the country you want to support. If you can't find it below it means it already has an outstanding ambassador.
+                You can find out who the person is in the Standings tab, hovering on the 🎖 symbol.
+              </div>
               <v-autocomplete outline v-model="currentCountry" :items="computedMapping" item-text="name"
                 item-value="numberId" hide-no-data hide-selected label="Select Country"
                 placeholder="Type in to select a country">
               </v-autocomplete>
-              <v-layout row>
-              <v-btn color="primary" :disabled="(!terms) || (currentCountry == null)" @click="becomeAnAmbassador">Become an ambassador</v-btn>
               <v-checkbox
                 color="primary"
-                class="ml-2" 
+                class="ml-2"
                 v-model="terms"
-                :label="'Accept our terms and conditions'" >
+                :label="'By checking this box you accept to publicly disclose your social media identity and profile on TronWarBot website and all of its related social media channels'" >
               </v-checkbox>
-              </v-layout>
+              <v-btn color="primary" :disabled="(!terms) || (currentCountry == null)" @click="becomeAnAmbassador">Become an ambassador</v-btn>
             </v-stepper-content>
 
-            <v-stepper-step :complete="ambStep > 4" step="4">Wait to be approved</v-stepper-step>
+            <v-stepper-step :complete="ambStep > 4" step="4">Wait for your approval</v-stepper-step>
 
             <v-stepper-content step="4">
-              <div> Your request has been accepted. Now we will review your information and if everithing is fine we will get back to you! </div>
+              <div> <b>Your request has been sent successfully!</b>
+                <br />
+                For security reasons, our team will review your request and approve it within 12 hours.
+                You will be notified about the approval of your request on our <b><a target="_blank" href="https://t.me/Tron_WarBot">telegram channel here!</a></b> </div>
             </v-stepper-content>
 
           </v-stepper>
@@ -651,7 +665,7 @@
             this.snackbarColor = "error";
             this.snackbarTimeout = 10000;
             this.snackbar = true;
-          }     
+          }
         }
       }
     },
