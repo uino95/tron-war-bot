@@ -155,7 +155,8 @@ const postTurn = async (turnData) => {
     countriesMap[i].probability = e;
     let pf = countriesMap[i].territories/COUNTRIES;
     countriesMap[i].nextQuote = utils.quoteFromProbability(e);
-    countriesMap[i].finalQuote = Math.round(((jackpot * pf)/(betsPerCountry[i]+1)) + 25 + (turn/100));
+    let discountFactor = (betsPerCountry[i]+1)/(betsPerCountry[i]+2);
+    countriesMap[i].finalQuote = Math.round((((jackpot * pf)/(betsPerCountry[i]+1)) + 50) * discountFactor);
   })
   turnData.next.quotes = turnData.next.probabilities.map(e=>utils.quoteFromProbability(e));
   //CALL EXTERNAL SCHEDULED FUNCTIONS
