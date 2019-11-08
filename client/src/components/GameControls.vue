@@ -51,12 +51,12 @@
           color: 'primary_stats_tab',
           symbol: 'poll'
         },
-        // {
-        //   name: 'Bets',
-        //   path: 'betBattle',
-        //   color: 'primary_battle_tab',
-        //   symbol: 'attach_money'
-        // }
+        {
+          name: 'Bets',
+          path: 'betBattle',
+          color: 'primary_battle_tab',
+          symbol: 'attach_money'
+        }
       ]
     }),
     computed:{
