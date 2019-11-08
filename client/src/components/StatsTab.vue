@@ -49,7 +49,7 @@
               {{ header.text }}
             </th>
             <th class="pa-0">
-              <v-btn fab small flat @click="visButton='next'" > Set </v-btn>
+              <v-btn fab small flat @click="toggleButton()"> {{visButton[countButton]}} </v-btn>
             </th>
           </template>
           <template v-slot:items="props">
@@ -102,13 +102,13 @@
               </v-btn>
             </td>
             <td class="text-xs-left hidden-sm-and-up pa-0">
-              <v-btn v-if="visButton === 'support'" fab small color="facebook" class="white--text"
+              <v-btn v-if="visButton[countButton] === 'next'" fab small color="facebook" class="white--text"
                 v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
                 <v-icon small color="white">
                   fab fa-facebook-square
                 </v-icon>
               </v-btn>
-              <v-btn fab small v-else-if="visbutton === 'final'" class="white--text" color="primary_final_tab"
+              <v-btn fab small v-else-if="visButton[countButton] === 'support'" class="white--text" color="primary_final_tab"
                 v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
                 {{ (props.item.finalQuote + ' TRX')}}
               </v-btn>
@@ -330,7 +330,8 @@
       snackbarColor: "",
       snackbarTimeout: 6000,
       mapStatus: [],
-      visButton: 'support'
+      visButton: ['support','next','final'],
+      countButton: 0
     }),
     firebase: function () {
       return {
@@ -338,6 +339,14 @@
       }
     },
     methods: {
+      toggleButton(){
+        if(this.countButton >= 2){
+          this.countButton = 0;
+          return;
+        }
+        this.countButton = this.countButton + 1
+        console.log(this.countButton)
+      },
       getFlagString(str) {
         return "/img/flags/" + str.toLowerCase()
           .replaceAll(" ", "-")
