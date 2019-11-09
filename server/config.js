@@ -68,7 +68,7 @@ const config = {
       statsFreq  : 100,
       battleFreq : 100,
       quotesFreq : 419,
-      rouletteFreq : 1//72
+      rouletteFreq : 72
     },
     promotions : {
       ambassadorFreq: 987
