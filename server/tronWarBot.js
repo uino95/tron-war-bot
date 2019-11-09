@@ -16,6 +16,8 @@ const block = {number:0, hash:'', timestamp: 0};
 const blockQueue = {};
 const cacheRounds = {};
 
+module.exports.tronWeb = tronWeb;
+
 const isReady = async ()=>{
   if (ready) return;
   while (!ready) {console.log("[TWB]: Not ready yet..."); await utils.sleep(1000);}
@@ -65,6 +67,7 @@ const onBlock = (bn, fn)=>{
     stop:()=>{ blockQueue[bn.toString()][idx] = undefined; }
   };
 }
+module.exports.onBlock = onBlock;
 
 const createEventsFilter = function(c){
   return async function (opts = {}){
@@ -76,7 +79,7 @@ const createEventsFilter = function(c){
 }
 
 const createWatchEvents = function(c){
-  return function (opts={}, fn){
+  return  (opts={}, fn)=>{
     if(typeof opts == "string") opts = { eventName : opts};
     if(!fn || (typeof fn != "function")) throw "Invalid callback function";
     return onBlock(async (b)=>{
@@ -95,7 +98,7 @@ const createWatchEvents = function(c){
   }
 }
 
-const init = async () => {
+module.exports.init = async () => {
   if (twb && war) return;
   if (config.test) console.log("[TWB]: Using Test contracts");
   console.log("[TWB]: Using WarCoin Contract at: " + config.tron.warCoinAddress);
@@ -112,7 +115,7 @@ const init = async () => {
   ready = true;
 }
 
-const getBlock = async (bn) => {
+module.exports.getBlock = async (bn) => {
   if (!twb || !war) await isReady();
   if (!bn || !parseInt(bn)) return JSON.parse(JSON.stringify(block));
   let b = await tronWeb.trx.getBlock(bn);
@@ -124,7 +127,7 @@ const getBlock = async (bn) => {
 }
 
 
-const getCurrentRound = async function (gameType) {
+module.exports.getCurrentRound = async function (gameType) {
   try {
     if (!twb || !war) await isReady();
     var stoppedAt, startedAt, startGame, endGame = {};
@@ -168,10 +171,10 @@ const getCurrentRound = async function (gameType) {
       stoppedAt: stopped ? (endGame.block || true) : false,
       startedAt,
     }
-  } catch (e) { return getCurrentRound(gameType)}
+  } catch (e) { return this.getCurrentRound(gameType)}
 }
 
-const startGame = async function (gameType, playAgainstDealer) {
+module.exports.startGame = async function (gameType, playAgainstDealer) {
   if (!twb || !war) await isReady();
   var round = await this.getCurrentRound(gameType);
   if (!round.stoppedAt) throw "Game must be stopped before a new round can be started";
@@ -182,7 +185,7 @@ const startGame = async function (gameType, playAgainstDealer) {
   return round.round;
 }
 
-const endGame = async function (gameType) {
+module.exports.endGame = async function (gameType) {
   if (!twb || !war) await isReady();
   var round = await this.getCurrentRound(gameType);
   if (!!round.stoppedAt) throw "Game must be started before it can be stopped";
@@ -193,12 +196,12 @@ const endGame = async function (gameType) {
   return round.round;
 }
 
-const watchEvents = async function (opts, fn=false) {
+module.exports.watchEvents = async function (opts, fn=false) {
   if (!twb || !war) await isReady();
   return this.twb.watchEvents(opts,fn);
 }
 
-const availableJackpot = async function (gameType, gameRound) {
+module.exports.availableJackpot = async function (gameType, gameRound) {
   if (!twb || !war) await isReady();
   let current = await this.getCurrentRound(gameType);
   if (!current.round || !current.round.toNumber()) throw "Inexisting game type";
@@ -209,7 +212,7 @@ const availableJackpot = async function (gameType, gameRound) {
     let houseReserves = await this.twb.houseReserves().call();
     roundFunds.houseReserves = houseReserves;
     return roundFunds;
-  } catch (e) {return availableJackpot(gameType, gameRound)}
+  } catch (e) {return this.availableJackpot(gameType, gameRound)}
 }
 
 //1. GET ALL BETS
@@ -218,7 +221,7 @@ const availableJackpot = async function (gameType, gameRound) {
 //4. FOR EACH WINNING BET DIVIDE THE BET AMOUNT FOR THE WINNING AMOUNT
 //5. MULTIPLIES FOR THE AVAILABLE JACKPOT
 //6. PAYOUT LOOP
-const jackpotPayout = async function (gameType, gameRound, winningChoice, _bets=[]) {
+module.exports.jackpotPayout = async function (gameType, gameRound, winningChoice, _bets=[]) {
   if (!twb || !war) await isReady();
   let bets = _bets;
   // let bets = await twb.getEvents({
@@ -298,7 +301,7 @@ const jackpotPayout = async function (gameType, gameRound, winningChoice, _bets=
 
 }
 
-const dealerPayout = async function (gameType, gameRound, winningChoice, winRate, _bets = []) {
+module.exports.dealerPayout = async function (gameType, gameRound, winningChoice, winRate, _bets = []) {
   if (!twb || !war) await isReady();
   let bets = _bets;
   // let bets = await twb.getEvents({
@@ -367,34 +370,18 @@ const dealerPayout = async function (gameType, gameRound, winningChoice, winRate
 }
 
 
-const cachedCurrentRound = async (gameType) => {
+module.exports.cachedCurrentRound = async (gameType) => {
   let g = gameType.toString();
   if (cacheRounds[g]) return cacheRounds[g]
   cacheRounds[g] = await this.getCurrentRound(gameType);
   return cacheRounds[g];
 }
 
-const launchGame = async (gameType, playAgainstDealer) => {
+module.exports.launchGame = async (gameType, playAgainstDealer) => {
   if (!twb || !war) await isReady();
   var l = await this.getCurrentRound(gameType);
   if (!l.stoppedAt) return console.log("[TWB]: START-UP completed. Game already started!");
   console.log("[TWB]: Starting game: " + gameType + " with dealer mode: " + playAgainstDealer );
   var r = await this.startGame(gameType, playAgainstDealer);
   console.log("[TWB]: START-UP completed")
-}
-
-module.exports = {
-  launchGame,
-  cachedCurrentRound,
-  dealerPayout,
-  jackpotPayout,
-  availableJackpot,
-  watchEvents,
-  endGame,
-  startGame,
-  getCurrentRound,
-  onBlock,
-  getBlock,
-  tronWeb,
-  init
 }
