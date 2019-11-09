@@ -8,7 +8,7 @@ const neighborCountries = require('./map-utilities/neighborCountries');
 const COUNTRIES = neighborCountries.length;
 var ROUND = 0;
 // SIMULATION PARAMS
-const SIMULATIONS = 30;
+const SIMULATIONS = 5;
 const EXPECTED_TURN_DURATION = 300;
 
 var countriesMap, turnData;
@@ -283,7 +283,7 @@ const simulate = async () => {
     do {
       preTurn();
       go = await launchNextTurn()
-      if (!(turn % 7)) editCohesion(utils.randomInt(5), (utils.randomInt(12)-2)/10)
+      if (!(turn % 5)) editCohesion(utils.randomInt(15), (utils.randomInt(12)-2)/10)
       // if (!(turn % 100)) {saveCurrentState(), await utils.sleep(5000)}
       if (!(turn % 100)) {
         realPdf().forEach((e,i)=>{

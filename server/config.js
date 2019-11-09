@@ -68,7 +68,7 @@ const config = {
       statsFreq  : 100,
       battleFreq : 100,
       quotesFreq : 419,
-      rouletteFreq : 72
+      rouletteFreq : 1//72
     },
     promotions : {
       ambassadorFreq: 987
@@ -98,7 +98,7 @@ const config = {
   },
   wwb:{
     battleWeight: [0.15, 0.56, 0.29],
-    civilWarLikelihood: 0.02,
+    civilWarLikelihood: 0.04,
     restart: JSON.parse(process.env.RESTART || false)
   }
 }
