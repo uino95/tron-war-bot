@@ -71,6 +71,7 @@
           this.colorsDefault.push(this.colors[j])
           el['id'] = this.universalMap(index, 'charId')
           el['cohesion'] = (el['cohesion'] * 100).toFixed(2);
+          el['color'] = this.colors[j];
           j--;
           if (j < 0) {
             j = this.colors.length - 1
@@ -78,7 +79,7 @@
         })
         data.map(el => {
           el['controllerCohesion'] = (data[el['occupiedBy']]['cohesion']);
-          el['color'] = this.colorsDefault[el['occupiedBy']];
+          // el['color'] = this.colorsDefault[el['occupiedBy']];
           el['occupiedBy'] = this.universalMap(el['occupiedBy'])
         })
         this.countriesData = data

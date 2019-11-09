@@ -397,7 +397,7 @@
             Motivate your cadets to engage through social media so that your country gain cohesion points and increase the odds of winning the war.
           </div>
           <v-stepper v-model="ambStep" vertical>
-            <v-stepper-step :complete="ambStep > 1" step="1">
+            <!-- <v-stepper-step :complete="ambStep > 1" step="1">
               Login with a wallet
             </v-stepper-step>
 
@@ -411,17 +411,18 @@
                 <v-alert :value="true" type="warning">Tron War Bot can only be used with an active Tron wallet at the moment.
                 </v-alert>
               </div>
-            </v-stepper-content>
+            </v-stepper-content> -->
 
-            <v-stepper-step :complete="ambStep > 2" step="2">Login to Facebook</v-stepper-step>
+            <v-stepper-step :complete="ambStep > 1" step="1">Login to Facebook</v-stepper-step>
 
-            <v-stepper-content step="2">
+            <v-stepper-content step="1">
+
               <v-btn color="facebook" class="white--text" @click="loginToFb">Login with Facebook</v-btn>
             </v-stepper-content>
 
-            <v-stepper-step :complete="ambStep > 3" step="3">Pick a country</v-stepper-step>
+            <v-stepper-step :complete="ambStep > 2" step="2">Pick a country</v-stepper-step>
 
-            <v-stepper-content step="3">
+            <v-stepper-content step="2">
               <div class="my-2">
                 Select the country you want to support. If you can't find it below it means it already has an outstanding ambassador.
                 You can find out who the person is in the Standings tab, hovering on the 🎖 symbol.
@@ -439,9 +440,9 @@
               <v-btn color="primary" :disabled="(!terms) || (currentCountry == null)" @click="becomeAnAmbassador">Become an ambassador</v-btn>
             </v-stepper-content>
 
-            <v-stepper-step :complete="ambStep > 4" step="4">Wait for your approval</v-stepper-step>
+            <v-stepper-step :complete="ambStep > 3" step="3">Wait for your approval</v-stepper-step>
 
-            <v-stepper-content step="4">
+            <v-stepper-content step="3">
               <div> <b>Your request has been sent successfully!</b>
                 <br />
                 For security reasons, our team will review your request and approve it within 12 hours.
@@ -527,9 +528,9 @@
     computed: {
       ambStep: {
         get() {
-          if (this.allDone) return 4;
-          if (this.$store.state.fbAcessToken != null && this.$store.state.loggedInAccount != null) return 3;
-          if (this.$store.state.loggedInAccount != null) return 2;
+          if (this.allDone) return 3;
+          if (this.$store.state.fbAcessToken != null /*&& this.$store.state.loggedInAccount != null*/) return 2;
+          // if (this.$store.state.loggedInAccount != null) return 1;
           return 1;
         },
         set() {

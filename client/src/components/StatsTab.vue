@@ -41,53 +41,80 @@
 
         <v-data-table :search="searchStats" :headers="headersStats" :items="countryStatus" :item-key="'name'"
           class="elevation-1" :pagination.sync="paginationStats" :rows-per-page-items="[10,20,50]">
+          <template v-slot:headers="props">
+            <th v-for="header in props.headers" :key="header.text" :align="header.align"
+              :class="[header.class, 'column sortable', paginationStats.descending ? 'desc' : 'asc', header.value === paginationStats.sortBy ? 'active' : '']"
+              @click="changeSort(header.value)">
+              <v-icon small>arrow_upward</v-icon>
+              {{ header.text }}
+            </th>
+            <th class="pa-0">
+              <v-btn fab small flat @click="visButton='next'" > Set </v-btn>
+            </th>
+          </template>
           <template v-slot:items="props">
-            <td class="text-xs-right">
-                <v-avatar>
-                  <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                    :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
-                </v-avatar>
+            <td class="text-xs-right pa-0">
+              <v-avatar>
+                <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                  :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
+              </v-avatar>
             </td>
-            <td class="text-xs-center" style="font-size:18px; padding:0px 6px;">
+            <td class="text-xs-left pa-0">
               <v-tooltip v-if="props.item.ambassador" close-delay="3000" bottom>
                 <template v-slot:activator="{ on }">
-                  <div class="text-right" v-on="on">🎖</div>
+                  <div class="text-left title" v-on="on">🎖</div>
                 </template>
                 <span>The ambassador of {{props.item.name}} is
-                  <br /><b><a style="color: white" :href="props.item.ambassador.link" target="blank"> {{props.item.ambassador.name}}</a></b></span>
+                  <br /><b><a style="color: white" :href="props.item.ambassador.link" target="blank">
+                      {{props.item.ambassador.name}}</a></b></span>
                 <br />
                 <i>If you would like to become an ambassador of your country,
-                <br />check out the rules in the <i>Ambassador</i> section in the menu.</i>
+                  <br />check out the rules in the <i>Ambassador</i> section in the menu.</i>
               </v-tooltip>
             </td>
-            <td class="text-xs-right && font-weight-bold text-truncate">
-
+            <td class="text-xs-left && font-weight-bold text-truncate pr-0 pl-1"
+              v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}">
               <v-layout row>
-
                 <div> {{props.item.name}} </div>
               </v-layout>
             </td>
-            <td class="text-xs-right">{{ props.item.territories }}</td>
-            <td class="text-xs-right text-truncate">{{ (props.item.cohesion * 100).toFixed(1) + ' %'}}</td>
-            <td class="text-xs-right hidden-xs-only">
+            <td class="text-xs-left pa-0">{{ props.item.territories }}</td>
+            <td class="text-xs-left text-truncate pa-0">{{ (props.item.cohesion * 100).toFixed(1) + ' %'}}</td>
+            <td class="text-xs-left hidden-xs-only pa-0">
               <v-btn class="white--text" color="primary_final_tab"
                 v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
                 {{ (props.item.finalQuote + ' TRX')}}
               </v-btn>
             </td>
-            <td class="text-xs-right hidden-xs-only">
+            <td class="text-xs-left hidden-xs-only pa-0">
               <v-btn class="white--text" color="primary_next_tab"
                 v-on:click="goToBet('betnext',universalMap(props.item.name, 'numberId'))">
                 {{ (props.item.probability * 100).toFixed(2) + ' %'}}
               </v-btn>
             </td>
-            <td class="text-xs-right ">
+            <td class="text-xs-left hidden-xs-only pa-0">
               <v-btn color="facebook" class="white--text"
                 v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
                 <v-icon class="mr-2" small color="white">
                   fab fa-facebook-square
                 </v-icon>
                 Support
+              </v-btn>
+            </td>
+            <td class="text-xs-left hidden-sm-and-up pa-0">
+              <v-btn v-if="visButton === 'support'" fab small color="facebook" class="white--text"
+                v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
+                <v-icon small color="white">
+                  fab fa-facebook-square
+                </v-icon>
+              </v-btn>
+              <v-btn fab small v-else-if="visbutton === 'final'" class="white--text" color="primary_final_tab"
+                v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
+                {{ (props.item.finalQuote + ' TRX')}}
+              </v-btn>
+              <v-btn fab small v-else class="white--text" color="primary_next_tab"
+                v-on:click="goToBet('betnext',universalMap(props.item.name, 'numberId'))">
+                {{ (props.item.probability * 100).toFixed(2) + ' %'}}
               </v-btn>
             </td>
           </template>
@@ -219,6 +246,10 @@
       VLazyImage,
     },
     data: () => ({
+      windowSize: {
+        x: window.innerWidth,
+        y: window.innerHeight
+      },
       phrases: [
         '<placeholder> is best country ever',
         'I love <placeholder> and all of its super cute penguins',
@@ -229,54 +260,63 @@
           text: '',
           value: 'no-value',
           sortable: false,
-          align: 'left'
-        },
-        {
-            text: '',
-            value: 'no-value',
-            sortable: false,
-            align: 'center'
-          },
-        {
-          text: 'Country',
-          value: 'name',
-          sortable: false,
           align: 'left',
-          class: 'body-1'
-        }, {
-          text: 'Owned',
-          value: 'territories',
-          sortable: true,
-          align: 'right',
-          class: 'body-1'
-        }, {
-          text: 'Cohesion',
-          value: 'cohesion',
-          sortable: true,
-          align: 'right',
-          class: 'body-1'
-        },
-        {
-          text: 'Final Conquer Quote',
-          value: 'finalQuote',
-          sortable: true,
-          align: 'right',
-          class: 'body-1 hidden-xs-only'
-        },
-        {
-          text: 'Next Conquer %',
-          value: 'probability',
-          sortable: true,
-          align: 'right',
-          class: 'body-1 hidden-xs-only'
+          class: 'pa-0'
         },
         {
           text: '',
           value: 'no-value',
           sortable: false,
           align: 'left',
-          class: 'body-1'
-        }
+          class: 'pa-0'
+        },
+        {
+          text: 'Country',
+          value: 'name',
+          sortable: false,
+          align: 'left',
+          class: 'body-1 pa-0'
+        }, {
+          text: 'T',
+          value: 'territories',
+          sortable: true,
+          align: 'left',
+          class: 'body-1 pa-0'
+        }, {
+          text: 'C',
+          value: 'cohesion',
+          sortable: true,
+          align: 'left',
+          class: 'body-1 pa-0'
+        },
+        {
+          text: 'Final Quote',
+          value: 'finalQuote',
+          sortable: true,
+          align: 'left',
+          class: 'body-1 hidden-xs-only pa-0'
+        },
+        {
+          text: 'Next %',
+          value: 'probability',
+          sortable: true,
+          align: 'left',
+          class: 'body-1 hidden-xs-only pa-0'
+        },
+        {
+          text: '',
+          value: 'no-value',
+          sortable: false,
+          align: 'left',
+          class: 'body-1 pa-0 hidden-xs-only pa-0',
+        },
+        // {
+        //   text: 'set',
+        //   value: 'no-value',
+        //   sortable: false,
+        //   align: 'left',
+        //   class: 'body-1 pa-0 hidden-sm-and-up pa-0',
+        // }
       ],
       paginationStats: {
         sortBy: 'territories',
@@ -290,6 +330,7 @@
       snackbarColor: "",
       snackbarTimeout: 6000,
       mapStatus: [],
+      visButton: 'support'
     }),
     firebase: function () {
       return {
@@ -331,7 +372,7 @@
           display: 'touch',
           to: '423138885180430'
         }, function (response) {});
-      }
+      },
     },
     computed: {
       countryStatus: function () {
@@ -348,6 +389,10 @@
     mounted() {
       db.ref('public/mapStatus').orderByChild('territories').once('value', snap => {
         this.$root.$emit('stats_loaded', true);
+      })
+      window.addEventListener('resize', () => {
+        this.windowSize.x = window.innerWidth
+        this.windowSize.y = window.innerHeight
       })
     }
   }
