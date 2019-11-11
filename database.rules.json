@@ -6,7 +6,7 @@
        ".indexOn": "turn" 
       },
       "bets":{
-        ".indexOn": ["gameType", "betReference"]
+        ".indexOn": ["gameType", "betReference", "from"]
       },
       "cohesion":{
         ".indexOn": "turn" 
