@@ -6,7 +6,10 @@
        ".indexOn": "turn" 
       },
       "bets":{
-        ".indexOn": "gameType"
+        ".indexOn": ["gameType", "betReference"]
+      },
+      "cohesion":{
+        ".indexOn": "turn" 
       }
     },
     "secret":{

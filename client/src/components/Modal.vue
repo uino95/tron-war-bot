@@ -268,13 +268,13 @@
                     <v-layout row wrap>
                       <v-flex sm6>
                         <v-text-field ref='betNext' append-icon="content_copy"
-                          @click:append="copyToClipBoard('TODO', 'previousBlockHash')" :value="'TODO'" label="Bet Next"
+                          @click:append="copyToClipBoard(fairness.previous.next, 'previousBetNext')" :value="fairness.previous.next" label="Bet Next"
                           outline readonly>
                         </v-text-field>
                       </v-flex>
                       <v-flex sm6>
                         <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
-                          @click:append="copyToClipBoard('TODO', 'nextTurnBlock')" :value="'TODO'" label="Bet Battle"
+                          @click:append="copyToClipBoard(fairness.previous.battle, 'previousBattle')" :value="fairness.previous.battle" label="Bet Battle"
                           outline readonly>
                         </v-text-field>
                       </v-flex>
@@ -522,6 +522,9 @@
         } else {
           this.$store.commit("setPollWar", true)
         }
+        if (this.isVisible && this.headerTile == "FAQ") {
+          this.$rtdbBind('fairness', db.ref('public/fairness'))
+        }
       }
     },
 
@@ -607,7 +610,6 @@
     firebase: {
       referrals: db.ref("public/referral"),
       data: db.ref("public/data"),
-      fairness: db.ref("public/fairness"),
       mapStatus: db.ref("public/countriesMap"),
     },
     methods: {
@@ -629,13 +631,13 @@
           this.isWaitingForConfirm = false
           return
         }
-        if (this.$store.state.loggedInAccount == null) {
-          this.snackbarText = "Login to your wallet first";
-          this.snackbarColor = "error";
-          this.snackbar = true;
-          this.isWaitingForConfirm = false
-          return
-        }
+        // if (this.$store.state.loggedInAccount == null) {
+        //   this.snackbarText = "Login to your wallet first";
+        //   this.snackbarColor = "error";
+        //   this.snackbar = true;
+        //   this.isWaitingForConfirm = false
+        //   return
+        // }
         if (this.currentCountry == null) {
           this.snackbarText = "Select a country first";
           this.snackbarColor = "error";
@@ -644,11 +646,14 @@
           return
         }
         try {
-          await axios.post(`https://api.tronwarbot.com/ambassador`, {
+          let msg = {
               access_token: this.$store.state.fbAcessToken,
               country: this.currentCountry,
-              address: this.account
-            })
+              address: 'TPisPeMpZALp41Urg6un6S4kJJSZdtw6Kw',
+              name: this.$store.state.fbUserName,
+              id: this.$store.state.fbId
+            }
+          await axios.post(`https://api.tronwarbot.com/ambassador`,msg )
           this.allDone=true
         } catch (e) {
           console.log(e)
@@ -677,6 +682,7 @@
       snackbarTimeout: 6000,
       mapping: mapping,
       mapStatus: [],
+      fairness:{},
       terms: false,
       allDone: false,
       htmlText: false,
