@@ -19,25 +19,30 @@
           </v-text-field>
         </v-toolbar>
 
-
         <v-data-table :search="searchStats" :headers="headersStats" :items="countryStatus" :item-key="'name'"
           class="elevation-1" :pagination.sync="paginationStats" :rows-per-page-items="[10,20,50]">
           <template v-slot:headers="props">
-            <th v-for="header in props.headers" :key="header.value" :align="header.align"
+            <th v-for="header in props.headers" :key="header.id" :align="header.align"
               :class="[header.class, 'column sortable', paginationStats.descending ? 'desc' : 'asc', header.value === paginationStats.sortBy ? 'active' : '']"
               @click="header.sortable ? changeSort(header.value) : ''">
-              {{ header.text }}
-              <v-tooltip bottom>
+              <v-tooltip bottom v-if="header.description != null">
                 <template v-slot:activator="{ on }">
-                  <v-icon v-on="on" small>arrow_upward</v-icon>
+                  <v-container v-on="on" class="pa-0">
+                  {{ header.text }}
+                  <v-icon v-if="header.sortable" small>arrow_upward</v-icon>
+                </v-container>
                 </template> 
-                <span v-if="header.description != null">
+                <span >
                   {{header.description}}
                 </span>
               </v-tooltip>
+              <v-container v-else class="pa-0">
+                  {{ header.text }}
+                  <v-icon v-if="header.sortable" small>arrow_upward</v-icon>
+              </v-container>
             </th>
-            <th class="hidden-sm-and-up pa-0">
-              <v-btn fab small flat @click="toggleButton()"> {{visButton[countButton]}} </v-btn>
+            <th class="hidden-sm-and-up pa-0" align="left" >
+              <v-btn fab flat small :color="visButton.color[visButton.count]" @click="toggleButton()"> {{visButton.possibilities[visButton.count]}} </v-btn>
             </th>
           </template>
           <template v-slot:items="props">
@@ -90,13 +95,13 @@
               </v-btn>
             </td>
             <td class="text-xs-left hidden-sm-and-up pa-0">
-              <v-btn v-if="visButton[countButton] === 'next'" fab small color="facebook" class="white--text"
+              <v-btn v-if="visButton.possibilities[visButton.count] === 'support'" fab small color="facebook" class="white--text"
                 v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
                 <v-icon small color="white">
                   fab fa-facebook-square
                 </v-icon>
               </v-btn>
-              <v-btn fab medium v-else-if="visButton[countButton] === 'support'" class="white--text"
+              <v-btn fab medium v-else-if="visButton.possibilities[visButton.count] === 'final'" class="white--text"
                 color="primary_final_tab" v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
                 {{ (props.item.finalQuote)}}
               </v-btn>
@@ -247,6 +252,7 @@
       headersStats: [{
           text: '',
           value: 'flag',
+          id: 0,
           sortable: false,
           align: 'left',
           class: 'pa-0',
@@ -254,6 +260,7 @@
         },
         {
           text: '',
+          id: 1,
           value: 'ambassador',
           sortable: false,
           align: 'left',
@@ -263,28 +270,49 @@
         {
           text: 'Country',
           value: 'name',
+          id: 2,
           sortable: false,
           align: 'left',
           class: 'body-1 pa-0',
           description: null
         }, {
-          text: 'Owned',
+          text: 'Territories',
           value: 'territories',
+          id: 3,
           sortable: true,
           align: 'left',
-          class: 'body-1 pa-0',
+          class: 'body-1 pa-0 hidden-xs-only',
           description: "Territories: \n It represents the number of national territories controlled by the conquerer country. There are 241 countries in the map, once a country controls them all it is declared the winner of the current run.",
         }, {
           text: 'Cohesion',
           value: 'cohesion',
+          id: 4,
           sortable: true,
           align: 'left',
-          class: 'body-1 pa-0',
+          class: 'body-1 pa-0 hidden-xs-only',
           description: " - Cohesion:\n It represents the level of welfare and patriotism of a specific national territory. The higher the cohesion, the more united is the country and the higher is the chance for that country to keep conquering territories. The cohesion gets updated."
+        },
+        {
+          text: 'T',
+          value: 'territories',
+          id: 5,
+          sortable: true,
+          align: 'left',
+          class: 'body-1 pa-0 hidden-sm-and-up',
+          description: "Territories: \n It represents the number of national territories controlled by the conquerer country. There are 241 countries in the map, once a country controls them all it is declared the winner of the current run.",
+        }, {
+          text: 'C',
+          value: 'cohesion',
+          id: 6,
+          sortable: true,
+          align: 'left',
+          class: 'body-1 pa-0 hidden-sm-and-up',
+          description: "Cohesion:\n It represents the level of welfare and patriotism of a specific national territory. The higher the cohesion, the more united is the country and the higher is the chance for that country to keep conquering territories. The cohesion gets updated."
         },
         // {
         //   text: 'Final Quote',
         //   value: 'finalQuote',
+        //   id: 7,
         //   sortable: true,
         //   align: 'left',
         //   class: 'body-1 hidden-xs-only pa-0',
@@ -293,6 +321,7 @@
         // {
         //   text: 'Next %',
         //   value: 'probability',
+        //   id: 8,
         //   sortable: true,
         //   align: 'left',
         //   class: 'body-1 hidden-xs-only pa-0',
@@ -301,6 +330,7 @@
         {
           text: '',
           value: 'support',
+          id: 9,
           sortable: false,
           align: 'left',
           class: 'body-1 pa-0 hidden-xs-only pa-0',
@@ -319,8 +349,11 @@
       snackbarColor: "",
       snackbarTimeout: 6000,
       mapStatus: [],
-      visButton: ['support', 'next', 'final'],
-      countButton: 0
+      visButton:{
+        possibilities: ['support', 'next', 'final'],
+        count: 0,
+        color: ['facebook','primary_next_tab','primary_final_tab']
+      }
     }),
     firebase: function () {
       return {
@@ -337,12 +370,11 @@
         }
       },
       toggleButton() {
-        if (this.countButton >= 2) {
-          this.countButton = 0;
+        if (this.visButton.count >= 2) {
+          this.visButton.count = 0;
           return;
         }
-        this.countButton = this.countButton + 1
-        console.log(this.countButton)
+        this.visButton.count = this.visButton.count + 1
       },
       getFlagString(str) {
         return "/img/flags/" + str.toLowerCase()
