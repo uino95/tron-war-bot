@@ -41,7 +41,7 @@ const countriesStillAlive = (countriesMap) => {
 const rawPdf = (countriesMap) => {
   return countriesMap.map((c,idx)=>{
     let pOfConquest = Math.min(conquerableTerritoriesOf(countriesMap, idx).length,1) * countriesMap[c.occupiedBy].cohesion * (1 - CIVIL_WAR_LIKELIHOOD);
-    let pOfCivilWar =  (c.occupiedBy != idx ? 1 : 0) * c.cohesion * CIVIL_WAR_LIKELIHOOD;
+    let pOfCivilWar =  (c.occupiedBy != idx ? 1 : 0) * Math.max(((0.5 + c.cohesion)**3 - 0.5), 0) * CIVIL_WAR_LIKELIHOOD;
     return [pOfConquest,  pOfCivilWar];
   })
 }
@@ -158,8 +158,9 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
 
 const computeFairResult = (mapState, firstEntropy, secondEntropy) => {
   let m = JSON.parse(Buffer.from(mapState, 'base64').toString('ascii'));
-  [battle, random] = resolveNextBattle(m.countriesMap, m.turnData, firstEntropy, secondEntropy);
-  [next, random] = resolveNextConqueror(m.countriesMap, m.turnData, firstEntropy, secondEntropy);
+  let countriesMap = m.countriesMap.map((e)=>{return {occupiedBy:e.o, cohesion : e.c}});
+  [battle, random] = resolveNextBattle(countriesMap, m.turnData, firstEntropy, secondEntropy);
+  [next, random] = resolveNextConqueror(countriesMap, m.turnData, firstEntropy, secondEntropy);
   // console.log("Previous Battle:  " + utils.universalMap(battle.o) + " vs " + utils.universalMap(battle.d) + " ended with a " + (battle.result || "X" ) );
   // if (next.civilWar) console.log("Next is a civil war:  " + utils.universalMap(next.o) + " is rebelling on " + utils.universalMap(next.d));
   // else console.log("Next conqueror is:  " + utils.universalMap(next.o) + " attacking " + utils.universalMap(next.d) + " from: " + utils.universalMap(next.ot) + " to control: " + utils.universalMap(next.dt) );

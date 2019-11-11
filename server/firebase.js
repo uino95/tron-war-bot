@@ -29,16 +29,20 @@ const out = {
 }
 
 
-out.bets.checkBetOnDb = async (txId) => out.bets.once('value').then((r) => r.child(txId).exists());
+out.bets.checkBetOnDb = async (txId) => out.bets.orderByKey().equalTo(txId).once('value').then((r) => r ? r.val() : false);
 
 out.bets.getCurrentTurnBets = async (gameType, round, turn) => {
-  var snapshot, bets = []
-  await out.bets.orderByChild("gameType").equalTo(gameType.toString()).once("value")
+  var snapshot, bets = [];
+  var order = {by:"gameType", value:gameType};
+  if (round) order = {by:"round", value:round};
+  if (turn) order = {by:"betReference", value:turn};
+  await out.bets.orderByChild(order.by).equalTo(order.value.toString()).once("value")
     .then(r => {
       snapshot = r.val();
       if (!snapshot) return [];
       r = Object.keys(snapshot);
       return r.forEach(key => {
+        if (gameType && snapshot[key].gameType.toString() != gameType.toString()) return;
         if (round && snapshot[key].round.toString() != round.toString()) return;
         if (turn && snapshot[key].betReference.toString() != turn.toString()) return;
         snapshot[key].txId = key
@@ -48,21 +52,6 @@ out.bets.getCurrentTurnBets = async (gameType, round, turn) => {
   return bets;
 }
 
-out.bets.getCurrentRoundBets = async (gameType, round) => {
-  var snapshot, bets = []
-  await out.bets.orderByChild("gameType").equalTo(gameType.toString()).once("value")
-    .then(r => {
-      snapshot = r.val()
-      r = Object.keys(snapshot);
-      return r.forEach(key => {
-        if (round && snapshot[key].round.toString() != round.toString()) return;
-        snapshot[key].txId = key
-        bets.push(snapshot[key])
-      })
-    })
-  console.log(bets)
-  return bets;
-}
 
 out.reset = async () => {
   await out.data.set({})

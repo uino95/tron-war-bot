@@ -36,7 +36,7 @@ const getCbData = (e)=>{
 const pickCountry = (cmap, td) => {
   const COUNTRIES = cmap.length;
   const getImpact = (e) => {
-    return (1 + e.cohesion + (e.territories/COUNTRIES))**2
+    return (1 + (e.territories/4)) * e.cohesion
   }
   let total = cmap.reduce((acc, v)=>acc+getImpact(v),0)
   let acc = 0;
@@ -55,7 +55,8 @@ const closePreviousRoulette = async (cmap, td) => {
   let total = 0
   let msg = "<b>⏱ ROULETTE TIME ⏱</b>"
   let text = "Roulette: "
-  msg += "\nSupport time for <b>" + utils.universalMap(current.country, "full") + "</b> is over!\n\n"
+  msg += "\nSupport time for <b>" + utils.universalMap(current.country, "full") + "</b> is over!\n"
+  msg += "Territories: <b>"+ cmap[current.country].territories +"</b>\n\n"
   // - COUNT VOTES
   if (votes){
     msg += "<b>Results:</b>\n"
@@ -114,7 +115,7 @@ module.exports.next = async (cmap, td)=>{
   msg += "<i>You have got 6 hours to like (or dislike).\n"
   msg += "Likes (👍🏻/👎🏻) gives ±"+ROULETTE.vote+"% cohesion point\n"
   msg += "Superlikes (🌟/😡) gives ±"+ROULETTE.superVote+"% (can only use once per day)</i>\n"
-  msg += "A ±"+ROULETTE.bonus+"% cohesion bonus will be given on top"
+  msg += "A <b>±"+ROULETTE.bonus+"% cohesion bonus</b> will be given on top"
   // PICK A COUNTRY
   // CREATE TEXT AND KEYBOARD
   let m = { 'inline_keyboard': [Object.keys(current.votes).map(e=> {return {'text':e, 'callback_data': getCbData(e)}})]};

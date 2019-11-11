@@ -9,6 +9,7 @@ let map = JSON.parse(JSON.stringify(utils.map))
 const REGEXPMATCHER = map.sort((a,b)=>{return b.name.split(/ |-/g).length - a.name.split(/ |-/g).length}).map(e=>e.name.toLowerCase().replace(/ |-/g,"")).toString().replace(/,/g,"|")
 const FUZZYMATCHER = map.map(e=>e.name).map(e=>e.toLowerCase()).map(e=>e.replace(/-/g," "))
 
+
 const analyze = (txt) => {
   if (typeof txt != "string") return;
   txt = txt.toLowerCase().replace(/-|#|@/g," ");
@@ -48,7 +49,7 @@ const update = async (country, delta, platform, text, extra={})=>{
   let date = new Date()
   // ALREADY EXISTS?
   let id = extra.id || (date.toISOString().substr(0,16) +'|'+ platform + '|' +  country)
-  let alreadyExists = await firebase.cohesion.once('value').then((r) => r.child(id).exists())
+  let alreadyExists = await firebase.cohesion.orderByKey().equalTo(id).once('value').then((r) => r ? r.val() : false);
   if (alreadyExists) return;
   await wwb.currentTurnData();
   let u = wwb.editCohesion(country, delta);
