@@ -45,16 +45,14 @@ const winner = () => fairness.winner(countriesMap);
 const compressedState = async ()=>{
   let cMap = await mapState();
   let td = await currentTurnData();
-  cMap.forEach(e=>{
-    delete e.nextCohesion;
-    delete e.finalQuote;
-    delete e.nextQuote
-    delete e.territories;
-    delete e.probability;
+  let mapCompressedCopy = new Array(COUNTRIES).fill({});
+  cMap.forEach((e, idx)=>{
+    mapCompressedCopy[idx].c = cMap[idx].cohesion;
+    mapCompressedCopy[idx].o = cMap[idx].occupiedBy;
   });
   if (td.battle && td.battle.quotes) delete td.battle.quotes;
   if (td.next && td.next.quotes) delete td.battle.quotes;
-  let o = {countriesMap : cMap, turnData: td}
+  let o = {countriesMap : mapCompressedCopy, turnData: td}
   return Buffer.from(JSON.stringify(o), "ascii").toString("base64");
 }
 
@@ -145,7 +143,7 @@ const preTurn = async () => {
 
 const postTurn = async (turnData) => {
   // GET JACKPOT
-  let jackpot = await firebase.data.once("value").then(r=>r.val()['jackpot'] || 0);
+  let jackpot = await firebase.data.child('jackpot').once("value").then(r=>r.val() || 0);
   let bets = (await firebase.bets.getCurrentTurnBets(0, ROUND) )|| [];
   let betsPerCountry = new Array(COUNTRIES).fill(0);
   bets.forEach((e,i)=>betsPerCountry[e.userChoice]+=1);
