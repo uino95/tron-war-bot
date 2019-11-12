@@ -54,7 +54,7 @@ Vue.mixin({
             } else {
               throw ("User not logged in with facebook")
             }
-          })
+          },{scope:'public_profile,email,user_link'})
         }
         if (response.status == 'connected') {
           if (response.authResponse && (store.state.fbUserName == null || store.state.fbAcessToken == null)) {
@@ -77,6 +77,7 @@ Vue.mixin({
   }
 });
 
+/* eslint-disable no-new */
 new Vue({
   router,
   store,

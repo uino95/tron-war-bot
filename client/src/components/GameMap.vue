@@ -35,6 +35,7 @@
 
     }),
     mounted() {
+      // subscribe to chanhges
       db.ref('public/countriesMap').on('child_changed', (snapshot) => {
         let data = snapshot.val();
         data['id'] = this.universalMap(data.idx, 'charId')
@@ -47,6 +48,7 @@
 
       })
 
+      // initialize the array
       db.ref('public/countriesMap').once('value', (snapshot) => {
         let j = this.colors.length
         let data = snapshot.val();
