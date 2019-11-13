@@ -45,10 +45,13 @@ Vue.mixin({
       await FB.getLoginStatus((response) => {
         if (response.status != 'connected') {
           FB.login((response) => {
+            console.log(response)
             if (response.authResponse) {
-              FB.api('/me', (response) => {
+              FB.api('/me?fields=link,name', (response) => {
+                console.log(response)
                 store.commit('setFbId', response.id)
                 store.commit('setFbUserName', response.name)
+                store.commit('setFbLink',response.link)
               });
               store.commit('setFbAcessToken', response.authResponse.accessToken)
             } else {

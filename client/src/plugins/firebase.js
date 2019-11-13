@@ -9,15 +9,25 @@ Vue.use(rtdbPlugin)
 let config
 if(test){
     console.log("TEST MODE")
+    // config = {
+    //     apiKey: "AIzaSyC7n-39bx5kEnxZELCgxB2BIBNkElfUPWw",
+    //     authDomain: "tron-war-bot-test.firebaseapp.com",
+    //     databaseURL: "https://tron-war-bot-test.firebaseio.com",
+    //     projectId: "tron-war-bot-test",
+    //     storageBucket: "",
+    //     messagingSenderId: "621094589680",
+    //     appId: "1:621094589680:web:288901fe2878cbc7"
+    // };
     config = {
-        apiKey: "AIzaSyC7n-39bx5kEnxZELCgxB2BIBNkElfUPWw",
-        authDomain: "tron-war-bot-test.firebaseapp.com",
-        databaseURL: "https://tron-war-bot-test.firebaseio.com",
-        projectId: "tron-war-bot-test",
-        storageBucket: "",
-        messagingSenderId: "621094589680",
-        appId: "1:621094589680:web:288901fe2878cbc7"
-    };
+        apiKey: "AIzaSyDWtnQWw5Fu7m-77Q_ApXzAeWNkJ8ckE7k",
+        authDomain: "twb-backup-de2e5.firebaseapp.com",
+        databaseURL: "https://twb-backup-de2e5.firebaseio.com",
+        projectId: "twb-backup-de2e5",
+        storageBucket: "twb-backup-de2e5.appspot.com",
+        messagingSenderId: "927233292346",
+        appId: "1:927233292346:web:821ed4352a0d5d4e421d03",
+        measurementId: "G-Z18G4NWNVD"
+      };
 } else {
     config = {
         apiKey: "AIzaSyBi8sg117ggZW_mYNMQBbaY0qyaWpvGqWg",

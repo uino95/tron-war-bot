@@ -233,14 +233,14 @@
                   <v-container fluid grid-list-sm>
                     <v-flex sm 16>
                       <v-text-field ref='previousCountriesMap' append-icon="content_copy"
-                        @click:append="copyToClipBoard(fairness.previous.mapState, 'previousMapState')"
+                        @click:append="copyToClipBoard(fairness.previous.mapState, 'previousCountriesMap')"
                         :value="fairness.previous.mapState" label="Countries Map" outline readonly>
                       </v-text-field>
                     </v-flex>
                     <v-layout row wrap>
                       <v-flex sm6>
                         <v-text-field ref='previousMagicNumber' append-icon="content_copy"
-                          @click:append="copyToClipBoard(fairness.previous.magic, 'previousMagic')"
+                          @click:append="copyToClipBoard(fairness.previous.magic, 'previousMagicNumber')"
                           :value="fairness.previous.magic" label="Magic Number" outline readonly>
                         </v-text-field>
                       </v-flex>
@@ -260,7 +260,7 @@
                       </v-flex>
                       <v-flex sm6>
                         <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
-                          @click:append="copyToClipBoard(fairness.previous.nextTurnBlock, 'nextTurnBlock')"
+                          @click:append="copyToClipBoard(fairness.previous.nextTurnBlock, 'previousNextBlockNumber')"
                           :value="fairness.previous.nextTurnBlock" label="Block Number" outline readonly>
                         </v-text-field>
                       </v-flex>
@@ -268,12 +268,12 @@
                     <v-layout row wrap>
                       <v-flex sm6>
                         <v-text-field ref='betNext' append-icon="content_copy"
-                          @click:append="copyToClipBoard(fairness.previous.next, 'previousBetNext')" :value="fairness.previous.next" label="Bet Next"
+                          @click:append="copyToClipBoard(fairness.previous.next, 'betNext')" :value="fairness.previous.next" label="Bet Next"
                           outline readonly>
                         </v-text-field>
                       </v-flex>
                       <v-flex sm6>
-                        <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
+                        <v-text-field ref='previousBattle' append-icon="content_copy"
                           @click:append="copyToClipBoard(fairness.previous.battle, 'previousBattle')" :value="fairness.previous.battle" label="Bet Battle"
                           outline readonly>
                         </v-text-field>
@@ -289,7 +289,7 @@
                   <v-container fluid grid-list-sm>
                     <v-flex sm 16>
                       <v-text-field ref='nextCountriesMap' append-icon="content_copy"
-                        @click:append="copyToClipBoard(fairness.next.mapState, 'nextMapState')"
+                        @click:append="copyToClipBoard(fairness.next.mapState, 'nextCountriesMap')"
                         :value="fairness.next.mapState" label="Countries Map" outline readonly>
                       </v-text-field>
                     </v-flex>
@@ -321,8 +321,8 @@
                         </v-text-field>
                       </v-flex>
                       <v-flex sm6>
-                        <v-text-field ref='nextNextBlockNumber' append-icon="content_copy"
-                          @click:append="copyToClipBoard(fairness.next.nextTurnBlock, 'nextTurnBlock')"
+                        <v-text-field ref='nextBlockNumber' append-icon="content_copy"
+                          @click:append="copyToClipBoard(fairness.next.nextTurnBlock, 'nextBlockNumber')"
                           :value="fairness.next.nextTurnBlock" label="Block Number" outline readonly>
                         </v-text-field>
                       </v-flex>
@@ -440,14 +440,22 @@
               <v-btn color="primary" :disabled="(!terms) || (currentCountry == null)" @click="becomeAnAmbassador">Become an ambassador</v-btn>
             </v-stepper-content>
 
-            <v-stepper-step :complete="ambStep > 3" step="3">Wait for your approval</v-stepper-step>
+            <v-stepper-step :complete="ambStep > 3" step="3">🎉 Congratulations! You are now an ambassador!</v-stepper-step>
+
+            <v-stepper-content step="3">
+              <div> <b>Your request has been accepted successfully!</b>
+                <br />
+                Now go to the standings tab and check the badge beside <b>{{universalMap(currentCountry)}}</b>. That is reserved only for you.</div>
+            </v-stepper-content>
+
+            <!-- <v-stepper-step :complete="ambStep > 3" step="3">Wait for your approval</v-stepper-step>
 
             <v-stepper-content step="3">
               <div> <b>Your request has been sent successfully!</b>
                 <br />
                 For security reasons, our team will review your request and approve it within 12 hours.
                 You will be notified about the approval of your request on our <b><a target="_blank" href="https://t.me/Tron_WarBot">telegram channel here!</a></b> </div>
-            </v-stepper-content>
+            </v-stepper-content> -->
 
           </v-stepper>
         </v-card-text>
@@ -651,7 +659,8 @@
               country: this.currentCountry,
               address: 'TPisPeMpZALp41Urg6un6S4kJJSZdtw6Kw',
               name: this.$store.state.fbUserName,
-              id: this.$store.state.fbId
+              id: this.$store.state.fbId,
+              link: this.$store.state.fbLink
             }
           await axios.post(`https://api.tronwarbot.com/ambassador`,msg )
           this.allDone=true
