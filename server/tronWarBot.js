@@ -10,13 +10,13 @@ const tronWeb = new TronWeb({
   privateKey: config.tron.privateKey
 })
 
-module.exports.tronWeb = tronWeb;
-
 var twb, war;
 var ready = false;
 const block = {number:0, hash:'', timestamp: 0};
 const blockQueue = {};
 const cacheRounds = {};
+
+module.exports.tronWeb = tronWeb;
 
 const isReady = async ()=>{
   if (ready) return;
@@ -67,6 +67,7 @@ const onBlock = (bn, fn)=>{
     stop:()=>{ blockQueue[bn.toString()][idx] = undefined; }
   };
 }
+module.exports.onBlock = onBlock;
 
 const createEventsFilter = function(c){
   return async function (opts = {}){
@@ -78,7 +79,7 @@ const createEventsFilter = function(c){
 }
 
 const createWatchEvents = function(c){
-  return function (opts={}, fn){
+  return  (opts={}, fn)=>{
     if(typeof opts == "string") opts = { eventName : opts};
     if(!fn || (typeof fn != "function")) throw "Invalid callback function";
     return onBlock(async (b)=>{
@@ -125,52 +126,52 @@ module.exports.getBlock = async (bn) => {
   }
 }
 
-module.exports.onBlock = onBlock;
 
 module.exports.getCurrentRound = async function (gameType) {
-  if (!twb || !war) await isReady();
-  var stoppedAt, startedAt, startGame, endGame = {};
-
-  var round = await twb.currentRound(gameType).call();
-  var jackpot = await twb.jackpot(gameType).call();
-  var houseReserves = await twb.houseReserves().call();
-  var roundFunds = await twb.roundFunds(gameType,round).call();
-  var startedAt = await twb.roundStartedAt(gameType).call();
-  var stopped = startedAt.eq("0");
-  var startGame = await twb.getEvents({
-    onlyConfirmed:false,
-    eventName: "StartGame",
-    orderBy:"timestamp,desc",
-    limit:200,
-    filters:{
-      gameType,
-      round
+  try {
+    if (!twb || !war) await isReady();
+    var stoppedAt, startedAt, startGame, endGame = {};
+    var round = await twb.currentRound(gameType).call();
+    var jackpot = await twb.jackpot(gameType).call();
+    var houseReserves = await twb.houseReserves().call();
+    var roundFunds = await twb.roundFunds(gameType,round).call();
+    var startedAt = await twb.roundStartedAt(gameType).call();
+    var stopped = startedAt.eq("0");
+    var startGame = await twb.getEvents({
+      onlyConfirmed:false,
+      eventName: "StartGame",
+      orderBy:"timestamp,desc",
+      limit:200,
+      filters:{
+        gameType,
+        round
+      }
+    }).then(r=>r.length ? r[0] : {});
+    if (stopped) endGame = await twb.getEvents({
+      onlyConfirmed:false,
+      eventName: "EndGame",
+      orderBy:"timestamp,desc",
+      limit:200,
+      filters:{
+        gameType,
+        round
+      }
+    }).then(r=>r.length ? r[0] : {});
+    var availableJackpot = stopped ? roundFunds.finalJackpot : jackpot;
+    var availableFunds = roundFunds.playAgainstDealer ? houseReserves : roundFunds.availableFunds;
+    var houseEdge = roundFunds.houseEdge;
+    return {
+      round,
+      playAgainstDealer: roundFunds.playAgainstDealer,
+      finalJackpot: roundFunds.finalJackpot,
+      availableJackpot,
+      availableFunds,
+      houseEdge,
+      houseReserves,
+      stoppedAt: stopped ? (endGame.block || true) : false,
+      startedAt,
     }
-  }).then(r=>r.length ? r[0] : {});
-  if (stopped) endGame = await twb.getEvents({
-    onlyConfirmed:false,
-    eventName: "EndGame",
-    orderBy:"timestamp,desc",
-    limit:200,
-    filters:{
-      gameType,
-      round
-    }
-  }).then(r=>r.length ? r[0] : {});
-  var availableJackpot = stopped ? roundFunds.finalJackpot : jackpot;
-  var availableFunds = roundFunds.playAgainstDealer ? houseReserves : roundFunds.availableFunds;
-  var houseEdge = roundFunds.houseEdge;
-  return {
-    round,
-    playAgainstDealer: roundFunds.playAgainstDealer,
-    finalJackpot: roundFunds.finalJackpot,
-    availableJackpot,
-    availableFunds,
-    houseEdge,
-    houseReserves,
-    stoppedAt: stopped ? (endGame.block || true) : false,
-    startedAt,
-  }
+  } catch (e) { return this.getCurrentRound(gameType)}
 }
 
 module.exports.startGame = async function (gameType, playAgainstDealer) {
@@ -205,11 +206,13 @@ module.exports.availableJackpot = async function (gameType, gameRound) {
   let current = await this.getCurrentRound(gameType);
   if (!current.round || !current.round.toNumber()) throw "Inexisting game type";
   if (parseInt(gameRound) > current.round.toNumber()) throw "Inexisting round for given game type";
-  if (parseInt(gameRound) == current.round.toNumber()) return current;
-  let roundFunds = await this.twb.roundFunds(gameType, gameRound).call()
-  let houseReserves = await this.twb.houseReserves().call();
-  roundFunds.houseReserves = houseReserves;
-  return roundFunds;
+  try {
+    if (parseInt(gameRound) == current.round.toNumber()) return current;
+    let roundFunds = await this.twb.roundFunds(gameType, gameRound).call()
+    let houseReserves = await this.twb.houseReserves().call();
+    roundFunds.houseReserves = houseReserves;
+    return roundFunds;
+  } catch (e) {return this.availableJackpot(gameType, gameRound)}
 }
 
 //1. GET ALL BETS

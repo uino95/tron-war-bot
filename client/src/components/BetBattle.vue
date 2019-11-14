@@ -500,7 +500,6 @@
       window.addEventListener('resize', () => {
         this.windowSize.x = window.innerWidth
         this.windowSize.y = window.innerHeight
-        console.log(this.windowSize)
       })
     },
 

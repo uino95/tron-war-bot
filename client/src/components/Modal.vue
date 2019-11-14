@@ -268,13 +268,13 @@
                     <v-layout row wrap>
                       <v-flex sm6>
                         <v-text-field ref='betNext' append-icon="content_copy"
-                          @click:append="copyToClipBoard('TODO', 'previousBlockHash')" :value="'TODO'" label="Bet Next"
+                          @click:append="copyToClipBoard(fairness.previous.next, 'previousBetNext')" :value="fairness.previous.next" label="Bet Next"
                           outline readonly>
                         </v-text-field>
                       </v-flex>
                       <v-flex sm6>
                         <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
-                          @click:append="copyToClipBoard('TODO', 'nextTurnBlock')" :value="'TODO'" label="Bet Battle"
+                          @click:append="copyToClipBoard(fairness.previous.battle, 'previousBattle')" :value="fairness.previous.battle" label="Bet Battle"
                           outline readonly>
                         </v-text-field>
                       </v-flex>
@@ -399,7 +399,7 @@
             Motivate your cadets to engage through social media so that your country gain cohesion points and increase the odds of winning the war.
           </div>
           <v-stepper v-model="ambStep" vertical>
-            <v-stepper-step :complete="ambStep > 1" step="1">
+            <!-- <v-stepper-step :complete="ambStep > 1" step="1">
               Login with a wallet
             </v-stepper-step>
 
@@ -413,17 +413,18 @@
                 <v-alert :value="true" type="warning">Tron War Bot can only be used with an active Tron wallet at the moment.
                 </v-alert>
               </div>
-            </v-stepper-content>
+            </v-stepper-content> -->
 
-            <v-stepper-step :complete="ambStep > 2" step="2">Login to Facebook</v-stepper-step>
+            <v-stepper-step :complete="ambStep > 1" step="1">Login to Facebook</v-stepper-step>
 
-            <v-stepper-content step="2">
+            <v-stepper-content step="1">
+
               <v-btn color="facebook" class="white--text" @click="loginToFb">Login with Facebook</v-btn>
             </v-stepper-content>
 
-            <v-stepper-step :complete="ambStep > 3" step="3">Pick a country</v-stepper-step>
+            <v-stepper-step :complete="ambStep > 2" step="2">Pick a country</v-stepper-step>
 
-            <v-stepper-content step="3">
+            <v-stepper-content step="2">
               <div class="my-2">
                 Select the country you want to support. If you can't find it below it means it already has an outstanding ambassador.
                 You can find out who the person is in the Standings tab, hovering on the 🎖 symbol.
@@ -441,9 +442,9 @@
               <v-btn color="primary" :disabled="(!terms) || (currentCountry == null)" @click="becomeAnAmbassador">Become an ambassador</v-btn>
             </v-stepper-content>
 
-            <v-stepper-step :complete="ambStep > 4" step="4">Wait for your approval</v-stepper-step>
+            <v-stepper-step :complete="ambStep > 3" step="3">Wait for your approval</v-stepper-step>
 
-            <v-stepper-content step="4">
+            <v-stepper-content step="3">
               <div> <b>Your request has been sent successfully!</b>
                 <br />
                 For security reasons, our team will review your request and approve it within 12 hours.
@@ -524,15 +525,18 @@
         } else {
           this.$store.commit("setPollWar", true)
         }
+        if (this.isVisible && this.headerTile == "FAQ") {
+          this.$rtdbBind('fairness', db.ref('public/fairness'))
+        }
       }
     },
 
     computed: {
       ambStep: {
         get() {
-          if (this.allDone) return 4;
-          if (this.$store.state.fbAcessToken != null && this.$store.state.loggedInAccount != null) return 3;
-          if (this.$store.state.loggedInAccount != null) return 2;
+          if (this.allDone) return 3;
+          if (this.$store.state.fbAcessToken != null /*&& this.$store.state.loggedInAccount != null*/) return 2;
+          // if (this.$store.state.loggedInAccount != null) return 1;
           return 1;
         },
         set() {
@@ -609,7 +613,6 @@
     firebase: {
       referrals: db.ref("public/referral"),
       data: db.ref("public/data"),
-      fairness: db.ref("public/fairness"),
       mapStatus: db.ref("public/countriesMap"),
     },
     methods: {
@@ -631,13 +634,13 @@
           this.isWaitingForConfirm = false
           return
         }
-        if (this.$store.state.loggedInAccount == null) {
-          this.snackbarText = "Login to your wallet first";
-          this.snackbarColor = "error";
-          this.snackbar = true;
-          this.isWaitingForConfirm = false
-          return
-        }
+        // if (this.$store.state.loggedInAccount == null) {
+        //   this.snackbarText = "Login to your wallet first";
+        //   this.snackbarColor = "error";
+        //   this.snackbar = true;
+        //   this.isWaitingForConfirm = false
+        //   return
+        // }
         if (this.currentCountry == null) {
           this.snackbarText = "Select a country first";
           this.snackbarColor = "error";
@@ -646,11 +649,14 @@
           return
         }
         try {
-          await axios.post(`https://api.tronwarbot.com/ambassador`, {
+          let msg = {
               access_token: this.$store.state.fbAcessToken,
               country: this.currentCountry,
-              address: this.account
-            })
+              address: 'TPisPeMpZALp41Urg6un6S4kJJSZdtw6Kw',
+              name: this.$store.state.fbUserName,
+              id: this.$store.state.fbId
+            }
+          await axios.post(`https://api.tronwarbot.com/ambassador`,msg )
           this.allDone=true
         } catch (e) {
           console.log(e)
@@ -679,6 +685,7 @@
       snackbarTimeout: 6000,
       mapping: mapping,
       mapStatus: [],
+      fairness:{},
       terms: false,
       allDone: false,
       htmlText: false,

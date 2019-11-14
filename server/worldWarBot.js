@@ -8,7 +8,7 @@ const neighborCountries = require('./map-utilities/neighborCountries');
 const COUNTRIES = neighborCountries.length;
 var ROUND = 0;
 // SIMULATION PARAMS
-const SIMULATIONS = 30;
+const SIMULATIONS = 5;
 const EXPECTED_TURN_DURATION = 300;
 
 var countriesMap, turnData;
@@ -45,16 +45,14 @@ const winner = () => fairness.winner(countriesMap);
 const compressedState = async ()=>{
   let cMap = await mapState();
   let td = await currentTurnData();
-  cMap.forEach(e=>{
-    delete e.nextCohesion;
-    delete e.finalQuote;
-    delete e.nextQuote
-    delete e.territories;
-    delete e.probability;
+  let mapCompressedCopy = new Array(COUNTRIES).fill({});
+  cMap.forEach((e, idx)=>{
+    mapCompressedCopy[idx].c = cMap[idx].cohesion;
+    mapCompressedCopy[idx].o = cMap[idx].occupiedBy;
   });
   if (td.battle && td.battle.quotes) delete td.battle.quotes;
   if (td.next && td.next.quotes) delete td.battle.quotes;
-  let o = {countriesMap : cMap, turnData: td}
+  let o = {countriesMap : mapCompressedCopy, turnData: td}
   return Buffer.from(JSON.stringify(o), "ascii").toString("base64");
 }
 
@@ -145,7 +143,7 @@ const preTurn = async () => {
 
 const postTurn = async (turnData) => {
   // GET JACKPOT
-  let jackpot = await firebase.data.once("value").then(r=>r.val()['jackpot'] || 0);
+  let jackpot = await firebase.data.child('jackpot').once("value").then(r=>r.val() || 0);
   let bets = (await firebase.bets.getCurrentTurnBets(0, ROUND) )|| [];
   let betsPerCountry = new Array(COUNTRIES).fill(0);
   bets.forEach((e,i)=>betsPerCountry[e.userChoice]+=1);
@@ -155,7 +153,8 @@ const postTurn = async (turnData) => {
     countriesMap[i].probability = e;
     let pf = countriesMap[i].territories/COUNTRIES;
     countriesMap[i].nextQuote = utils.quoteFromProbability(e);
-    countriesMap[i].finalQuote = Math.round(((jackpot * pf)/(betsPerCountry[i]+1)) + 25 + (turn/100));
+    let discountFactor = (betsPerCountry[i]+1)/(betsPerCountry[i]+2);
+    countriesMap[i].finalQuote = Math.round((((jackpot * pf)/(betsPerCountry[i]+1)) + 50) * discountFactor);
   })
   turnData.next.quotes = turnData.next.probabilities.map(e=>utils.quoteFromProbability(e));
   //CALL EXTERNAL SCHEDULED FUNCTIONS
@@ -282,7 +281,7 @@ const simulate = async () => {
     do {
       preTurn();
       go = await launchNextTurn()
-      if (!(turn % 7)) editCohesion(utils.randomInt(5), (utils.randomInt(12)-2)/10)
+      if (!(turn % 5)) editCohesion(utils.randomInt(15), (utils.randomInt(12)-2)/10)
       // if (!(turn % 100)) {saveCurrentState(), await utils.sleep(5000)}
       if (!(turn % 100)) {
         realPdf().forEach((e,i)=>{

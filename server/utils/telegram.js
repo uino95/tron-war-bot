@@ -22,6 +22,24 @@ const init = async ()=>{
 
 const sendMessage = async (...d) => {return await telegram.sendMessage(chatId, ...d).catch(console.error);};
 
+const cleanCache = ()=>{
+  let temp = {};
+  let newCache = {};
+  Object.keys(mxCache).forEach((e)=>{
+    if (e.length < 2) return;
+    let type = e.substr(0,2);
+    let idx = parseInt(e.substr(2));
+    if (isNaN(idx)) return;
+    if (temp[type] && temp[type]>=idx) return;
+    temp[type]=idx;
+  })
+  Object.keys(temp).forEach(e=>{
+    idx = e + temp[e].toString();
+    newCache[idx]=mxCache[idx];
+  })
+  mxCache = newCache;
+}
+
 const sendOrUpdate = async (...d) => {
   if (!mxCache) await init();
   let idx = d.shift();
@@ -34,6 +52,7 @@ const sendOrUpdate = async (...d) => {
   }
   let m = await sendMessage(...d);
   mxCache[idx] = m.message_id;
+  cleanCache();
   firebase.data.update({tgMessageCache: mxCache})
   return m;
 };
