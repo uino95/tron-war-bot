@@ -163,19 +163,30 @@
         </v-card-text>
 
         <v-card-text v-if="headerTile === 'How To Play'">
-          The game is inspired from the popular WorldWarBot 2020
-          <a href="https://www.facebook.com/worldwarbot/" target="_blank">Facebook Game</a>
-          <br />The bot simulates a world war: every turn, one every 5 minutes, a state (randomly chosen)
-          conquers
-          another country.
-          The conquest probability is proportional to the number of conquered countries and the cohesion index
-          of that
-          country.
-          A World War run lasts on average 40 days.
+          Inspired by a popular Facebook page, named WorldWarBot2020, the game is a world war simulation
+          driven by a bot where users engagement affects the outcome of the war.
+          <br />
+          Each turn (5 minutes), the bot picks a country (in a provably fair manner)
+          and make it attack a foreign territory.
+          The probability of being chosen and the success of the attack
+          depends on the number of conquered territories and on the cohesion index of that country (check FAQ for details).
+          The cohesion index is the most important factor in the game as it is entirely controlled by users through
+          their engagement on social media platforms (different rules apply on each platform).
+          <br />
+          <i>The game ends when the entire map has been conquered by a single country.</i>
+          <br />
+          An average World War simulation usually lasts about 40 days,
+          however no precise estimate can be given upfront as the war is in large part
+          controlled by users and their resiliency.
 
           <br />
           <br>
           <b>What do I need to play?</b>
+          <br>There exists different game modes:
+          - Entertainment
+          - Social gaming
+          - Betting
+          - Value gaming
           <br>In order to play, you must own TRX, the underlying cryptocurrency of TRON’s network. Make sure
           you have a
           TronLink Wallet.

@@ -4,7 +4,7 @@ var config = require('./config');
 if(config.test){
     admin.initializeApp({
         credential: admin.credential.cert(config.firebaseTest),
-        databaseURL: 'https://tron-war-bot-test.firebaseio.com/'
+        databaseURL: 'https://twb-backup-de2e5.firebaseio.com/'
     });
     console.log("TEST MODE")
 } else {
