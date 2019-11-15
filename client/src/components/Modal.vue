@@ -15,10 +15,10 @@
           <div v-else>
             Please, login to your Tron wallet.
             <br />If you do not have a Tron wallet installed, please visit
-            <a target="blank" href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.
+            <a target="blank" href="https://www.tronlink.org/">TronLink</a> and download the Chrome extension.
             <br />
             <br />
-            <v-alert :value="true" type="warning">Tron War Bot is only available on Google Chrome or on
+            <v-alert :value="true" type="warning">Tron War Bot guarantees full proper functioning only with Google Chrome and
               TronLink/TronWallet mobile app.
             </v-alert>
           </div>
@@ -227,17 +227,19 @@
                   details to check that we are <a href="https://en.wikipedia.org/wiki/Provably_fair"
                     targte="_blank">provably fair</a>.
                   <br /><br />
-                  At the very beginning of a turn the Bot decides which country will conquer next. The
-                  Bot will hash (sha256) the name of the winner + a random string (called seed or salt
-                  in cryptography). You can find that hash in the box under Next Turn.<br>
-                  Once the timer runs out, the battle takes place and the conqueror is revealed
-                  alongside that seed used to compute the hash. You will then find the initial hash
-                  and
-                  the Conqueror and its seed under Previous Turn.
+                  At the very beginning of a turn the Bot decides which country will conquer next.
+                  1. The bot will reveal the current map state (a.k.a. countriesMap) at the beginning of each turn that also takes into account of the cohesion values.
+                  2. The bot will generate a magic number which will be used as the first seed for the next turn and reveal its hash (a.k.a. Magic Hash) using sha256 algorithm.
+                  3. The bot will reveal the future block number of TRON blockchain whose blockhash will be used as the second source of entropy for the next turn.
+                  Once the TRON block approaches the timer runs out, the magic number will be revealed and the battle will take place.
+                  Both the battle result and the next conqueror will be revealed.
+                  Now you will be able to find all the revealed data under the Previous Turn section.
                   <br /><br />
-                  This way we prove the Bot truly picks the countries in a random manner and doesn't
-                  "change its mind" on the way! And this is done in a way you can easily check, that
-                  is use any sha256 online tool like the one suggested below.
+                  At this point you can verify that data did not change and you can test this data against our <a href="https://jsfiddle.net/tronwarbot/d82915un/" target="_blank">open source war engine</a>
+                  to verify that the declared battle result and next conqueror area effectively the result of:
+                  - The previous turn's map state
+                  - The revealed Magic Number
+                  - The declared Block Hash
                   <br />
                   <br />
                   <v-divider mt-3 />
@@ -345,14 +347,14 @@
 
                   <v-card sm12>
                     <v-card-title text-xs-centered>
-                      If you want to check the correctness of the hash, we suggest to use the
-                      following sha256 online calculator, but you can whatever tool you prefer.
+                      If you want to check the correctness of the TronWarBot, we suggest you to copy the data in the 'Next Turn' section and verify they are consistent with the 'Previous Turn' section as the turn changes.
+                      After that use the <i>Countries Map</i>, <i>Magic Number</i> and the <i>Block Hash</i> in our War Engine.
+                      And if you are brave enough, we even challenge you to hack it to get better chances at winning the jackpot!
                     </v-card-title>
                     <v-layout justify-center>
                       <v-card-actions>
                         <v-chip label outline color="primary">
-                          <a href="https://emn178.github.io/online-tools/sha256.html" target="_blank">SHA256 Online
-                            Tool</a>
+                          <a href="https://jsfiddle.net/tronwarbot/d82915un/" target="_blank">Check out our War Engine</a>
                         </v-chip>
                       </v-card-actions>
                     </v-layout>
@@ -734,9 +736,9 @@
         {
           question: "How does the Bot work?",
           answer: "It uses a probability density function (PDF) to determine next conqueror state.\n" +
-            "PDF is based on number of conquered neighbouring countries times the cohesion index.\n\n" +
+            "PDF for a country is based on number of the conquered territories and its cohesion index.\nTo put it simply the formula looks similar to this:\n\n" +
             "<br><br><code>PDF = (NUMBER OF TERRITORIES CONQUERED ON THE BORDER) * (COHESION INDEX + PROBABILITY OF INSURRECTION BY THE FOREIGN STATE)</code>\n" +
-            "<br>Can you do something about it? Yes! Read more onto 'Modify the outcome of the War'"
+            "<br>However, if you wanna check the full algorithm we'd like to invite you to have a look at our <a href=\"https://jsfiddle.net/tronwarbot/d82915un/\" target=\"_blank\">open source war engine<\a>.\n\nCan you do something about it? Yes! Read more onto 'Modify the outcome of the War'"
         },
         {
           question: "What is the cohesion index?",
@@ -744,58 +746,9 @@
         },
         {
           question: "When the cohesion index is updated?",
-          answer: "It is updated anytime there is a variation in the number of countries belonging to a state, both if conquering or losing a country. It is computed taking care of the cohesion index of the conquered state.\n" +
-            "<br><b>Example</b>: France conquers a very patriotic Germany and then France will have a lower cohesion index, due to the German people that want to be independent!\n" +
-            "<br>Starting from TWB2.0 there is also another way cohesion can be modified, and that is by YOUR actions!" +
-            "<!--  <div>
-              <b> TronWarBot </b> will automatically read your post/comment and update the <b>cohesion</b> of the
-              mentioned country
-              based on the energy of your message, which will drastically increase the winning odds for that country in
-              the <b>Tron World War!</b>
-              <br>
-              Be creative now!!
-            </div>
-            <br>
-            <v-expansion-panel>
-              <v-expansion-panel-content v-for="(item,i) in 1" :key="i">
-                <template v-slot:header>
-                  <div> <b>Rules</b></div>
-                </template>
-                <v-card>
-                  <v-card-text>
-                    <div>
-
-                      The message, if valid, will update the cohesion of the mentioned country with the following
-                      criteria:
-                      <br>
-                      <ul>
-                        <li><b>COMMENT</b> is worth <span style="color: green"><b>+/- 0.1%</b></span> cohesion point for
-                          the mentioned country </li>
-                        <li><b>VISITOR POST</b> on page's feed is worth <span style="color: green"><b>+/-
-                              0.2%</b></span> cohesion point for the mentioned country (or
-                          anything in
-                          between based on the message energy) </li>
-                        <li><b>REVIEW</b> is worth <span style="color: green"><b>+/- 0.5%</b></span> cohesion point for
-                          the mentioned country (or anything in between
-                          based on
-                          the
-                          message energy)</li>
-                        <li><b>SHARE</b> of a page's post is worth <span style="color: green"><b>+/- 1.0%</b></span>
-                          cohesion point for the mentioned country (or
-                          anything in
-                          between based on the message energy)</li>
-                      </ul>
-                      <br>
-                      Beware that a negative message, will also make a country lose its cohesion!
-                      <v-spacer />
-                      <br>
-                      <i>P.S: Each facebook user is entitled to only one motivational comment plus one post and one
-                        share
-                        per
-                        day
-                        (UTC time), and a single page's review.</i>
-                    </div>
-                  </v-card-text>-->"
+          answer: "It is updated mainly through social media engagement!" +
+            "In addition to that there is also a cohesion update as a result of the battle: when the result is 1 the attacking country loses 0.1% of cohesion, when it is 2 the defending country gains 0.2% of cohesion.\n" +
+            "<br>Starting from TWB2.0 there is also another way cohesion can be modified, and that is by YOUR actions!"
         },
         {
           question: "How long is a World War?\n",
@@ -803,7 +756,7 @@
         },
         {
           question: "What do I do if I'm not able to place the bet?",
-          answer: "Check if you have got enough Energy and Bandwidth."
+          answer: "Check if you have got enough Energy and Bandwidth. If you have no issue with your wallet you might be sending inconsistent transaction. Make sure you always generate transactions from our official website and make sure to have a good connection to use latest quotes available."
         },
         {
           question: "What are Energy and Bandwidth?",
@@ -825,7 +778,7 @@
         },
         {
           question: "Couldn't find your answer?",
-          answer: "Please reach us out on the telegram group (please find the link on the bottom side of the menu)! We would be very happy to answer your questions :)"
+          answer: "Please reach us out on our offical <a href=\"https://t.me/Tron_WarBot\" target=\"_blank\">telegram group </a>! We would be very happy to answer your questions :)"
         },
         {
           question: "Is there a whitepaper?",
