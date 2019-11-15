@@ -10,46 +10,39 @@
               <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
             </template>
             <span>
-              - Territories:
-              It represents the number of national territories controlled by the conquerer country. There are 241
-              countries in the map, once a country controls them all it is declared the winner of the current run.<br>
-
-              - Cohesion:
-              It represents the level of welfare and patriotism of a specific national territory. The higher the
-              cohesion, the more united is the country and the higher is the chance for that country to keep
-              conquering territories. The cohesion gets updated.<br>
-
-              - Final conquer quote:
-              It represents the price for a single bet on the final winner which allows to redeem the final jackpot.
-              The price varies depending on jackpot size and the probability of the chosen country to win the full
-              run. The higher the probability or the jackpot, the higher the cost of a single bet. Prices steadily
-              increase over turns, the sooner the bets get placed the higher will be the reward in case of
-              victory.<br>
-
-              - Next conquer %:
-              It represents the exact likelihood for a country to conquer a territory in the upcoming turn. It is
-              calculated considering the size of the conquered borders for a given country times its cohesion index.
-              The more cohesive the country is the higher the chance it keeps on conquering territories. Similarly,
-              the cohesion index affects also the probability for a given territory to rebel on the dominating
-              country.<br></span>
+              Here you can see some interisting insight which can hel you decide which country to bet on.
+            </span>
           </v-tooltip>
           <v-spacer />
-          <v-text-field class="pa-2" v-model="searchStats" append-icon="search" label="Search" single-line hide-details>
+          <v-text-field class="pa-2" v-model="searchStats" append-icon="search" label="Search for a country" single-line
+            hide-details>
           </v-text-field>
         </v-toolbar>
-
 
         <v-data-table :search="searchStats" :headers="headersStats" :items="countryStatus" :item-key="'name'"
           class="elevation-1" :pagination.sync="paginationStats" :rows-per-page-items="[10,20,50]">
           <template v-slot:headers="props">
-            <th v-for="header in props.headers" :key="header.text" :align="header.align"
+            <th v-for="header in props.headers" :key="header.id" :align="header.align"
               :class="[header.class, 'column sortable', paginationStats.descending ? 'desc' : 'asc', header.value === paginationStats.sortBy ? 'active' : '']"
-              @click="changeSort(header.value)">
-              <v-icon small>arrow_upward</v-icon>
-              {{ header.text }}
+              @click="header.sortable ? changeSort(header.value) : ''">
+              <v-tooltip bottom v-if="header.description != null">
+                <template v-slot:activator="{ on }">
+                  <v-container v-on="on" class="pa-0">
+                  {{ header.text }}
+                  <v-icon v-if="header.sortable" small>arrow_upward</v-icon>
+                </v-container>
+                </template> 
+                <span >
+                  {{header.description}}
+                </span>
+              </v-tooltip>
+              <v-container v-else class="pa-0">
+                  {{ header.text }}
+                  <v-icon v-if="header.sortable" small>arrow_upward</v-icon>
+              </v-container>
             </th>
-            <th class="pa-0">
-              <v-btn fab small flat @click="visButton='next'" > Set </v-btn>
+            <th class="hidden-sm-and-up pa-0" align="left" >
+              <v-btn fab flat small :color="visButton.color[visButton.count]" @click="toggleButton()"> {{visButton.possibilities[visButton.count]}} </v-btn>
             </th>
           </template>
           <template v-slot:items="props">
@@ -80,7 +73,7 @@
             </td>
             <td class="text-xs-left pa-0">{{ props.item.territories }}</td>
             <td class="text-xs-left text-truncate pa-0">{{ (props.item.cohesion * 100).toFixed(1) + ' %'}}</td>
-            <td class="text-xs-left hidden-xs-only pa-0">
+            <!-- <td class="text-xs-left hidden-xs-only pa-0">
               <v-btn class="white--text" color="primary_final_tab"
                 v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
                 {{ (props.item.finalQuote + ' TRX')}}
@@ -91,7 +84,7 @@
                 v-on:click="goToBet('betnext',universalMap(props.item.name, 'numberId'))">
                 {{ (props.item.probability * 100).toFixed(2) + ' %'}}
               </v-btn>
-            </td>
+            </td> -->
             <td class="text-xs-left hidden-xs-only pa-0">
               <v-btn color="facebook" class="white--text"
                 v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
@@ -102,17 +95,17 @@
               </v-btn>
             </td>
             <td class="text-xs-left hidden-sm-and-up pa-0">
-              <v-btn v-if="visButton === 'support'" fab small color="facebook" class="white--text"
+              <v-btn v-if="visButton.possibilities[visButton.count] === 'support'" fab small color="facebook" class="white--text"
                 v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
                 <v-icon small color="white">
                   fab fa-facebook-square
                 </v-icon>
               </v-btn>
-              <v-btn fab small v-else-if="visbutton === 'final'" class="white--text" color="primary_final_tab"
-                v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
-                {{ (props.item.finalQuote + ' TRX')}}
+              <v-btn fab medium v-else-if="visButton.possibilities[visButton.count] === 'final'" class="white--text"
+                color="primary_final_tab" v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
+                {{ (props.item.finalQuote)}}
               </v-btn>
-              <v-btn fab small v-else class="white--text" color="primary_next_tab"
+              <v-btn fab medium v-else class="white--text" color="primary_next_tab"
                 v-on:click="goToBet('betnext',universalMap(props.item.name, 'numberId'))">
                 {{ (props.item.probability * 100).toFixed(2) + ' %'}}
               </v-btn>
@@ -258,65 +251,91 @@
       ],
       headersStats: [{
           text: '',
-          value: 'no-value',
+          value: 'flag',
+          id: 0,
           sortable: false,
           align: 'left',
-          class: 'pa-0'
+          class: 'pa-0',
+          description: null
         },
         {
           text: '',
-          value: 'no-value',
+          id: 1,
+          value: 'ambassador',
           sortable: false,
           align: 'left',
-          class: 'pa-0'
+          class: 'pa-0',
+          description: null
         },
         {
           text: 'Country',
           value: 'name',
+          id: 2,
           sortable: false,
           align: 'left',
-          class: 'body-1 pa-0'
+          class: 'body-1 pa-0',
+          description: null
         }, {
-          text: 'T',
+          text: 'Territories',
           value: 'territories',
+          id: 3,
           sortable: true,
           align: 'left',
-          class: 'body-1 pa-0'
+          class: 'body-1 pa-0 hidden-xs-only',
+          description: "Territories: \n It represents the number of national territories controlled by the conquerer country. There are 241 countries in the map, once a country controls them all it is declared the winner of the current run.",
+        }, {
+          text: 'Cohesion',
+          value: 'cohesion',
+          id: 4,
+          sortable: true,
+          align: 'left',
+          class: 'body-1 pa-0 hidden-xs-only',
+          description: " - Cohesion:\n It represents the level of welfare and patriotism of a specific national territory. The higher the cohesion, the more united is the country and the higher is the chance for that country to keep conquering territories. The cohesion gets updated."
+        },
+        {
+          text: 'T',
+          value: 'territories',
+          id: 5,
+          sortable: true,
+          align: 'left',
+          class: 'body-1 pa-0 hidden-sm-and-up',
+          description: "Territories: \n It represents the number of national territories controlled by the conquerer country. There are 241 countries in the map, once a country controls them all it is declared the winner of the current run.",
         }, {
           text: 'C',
           value: 'cohesion',
+          id: 6,
           sortable: true,
           align: 'left',
-          class: 'body-1 pa-0'
+          class: 'body-1 pa-0 hidden-sm-and-up',
+          description: "Cohesion:\n It represents the level of welfare and patriotism of a specific national territory. The higher the cohesion, the more united is the country and the higher is the chance for that country to keep conquering territories. The cohesion gets updated."
         },
-        {
-          text: 'Final Quote',
-          value: 'finalQuote',
-          sortable: true,
-          align: 'left',
-          class: 'body-1 hidden-xs-only pa-0'
-        },
-        {
-          text: 'Next %',
-          value: 'probability',
-          sortable: true,
-          align: 'left',
-          class: 'body-1 hidden-xs-only pa-0'
-        },
+        // {
+        //   text: 'Final Quote',
+        //   value: 'finalQuote',
+        //   id: 7,
+        //   sortable: true,
+        //   align: 'left',
+        //   class: 'body-1 hidden-xs-only pa-0',
+        //   description: "Final conquer quote:\n It represents the price for a single bet on the final winner which allows to redeem the final jackpot.The price varies depending on jackpot size and the probability of the chosen country to win the full run. The higher the probability or the jackpot, the higher the cost of a single bet. Prices steadily increase over turns, the sooner the bets get placed the higher will be the reward in case of victory."
+        // },
+        // {
+        //   text: 'Next %',
+        //   value: 'probability',
+        //   id: 8,
+        //   sortable: true,
+        //   align: 'left',
+        //   class: 'body-1 hidden-xs-only pa-0',
+        //   description: "Next conquer %: \n It represents the exact likelihood for a country to conquer a territory in the upcoming turn. It is alculated considering the size of the conquered borders for a given country times its cohesion index. The more cohesive the country is the higher the chance it keeps on conquering territories. Similarly, the cohesion index affects also the probability for a given territory to rebel on the dominating country."
+        // },
         {
           text: '',
-          value: 'no-value',
+          value: 'support',
+          id: 9,
           sortable: false,
           align: 'left',
           class: 'body-1 pa-0 hidden-xs-only pa-0',
+          description: null
         },
-        // {
-        //   text: 'set',
-        //   value: 'no-value',
-        //   sortable: false,
-        //   align: 'left',
-        //   class: 'body-1 pa-0 hidden-sm-and-up pa-0',
-        // }
       ],
       paginationStats: {
         sortBy: 'territories',
@@ -330,7 +349,11 @@
       snackbarColor: "",
       snackbarTimeout: 6000,
       mapStatus: [],
-      visButton: 'support'
+      visButton:{
+        possibilities: ['support', 'next', 'final'],
+        count: 0,
+        color: ['facebook','primary_next_tab','primary_final_tab']
+      }
     }),
     firebase: function () {
       return {
@@ -338,6 +361,21 @@
       }
     },
     methods: {
+      changeSort(column) {
+        if (this.paginationStats.sortBy === column) {
+          this.paginationStats.descending = !this.paginationStats.descending
+        } else {
+          this.paginationStats.sortBy = column
+          this.paginationStats.descending = false
+        }
+      },
+      toggleButton() {
+        if (this.visButton.count >= 2) {
+          this.visButton.count = 0;
+          return;
+        }
+        this.visButton.count = this.visButton.count + 1
+      },
       getFlagString(str) {
         return "/img/flags/" + str.toLowerCase()
           .replaceAll(" ", "-")

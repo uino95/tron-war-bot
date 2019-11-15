@@ -6,7 +6,6 @@
                  background-color="#001537"
                  :is-full-page="true">
         </loading>
-
         <v-navigation-drawer v-model="drawer" fixed clipped class="secondary" app dark>
             <v-list dense class="secondary" dark>
                 <template v-for="(item, i) in menuItems">

@@ -34,13 +34,13 @@ function pollAccount(interval) {
       const account = await store.state.tronWeb.trx.getAccount();
       const accountAddress = account.address; // HexString(Ascii)
       const accountAddressInBase58 = store.state.tronWeb.address.fromHex(accountAddress); // Base58
-
       if (accountAddressInBase58 !== store.state.loggedInAccount) {
         store.commit('setLoggedInAccount', {
           accountAddress: accountAddressInBase58
         })
       }
     } catch (error) {
+      console.log(error)
       store.commit('setLoggedInAccount', {
         accountAddress: null
       })

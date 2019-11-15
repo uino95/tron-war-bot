@@ -38,7 +38,7 @@
 
     }),
     mounted() {
-      db.ref('public').on('child_changed', (snapshot) => {
+      db.ref('public/countriesMap').on('child_changed', (snapshot) => {
         let data = snapshot.val();
         if (data.length == 241) {
           // console.log(data)

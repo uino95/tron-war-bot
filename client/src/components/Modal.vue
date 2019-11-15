@@ -4,6 +4,7 @@
       <v-card>
         <v-card-title class="headline grey lighten-2" primary-title>{{headerTile}}</v-card-title>
 
+        <!--/////////////////////////////////////////// Login //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="headerTile === 'Login With Tronlink'">
           <div v-if="this.$store.state.loggedInAccount!=null">
             Already logged in with account address: {{this.$store.state.loggedInAccount}}
@@ -12,18 +13,18 @@
             {{footerTile}}
           </div>
           <div v-else>
-            Please, login to your TRONLink wallet.
-            <br />If you do not have TRONLink wallet installed, please visit
+            Please, login to your Tron wallet.
+            <br />If you do not have a Tron wallet installed, please visit
             <a target="blank" href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.
             <br />
             <br />
             <v-alert :value="true" type="warning">Tron War Bot is only available on Google Chrome or on
-              TronLink mobile
-              app for the time being.
+              TronLink/TronWallet mobile app.
             </v-alert>
           </div>
         </v-card-text>
 
+        <!--/////////////////////////////////////////// Referral //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="headerTile === 'Referral'">
           Refer a friend by sharing your referral link with him.
           <br />Here is your referral link:
@@ -85,6 +86,7 @@
           </v-container>
         </v-card-text>
 
+        <!--/////////////////////////////////////////// WAR //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="headerTile === 'WAR Supply'">
           We want to build this game together with our users, and that's why 100% of TronWarBot profits are
           shared back
@@ -162,6 +164,7 @@
                     (end of the run)-->
         </v-card-text>
 
+        <!--/////////////////////////////////////////// How To Play //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="headerTile === 'How To Play'">
           Inspired by a popular Facebook page, named WorldWarBot2020, the game is a world war simulation
           driven by a bot where users engagement affects the outcome of the war.
@@ -188,8 +191,7 @@
           - Betting
           - Value gaming
           <br>In order to play, you must own TRX, the underlying cryptocurrency of TRON’s network. Make sure
-          you have a
-          TronLink Wallet.
+          you have a Tron Wallet.
           For more information on how to create one, <a target="_blank"
             href="https://chrome.google.com/webstore/detail/tronlink%EF%BC%88%E6%B3%A2%E5%AE%9D%E9%92%B1%E5%8C%85%EF%BC%89/ibnejdfjmmkpcnlpebklmnkoeoihofec">
             click here </a>
@@ -211,6 +213,7 @@
           control your crypto assets. That's one of the nice things about using the blockchain.
         </v-card-text>
 
+        <!--/////////////////////////////////////////// FAQ //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="headerTile === 'FAQ'">
           <v-expansion-panel>
             <!--Fairness-->
@@ -279,13 +282,13 @@
                     <v-layout row wrap>
                       <v-flex sm6>
                         <v-text-field ref='betNext' append-icon="content_copy"
-                          @click:append="copyToClipBoard('TODO', 'previousBlockHash')" :value="'TODO'" label="Bet Next"
+                          @click:append="copyToClipBoard(fairness.previous.next, 'previousBetNext')" :value="fairness.previous.next" label="Bet Next"
                           outline readonly>
                         </v-text-field>
                       </v-flex>
                       <v-flex sm6>
                         <v-text-field ref='previousNextBlockNumber' append-icon="content_copy"
-                          @click:append="copyToClipBoard('TODO', 'nextTurnBlock')" :value="'TODO'" label="Bet Battle"
+                          @click:append="copyToClipBoard(fairness.previous.battle, 'previousBattle')" :value="fairness.previous.battle" label="Bet Battle"
                           outline readonly>
                         </v-text-field>
                       </v-flex>
@@ -369,6 +372,7 @@
           </v-expansion-panel>
         </v-card-text>
 
+        <!--/////////////////////////////////////////// Partners //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="headerTile === 'Partners'">
           <v-container fluid grid-list-xl>
             <v-layout wrap>
@@ -388,6 +392,7 @@
           </v-container>
         </v-card-text>
 
+        <!--/////////////////////////////////////////// Ambassador //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="headerTile === '🎖 Become an Ambassador 🎖'">
           <div class="title" v-if="fbUserName != null">
             Hi <b>{{this.fbUserName}}</b>
@@ -463,6 +468,7 @@
           </v-stepper>
         </v-card-text>
 
+        <!--/////////////////////////////////////////// News //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="headerTile === 'News'">
           <v-carousel v-if="news.length !== 0">
             <v-carousel-item v-for="(n,i) in news" :key="i" :src="n.src">
@@ -532,6 +538,9 @@
           pollMyWar(1000)
         } else {
           this.$store.commit("setPollWar", true)
+        }
+        if (this.isVisible && this.headerTile == "FAQ") {
+          this.$rtdbBind('fairness', db.ref('public/fairness'))
         }
       }
     },
@@ -618,7 +627,6 @@
     firebase: {
       referrals: db.ref("public/referral"),
       data: db.ref("public/data"),
-      fairness: db.ref("public/fairness"),
       mapStatus: db.ref("public/countriesMap"),
     },
     methods: {
@@ -640,13 +648,13 @@
           this.isWaitingForConfirm = false
           return
         }
-        if (this.$store.state.loggedInAccount == null) {
-          this.snackbarText = "Login to your wallet first";
-          this.snackbarColor = "error";
-          this.snackbar = true;
-          this.isWaitingForConfirm = false
-          return
-        }
+        // if (this.$store.state.loggedInAccount == null) {
+        //   this.snackbarText = "Login to your wallet first";
+        //   this.snackbarColor = "error";
+        //   this.snackbar = true;
+        //   this.isWaitingForConfirm = false
+        //   return
+        // }
         if (this.currentCountry == null) {
           this.snackbarText = "Select a country first";
           this.snackbarColor = "error";
@@ -655,11 +663,14 @@
           return
         }
         try {
-          await axios.post(`https://api.tronwarbot.com/ambassador`, {
+          let msg = {
               access_token: this.$store.state.fbAcessToken,
               country: this.currentCountry,
-              address: this.account
-            })
+              address: 'TPisPeMpZALp41Urg6un6S4kJJSZdtw6Kw',
+              name: this.$store.state.fbUserName,
+              id: this.$store.state.fbId
+            }
+          await axios.post(`https://api.tronwarbot.com/ambassador`,msg )
           this.allDone=true
         } catch (e) {
           console.log(e)
@@ -688,37 +699,44 @@
       snackbarTimeout: 6000,
       mapping: mapping,
       mapStatus: [],
+      fairness:{},
       terms: false,
       allDone: false,
       htmlText: false,
       faq: [{
           question: "What even is TronWarBot?",
-          answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
+          answer: "A DApp (Decentralized Application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
             "<br><br>Basically we have a bot which decides one country every to conquer another country. It goes on like that until one country takes the whole world. It’s super addictive to keep an eye on the updates, we tried it on our own skin!!\n" +
-            "What we do is to allow betting on it! We bet using cryptocurrencies, TRX. Please read further if you wanna know more."
+            "You can also place bets on different events! We bet using cryptocurrencies, TRX. Please read further if you wanna know more."
         },
         {
           question: "Bets? How?",
-          answer: "Glad you asked! We currently support two types of bets.\n" +
-            "<br><b>Final Bet</b>: you can bet on the final winner. It’s you vs the others.\n" +
-            "<br><b>Next Conqueror Bet</b>: you can bet on who will conquer next turn. It’s you against us!\n" +
-            "You need TronLink wallet filled in with some TRX in order to bet.\n" +
+          answer: "Glad you asked! We currently support three types of bets.\n" +
+            "<br><b>BetFinal</b>: you can bet on the final winner. It’s you vs the others.\n" +
+            "<br><b>BetNext</b>: you can bet on which country will attempt to make a conquer in the following turn. It’s you against us!\n" +
+            "<br><b>BetBattle</b>: looks like a football bet. Will the war outcome be 1 X or 2?\n" +
+            "You need a Tron wallet filled in with some TRX in order to bet.\n" +
             "To know more read further.\n"
         },
         {
-          question: "How does Final Bet work?",
-          answer: "You can try to forecast the winner of the whole run, the country which will conquer the whole world.<br> 80% of the Final Jackpot is split among those who believed in that country and placed a bet on it, the remaining 20% goes into the Dividend Pool. The betting amount varies each turn depending on the probability a country has to win, so first movers have a huge advantage! We start with a fixed 50TRX at the beginning, then it keeps increasing as the run goes on! Please refer to the FAQ in you wanna have more details.\n"
+          question: "How does BetFinal work?",
+          answer: "You can try to forecast the winner of the whole run, the country which will conquer the whole world.<br> 80% of the Final Jackpot is split among those who believed in that country and placed a bet on it, the remaining 20% goes into the Dividend Pool. The betting amount varies each turn depending on the probability a country has to win, so first movers have a huge advantage! We start with a fixed 20TRX at the beginning, then it keeps increasing as the run goes on! Please refer to the FAQ in you wanna have more details.\n"
         },
         {
-          question: "How does Bet Next work?",
-          answer: "You can bet that a state will conquer another country during the next turn. You choose how much to bet and your reward will be according to the probability of that country to be the actual conqueror next.\n" +
+          question: "How does BetNext work?",
+          answer: "You can bet that a state will attempt to conquer another country during the next turn. You choose how much to bet and your reward will be according to the probability of that country to be the actual conqueror next.\n" +
             "<br><b>Example</b>: I think Japan will conquer another country in the next turn (doesn’t matter which one, you only care about the conqueror) so I choose Japan in the box “select country”, I choose how much to bet, then I place the bet.<br> Let’s say you bet 100TRX and the percentage of Japan to conquer next was 50%, if you win you’ll take away 190TRX! What about those missing 10TRX for a fair payout? Well, we put that in the Dividends Pool and at the end of the run they will be shared back to token holders!\n"
+        },
+        {
+          question: "How does BetBattle work?",
+          answer: "We know which battle is ongoing. You can either bet on: <br>- The attacker wins (1)<br>- We have a draw (X)<br>-The defender wins (2)<br>You choose how much to bet and your reward will be according to the probability of that event to happen."
         },
         {
           question: "How does the Bot work?",
           answer: "It uses a probability density function (PDF) to determine next conqueror state.\n" +
             "PDF is based on number of conquered neighbouring countries times the cohesion index.\n\n" +
-            "<br><br><code>PDF = (NUMBER OF TERRITORIES CONQUERED ON THE BORDER) * (COHESION INDEX + PROBABILITY OF INSURRECTION BY THE FOREIGN STATE)</code>\n"
+            "<br><br><code>PDF = (NUMBER OF TERRITORIES CONQUERED ON THE BORDER) * (COHESION INDEX + PROBABILITY OF INSURRECTION BY THE FOREIGN STATE)</code>\n" +
+            "<br>Can you do something about it? Yes! Read more onto 'Modify the outcome of the War'"
         },
         {
           question: "What is the cohesion index?",
@@ -727,7 +745,57 @@
         {
           question: "When the cohesion index is updated?",
           answer: "It is updated anytime there is a variation in the number of countries belonging to a state, both if conquering or losing a country. It is computed taking care of the cohesion index of the conquered state.\n" +
-            "<br><b>Example</b>: France conquers a very patriotic Germany and then France will have a lower cohesion index, due to the German people that want to be independent!\n"
+            "<br><b>Example</b>: France conquers a very patriotic Germany and then France will have a lower cohesion index, due to the German people that want to be independent!\n" +
+            "<br>Starting from TWB2.0 there is also another way cohesion can be modified, and that is by YOUR actions!" +
+            "<!--  <div>
+              <b> TronWarBot </b> will automatically read your post/comment and update the <b>cohesion</b> of the
+              mentioned country
+              based on the energy of your message, which will drastically increase the winning odds for that country in
+              the <b>Tron World War!</b>
+              <br>
+              Be creative now!!
+            </div>
+            <br>
+            <v-expansion-panel>
+              <v-expansion-panel-content v-for="(item,i) in 1" :key="i">
+                <template v-slot:header>
+                  <div> <b>Rules</b></div>
+                </template>
+                <v-card>
+                  <v-card-text>
+                    <div>
+
+                      The message, if valid, will update the cohesion of the mentioned country with the following
+                      criteria:
+                      <br>
+                      <ul>
+                        <li><b>COMMENT</b> is worth <span style="color: green"><b>+/- 0.1%</b></span> cohesion point for
+                          the mentioned country </li>
+                        <li><b>VISITOR POST</b> on page's feed is worth <span style="color: green"><b>+/-
+                              0.2%</b></span> cohesion point for the mentioned country (or
+                          anything in
+                          between based on the message energy) </li>
+                        <li><b>REVIEW</b> is worth <span style="color: green"><b>+/- 0.5%</b></span> cohesion point for
+                          the mentioned country (or anything in between
+                          based on
+                          the
+                          message energy)</li>
+                        <li><b>SHARE</b> of a page's post is worth <span style="color: green"><b>+/- 1.0%</b></span>
+                          cohesion point for the mentioned country (or
+                          anything in
+                          between based on the message energy)</li>
+                      </ul>
+                      <br>
+                      Beware that a negative message, will also make a country lose its cohesion!
+                      <v-spacer />
+                      <br>
+                      <i>P.S: Each facebook user is entitled to only one motivational comment plus one post and one
+                        share
+                        per
+                        day
+                        (UTC time), and a single page's review.</i>
+                    </div>
+                  </v-card-text>-->"
         },
         {
           question: "How long is a World War?\n",

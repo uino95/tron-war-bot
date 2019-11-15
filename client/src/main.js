@@ -47,6 +47,7 @@ Vue.mixin({
           FB.login((response) => {
             if (response.authResponse) {
               FB.api('/me', (response) => {
+                store.commit('setFbId', response.id)
                 store.commit('setFbUserName', response.name)
               });
               store.commit('setFbAcessToken', response.authResponse.accessToken)
