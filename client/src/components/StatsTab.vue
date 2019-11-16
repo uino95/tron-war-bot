@@ -53,7 +53,7 @@
               </v-avatar>
             </td>
             <td class="text-xs-left pa-0">
-              <v-tooltip v-if="props.item.ambassador" close-delay="3000" bottom>
+              <v-tooltip v-if="props.item.ambassador" close-delay="1000" bottom>
                 <template v-slot:activator="{ on }">
                   <div class="text-left title" v-on="on">🎖</div>
                 </template>

@@ -59,8 +59,7 @@
 
                 <v-layout row wrap>
                   <v-flex xs12>
-                    <v-slider thumb-label v-model="betAmount" :min="betNextGameParam.minimumBet "
-                      :max="betNextGameParam.maximumBet " label="Bet Amount"></v-slider>
+                    <v-slider thumb-label v-model="betAmount" :min="betNextGameParam ? betNextGameParam.minimumBet : 1" :max="betNextGameParam ? betNextGameParam.maximumBet : 1"label="Bet Amount"></v-slider>
                   </v-flex>
                 </v-layout>
                 <!-- <v-layout row wrap>

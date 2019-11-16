@@ -172,7 +172,7 @@
                 {
                     icon: 'fa-paper-plane',
                     text: 'Login To Your Wallet',
-                    path: 'WalletLogin',
+                    path: 'walletLogin',
                     link: false,
                     login: true,
                     class: "hidden-sm-and-up"

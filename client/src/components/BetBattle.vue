@@ -24,48 +24,48 @@
             <v-flex md10>
 
               <v-card class="mb-4">
-                <v-img class="white--text" :position="history[0].next.civilWar == 1 ? 'bottom 75% center' : 'center'"
+                <v-img class="white--text" :position="currentBattle.civilWar == 1 ? 'bottom 75% center' : 'center'"
                   :aspect-ratio="this.windowSize.x/150"
-                  :src=" history[0].next.civilWar == 1 ? 'img/civilWar9.png' : 'img/vs-battle.jpg'">
+                  :src=" currentBattle.civilWar == 1 ? 'img/civilWar9.png' : 'img/vs-battle.jpg'">
                   <v-layout class="mt-4" row wrap align-center justify-space-between>
                     <v-flex ml-1 xs4>
                       <v-layout column align-center>
                         <v-tooltip open-delay="600" bottom>
                           <template v-slot:activator="{ on }">
                             <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
-                          class="title pb-2 text-truncate">{{universalMap(history[0].next.o)}} </div>
+                              class="title pb-2 text-truncate">{{universalMap(currentBattle.o)}} </div>
                           </template>
-                          <span>{{universalMap(history[0].next.o)}}</span>
+                          <span>{{universalMap(currentBattle.o)}}</span>
                         </v-tooltip>
                         <v-hover v-if="!isMobile">
                           <v-avatar slot-scope="{ hover }">
-                            <v-btn large icon dark v-if="hover" v-on:click="toggle_country(history[0].next.o,1)">
+                            <v-btn large icon dark v-if="hover" v-on:click="toggle_country(currentBattle.o,1)">
                               <div class="title"> 1 </div>
                             </v-btn>
                             <v-btn large icon dark color="primary_battle_tab" v-else-if="currentChoice==1"
-                              v-on:click="toggle_country(history[0].next.o,1)">
+                              v-on:click="toggle_country(currentBattle.o,1)">
                               <div class="title"> 1 </div>
                             </v-btn>
                             <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                              :src="getFlagString(universalMap(history[0].next.o))"
-                              :alt="universalMap(history[0].next.o)" />
+                              :src="getFlagString(universalMap(currentBattle.o))"
+                              :alt="universalMap(currentBattle.o)" />
                           </v-avatar>
                         </v-hover>
                         <v-avatar v-else>
                           <v-btn large icon dark color="primary_battle_tab" v-if="currentChoice==1"
-                            v-on:click="toggle_country(history[0].next.o,1)">
+                            v-on:click="toggle_country(currentBattle.o,1)">
                             <div class="title"> 1 </div>
                           </v-btn>
                           <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                            :src="getFlagString(universalMap(history[0].next.o))" :alt="universalMap(history[0].next.o)"
-                            v-on:click="toggle_country(history[0].next.o,1)" />
+                            :src="getFlagString(universalMap(currentBattle.o))" :alt="universalMap(currentBattle.o)"
+                            v-on:click="toggle_country(currentBattle.o,1)" />
                         </v-avatar>
-                        <div class="title pt-2">{{history[0].next.probabilities[1] | probability}}</div>
+                        <div class="title pt-2">{{currentBattle.probabilities[1] | probability}}</div>
                       </v-layout>
                     </v-flex>
 
                     <v-flex xs2>
-                      <v-hover v-if="history[0].next.civilWar != 1">
+                      <v-hover v-if="currentBattle.civilWar != 1">
                         <v-avatar class="mt-2" slot-scope="{ hover }">
                           <v-btn fab dark color="primary_battle_tab" v-if="hover || currentChoice == 0"
                             v-on:click="toggle_country(241,0)">
@@ -76,14 +76,14 @@
                       <div class="title" v-else> Raise VS </div>
                     </v-flex>
 
-                    <v-flex v-if="history[0].next.civilWar == 1" mr-1 xs4>
+                    <v-flex v-if="currentBattle.civilWar == 1" mr-1 xs4>
                       <v-layout column align-center>
                         <v-tooltip open-delay="600" bottom>
                           <template v-slot:activator="{ on }">
                             <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
-                              class="title pb-2 truncate">{{universalMap(history[0].next.d)}} </div>
+                              class="title pb-2 truncate">{{universalMap(currentBattle.d)}} </div>
                           </template>
-                          <span>{{universalMap(history[0].next.d)}}</span>
+                          <span>{{universalMap(currentBattle.d)}}</span>
                         </v-tooltip>
                         <v-hover v-if="!isMobile">
                           <v-avatar slot-scope="{ hover }">
@@ -95,8 +95,8 @@
                               <div class="title"> X </div>
                             </v-btn>
                             <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                              :src="getFlagString(universalMap(history[0].next.d))"
-                              :alt="universalMap(history[0].next.d)" />
+                              :src="getFlagString(universalMap(currentBattle.d))"
+                              :alt="universalMap(currentBattle.d)" />
                           </v-avatar>
                         </v-hover>
                         <v-avatar v-else>
@@ -105,10 +105,10 @@
                             <div class="title"> X </div>
                           </v-btn>
                           <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                            :src="getFlagString(universalMap(history[0].next.d))" :alt="universalMap(history[0].next.d)"
+                            :src="getFlagString(universalMap(currentBattle.d))" :alt="universalMap(currentBattle.d)"
                             v-on:click="toggle_country(241,0)" />
                         </v-avatar>
-                        <div class="title pt-2">{{history[0].next.probabilities[0] | probability}}</div>
+                        <div class="title pt-2">{{currentBattle.probabilities[0] | probability}}</div>
                       </v-layout>
                     </v-flex>
 
@@ -117,34 +117,34 @@
                         <v-tooltip open-delay="600" bottom>
                           <template v-slot:activator="{ on }">
                             <div v-on="on" v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
-                              class="title pb-2 truncate">{{universalMap(history[0].next.d)}} </div>
+                              class="title pb-2 truncate">{{universalMap(currentBattle.d)}} </div>
                           </template>
-                          <span>{{universalMap(history[0].next.d)}}</span>
+                          <span>{{universalMap(currentBattle.d)}}</span>
                         </v-tooltip>
                         <v-hover v-if="!isMobile">
                           <v-avatar slot-scope="{ hover }">
-                            <v-btn large icon dark v-on:click="toggle_country(history[0].next.d, 2)" v-if="hover">
+                            <v-btn large icon dark v-on:click="toggle_country(currentBattle.d, 2)" v-if="hover">
                               <div class="title"> 2 </div>
                             </v-btn>
                             <v-btn large icon dark color="primary_battle_tab" v-else-if="currentChoice==2"
-                              v-on:click="toggle_country(history[0].next.d,2)">
+                              v-on:click="toggle_country(currentBattle.d,2)">
                               <div class="title"> 2 </div>
                             </v-btn>
                             <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                              :src="getFlagString(universalMap(history[0].next.d))"
-                              :alt="universalMap(history[0].next.d)" />
+                              :src="getFlagString(universalMap(currentBattle.d))"
+                              :alt="universalMap(currentBattle.d)" />
                           </v-avatar>
                         </v-hover>
                         <v-avatar v-else>
                           <v-btn large icon dark color="primary_battle_tab" v-if="currentChoice==2"
-                            v-on:click="toggle_country(history[0].next.d,2)">
+                            v-on:click="toggle_country(currentBattle.d,2)">
                             <div class="title"> 2 </div>
                           </v-btn>
                           <v-img v-else :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                            :src="getFlagString(universalMap(history[0].next.d))" :alt="universalMap(history[0].next.d)"
-                            v-on:click="toggle_country(history[0].next.d,2)" />
+                            :src="getFlagString(universalMap(currentBattle.d))" :alt="universalMap(currentBattle.d)"
+                            v-on:click="toggle_country(currentBattle.d,2)" />
                         </v-avatar>
-                        <div class="title pt-2">{{history[0].next.probabilities[2] | probability}}</div>
+                        <div class="title pt-2">{{currentBattle.probabilities[2] | probability}}</div>
                       </v-layout>
                     </v-flex>
 
@@ -174,14 +174,14 @@
 
                 <v-layout row wrap>
                   <v-flex xs12>
-                    <v-slider thumb-label v-model="betAmount" :min="1 " :max="betBattleGameParams.maximumBet "
+                    <v-slider thumb-label v-model="betAmount" :min="betBattleGameParams ? betBattleGameParams.minimumBet : 1" :max="betBattleGameParams ? betBattleGameParams.maximumBet : 1"
                       label="Bet Amount"></v-slider>
                   </v-flex>
                 </v-layout>
                 <v-flex xs12 class="text-xs-center pa-2">
                   <div class="title pb-2"> Choose your guess </div>
                   <v-hover>
-                    <v-btn fab dark color="primary_battle_tab" v-on:click="toggle_country(history[0].next.o,1)">
+                    <v-btn fab dark color="primary_battle_tab" v-on:click="toggle_country(currentBattle.o,1)">
                       <div class="title white--text"> 1 </div>
                     </v-btn>
                   </v-hover>
@@ -189,8 +189,8 @@
                     <div class="title white--text"> x </div>
                   </v-btn>
                   <v-hover>
-                    <v-btn v-if="history[0].next.civilWar != 1" fab dark color="primary_battle_tab"
-                      v-on:click="toggle_country(history[0].next.d,2)">
+                    <v-btn v-if="currentBattle.civilWar != 1" fab dark color="primary_battle_tab"
+                      v-on:click="toggle_country(currentBattle.d,2)">
                       <div class="title white--text"> 2 </div>
                     </v-btn>
                   </v-hover>
@@ -198,7 +198,8 @@
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_battle_tab" dark
                   @click="placeBet">
                   <div v-bind:style="{'max-width': windowSize.x * 0.6 + 'px'}" class="text-truncate">
-                    Bet {{betAmount}} TRX {{currentCountry != null ?'on ' + (currentChoice ? universalMap(currentCountry) : 'DRAW')  :''}}
+                    Bet {{betAmount}} TRX
+                    {{currentCountry != null ?'on ' + (currentChoice ? universalMap(currentCountry) : 'DRAW')  :''}}
                   </div>
                 </v-btn>
                 <v-btn v-else-if="info.serverStatus == 300" dark color="primary_battle_tab" @click="battleInProgress">
@@ -590,7 +591,7 @@
       initBetAmount: function () {
         setTimeout(() => {
           if (this.betBattleGameParams) {
-            this.betAmount = 1
+            this.betAmount = this.betBattleParams.minimumBet
           } else {
             this.initBetAmount()
           }
@@ -631,6 +632,24 @@
       }
     },
     computed: {
+      currentBattle: function () {
+        if (this.history[0]) return this.history[0].next;
+        return {
+          "civilWar": 0,
+          "cohesion": {
+            "d": 0.5,
+            "dt": 0.5,
+            "o": 0.5,
+            "ot": 0.5
+          },
+          "d": 0,
+          "dt": 0,
+          "o": 0,
+          "ot": 0,
+          "probabilities": [0,0,0],
+          "quotes": [0,0,0]
+        }
+      },
       isMobile: function () {
         return this.$store.state.isMobile
       },
@@ -643,11 +662,11 @@
       },
       winChance: function () {
         if (this.currentChoice == null) return 0;
-        return this.history[0].next.probabilities[this.currentChoice]
+        return this.currentBattle.probabilities[this.currentChoice]
       },
       multiplier: function () {
         if (this.currentChoice == null) return 0;
-        return this.history[0].next.quotes[this.currentChoice]
+        return this.currentBattle.quotes[this.currentChoice]
       },
       potentialWin: function () {
 
