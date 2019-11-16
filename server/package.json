@@ -25,6 +25,7 @@
     "newrelic": "^5.13.1",
     "node-cron": "^2.0.3",
     "nodemon": "^1.19.4",
+    "puppeteer": "^2.0.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "socket.io": "^2.2.0",
