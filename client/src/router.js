@@ -10,8 +10,8 @@ import BetNext from './components/BetNextTab.vue'
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
+  mode: 'history',
+  routes: [{
       path: '/',
       name: 'home',
       component: Stats
@@ -45,6 +45,6 @@ export default new Router({
       path: '/cohesion',
       name: 'cohesion',
       component: Cohesion
-    },
+    }
   ]
 })

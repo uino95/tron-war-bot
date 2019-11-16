@@ -4,7 +4,7 @@
       <v-card>
         <v-card-title class="headline grey lighten-2" primary-title>{{headerTile}}</v-card-title>
 
-        <v-card-text v-if="headerTile === 'Login With Tronlink'">
+        <v-card-text v-if="path === 'walletLogin'">
           <div v-if="this.$store.state.loggedInAccount!=null">
             Already logged in with account address: {{this.$store.state.loggedInAccount}}
             <br />
@@ -24,7 +24,7 @@
           </div>
         </v-card-text>
 
-        <v-card-text v-if="headerTile === 'Referral'">
+        <v-card-text v-if="path === 'referral'">
           Refer a friend by sharing your referral link with him.
           <br />Here is your referral link:
           <v-chip v-if="this.$store.state.loggedInAccount != null" label outline color="primary">
@@ -81,11 +81,11 @@
 
             <v-container v-else class="text-md-center">
               <v-chip label outline color="red">Still no one played with your link... :(</v-chip>
-            </v-container> -->
+            </v-container>
           </v-container>
         </v-card-text>
 
-        <v-card-text v-if="headerTile === 'WAR Supply'">
+        <v-card-text v-if="path === 'warSupply'">
           We want to build this game together with our users, and that's why 100% of TronWarBot profits are
           shared back
           to token holders! (..but yes we detain around 50% of the current
@@ -162,7 +162,7 @@
                     (end of the run)-->
         </v-card-text>
 
-        <v-card-text v-if="headerTile === 'How To Play'">
+        <v-card-text v-if="path === 'howToPlay'">
           The game is inspired from the popular WorldWarBot 2020
           <a href="https://www.facebook.com/worldwarbot/" target="_blank">Facebook Game</a>
           <br />The bot simulates a world war: every turn, one every 5 minutes, a state (randomly chosen)
@@ -200,7 +200,7 @@
           control your crypto assets. That's one of the nice things about using the blockchain.
         </v-card-text>
 
-        <v-card-text v-if="headerTile === 'FAQ'">
+        <v-card-text v-if="path === 'faq'">
           <v-expansion-panel>
             <!--Fairness-->
             <v-expansion-panel-content>
@@ -228,7 +228,7 @@
                   <br />
                   <v-divider mt-3 />
                   <br />
-                  <span class="title">Previous Turn: {{data.turn - 1}} </span>
+                  <span class="title">Previous Turn: {{info.turn - 1}} </span>
                   <br />
                   <v-container fluid grid-list-sm>
                     <v-flex sm 16>
@@ -268,14 +268,14 @@
                     <v-layout row wrap>
                       <v-flex sm6>
                         <v-text-field ref='betNext' append-icon="content_copy"
-                          @click:append="copyToClipBoard(fairness.previous.next, 'betNext')" :value="fairness.previous.next" label="Bet Next"
-                          outline readonly>
+                          @click:append="copyToClipBoard(fairness.previous.next, 'betNext')"
+                          :value="fairness.previous.next" label="Bet Next" outline readonly>
                         </v-text-field>
                       </v-flex>
                       <v-flex sm6>
                         <v-text-field ref='previousBattle' append-icon="content_copy"
-                          @click:append="copyToClipBoard(fairness.previous.battle, 'previousBattle')" :value="fairness.previous.battle" label="Bet Battle"
-                          outline readonly>
+                          @click:append="copyToClipBoard(fairness.previous.battle, 'previousBattle')"
+                          :value="fairness.previous.battle" label="Bet Battle" outline readonly>
                         </v-text-field>
                       </v-flex>
                     </v-layout>
@@ -283,7 +283,7 @@
 
                   <v-divider />
                   <br />
-                  <span class="title">Next Turn: {{data.turn}} </span>
+                  <span class="title">Next Turn: {{info.turn}} </span>
                   <br />
 
                   <v-container fluid grid-list-sm>
@@ -358,7 +358,7 @@
           </v-expansion-panel>
         </v-card-text>
 
-        <v-card-text v-if="headerTile === 'Partners'">
+        <v-card-text v-if="path === 'partners'">
           <v-container fluid grid-list-xl>
             <v-layout wrap>
               <v-flex v-for="partner in partners" :key="partner.name" sm6>
@@ -377,15 +377,15 @@
           </v-container>
         </v-card-text>
 
-        <v-card-text v-if="headerTile === '🎖 Become an Ambassador 🎖'">
-          <div class="title" v-if="fbUserName != null">
+        <v-card-text v-if="path === 'ambassador'">
+          <div class="title" v-if="isLoggedIn">
             Hi <b>{{this.fbUserName}}</b>
           </div>
-          <br v-if="fbUserName != null">
+          <br v-if="isLoggedIn">
           <div class="mb-2">
             <h4 class=" text-xs-center">
               <i>Have you ever dreamt of becoming the leader of your home country and guide it to conquer the world?</i>
-              <br /> <b >Now you can!</b>
+              <br /> <b>Now you can!</b>
             </h4>
             <br />
             <br />
@@ -394,7 +394,8 @@
             <br />
             <br />
             <b>How?</b>
-            Motivate your cadets to engage through social media so that your country gain cohesion points and increase the odds of winning the war.
+            Motivate your cadets to engage through social media so that your country gain cohesion points and increase
+            the odds of winning the war.
           </div>
           <v-stepper v-model="ambStep" vertical>
             <!-- <v-stepper-step :complete="ambStep > 1" step="1">
@@ -417,35 +418,36 @@
 
             <v-stepper-content step="1">
 
-              <v-btn color="facebook" class="white--text" @click="loginToFb">Login with Facebook</v-btn>
+              <v-btn small color="facebook" class="white--text" @click="loginToFb">Facebook Login</v-btn>
             </v-stepper-content>
 
             <v-stepper-step :complete="ambStep > 2" step="2">Pick a country</v-stepper-step>
 
             <v-stepper-content step="2">
               <div class="my-2">
-                Select the country you want to support. If you can't find it below it means it already has an outstanding ambassador.
+                Select the country you want to support. If you can't find it below it means it already has an
+                outstanding ambassador.
                 You can find out who the person is in the Standings tab, hovering on the 🎖 symbol.
               </div>
               <v-autocomplete outline v-model="currentCountry" :items="computedMapping" item-text="name"
                 item-value="numberId" hide-no-data hide-selected label="Select Country"
                 placeholder="Type in to select a country">
               </v-autocomplete>
-              <v-checkbox
-                color="primary"
-                class="ml-2"
-                v-model="terms"
-                :label="'By checking this box you accept to publicly disclose your social media identity and profile on TronWarBot website and all of its related social media channels'" >
+              <v-checkbox color="primary" class="ml-2" v-model="terms"
+                :label="'By checking this box you accept to publicly disclose your social media identity and profile on TronWarBot website and all of its related social media channels'">
               </v-checkbox>
-              <v-btn color="primary" :disabled="(!terms) || (currentCountry == null)" @click="becomeAnAmbassador">Become an ambassador</v-btn>
+              <v-btn small color="primary" :disabled="(!terms) || (currentCountry == null)" @click="becomeAnAmbassador">
+                Confirm</v-btn>
             </v-stepper-content>
 
-            <v-stepper-step :complete="ambStep > 3" step="3">🎉 Congratulations! You are now an ambassador!</v-stepper-step>
+            <v-stepper-step :complete="ambStep >= 3" step="3">🎉 Congratulations! You are now an ambassador!
+            </v-stepper-step>
 
             <v-stepper-content step="3">
               <div> <b>Your request has been accepted successfully!</b>
                 <br />
-                Now go to the standings tab and check the badge beside <b>{{universalMap(currentCountry)}}</b>. That is reserved only for you.</div>
+                Now go to the standings tab and check the badge beside <b>{{universalMap(currentCountry)}}</b>. That is
+                reserved only for you.</div>
             </v-stepper-content>
 
             <!-- <v-stepper-step :complete="ambStep > 3" step="3">Wait for your approval</v-stepper-step>
@@ -460,7 +462,7 @@
           </v-stepper>
         </v-card-text>
 
-        <v-card-text v-if="headerTile === 'News'">
+        <v-card-text v-if="path === 'news'">
           <v-carousel v-if="news.length !== 0">
             <v-carousel-item v-for="(n,i) in news" :key="i" :src="n.src">
             </v-carousel-item>
@@ -472,7 +474,7 @@
           <v-spacer></v-spacer>
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-              <v-btn v-if="headerTile === 'Dividends'" color="blue darken-1" flat="flat" v-on="on">Claim
+              <v-btn v-if="path === 'dividends'" color="blue darken-1" flat="flat" v-on="on">Claim
                 your Dividends
               </v-btn>
             </template>
@@ -508,6 +510,7 @@
     name: "Modal",
     props: {
       value: Boolean,
+      path: String,
       headerTile: String,
       footerTile: String,
       bodyTile: String
@@ -524,13 +527,13 @@
 
     watch: {
       isVisible: function () {
-        if (this.isVisible && this.headerTile == "WAR Supply") {
+        if (this.isVisible && this.path == "warSupply") {
           this.$store.commit("setPollWar", false)
           pollMyWar(1000)
         } else {
           this.$store.commit("setPollWar", true)
         }
-        if (this.isVisible && this.headerTile == "FAQ") {
+        if (this.isVisible && this.path == "faq") {
           this.$rtdbBind('fairness', db.ref('public/fairness'))
         }
       }
@@ -540,7 +543,7 @@
       ambStep: {
         get() {
           if (this.allDone) return 3;
-          if (this.$store.state.fbAcessToken != null /*&& this.$store.state.loggedInAccount != null*/) return 2;
+          if (this.$store.state.fbStatus.loggedIn /*&& this.$store.state.loggedInAccount != null*/ ) return 2;
           // if (this.$store.state.loggedInAccount != null) return 1;
           return 1;
         },
@@ -554,10 +557,11 @@
         })
       },
       percentage: function () {
-        if (this.referrals.percentages[this.$store.state.loggedInAccount]) {
-          return this.referrals.percentages[this.$store.state.loggedInAccount] * 100
-        }
-        return this.referrals.percentages.default * 100
+          if (this.referrals.percentages[this.$store.state.loggedInAccount]) {
+            return this.referrals.percentages[this.$store.state.loggedInAccount] * 100
+          }
+          return this.referrals.percentages.default * 100
+        
       },
       isVisible: {
         get() {
@@ -588,9 +592,9 @@
       },
       // availableTRX() {
       //     // BetFinal Jackpot + max((BetNext - deposit),0)
-      //     const BetFinal = tronweb.BigNumber(tronweb.toSun(this.data.jackpot * this.$store.state.gameParams.finalBetParams.houseEdge))
+      //     const BetFinal = tronweb.BigNumber(tronweb.toSun(this.info.jackpot * this.$store.state.gameParams.finalBetParams.houseEdge))
       //     const BetNext = this.$store.state.availableDividends
-      //     const deposit = tronweb.toSun(this.data.deposit)
+      //     const deposit = tronweb.toSun(this.info.deposit)
       //     return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
       // },
       myWAR() {
@@ -612,13 +616,17 @@
         }
       },
       fbUserName() {
-        return this.$store.state.fbUserName
+        return this.$store.state.fbStatus.fbUserName
+      },
+      isLoggedIn() {
+        return this.$store.state.fbStatus.loggedIn
       }
     },
     firebase: {
       referrals: db.ref("public/referral"),
-      data: db.ref("public/data"),
+      info: db.ref("public/data"),
       mapStatus: db.ref("public/countriesMap"),
+      news: db.ref("public/news")
     },
     methods: {
       copyToClipBoard(value, ref) {
@@ -632,7 +640,7 @@
         this.snackbar = true
       },
       async becomeAnAmbassador() {
-        if(this.$store.state.fbAcessToken == null){
+        if (!this.isLoggedIn) {
           this.snackbarText = "Login to facebook First";
           this.snackbarColor = "error";
           this.snackbar = true;
@@ -655,15 +663,15 @@
         }
         try {
           let msg = {
-              access_token: this.$store.state.fbAcessToken,
-              country: this.currentCountry,
-              address: 'TPisPeMpZALp41Urg6un6S4kJJSZdtw6Kw',
-              name: this.$store.state.fbUserName,
-              id: this.$store.state.fbId,
-              link: this.$store.state.fbLink
-            }
-          await axios.post(`https://api.tronwarbot.com/ambassador`,msg )
-          this.allDone=true
+            access_token: this.$store.state.fbStatus.fbAcessToken,
+            country: this.currentCountry,
+            address: 'TPisPeMpZALp41Urg6un6S4kJJSZdtw6Kw',
+            name: this.$store.state.fbStatus.fbUserName,
+            id: this.$store.state.fbStatus.fbId,
+            link: this.$store.state.fbStatus.fbLink
+          }
+          await axios.post(`https://api.tronwarbot.com/ambassador`, msg)
+          this.allDone = true
         } catch (e) {
           console.log(e)
           console.log(e.response)
@@ -691,10 +699,11 @@
       snackbarTimeout: 6000,
       mapping: mapping,
       mapStatus: [],
-      fairness:{},
+      fairness: {},
       terms: false,
       allDone: false,
       htmlText: false,
+      info: null,
       faq: [{
           question: "What even is TronWarBot?",
           answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
@@ -795,19 +804,7 @@
             img: 'bingtron.jpg'
         }*/
       ],
-      news: [{
-          src: 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg'
-        },
-        {
-          src: 'https://cdn.vuetifyjs.com/images/carousel/sky.jpg'
-        },
-        {
-          src: 'https://cdn.vuetifyjs.com/images/carousel/bird.jpg'
-        },
-        {
-          src: 'https://cdn.vuetifyjs.com/images/carousel/planet.jpg'
-        }
-      ]
+      news: []
     })
   };
 </script>
