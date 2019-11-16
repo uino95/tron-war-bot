@@ -5,6 +5,7 @@ import './plugins/firebase'
 import router from './router'
 import store from './store'
 import mapping from './assets/mapping.js'
+import axios from 'axios'
 import '@fortawesome/fontawesome-free/css/all.css'
 
 import App from './App.vue'
@@ -20,6 +21,7 @@ Vue.use(VueAnalytics, {
 });
 
 Vue.mixin({
+  localStorage: window.localStorage,
   methods: {
     universalMap(id, to) {
       try {
@@ -41,41 +43,75 @@ Vue.mixin({
       } catch (error) {}
     },
 
-    async loginToFb() {
-      await FB.getLoginStatus((response) => {
-        if (response.status != 'connected') {
-          FB.login((response) => {
-            console.log(response)
-            if (response.authResponse) {
-              FB.api('/me?fields=link,name', (response) => {
-                console.log(response)
-                store.commit('setFbId', response.id)
-                store.commit('setFbUserName', response.name)
-                store.commit('setFbLink',response.link)
-              });
-              store.commit('setFbAcessToken', response.authResponse.accessToken)
-            } else {
-              throw ("User not logged in with facebook")
-            }
-          },{scope:'public_profile,email,user_link'})
-        }
-        if (response.status == 'connected') {
-          if (response.authResponse && (store.state.fbUserName == null || store.state.fbAcessToken == null)) {
-            FB.api('/me', (response) => {
-              store.commit('setFbUserName', response.name)
-            });
-            store.commit('setFbAcessToken', response.authResponse.accessToken)
+    async loggedInFb() {
+      let fbAcessToken = localStorage.getItem('fbAcessToken')
+      if (fbAcessToken != null) {
+        let fbUser = await axios.get("https://graph.facebook.com/v4.0/me?access_token=" + fbAcessToken + "&fields=id,name,link").catch(()=>{
+          console.log("something went wrong")
+          console.error
+          this.cleanFbStatus()
+          return false
+        })
+        if (fbUser.status == 200) {
+          let fb = {
+            fbAcessToken: localStorage.getItem('fbAcessToken'),
+            fbId: localStorage.getItem('fbId'),
+            fbUserName: localStorage.getItem('fbUserName'),
+            fbLink: localStorage.getItem('fbLink'),
+            loggedIn: true
           }
+          store.commit('setFbStatus', fb)
+          return true;
         }
-      })
+        else {
+          //acesstoken expired or something went wrong
+          this.cleanFbStatus()
+          return false;
+        }
+      } else {
+        // you have logout before or neve logged in before
+        this.cleanFbStatus()
+        return false
+      }
+    },
+
+    async loginToFb() {
+      let loggedIn = await this.loggedInFb()
+      if (!loggedIn) {
+        // not logged in yet, proceed to Login
+        FB.login((response) => {
+          if (response.authResponse) {
+            FB.api('/me?fields=link,name', (response) => {
+              localStorage.setItem('fbId', response.id)
+              localStorage.setItem('fbUserName', response.name)
+              localStorage.setItem('fbLink', response.link)
+              store.commit('setFbStatus', {fbId: response.id, fbUserName: response.name, fbLink: response.link})
+            });
+            localStorage.setItem('fbAcessToken', response.authResponse.accessToken)
+            store.commit('setFbStatus', {fbAcessToken: response.authResponse.accessToken, loggedIn: true})
+          } else {
+            throw ("User not logged in with facebook")
+          }
+        }, {
+          scope: 'public_profile,email,user_link',
+          auth_type: 'reauthenticate'
+        })
+      }
     },
     logoutFb() {
-      console.log("logging out")
-      FB.logout(function (response) {
-        console.log("logged out")
-        store.commit('setFbUserName', null)
-        store.commit('setFbAcessToken', null)
-      });
+      this.cleanFbStatus();
+      FB.getLoginStatus(function(response) {
+        if (response.status === 'connected') {
+            FB.logout(function(response) { console.log(response)});
+        }
+    });
+    },
+    cleanFbStatus(){
+      localStorage.removeItem('fbAcessToken');
+      localStorage.removeItem('fbUserName');
+      localStorage.removeItem('fbLink');
+      localStorage.removeItem('fbId');
+      store.commit('setFbStatus', null)
     }
   }
 });

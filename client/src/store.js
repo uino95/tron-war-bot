@@ -30,10 +30,13 @@ export default new Vuex.Store({
     },
     pollWarEndend: false,
     statsLoaded: false,
-    fbAcessToken: null,
-    fbUserName: null,
-    fbId: null,
-    fbLink: null
+    fbStatus: {
+      loggedIn: false,
+      fbUserName: null,
+      fbLink: null,
+      fbId: null,
+      fbAcessToken: null
+    }
   },
   mutations: {
     setLoggedInAccount(state, payload) {
@@ -79,17 +82,24 @@ export default new Vuex.Store({
     setStatsLoaded(state, payload){
       state.statsLoaded = payload
     },
-    setFbAcessToken(state, payload){
-      state.fbAcessToken = payload
-    },
-    setFbUserName(state, payload){
-      state.fbUserName = payload
-    },
-    setFbId(state, payload){
-      state.fbId = payload
-    },
-    setFbLink(state, payload){
-      state.fbLink = payload
+    setFbStatus(state, payload){
+      if(payload == null){
+        state.fbStatus = {
+          loggedIn: false,
+          fbUserName: null,
+          fbLink: null,
+          fbId: null,
+          fbAcessToken: null
+        }
+      } else {
+        state.fbStatus = {
+          loggedIn: payload.loggedIn || state.fbStatus.loggedIn,
+          fbUserName: payload.fbUserName || state.fbStatus.fbUserName,
+          fbId: payload.fbId || state.fbStatus.fbId,
+          fbLink: payload.fbLink || state.fbStatus.fbLink,
+          fbAcessToken: payload.fbAcessToken || state.fbStatus.fbAcessToken
+        }
+      }
     }
   },
   actions: {
