@@ -80,7 +80,7 @@ const loadSavedState = async () => {
   let r = await firebase.data.once('value').then(r=>r.val());
   countriesMap = await firebase.countriesMap.once('value').then(r=>r.val());
   turn = r["turn"];
-  turnData = r["turnData"];
+  turnData = r["turnData"] || {};
 };
 
 const saveCurrentState = async () => {
