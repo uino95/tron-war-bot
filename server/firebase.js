@@ -57,6 +57,7 @@ out.reset = async () => {
   await out.data.set({})
   await out.secret.set({})
   await out.fairness.set({})
+  await out.referral.set({map:{},percentages:{}})
   await out.countriesMap.set({})
   await out.cohesion.set({})
   await out.history.set([])
