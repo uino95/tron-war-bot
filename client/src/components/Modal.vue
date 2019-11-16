@@ -398,7 +398,7 @@
             the odds of winning the war.
           </div>
           <v-stepper v-model="ambStep" vertical>
-            <!-- <v-stepper-step :complete="ambStep > 1" step="1">
+            <v-stepper-step :complete="ambStep > 1" step="1">
               Login with a wallet
             </v-stepper-step>
 
@@ -412,16 +412,16 @@
                 <v-alert :value="true" type="warning">Tron War Bot can only be used with an active Tron wallet at the moment.
                 </v-alert>
               </div>
-            </v-stepper-content> -->
+            </v-stepper-content> 
 
-            <v-stepper-step :complete="ambStep > 1" step="1">Login to Facebook</v-stepper-step>
+            <v-stepper-step :complete="ambStep > 2" step="2">Login to Facebook</v-stepper-step>
 
             <v-stepper-content step="1">
 
               <v-btn small color="facebook" class="white--text" @click="loginToFb">Facebook Login</v-btn>
             </v-stepper-content>
 
-            <v-stepper-step :complete="ambStep > 2" step="2">Pick a country</v-stepper-step>
+            <v-stepper-step :complete="ambStep > 3" step="3">Pick a country</v-stepper-step>
 
             <v-stepper-content step="2">
               <div class="my-2">
@@ -440,17 +440,7 @@
                 Confirm</v-btn>
             </v-stepper-content>
 
-            <v-stepper-step :complete="ambStep >= 3" step="3">🎉 Congratulations! You are now an ambassador!
-            </v-stepper-step>
-
-            <v-stepper-content step="3">
-              <div> <b>Your request has been accepted successfully!</b>
-                <br />
-                Now go to the standings tab and check the badge beside <b>{{universalMap(currentCountry)}}</b>. That is
-                reserved only for you.</div>
-            </v-stepper-content>
-
-            <!-- <v-stepper-step :complete="ambStep > 3" step="3">Wait for your approval</v-stepper-step>
+            <v-stepper-step :complete="ambStep >= 4" step="4">Wait for your approval</v-stepper-step>
 
             <v-stepper-content step="3">
               <div> <b>Your request has been sent successfully!</b>
@@ -542,9 +532,9 @@
     computed: {
       ambStep: {
         get() {
-          if (this.allDone) return 3;
-          if (this.$store.state.fbStatus.loggedIn /*&& this.$store.state.loggedInAccount != null*/ ) return 2;
-          // if (this.$store.state.loggedInAccount != null) return 1;
+          if (this.allDone) return 4;
+          if (this.$store.state.fbStatus.loggedIn && this.$store.state.loggedInAccount != null ) return 3;
+          if (this.$store.state.loggedInAccount != null) return 2;
           return 1;
         },
         set() {
@@ -590,13 +580,13 @@
       account() {
         return this.$store.state.loggedInAccount;
       },
-      // availableTRX() {
-      //     // BetFinal Jackpot + max((BetNext - deposit),0)
-      //     const BetFinal = tronweb.BigNumber(tronweb.toSun(this.info.jackpot * this.$store.state.gameParams.finalBetParams.houseEdge))
-      //     const BetNext = this.$store.state.availableDividends
-      //     const deposit = tronweb.toSun(this.info.deposit)
-      //     return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
-      // },
+      availableTRX() {
+          // BetFinal Jackpot + max((BetNext - deposit),0)
+          const BetFinal = tronweb.BigNumber(tronweb.toSun(this.info.jackpot * this.$store.state.gameParams.finalBetParams.houseEdge))
+          const BetNext = this.$store.state.availableDividends
+          const deposit = tronweb.toSun(this.info.deposit)
+          return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
+      },
       myWAR() {
         return this.$store.state.currentAddressWarBalance;
       },
@@ -647,13 +637,13 @@
           this.isWaitingForConfirm = false
           return
         }
-        // if (this.$store.state.loggedInAccount == null) {
-        //   this.snackbarText = "Login to your wallet first";
-        //   this.snackbarColor = "error";
-        //   this.snackbar = true;
-        //   this.isWaitingForConfirm = false
-        //   return
-        // }
+        if (this.$store.state.loggedInAccount == null) {
+          this.snackbarText = "Login to your wallet first";
+          this.snackbarColor = "error";
+          this.snackbar = true;
+          this.isWaitingForConfirm = false
+          return
+        }
         if (this.currentCountry == null) {
           this.snackbarText = "Select a country first";
           this.snackbarColor = "error";

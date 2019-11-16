@@ -73,7 +73,7 @@
             </td>
             <td class="text-xs-left pa-0">{{ props.item.territories }}</td>
             <td class="text-xs-left text-truncate pa-0">{{ (props.item.cohesion * 100).toFixed(1) + ' %'}}</td>
-            <!-- <td class="text-xs-left hidden-xs-only pa-0">
+            <td class="text-xs-left hidden-xs-only pa-0">
               <v-btn class="white--text" color="primary_final_tab"
                 v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
                 {{ (props.item.finalQuote + ' TRX')}}
@@ -84,7 +84,7 @@
                 v-on:click="goToBet('betnext',universalMap(props.item.name, 'numberId'))">
                 {{ (props.item.probability * 100).toFixed(2) + ' %'}}
               </v-btn>
-            </td> -->
+            </td>
             <td class="text-xs-left hidden-xs-only pa-0">
               <v-btn color="facebook" class="white--text"
                 v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
@@ -309,24 +309,24 @@
           class: 'body-1 pa-0 hidden-sm-and-up',
           description: "Cohesion:\n It represents the level of welfare and patriotism of a specific national territory. The higher the cohesion, the more united is the country and the higher is the chance for that country to keep conquering territories. The cohesion gets updated."
         },
-        // {
-        //   text: 'Final Quote',
-        //   value: 'finalQuote',
-        //   id: 7,
-        //   sortable: true,
-        //   align: 'left',
-        //   class: 'body-1 hidden-xs-only pa-0',
-        //   description: "Final conquer quote:\n It represents the price for a single bet on the final winner which allows to redeem the final jackpot.The price varies depending on jackpot size and the probability of the chosen country to win the full run. The higher the probability or the jackpot, the higher the cost of a single bet. Prices steadily increase over turns, the sooner the bets get placed the higher will be the reward in case of victory."
-        // },
-        // {
-        //   text: 'Next %',
-        //   value: 'probability',
-        //   id: 8,
-        //   sortable: true,
-        //   align: 'left',
-        //   class: 'body-1 hidden-xs-only pa-0',
-        //   description: "Next conquer %: \n It represents the exact likelihood for a country to conquer a territory in the upcoming turn. It is alculated considering the size of the conquered borders for a given country times its cohesion index. The more cohesive the country is the higher the chance it keeps on conquering territories. Similarly, the cohesion index affects also the probability for a given territory to rebel on the dominating country."
-        // },
+        {
+          text: 'Final Quote',
+          value: 'finalQuote',
+          id: 7,
+          sortable: true,
+          align: 'left',
+          class: 'body-1 hidden-xs-only pa-0',
+          description: "Final conquer quote:\n It represents the price for a single bet on the final winner which allows to redeem the final jackpot.The price varies depending on jackpot size and the probability of the chosen country to win the full run. The higher the probability or the jackpot, the higher the cost of a single bet. Prices steadily increase over turns, the sooner the bets get placed the higher will be the reward in case of victory."
+        },
+        {
+          text: 'Next %',
+          value: 'probability',
+          id: 8,
+          sortable: true,
+          align: 'left',
+          class: 'body-1 hidden-xs-only pa-0',
+          description: "Next conquer %: \n It represents the exact likelihood for a country to conquer a territory in the upcoming turn. It is alculated considering the size of the conquered borders for a given country times its cohesion index. The more cohesive the country is the higher the chance it keeps on conquering territories. Similarly, the cohesion index affects also the probability for a given territory to rebel on the dominating country."
+        },
         {
           text: '',
           value: 'support',

@@ -21,9 +21,9 @@
         <b>{{universalMap(history[0].next.o)}}</b> VS
         <b>{{universalMap(history[0].next.d)}}</b>
         <br>
-         <!-- <v-btn class="mt-0 mb-0" color="primary_battle_tab" fab dark small v-on:click="goToBet(history[0].next.o,1)"> 1 </v-btn>
+         <v-btn class="mt-0 mb-0" color="primary_battle_tab" fab dark small v-on:click="goToBet(history[0].next.o,1)"> 1 </v-btn>
          <v-btn class="mt-0 mb-0" color="primary_battle_tab" fab dark small v-on:click="goToBet(241, 0)"> X </v-btn>
-         <v-btn class="mt-0 mb-0"  color="primary_battle_tab" fab  dark small v-on:click="goToBet(history[0].next.d,2)"> 2 </v-btn> -->
+         <v-btn class="mt-0 mb-0"  color="primary_battle_tab" fab  dark small v-on:click="goToBet(history[0].next.d,2)"> 2 </v-btn>
       </v-card-text>
 
     </v-card>

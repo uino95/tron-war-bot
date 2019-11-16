@@ -197,7 +197,7 @@
                 </v-flex>
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_battle_tab" dark
                   @click="placeBet">
-                  <div v-bind:style="{'max-width': windowSize.x * 0.6 + 'px'}" class="truncate">
+                  <div v-bind:style="{'max-width': windowSize.x * 0.6 + 'px'}" class="text-truncate">
                     Bet {{betAmount}} TRX {{currentCountry != null ?'on ' + (currentChoice ? universalMap(currentCountry) : 'DRAW')  :''}}
                   </div>
                 </v-btn>
