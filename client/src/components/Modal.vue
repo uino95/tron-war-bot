@@ -416,14 +416,14 @@
 
             <v-stepper-step :complete="ambStep > 2" step="2">Login to Facebook</v-stepper-step>
 
-            <v-stepper-content step="1">
+            <v-stepper-content step="2">
 
               <v-btn small color="facebook" class="white--text" @click="loginToFb">Facebook Login</v-btn>
             </v-stepper-content>
 
             <v-stepper-step :complete="ambStep > 3" step="3">Pick a country</v-stepper-step>
 
-            <v-stepper-content step="2">
+            <v-stepper-content step="3">
               <div class="my-2">
                 Select the country you want to support. If you can't find it below it means it already has an
                 outstanding ambassador.
@@ -442,12 +442,12 @@
 
             <v-stepper-step :complete="ambStep >= 4" step="4">Wait for your approval</v-stepper-step>
 
-            <v-stepper-content step="3">
+            <v-stepper-content step="4">
               <div> <b>Your request has been sent successfully!</b>
                 <br />
                 For security reasons, our team will review your request and approve it within 12 hours.
                 You will be notified about the approval of your request on our <b><a target="_blank" href="https://t.me/Tron_WarBot">telegram channel here!</a></b> </div>
-            </v-stepper-content> -->
+            </v-stepper-content> 
 
           </v-stepper>
         </v-card-text>

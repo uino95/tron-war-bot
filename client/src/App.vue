@@ -288,7 +288,7 @@
         watch: {
             loading(){
                 if(!this.loading){
-                    let item = this.menuItems.filter(el => {return el.path === window.location.pathname.slice(5)})
+                    let item = this.menuItems.filter(el => {return el.path === window.location.pathname.slice(1)})
                     console.log(item)
                     if(item.length > 0){
                         this.showModal(item[0])
