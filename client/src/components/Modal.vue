@@ -4,6 +4,7 @@
       <v-card>
         <v-card-title class="headline grey lighten-2" primary-title>{{headerTile}}</v-card-title>
 
+        <!--/////////////////////////////////////////// Wallet Login //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'walletLogin'">
           <div v-if="this.$store.state.loggedInAccount!=null">
             Already logged in with account address: {{this.$store.state.loggedInAccount}}
@@ -12,18 +13,18 @@
             {{footerTile}}
           </div>
           <div v-else>
-            Please, login to your TRONLink wallet.
-            <br />If you do not have TRONLink wallet installed, please visit
-            <a target="blank" href="http://u6.gg/gmc5D">http://u6.gg/gmc5D</a> and download the Chrome extension.
+            Please, login to your Tron wallet.
+            <br />If you do not have a Tron wallet installed, please visit
+            <a target="blank" href="https://www.tronlink.org/">TronLink</a> and download the Chrome extension.
             <br />
             <br />
-            <v-alert :value="true" type="warning">Tron War Bot is only available on Google Chrome or on
-              TronLink mobile
-              app for the time being.
+            <v-alert :value="true" type="warning">Tron War Bot guarantees full proper functioning only with Google Chrome and
+              TronLink/TronWallet mobile app.
             </v-alert>
           </div>
         </v-card-text>
-
+        
+        <!--/////////////////////////////////////////// Referral //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'referral'">
           Refer a friend by sharing your referral link with him.
           <br />Here is your referral link:
@@ -85,6 +86,7 @@
           </v-container>
         </v-card-text>
 
+        <!--/////////////////////////////////////////// Dividends //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'warSupply'">
           We want to build this game together with our users, and that's why 100% of TronWarBot profits are
           shared back
@@ -162,23 +164,34 @@
                     (end of the run)-->
         </v-card-text>
 
+        <!--/////////////////////////////////////////// How To Play //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'howToPlay'">
-          The game is inspired from the popular WorldWarBot 2020
-          <a href="https://www.facebook.com/worldwarbot/" target="_blank">Facebook Game</a>
-          <br />The bot simulates a world war: every turn, one every 5 minutes, a state (randomly chosen)
-          conquers
-          another country.
-          The conquest probability is proportional to the number of conquered countries and the cohesion index
-          of that
-          country.
-          A World War run lasts on average 40 days.
+          Inspired by a popular Facebook page, named WorldWarBot2020, the game is a world war simulation
+          driven by a bot where users engagement affects the outcome of the war.
+          <br />
+          Each turn (5 minutes), the bot picks a country (in a provably fair manner)
+          and make it attack a foreign territory.
+          The probability of being chosen and the success of the attack
+          depends on the number of conquered territories and on the cohesion index of that country (check FAQ for details).
+          The cohesion index is the most important factor in the game as it is entirely controlled by users through
+          their engagement on social media platforms (different rules apply on each platform).
+          <br />
+          <i>The game ends when the entire map has been conquered by a single country.</i>
+          <br />
+          An average World War simulation usually lasts about 40 days,
+          however no precise estimate can be given upfront as the war is in large part
+          controlled by users and their resiliency.
 
           <br />
           <br>
           <b>What do I need to play?</b>
+          <br>There exists different game modes:
+          - Entertainment
+          - Social gaming
+          - Betting
+          - Value gaming
           <br>In order to play, you must own TRX, the underlying cryptocurrency of TRON’s network. Make sure
-          you have a
-          TronLink Wallet.
+          you have a Tron Wallet.
           For more information on how to create one, <a target="_blank"
             href="https://chrome.google.com/webstore/detail/tronlink%EF%BC%88%E6%B3%A2%E5%AE%9D%E9%92%B1%E5%8C%85%EF%BC%89/ibnejdfjmmkpcnlpebklmnkoeoihofec">
             click here </a>
@@ -200,6 +213,7 @@
           control your crypto assets. That's one of the nice things about using the blockchain.
         </v-card-text>
 
+        <!--/////////////////////////////////////////// FAQ //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'faq'">
           <v-expansion-panel>
             <!--Fairness-->
@@ -213,17 +227,19 @@
                   details to check that we are <a href="https://en.wikipedia.org/wiki/Provably_fair"
                     targte="_blank">provably fair</a>.
                   <br /><br />
-                  At the very beginning of a turn the Bot decides which country will conquer next. The
-                  Bot will hash (sha256) the name of the winner + a random string (called seed or salt
-                  in cryptography). You can find that hash in the box under Next Turn.<br>
-                  Once the timer runs out, the battle takes place and the conqueror is revealed
-                  alongside that seed used to compute the hash. You will then find the initial hash
-                  and
-                  the Conqueror and its seed under Previous Turn.
+                  At the very beginning of a turn the Bot decides which country will conquer next.
+                  1. The bot will reveal the current map state (a.k.a. countriesMap) at the beginning of each turn that also takes into account of the cohesion values.
+                  2. The bot will generate a magic number which will be used as the first seed for the next turn and reveal its hash (a.k.a. Magic Hash) using sha256 algorithm.
+                  3. The bot will reveal the future block number of TRON blockchain whose blockhash will be used as the second source of entropy for the next turn.
+                  Once the TRON block approaches the timer runs out, the magic number will be revealed and the battle will take place.
+                  Both the battle result and the next conqueror will be revealed.
+                  Now you will be able to find all the revealed data under the Previous Turn section.
                   <br /><br />
-                  This way we prove the Bot truly picks the countries in a random manner and doesn't
-                  "change its mind" on the way! And this is done in a way you can easily check, that
-                  is use any sha256 online tool like the one suggested below.
+                  At this point you can verify that data did not change and you can test this data against our <a href="https://jsfiddle.net/tronwarbot/d82915un/" target="_blank">open source war engine</a>
+                  to verify that the declared battle result and next conqueror area effectively the result of:
+                  - The previous turn's map state
+                  - The revealed Magic Number
+                  - The declared Block Hash
                   <br />
                   <br />
                   <v-divider mt-3 />
@@ -331,14 +347,14 @@
 
                   <v-card sm12>
                     <v-card-title text-xs-centered>
-                      If you want to check the correctness of the hash, we suggest to use the
-                      following sha256 online calculator, but you can whatever tool you prefer.
+                      If you want to check the correctness of the TronWarBot, we suggest you to copy the data in the 'Next Turn' section and verify they are consistent with the 'Previous Turn' section as the turn changes.
+                      After that use the <i>Countries Map</i>, <i>Magic Number</i> and the <i>Block Hash</i> in our War Engine.
+                      And if you are brave enough, we even challenge you to hack it to get better chances at winning the jackpot!
                     </v-card-title>
                     <v-layout justify-center>
                       <v-card-actions>
                         <v-chip label outline color="primary">
-                          <a href="https://emn178.github.io/online-tools/sha256.html" target="_blank">SHA256 Online
-                            Tool</a>
+                          <a href="https://jsfiddle.net/tronwarbot/d82915un/" target="_blank">Check out our War Engine</a>
                         </v-chip>
                       </v-card-actions>
                     </v-layout>
@@ -357,7 +373,8 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-card-text>
-
+        
+        <!--/////////////////////////////////////////// Partners //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'partners'">
           <v-container fluid grid-list-xl>
             <v-layout wrap>
@@ -377,6 +394,7 @@
           </v-container>
         </v-card-text>
 
+        <!--/////////////////////////////////////////// Ambassador //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'ambassador'">
           <div class="title" v-if="isLoggedIn">
             Hi <b>{{this.fbUserName}}</b>
@@ -452,6 +470,7 @@
           </v-stepper>
         </v-card-text>
 
+        <!--/////////////////////////////////////////// News //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'news'">
           <v-carousel v-if="news.length !== 0">
             <v-carousel-item v-for="(n,i) in news" :key="i" :src="n.src">
@@ -696,32 +715,38 @@
       info: null,
       faq: [{
           question: "What even is TronWarBot?",
-          answer: "A DApp (Distributed application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
+          answer: "A DApp (Decentralized Application, having part of its backend on the blockchain) based on the TRON blockchain created by a bunch of fans of the popular <a target=\"_blank\" href='https://www.facebook.com/worldwarbot/'>WorldWarBot2020 game on Facebook</a>.\n" +
             "<br><br>Basically we have a bot which decides one country every to conquer another country. It goes on like that until one country takes the whole world. It’s super addictive to keep an eye on the updates, we tried it on our own skin!!\n" +
-            "What we do is to allow betting on it! We bet using cryptocurrencies, TRX. Please read further if you wanna know more."
+            "You can also place bets on different events! We bet using cryptocurrencies, TRX. Please read further if you wanna know more."
         },
         {
           question: "Bets? How?",
-          answer: "Glad you asked! We currently support two types of bets.\n" +
-            "<br><b>Final Bet</b>: you can bet on the final winner. It’s you vs the others.\n" +
-            "<br><b>Next Conqueror Bet</b>: you can bet on who will conquer next turn. It’s you against us!\n" +
-            "You need TronLink wallet filled in with some TRX in order to bet.\n" +
+          answer: "Glad you asked! We currently support three types of bets.\n" +
+            "<br><b>BetFinal</b>: you can bet on the final winner. It’s you vs the others.\n" +
+            "<br><b>BetNext</b>: you can bet on which country will attempt to make a conquer in the following turn. It’s you against us!\n" +
+            "<br><b>BetBattle</b>: looks like a football bet. Will the war outcome be 1 X or 2?\n" +
+            "You need a Tron wallet filled in with some TRX in order to bet.\n" +
             "To know more read further.\n"
         },
         {
-          question: "How does Final Bet work?",
-          answer: "You can try to forecast the winner of the whole run, the country which will conquer the whole world.<br> 80% of the Final Jackpot is split among those who believed in that country and placed a bet on it, the remaining 20% goes into the Dividend Pool. The betting amount varies each turn depending on the probability a country has to win, so first movers have a huge advantage! We start with a fixed 50TRX at the beginning, then it keeps increasing as the run goes on! Please refer to the FAQ in you wanna have more details.\n"
+          question: "How does BetFinal work?",
+          answer: "You can try to forecast the winner of the whole run, the country which will conquer the whole world.<br> 80% of the Final Jackpot is split among those who believed in that country and placed a bet on it, the remaining 20% goes into the Dividend Pool. The betting amount varies each turn depending on the probability a country has to win, so first movers have a huge advantage! We start with a fixed 20TRX at the beginning, then it keeps increasing as the run goes on! Please refer to the FAQ in you wanna have more details.\n"
         },
         {
-          question: "How does Bet Next work?",
-          answer: "You can bet that a state will conquer another country during the next turn. You choose how much to bet and your reward will be according to the probability of that country to be the actual conqueror next.\n" +
+          question: "How does BetNext work?",
+          answer: "You can bet that a state will attempt to conquer another country during the next turn. You choose how much to bet and your reward will be according to the probability of that country to be the actual conqueror next.\n" +
             "<br><b>Example</b>: I think Japan will conquer another country in the next turn (doesn’t matter which one, you only care about the conqueror) so I choose Japan in the box “select country”, I choose how much to bet, then I place the bet.<br> Let’s say you bet 100TRX and the percentage of Japan to conquer next was 50%, if you win you’ll take away 190TRX! What about those missing 10TRX for a fair payout? Well, we put that in the Dividends Pool and at the end of the run they will be shared back to token holders!\n"
+        },
+        {
+          question: "How does BetBattle work?",
+          answer: "We know which battle is ongoing. You can either bet on: <br>- The attacker wins (1)<br>- We have a draw (X)<br>-The defender wins (2)<br>You choose how much to bet and your reward will be according to the probability of that event to happen."
         },
         {
           question: "How does the Bot work?",
           answer: "It uses a probability density function (PDF) to determine next conqueror state.\n" +
-            "PDF is based on number of conquered neighbouring countries times the cohesion index.\n\n" +
-            "<br><br><code>PDF = (NUMBER OF TERRITORIES CONQUERED ON THE BORDER) * (COHESION INDEX + PROBABILITY OF INSURRECTION BY THE FOREIGN STATE)</code>\n"
+            "PDF for a country is based on number of the conquered territories and its cohesion index.\nTo put it simply the formula looks similar to this:\n\n" +
+            "<br><br><code>PDF = (NUMBER OF TERRITORIES CONQUERED ON THE BORDER) * (COHESION INDEX + PROBABILITY OF INSURRECTION BY THE FOREIGN STATE)</code>\n" +
+            "<br>However, if you wanna check the full algorithm we'd like to invite you to have a look at our <a href=\"https://jsfiddle.net/tronwarbot/d82915un/\" target=\"_blank\">open source war engine<\a>.\n\nCan you do something about it? Yes! Read more onto 'Modify the outcome of the War'"
         },
         {
           question: "What is the cohesion index?",
@@ -729,8 +754,9 @@
         },
         {
           question: "When the cohesion index is updated?",
-          answer: "It is updated anytime there is a variation in the number of countries belonging to a state, both if conquering or losing a country. It is computed taking care of the cohesion index of the conquered state.\n" +
-            "<br><b>Example</b>: France conquers a very patriotic Germany and then France will have a lower cohesion index, due to the German people that want to be independent!\n"
+          answer: "It is updated mainly through social media engagement!" +
+            "In addition to that there is also a cohesion update as a result of the battle: when the result is 1 the attacking country loses 0.1% of cohesion, when it is 2 the defending country gains 0.2% of cohesion.\n" +
+            "<br>Starting from TWB2.0 there is also another way cohesion can be modified, and that is by YOUR actions!"
         },
         {
           question: "How long is a World War?\n",
@@ -738,7 +764,7 @@
         },
         {
           question: "What do I do if I'm not able to place the bet?",
-          answer: "Check if you have got enough Energy and Bandwidth."
+          answer: "Check if you have got enough Energy and Bandwidth. If you have no issue with your wallet you might be sending inconsistent transaction. Make sure you always generate transactions from our official website and make sure to have a good connection to use latest quotes available."
         },
         {
           question: "What are Energy and Bandwidth?",
@@ -760,7 +786,7 @@
         },
         {
           question: "Couldn't find your answer?",
-          answer: "Please reach us out on the telegram group (please find the link on the bottom side of the menu)! We would be very happy to answer your questions :)"
+          answer: "Please reach us out on our offical <a href=\"https://t.me/Tron_WarBot\" target=\"_blank\">telegram group </a>! We would be very happy to answer your questions :)"
         },
         {
           question: "Is there a whitepaper?",

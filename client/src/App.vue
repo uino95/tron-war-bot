@@ -100,11 +100,6 @@
                                 <v-btn flat @click="loginToFb" v-else> Login </v-btn>
                             </v-list-tile-action>
                         </v-list-tile>
-                        <v-list-tile v-if="isLoggedIn">
-                            <v-list-tile-title>
-                                <a target="blank" :href="fbLink">Link to your Profile</a>
-                            </v-list-tile-title>
-                        </v-list-tile>
 
                     </v-list>
                 </v-menu>
