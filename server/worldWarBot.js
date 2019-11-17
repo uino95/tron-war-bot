@@ -47,8 +47,10 @@ const compressedState = async ()=>{
   let td = await currentTurnData();
   let mapCompressedCopy = new Array(COUNTRIES).fill({});
   cMap.forEach((e, idx)=>{
-    mapCompressedCopy[idx].c = cMap[idx].cohesion;
-    mapCompressedCopy[idx].o = cMap[idx].occupiedBy;
+    mapCompressedCopy[idx] = {
+      c: e.cohesion,
+      o: e.occupiedBy
+    }
   });
   if (td.battle && td.battle.quotes) delete td.battle.quotes;
   if (td.next && td.next.quotes) delete td.battle.quotes;
