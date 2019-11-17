@@ -105,7 +105,8 @@ module.exports.stats = async (td) =>{
   await telegram.sendMessage(t, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true}).catch(console.error);
 
   let f = buildFbStats(td, leaderboard, countriesStillAlive, j, top3, civilWar);
-  await facebook.post(f).catch(console.error);
+  let img = utils.imgUrl('map.jpg')
+  await facebook.postWithPhoto(img, f).catch(console.error);
 }
 
 module.exports.battleUpdate = async (cmap, td) => {

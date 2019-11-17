@@ -59,5 +59,8 @@ dist
 # vagrant files
 .vagrant
 
+# Map img
+server/img/map.jpg
+
 # Secret file
 secret.js

@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
 const xhub = require('express-x-hub');
 
 const config = require('./config');
@@ -19,6 +20,7 @@ const social = require('./social');
 app.use(cors());
 app.use(xhub({ algorithm: 'sha1', secret: config.facebook.appSecret }));
 app.use(bodyParser.json());
+app.use('/img', express.static(path.join(__dirname, 'img')))
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// Endpoints //////////////////////////////////////
@@ -29,7 +31,8 @@ app.post('/referral', referral.registerReferral);
 app.post('/ambassador', social.ambassador.register);
 app.get('/webhooks', facebook.webhooksVerification);
 app.post('/webhooks', facebook.webhooks);
-
+//Serve map
+console.log(path.join(__dirname, 'img'));
 // just for keeping it alive
 app.get('/', (req, res) => {
     return res.status(200).send({ success: 'true', message: 'pinged'});
