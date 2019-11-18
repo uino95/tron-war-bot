@@ -572,6 +572,10 @@
         }
       }
     },
-    mounted() {}
+    mounted() {
+      db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30).once('value', snap => {
+        this.$root.$emit('loaded', true);
+      })
+    }
   }
 </script>

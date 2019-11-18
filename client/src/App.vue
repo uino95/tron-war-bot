@@ -357,7 +357,7 @@
                 this.noShowMap = false
             }
             if (this.$store.state.isMobile) {
-                this.$root.$on('stats_loaded', () => {
+                this.$root.$on('loaded', () => {
                     this.loading = false;
                     this.toDisplay = "flex"
                     console.log('all loaded')

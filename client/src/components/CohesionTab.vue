@@ -152,6 +152,11 @@
     firebase: {
       cohesionHistory: db.ref('public/cohesion').orderByChild('turn').limitToLast(30),
     },
+    mounted(){
+      db.ref('public/cohesion').orderByChild('turn').limitToLast(30).once('value', snap => {
+        this.$root.$emit('loaded', true);
+      })
+    },
     methods: {
       computePhrase(battle){
         if(battle.civilWar){

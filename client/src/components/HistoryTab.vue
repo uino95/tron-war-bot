@@ -141,6 +141,11 @@
         }
       }
     },
+    mounted(){
+      db.ref('public/history').orderByChild('turn').limitToLast(this.limit).once('value', snap => {
+        this.$root.$emit('loaded', true);
+      })
+    },
     computed: {
       isMobile: function () {
         return this.$store.state.isMobile

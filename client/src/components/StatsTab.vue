@@ -408,7 +408,8 @@
           method: 'feed',
           link: 'https://tronwarbot.com',
           display: 'touch',
-          to: '423138885180430'
+          to: '423138885180430',
+          caption: '@Tron War Bot'
         }, function (response) {});
       },
     },
@@ -426,7 +427,7 @@
     },
     mounted() {
       db.ref('public/mapStatus').orderByChild('territories').once('value', snap => {
-        this.$root.$emit('stats_loaded', true);
+        this.$root.$emit('loaded', true);
       })
       window.addEventListener('resize', () => {
         this.windowSize.x = window.innerWidth
