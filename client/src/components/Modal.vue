@@ -18,12 +18,13 @@
             <a target="blank" href="https://www.tronlink.org/">TronLink</a> and download the Chrome extension.
             <br />
             <br />
-            <v-alert :value="true" type="warning">Tron War Bot guarantees full proper functioning only with Google Chrome and
+            <v-alert :value="true" type="warning">Tron War Bot guarantees full proper functioning only with Google
+              Chrome and
               TronLink/TronWallet mobile app.
             </v-alert>
           </div>
         </v-card-text>
-        
+
         <!--/////////////////////////////////////////// Referral //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'referral'">
           Refer a friend by sharing your referral link with him.
@@ -172,7 +173,8 @@
           Each turn (5 minutes), the bot picks a country (in a provably fair manner)
           and make it attack a foreign territory.
           The probability of being chosen and the success of the attack
-          depends on the number of conquered territories and on the cohesion index of that country (check FAQ for details).
+          depends on the number of conquered territories and on the cohesion index of that country (check FAQ for
+          details).
           The cohesion index is the most important factor in the game as it is entirely controlled by users through
           their engagement on social media platforms (different rules apply on each platform).
           <br />
@@ -228,14 +230,19 @@
                     targte="_blank">provably fair</a>.
                   <br /><br />
                   At the very beginning of a turn the Bot decides which country will conquer next.
-                  1. The bot will reveal the current map state (a.k.a. countriesMap) at the beginning of each turn that also takes into account of the cohesion values.
-                  2. The bot will generate a magic number which will be used as the first seed for the next turn and reveal its hash (a.k.a. Magic Hash) using sha256 algorithm.
-                  3. The bot will reveal the future block number of TRON blockchain whose blockhash will be used as the second source of entropy for the next turn.
-                  Once the TRON block approaches the timer runs out, the magic number will be revealed and the battle will take place.
+                  1. The bot will reveal the current map state (a.k.a. countriesMap) at the beginning of each turn that
+                  also takes into account of the cohesion values.
+                  2. The bot will generate a magic number which will be used as the first seed for the next turn and
+                  reveal its hash (a.k.a. Magic Hash) using sha256 algorithm.
+                  3. The bot will reveal the future block number of TRON blockchain whose blockhash will be used as the
+                  second source of entropy for the next turn.
+                  Once the TRON block approaches the timer runs out, the magic number will be revealed and the battle
+                  will take place.
                   Both the battle result and the next conqueror will be revealed.
                   Now you will be able to find all the revealed data under the Previous Turn section.
                   <br /><br />
-                  At this point you can verify that data did not change and you can test this data against our <a href="https://jsfiddle.net/tronwarbot/d82915un/" target="_blank">open source war engine</a>
+                  At this point you can verify that data did not change and you can test this data against our <a
+                    href="https://jsfiddle.net/tronwarbot/d82915un/" target="_blank">open source war engine</a>
                   to verify that the declared battle result and next conqueror area effectively the result of:
                   - The previous turn's map state
                   - The revealed Magic Number
@@ -347,14 +354,19 @@
 
                   <v-card sm12>
                     <v-card-title text-xs-centered>
-                      If you want to check the correctness of the TronWarBot, we suggest you to copy the data in the 'Next Turn' section and verify they are consistent with the 'Previous Turn' section as the turn changes.
-                      After that use the <i>Countries Map</i>, <i>Magic Number</i> and the <i>Block Hash</i> in our War Engine.
-                      And if you are brave enough, we even challenge you to hack it to get better chances at winning the jackpot!
+                      If you want to check the correctness of the TronWarBot, we suggest you to copy the data in the
+                      'Next Turn' section and verify they are consistent with the 'Previous Turn' section as the turn
+                      changes.
+                      After that use the <i>Countries Map</i>, <i>Magic Number</i> and the <i>Block Hash</i> in our War
+                      Engine.
+                      And if you are brave enough, we even challenge you to hack it to get better chances at winning the
+                      jackpot!
                     </v-card-title>
                     <v-layout justify-center>
                       <v-card-actions>
                         <v-chip label outline color="primary">
-                          <a href="https://jsfiddle.net/tronwarbot/d82915un/" target="_blank">Check out our War Engine</a>
+                          <a href="https://jsfiddle.net/tronwarbot/d82915un/" target="_blank">Check out our War
+                            Engine</a>
                         </v-chip>
                       </v-card-actions>
                     </v-layout>
@@ -373,14 +385,25 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-card-text>
-        
+
         <!--/////////////////////////////////////////// Partners //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'partners'">
-          <v-container fluid grid-list-xl>
+          <v-carousel v-if="partners.length !== 0">
+            <v-carousel-item v-for="partner in partners" :key="partner.name" :height="windowSize.y*0.7" src="/img/partners/background.jpg">
+              <div class="text-xs-center pt-3">
+                <a class="title text-truncate white--text" :href="partner.link" target="_blank"
+                  style="text-decoration: none;">{{partner.name}}
+                  <v-img :src="partner.img" class="image" :alt="partner.name" :height="windowSize.y*0.7" contain>
+                  </v-img>
+                </a>
+              </div>
+            </v-carousel-item>
+          </v-carousel>
+          <!-- <v-container fluid grid-list-xl>
             <v-layout wrap>
               <v-flex v-for="partner in partners" :key="partner.name" sm6>
                 <v-card>
-                  <v-img :src="'/img/partners/'+partner.img" class="image" :alt="partner.name" height="150px" contain>
+                  <v-img :src="partner.img" class="image" :alt="partner.name" height="150px" contain>
                   </v-img>
                   <v-card-title primary-title>
                     <div>
@@ -391,7 +414,7 @@
                 </v-card>
               </v-flex>
             </v-layout>
-          </v-container>
+          </v-container> -->
         </v-card-text>
 
         <!--/////////////////////////////////////////// Ambassador //////////////////////////////////////////////////////////////////-->
@@ -424,13 +447,16 @@
               <div>
                 Please, login to your TRONLink wallet.
                 <br />If you do not have it installed, please download it from
-                <a target="blank" href="https://www.tronlink.org/">TronLink</a> or get the <a target="blank" href="http://u6.gg/gmc5D">Chrome extension</a> or make sure to have any alternative proper Tron wallet unlocked.
+                <a target="blank" href="https://www.tronlink.org/">TronLink</a> or get the <a target="blank"
+                  href="http://u6.gg/gmc5D">Chrome extension</a> or make sure to have any alternative proper Tron wallet
+                unlocked.
                 <br />
                 <br />
-                <v-alert :value="true" type="warning">Tron War Bot can only be used with an active Tron wallet at the moment.
+                <v-alert :value="true" type="warning">Tron War Bot can only be used with an active Tron wallet at the
+                  moment.
                 </v-alert>
               </div>
-            </v-stepper-content> 
+            </v-stepper-content>
 
             <v-stepper-step :complete="ambStep > 2" step="2">Login to Facebook</v-stepper-step>
 
@@ -464,16 +490,19 @@
               <div> <b>Your request has been sent successfully!</b>
                 <br />
                 For security reasons, our team will review your request and approve it within 12 hours.
-                You will be notified about the approval of your request on our <b><a target="_blank" href="https://t.me/Tron_WarBot">telegram channel here!</a></b> </div>
-            </v-stepper-content> 
+                You will be notified about the approval of your request on our <b><a target="_blank"
+                    href="https://t.me/Tron_WarBot">telegram channel here!</a></b> </div>
+            </v-stepper-content>
 
           </v-stepper>
         </v-card-text>
 
         <!--/////////////////////////////////////////// News //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'news'">
-          <v-carousel v-if="news.length !== 0">
-            <v-carousel-item v-for="(n,i) in news" :key="i" :src="n.src">
+          <v-carousel v-if="news.length !== 0" :height="windowSize.y*0.6">
+            <v-carousel-item  v-for="(n,i) in news" :key="i" >
+              <v-img :src="n.src" class="image" :alt="i.toString()" :aspect-ratio="windowSize.x/(windowSize.y*0.675)"  >
+              </v-img>
             </v-carousel-item>
           </v-carousel>
           <v-text-field v-else value="There're no recent news" outline readonly></v-text-field>
@@ -533,7 +562,12 @@
         return amount != 0 ? amount.div("1000000000000000000").toFixed(3) + ' WAR' : 0 + ' WAR'
       }
     },
-
+    mounted(){
+      window.addEventListener('resize', () => {
+        this.windowSize.x = window.innerWidth
+        this.windowSize.y = window.innerHeight
+      })
+    },
     watch: {
       isVisible: function () {
         if (this.isVisible && this.path == "warSupply") {
@@ -552,7 +586,7 @@
       ambStep: {
         get() {
           if (this.allDone) return 4;
-          if (this.$store.state.fbStatus.loggedIn && this.$store.state.loggedInAccount != null ) return 3;
+          if (this.$store.state.fbStatus.loggedIn && this.$store.state.loggedInAccount != null) return 3;
           if (this.$store.state.loggedInAccount != null) return 2;
           return 1;
         },
@@ -566,11 +600,11 @@
         })
       },
       percentage: function () {
-          if (this.referrals.percentages[this.$store.state.loggedInAccount]) {
-            return this.referrals.percentages[this.$store.state.loggedInAccount] * 100
-          }
-          return this.referrals.percentages.default * 100
-        
+        if (this.referrals.percentages[this.$store.state.loggedInAccount]) {
+          return this.referrals.percentages[this.$store.state.loggedInAccount] * 100
+        }
+        return this.referrals.percentages.default * 100
+
       },
       isVisible: {
         get() {
@@ -600,11 +634,12 @@
         return this.$store.state.loggedInAccount;
       },
       availableTRX() {
-          // BetFinal Jackpot + max((BetNext - deposit),0)
-          const BetFinal = tronweb.BigNumber(tronweb.toSun(this.info.jackpot * this.$store.state.gameParams.finalBetParams.houseEdge))
-          const BetNext = this.$store.state.availableDividends
-          const deposit = tronweb.toSun(this.info.deposit)
-          return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
+        // BetFinal Jackpot + max((BetNext - deposit),0)
+        const BetFinal = tronweb.BigNumber(tronweb.toSun(this.info.jackpot * this.$store.state.gameParams.finalBetParams
+          .houseEdge))
+        const BetNext = this.$store.state.availableDividends
+        const deposit = tronweb.toSun(this.info.deposit)
+        return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
       },
       myWAR() {
         return this.$store.state.currentAddressWarBalance;
@@ -635,7 +670,8 @@
       referrals: db.ref("public/referral"),
       info: db.ref("public/data"),
       mapStatus: db.ref("public/countriesMap"),
-      news: db.ref("public/news")
+      news: db.ref("public/news"),
+      partners: db.ref("public/partners")
     },
     methods: {
       copyToClipBoard(value, ref) {
@@ -793,34 +829,12 @@
           answer: "<a href=\"/files/WhitePaper.pdf\" target=\"_blank\">Click here to view the whitepaper<a/>"
         }
       ],
-      partners: [{
-          name: 'CHIPS Token',
-          link: 'https://chipstoken.io/',
-          img: 'chips.png'
-        },
-        {
-          name: 'Tron Game Center',
-          link: 'https://trongamecenter.org/',
-          img: 'tgc.png'
-        },
-        {
-          name: 'ECONEUARK',
-          link: 'http://www.ecoearthcoin.com',
-          img: 'econeuark.png'
-        },
-        {
-          name: 'Cryptopress Casa',
-          link: 'http://www.cryptopress.casa/',
-          img: 'crypropress_casa.jpg'
-        }
-        /*
-        {
-            name: 'BingTron',
-            link: '',
-            img: 'bingtron.jpg'
-        }*/
-      ],
-      news: []
+      partners: [],
+      news: [],
+      windowSize: {
+          x: window.innerWidth,
+          y: window.innerHeight
+      }
     })
   };
 </script>
