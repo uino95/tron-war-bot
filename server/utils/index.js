@@ -59,7 +59,7 @@ const utils = {
   },
   toPercent : (n) =>(n * 100).toFixed(1) + "%",
   truncate: (s, n)=> (s.length > n) ? s.substr(0, n-2) + '..' : s,
-  feImgUrl: (s)=> 'https://tronwarbot.com/img/promotions/' + s
+  imgUrl: (s)=> 'https://api.tronwarbot.com/img/' + s
 }
 
 module.exports = utils;

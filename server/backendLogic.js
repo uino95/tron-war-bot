@@ -59,10 +59,10 @@ const revealFairWinner = async (block) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////
 const prepareNextTurn = async () =>{
-  console.log("[SCHEDULER]: ********* Preparing next turn! *********");
   let cb = await twb.getBlock();
-  // CALCULATE MAGIC NUMBER
   let turn = wwb.currentTurn();
+  console.log("[SCHEDULER]: ********* Preparing next turn " + (turn+1) + " *********");
+  // CALCULATE MAGIC NUMBER
   let currentSecret = await firebase.secret.once('value').then(r=>r.val());
   let magic = utils.randomHex();
   let nextTurnBlock = cb.number + Math.ceil(config.timing.turn/3);

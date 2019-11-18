@@ -46,18 +46,47 @@ const webhooksVerification = async (req, res, next) => {
 
 const webhooks = async (req, res, next) => {
   if (!req.isXHubValid() && !config.test) return console.error("[WEBHOOKS]: Received an http call not originated from Facebook!")
-  console.log("[FACEBOOK]: Received new notification with signature: " + req.headers["X-Hub-Signature"] + "  and payload:  " + JSON.stringify(req.body))
+  console.log("[FACEBOOK]: Received new notification with payload:  " + JSON.stringify(req.body))
   let bd = req.body;
+  if (bd.object != "page" || !bd.entry || !bd.entry[0] || !bd.entry[0].changes) return res.send("");
   // IF MULTIPLE ENTRIES
-  for (var el of bd.entries) {
-    // let text = el.text;
-    // let user_id = el.user_id;
+  for (var el of bd.entry[0].changes) {
+    let u = getUpdateData(el);
+    if (!u) continue;
+    // let update_type = getUpdateType(el);
+    // let text = getText(el);
+    // let user_id = getUserId(el);
     // let user_name = el.user_name;
-    // let update_type = el.update_type;
     // let link = el.link;
-    // await shares.update(text, user_id, user_name, update_type, "FB", link)
+    await shares.update(u.text, u.user_id, u.user_name, u.update_type, "FB", u.link)
   }
   return res.send("");
+}
+
+const getUpdateData = (update)=>{
+  switch (update.field){
+    case "rating":
+      if (update.value.verb!="add") return;
+      return {
+        update_type: "review",
+        text: update.value.review_text,
+        user_id : update.value.reviewer_id,
+        user_name : update.value.reviewer_name,
+        link: "https://facebook.com/" + update.value.comment_id
+      }
+    case "feed":
+      if (update.value.verb!="add") return;
+      //POST
+      return {
+        update_type: "post",
+        text: update.value.message,
+        user_id : update.value.from.id,
+        user_name : update.value.from.name,
+        link: "https://facebook.com/" + update.value.post_id
+      }
+    default:
+      return
+  }
 }
 
 

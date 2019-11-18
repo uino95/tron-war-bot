@@ -22,7 +22,7 @@ module.exports.becomeAmbassador = async (cmap, td) => {
   f += "#tron #world #war #gaming #bot #simulation\n@tronwarbot"
 
   let m = { 'inline_keyboard': [[{'text': '🎖 Become an ambassador', 'url': 'https://tronwarbot.com/ambassador/'}]]};
-  let img = utils.feImgUrl('ambassador.jpg')
+  let img = utils.imgUrl('ambassador.jpg')
   await telegram.sendMessageWithPhoto(img, t, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true}).catch(console.error);
 
   await facebook.postWithPhoto(img, f).catch(console.error);
