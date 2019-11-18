@@ -53,11 +53,6 @@ const webhooks = async (req, res, next) => {
   for (var el of bd.entry[0].changes) {
     let u = getUpdateData(el);
     if (!u) continue;
-    // let update_type = getUpdateType(el);
-    // let text = getText(el);
-    // let user_id = getUserId(el);
-    // let user_name = el.user_name;
-    // let link = el.link;
     await shares.update(u.text, u.user_id, u.user_name, u.update_type, "FB", u.link)
   }
   return res.send("");
@@ -67,6 +62,7 @@ const getUpdateData = (update)=>{
   switch (update.field){
     case "rating":
       if (update.value.verb!="add") return;
+      // REVIEW
       return {
         update_type: "review",
         text: update.value.review_text,
@@ -76,12 +72,31 @@ const getUpdateData = (update)=>{
       }
     case "feed":
       if (update.value.verb!="add") return;
+      // COMMENT
+      if (update.value.item == "comment") return {
+        update_type: "comment",
+        text: update.value.message,
+        user_id : update.value.from.id,
+        user_name : update.value.from.name,
+        link: update.value.post.permalink_url + "?comment_id=" + update.value.comment_id.split('_')[1]
+      }
       //POST
-      return {
+      if (update.value.item == "post") return {
         update_type: "post",
         text: update.value.message,
         user_id : update.value.from.id,
         user_name : update.value.from.name,
+        link: "https://facebook.com/" + update.value.post_id
+      }
+      return
+    case "mention":
+      if (update.value.verb!="add") return;
+      //MENTION
+      return {
+        update_type: "mention",
+        text: update.value.message,
+        user_id : update.value.post_id.split('_')[0],
+        user_name : "",
         link: "https://facebook.com/" + update.value.post_id
       }
     default:
