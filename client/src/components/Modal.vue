@@ -577,6 +577,9 @@
       })
     },
     watch: {
+      news: function(){
+        this.$store.commit("updateNewsCount", this.news.length)
+      },
       isVisible: function () {
         if(this.isVisible){
           if(this.path != 'dividends') this.$store.commit("setPollDivs", true);

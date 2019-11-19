@@ -152,12 +152,12 @@
         },
         data: () => ({
             loading: true,
-            newsCount: 4,
             noShowMap: true,
             toDisplay: 'none',
             drawer: null,
             isModalVisible: false,
             itemClicked: {},
+            news:[],
             menuItems: [{
                     heading: 'My Info'
                 },
@@ -315,6 +315,9 @@
             },
             warBalance() {
                 return this.$store.state.currentAddressWarBalance
+            },
+            newsCount(){
+                return this.$store.state.newsCount
             }
         },
         methods: {

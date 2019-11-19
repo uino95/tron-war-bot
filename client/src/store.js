@@ -12,6 +12,7 @@ export default new Vuex.Store({
     selectedCountry: null,
     battleChoice: null,
     isMobile: false,
+    newsCount: 0,
     test: test, 
     contracts:{
       WarCoinAddress: test ? "TJ6kbSxQ8ctPGuHmRb3W92gUN42AooHeNt" : "TTbPmiq35XjAhQThatnukS45pNYd7xV2m1",
@@ -63,6 +64,7 @@ export default new Vuex.Store({
       state.availableDividends = payload.availableDividends
     },
     setJackpot(state, payload) {
+      console.log(payload.jackpot)
       state.jackpot = payload.jackpot
     },
     setCurrentAddressWarBalance(state, payload) {
@@ -104,6 +106,9 @@ export default new Vuex.Store({
           fbAcessToken: payload.fbAcessToken || state.fbStatus.fbAcessToken
         }
       }
+    },
+    updateNewsCount(state, payload){
+      state.newsCount = payload
     }
   },
   actions: {

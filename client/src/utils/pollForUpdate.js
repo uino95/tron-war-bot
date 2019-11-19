@@ -53,9 +53,11 @@ function pollJackpot(interval) {
     try {
       const jackpot = await tronWarBotInstance.jackpot("0").call()
       const jackPotBigNumber = tronWebPublic.BigNumber(jackpot.toString())
-      store.commit('setJackpot', {
-        jackpot: jackPotBigNumber
-      })
+      if (store.state.jackpot == null || jackPotBigNumber.toString() != store.state.jackpot.toString() ) {
+        store.commit('setJackpot', {
+          jackpot: jackPotBigNumber
+        })
+      }
     } catch (error) {
       console.log(error)
     }
