@@ -6,8 +6,8 @@ const vader = require('vader-sentiment');
 const fuzz = require('fuzzball');
 
 let map = JSON.parse(JSON.stringify(utils.map))
-const REGEXPMATCHER = map.sort((a,b)=>{return b.name.split(/ |-/g).length - a.name.split(/ |-/g).length}).map(e=>e.name.toLowerCase().replace(/ |-/g,"")).toString().replace(/,/g,"|")
 const FUZZYMATCHER = map.map(e=>e.name).map(e=>e.toLowerCase()).map(e=>e.replace(/-/g," "))
+const REGEXPMATCHER = map.sort((a,b)=>{return b.name.split(/ |-/g).length - a.name.split(/ |-/g).length}).map(e=>e.name.toLowerCase().replace(/ |-/g,"")).toString().replace(/,/g,"|")
 
 
 const analyze = (txt) => {
@@ -37,9 +37,9 @@ const regexMatch = (txt) => {
 }
 
 const fuzzyMatch = (txt) => {
-  let r = fuzz.extract(txt, FUZZYMATCHER, {limit: 4, cutoff: 50, scorer: fuzz.token_set_ratio});
+  let r = fuzz.extract(txt, FUZZYMATCHER, {limit: 4, cutoff: 60, scorer: fuzz.token_set_ratio});
   if (!r.length) return;
-  return r[0][2]
+  return utils.universalMap(r[0][0], "numberId");
 }
 
 

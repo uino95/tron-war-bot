@@ -80,7 +80,7 @@ const config = {
     },
     shares:{
       comment: 0.1,
-      share: 1,
+      mention: 1,
       post: 0.2,
       review: 0.5,
     }
