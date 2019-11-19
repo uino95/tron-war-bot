@@ -409,7 +409,6 @@
           link: 'https://tronwarbot.com',
           display: 'touch',
           to: '423138885180430',
-          caption: '@Tron War Bot'
         }, function (response) {});
       },
     },

@@ -88,7 +88,7 @@
         </v-card-text>
 
         <!--/////////////////////////////////////////// Dividends //////////////////////////////////////////////////////////////////-->
-        <v-card-text v-if="path === 'warSupply'">
+        <v-card-text v-if="path === 'dividends'">
           We want to build this game together with our users, and that's why 100% of TronWarBot profits are
           shared back
           to token holders! (..but yes we detain around 50% of the current
@@ -101,7 +101,19 @@
           <v-progress-linear color="primary" height="30" v-model="dividendStage"></v-progress-linear>
           <v-divider mt-8 />
           <br />
-          <v-layout row wrap>
+          <v-layout row wrap justify-center>
+            <v-flex xs12 sm5>
+              <v-text-field :value="availableTRX | TRX" label=" Estimate Available Dividends" outline readonly>
+                <template v-slot:append>
+                  <v-avatar class="pb-2" tile size="40">
+                    <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" />
+                  </v-avatar>
+                </template>
+              </v-text-field>
+            </v-flex>
+
+            <v-spacer />
+
             <v-flex xs12 sm5>
               <v-text-field v-if="account == null" :value="'Login First'" background-color="red" label="You have mined"
                 outline readonly>
@@ -120,19 +132,9 @@
                 </template>
               </v-text-field>
             </v-flex>
-            <!-- <v-flex xs12 sm5>
-                            <v-text-field :value="availableTRX | TRX" label=" Estimate Available Dividends" outline
-                                          readonly>
-                                <template v-slot:append>
-                                    <v-avatar class="pb-2" tile size="40">
-                                        <img src="https://cdn.coinranking.com/behejNqQs/trx.svg"/>
-                                    </v-avatar>
-                                </template>
-                            </v-text-field>
-                        </v-flex> -->
+          </v-layout>
 
-            <v-spacer />
-
+          <v-layout row wrap justify-center>
             <v-flex xs12 sm5>
               <v-text-field :value="totalWARSupply | WAR" label="Total WAR mined" outline readonly>
                 <template v-slot:append>
@@ -146,20 +148,24 @@
 
           <v-divider />
 
-          <!-- <v-card mt-3>
-                        <v-card-text style="text-align:center;">
-                            At the end of the run you will be eligible to get your share of dividends by clicking the
-                            button "Claim
-                            your dividends".
-                            <br/>Currently, for every
-                            <b>100 WAR you get
-                                {{availableTRX.div(totalWARSupply.div("1000000000000000000")).times('100') | TRX}}</b>
-                        </v-card-text>
-                        <v-chip v-if="account != null" label outline color="primary" style="margin-left:4.5em;">
-                            With your current WARs you will receive:
-                            {{availableTRX.times(myWAR.div(totalWARSupply).toString()) | TRX }}
-                        </v-chip>
-                    </v-card> -->
+          <v-card mt-3 >
+            <v-layout align-center column >
+            <v-card-text style="text-align:center;">
+              At the end of the run you will be eligible to get your share of dividends by clicking the
+              button "Claim
+              your dividends".
+              <br />Currently, for every
+              <b>100 WAR you get
+                {{ availableTRX.div(totalWARSupply.div("1000000000000000000")).times('100') | TRX}}</b>
+            </v-card-text>
+
+            <v-card-text v-if="account != null" class="text-xs-center">
+              <i>With your current WARs you will receive: </i>
+              <b>{{availableTRX.times(myWAR.div(totalWARSupply).toString()) | TRX }}</b>
+            </v-card-text>
+
+            </v-layout>
+          </v-card>
 
           <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
                     (end of the run)-->
@@ -389,7 +395,8 @@
         <!--/////////////////////////////////////////// Partners //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'partners'">
           <v-carousel v-if="partners.length !== 0">
-            <v-carousel-item v-for="partner in partners" :key="partner.name" :height="windowSize.y*0.7" src="/img/partners/background.jpg">
+            <v-carousel-item v-for="partner in partners" :key="partner.name" :height="windowSize.y*0.7"
+              src="/img/partners/background.jpg">
               <div class="text-xs-center pt-3">
                 <a class="title text-truncate white--text" :href="partner.link" target="_blank"
                   style="text-decoration: none;">{{partner.name}}
@@ -500,8 +507,8 @@
         <!--/////////////////////////////////////////// News //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'news'">
           <v-carousel v-if="news.length !== 0" :height="windowSize.y*0.6">
-            <v-carousel-item  v-for="(n,i) in news" :key="i" >
-              <v-img :src="n.src" class="image" :alt="i.toString()" :aspect-ratio="windowSize.x/(windowSize.y*0.675)"  >
+            <v-carousel-item v-for="(n,i) in news" :key="i">
+              <v-img :src="n.src" class="image" :alt="i.toString()" :aspect-ratio="windowSize.x/(windowSize.y*0.675)">
               </v-img>
             </v-carousel-item>
           </v-carousel>
@@ -541,7 +548,7 @@
   import mapping from '../assets/mapping'
   import axios from 'axios'
   import {
-    pollMyWar
+    startPolling
   } from '../utils/pollForUpdate'
 
   export default {
@@ -559,10 +566,10 @@
         return tronweb.fromSun(amount).toFixed(3) + ' TRX'
       },
       WAR: (amount) => {
-        return amount != 0 ? amount.div("1000000000000000000").toFixed(3) + ' WAR' : 0 + ' WAR'
+        return amount != null ? amount.div("1000000000000000000").toFixed(3) + ' WAR' : 0 + ' WAR'
       }
     },
-    mounted(){
+    mounted() {
       window.addEventListener('resize', () => {
         this.windowSize.x = window.innerWidth
         this.windowSize.y = window.innerHeight
@@ -570,14 +577,15 @@
     },
     watch: {
       isVisible: function () {
-        if (this.isVisible && this.path == "warSupply") {
-          this.$store.commit("setPollWar", false)
-          pollMyWar(1000)
+        if(this.isVisible){
+          if(this.path != 'dividends') this.$store.commit("setPollDivs", true);
+          if(this.path == 'dividends') {
+            this.$store.commit("setPollDivs", false)
+            startPolling(1000)
+          }
+          if(this.path == 'faq') this.$rtdbBind('fairness', db.ref('public/fairness'))
         } else {
-          this.$store.commit("setPollWar", true)
-        }
-        if (this.isVisible && this.path == "faq") {
-          this.$rtdbBind('fairness', db.ref('public/fairness'))
+          this.$store.commit("setPollDivs", true);
         }
       }
     },
@@ -634,21 +642,25 @@
         return this.$store.state.loggedInAccount;
       },
       availableTRX() {
-        // BetFinal Jackpot + max((BetNext - deposit),0)
-        const BetFinal = tronweb.BigNumber(tronweb.toSun(this.info.jackpot * this.$store.state.gameParams.finalBetParams
-          .houseEdge))
-        const BetNext = this.$store.state.availableDividends
-        const deposit = tronweb.toSun(this.info.deposit)
-        return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
+        if(this.$store.state.jackpot == null){
+          return tronweb.BigNumber('0')
+        }
+        if(this.$store.state.jackpot != null){
+          // BetFinal Jackpot + max((BetNext - deposit),0)
+          const BetFinal = this.$store.state.jackpot.times(tronweb.BigNumber((this.$store.state.gameParams.finalBetParams.houseEdge)))
+          const BetNext = this.$store.state.availableDividends
+          const deposit = tronweb.toSun(this.info.deposit)
+          return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
+        } 
       },
       myWAR() {
-        return this.$store.state.currentAddressWarBalance;
+        return this.$store.state.currentAddressWarBalance != null ? this.$store.state.currentAddressWarBalance : tronweb.BigNumber('0')
       },
       totalWARSupply() {
-        return this.$store.state.totalWARSupply;
+        return this.$store.state.totalWARSupply != null ? this.$store.state.totalWARSupply : tronweb.BigNumber('0');
       },
       dividendStage() {
-        return this.totalWARSupply != 0 ? parseInt(this.totalWARSupply.div("1000000000000000000").mod(1000000)
+        return this.totalWARSupply != null ? parseInt(this.totalWARSupply.div("1000000000000000000").mod(1000000)
           .div(100).toString()) : 0
       },
       currentCountry: {
@@ -832,8 +844,8 @@
       partners: [],
       news: [],
       windowSize: {
-          x: window.innerWidth,
-          y: window.innerHeight
+        x: window.innerWidth,
+        y: window.innerHeight
       }
     })
   };

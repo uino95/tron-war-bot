@@ -19,16 +19,17 @@ export default new Vuex.Store({
       WarCoinInstance: null,
       TronWarBotInstance: null
     },
-    currentAddressWarBalance: 0,
-    //availableDividends: 0,
-    totalWARSupply: 0,
+    currentAddressWarBalance: null,
+    availableDividends: null,
+    jackpot: null,
+    totalWARSupply: null,
     tronWeb: null,
     gameParams:{
       finalBetParams: null,
       betNextParams: null,
       betBattleParams: null
     },
-    pollWarEndend: false,
+    pollDivsEndend: false,
     statsLoaded: false,
     fbStatus: {
       loggedIn: false,
@@ -58,9 +59,12 @@ export default new Vuex.Store({
       state.contracts.TronWarBotInstance = payload.tronWarBot
       state.contracts.WarCoinInstance = payload.warCoin
     },
-    // setAvailableDividends(state, payload) {
-    //   state.availableDividends = payload.availableDividends
-    // },
+    setAvailableDividends(state, payload) {
+      state.availableDividends = payload.availableDividends
+    },
+    setJackpot(state, payload) {
+      state.jackpot = payload.jackpot
+    },
     setCurrentAddressWarBalance(state, payload) {
       state.currentAddressWarBalance = payload.currentAddressWarBalance
     },
@@ -76,8 +80,8 @@ export default new Vuex.Store({
       state.gameParams.betNextParams = payload.betNextParams
       state.gameParams.betBattleParams = payload.betBattleParams
     },
-    setPollWar(state, payload){
-      state.pollWarEndend = payload
+    setPollDivs(state, payload){
+      state.pollDivsEndend = payload
     },
     setStatsLoaded(state, payload){
       state.statsLoaded = payload

@@ -86,7 +86,7 @@
                             <v-list-tile-avatar>
                                 <img src="/img/logo.png" alt="war" />
                             </v-list-tile-avatar>
-                            <v-list-tile-title v-text="this.$store.state.currentAddressWarBalance"></v-list-tile-title>
+                            <v-list-tile-title >{{warBalance | WAR}}</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
                             <v-list-tile-avatar>
@@ -186,8 +186,8 @@
                 },
                 {
                     icon: 'attach_money',
-                    text: 'WAR Supply',
-                    path: 'warSupply',
+                    text: 'Dividends',
+                    path: 'dividends',
                     link: false,
                     body: 'WIP'
                 },
@@ -281,14 +281,21 @@
             ]
         }),
         watch: {
-            loading(){
-                if(!this.loading){
-                    let item = this.menuItems.filter(el => {return el.path === window.location.pathname.slice(1)})
+            loading() {
+                if (!this.loading) {
+                    let item = this.menuItems.filter(el => {
+                        return el.path === window.location.pathname.slice(1)
+                    })
                     console.log(item)
-                    if(item.length > 0){
+                    if (item.length > 0) {
                         this.showModal(item[0])
                     }
                 }
+            }
+        },
+        filters: {
+            WAR: (amount) => {
+                return amount != null ? amount.div("1000000000000000000").toFixed(3) + ' WAR' : 0 + ' WAR'
             }
         },
         computed: {
@@ -305,6 +312,9 @@
                 console.log("hey")
                 console.log(window.location)
                 return window.location
+            },
+            warBalance() {
+                return this.$store.state.currentAddressWarBalance
             }
         },
         methods: {

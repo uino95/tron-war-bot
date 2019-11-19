@@ -67,60 +67,73 @@ function pollBalance(interval) {
   }, interval)
 }
 
-// export async function pollDividends(interval){
+async function pollDividends(interval){
 
-//   let dividendsInterval = setInterval(async () => {
-//     try {
-//       // update available dividends
-//       const availableDividensInSunFromHouseReserves = await tronWarBotInstance.houseReserves().call()
-//       const availableDividensInSunFromMaster = await tronWebPublic.trx.getBalance(masterAddress);
-//       const houseReserves = tronWebPublic.BigNumber(availableDividensInSunFromHouseReserves.toString())
-//       const masterBalance = tronWebPublic.BigNumber(availableDividensInSunFromMaster.toString())
-//       const availableDividensInSun = houseReserves.plus(masterBalance)
-//       store.commit('setAvailableDividends', {
-//         availableDividends: availableDividensInSun
-//       })
-//     } catch (error) {
-//       console.log("error is here in dividends ", error)
-//     }
-//     try{
-//       // update total war balance supply
-//       const currentTotalWARSupply = await warCoinInstance.totalSupply().call();
-//       store.commit('setTotalWarSupply', {
-//         totalWARSupply: tronWebPublic.BigNumber(currentTotalWARSupply)
-//       })
-//     } catch (error) {
-//       console.log("error is here IN TOTAL WAR BALANCE ", error)
-//     }
-//   }, interval)
-// }
-
-export function pollMyWar(interval) {
-  let warInterval = setInterval(async () => {
-    console.log("Polling war")
+  let dividendsInterval = setInterval(async () => {
+    console.log("polling divs")
     try {
-      if (store.state.pollWarEndend) {
+      if (store.state.pollDivsEndend) {
+        clearInterval(dividendsInterval)
+      }
+      // update available dividends
+      const availableDividensInSunFromHouseReserves = await tronWarBotInstance.houseReserves().call()
+      const availableDividensInSunFromMaster = await tronWebPublic.trx.getBalance(masterAddress);
+      const houseReserves = tronWebPublic.BigNumber(availableDividensInSunFromHouseReserves.toString())
+      const masterBalance = tronWebPublic.BigNumber(availableDividensInSunFromMaster.toString())
+      const availableDividensInSun = houseReserves.plus(masterBalance)
+      store.commit('setAvailableDividends', {
+        availableDividends: availableDividensInSun
+      })
+    } catch (error) {
+      console.log("error is here in dividends ", error)
+    }
+    try {
+      const jackpot = await tronWarBotInstance.jackpot("0").call()
+      const jackPotBigNumber = tronWebPublic.BigNumber(jackpot.toString())
+      store.commit('setJackpot', {
+        jackpot: jackPotBigNumber
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }, interval)
+}
+
+function pollMyWar(interval) {
+  let warInterval = setInterval(async () => {
+    console.log("polling war")
+    try {
+      if (store.state.pollDivsEndend) {
         clearInterval(warInterval)
       }
       const currentTotalWARSupply = await warCoinInstance.totalSupply().call();
       store.commit('setTotalWarSupply', {
         totalWARSupply: tronWebPublic.BigNumber(currentTotalWARSupply)
       })
+    } catch (error) {
+      console.log("error is here in TOTAL WAR SUPPLY ", error)
+    }
+    try{
       // update current address war balance
       if (store.state.loggedInAccount !== null) {
         const currentWarBalanceInSun = await warCoinInstance.balanceOf(store.state.loggedInAccount).call();
         store.commit('setCurrentAddressWarBalance', {
-          currentAddressWarBalance: store.state.tronWeb.BigNumber(currentWarBalanceInSun)
+          currentAddressWarBalance: tronWebPublic.BigNumber(currentWarBalanceInSun)
         })
       } else {
         store.commit('setCurrentAddressWarBalance', {
-          currentAddressWarBalance: store.state.tronWeb.BigNumber("0")
+          currentAddressWarBalance: tronWebPublic.BigNumber("0")
         })
       }
     } catch (error) {
       console.log("error is here in MY WAR ", error)
     }
   }, interval)
+}
+
+export function startPolling(interval){
+  pollMyWar(interval)
+  pollDividends(interval)
 }
 
 async function getGameParams() {
