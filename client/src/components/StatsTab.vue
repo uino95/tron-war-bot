@@ -209,7 +209,7 @@
             <v-spacer></v-spacer>
             <v-btn class="white--text" color="facebook" v-on:click="shareOnFb">
               <v-icon class="mr-2"> fab fa-facebook-square </v-icon>
-              Share on facebook
+              Share 
             </v-btn>
             <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
           </v-card-actions>
@@ -406,13 +406,18 @@
         this.snackbar = true
       },
       shareOnFb: async function () {
-        this.loginToFb()
-        await FB.ui({
-          method: 'feed',
-          link: 'https://tronwarbot.com',
-          display: 'touch',
-          to: '423138885180430',
-        }, function (response) {});
+
+        if(!this.$store.state.isMobile){
+          window.open('https://www.facebook.com/TronWarBot/', '_blank');
+        } else {
+          this.loginToFb()
+          await FB.ui({
+            method: 'feed',
+            link: 'https://tronwarbot.com',
+            display: 'touch',
+            to: '423138885180430',
+          }, function (response) {});
+        }
       },
     },
     computed: {
