@@ -63,9 +63,9 @@
                     style="color: white">WarBot</span></span>
             <v-spacer></v-spacer>
             <v-toolbar-items>
-                <v-menu offset-y class="hidden-xs-only">
-                    <template v-slot:activator="{ on }" class="hidden-sm-and-down">
-                        <v-btn flat dark v-on="on">
+                <v-menu offset-y >
+                    <template v-slot:activator="{ on }" >
+                        <v-btn flat dark v-on="on" class="hidden-xs-only">
                             Account
                         </v-btn>
                     </template>

@@ -28,21 +28,23 @@
               <v-tooltip bottom v-if="header.description != null">
                 <template v-slot:activator="{ on }">
                   <v-container v-on="on" class="pa-0">
-                  {{ header.text }}
-                  <v-icon v-if="header.sortable" small>arrow_upward</v-icon>
-                </v-container>
-                </template> 
-                <span >
+                    {{ header.text }}
+                    <v-icon v-if="header.sortable" small>arrow_upward</v-icon>
+                  </v-container>
+                </template>
+                <span>
                   {{header.description}}
                 </span>
               </v-tooltip>
               <v-container v-else class="pa-0">
-                  {{ header.text }}
-                  <v-icon v-if="header.sortable" small>arrow_upward</v-icon>
+                {{ header.text }}
+                <v-icon v-if="header.sortable" small>arrow_upward</v-icon>
               </v-container>
             </th>
-            <th class="hidden-sm-and-up pa-0" align="left" >
-              <v-btn fab flat small :color="visButton.color[visButton.count]" @click="toggleButton()"> {{visButton.possibilities[visButton.count]}} </v-btn>
+            <th class="hidden-sm-and-up pa-0" align="left">
+              <v-btn v-on="on" fab small :style="visButton.possibilities[visButton.count] == 'support' ? 'font-size: 8px' : 'font-size:10px'" class="white--text" :color="visButton.color[visButton.count]"
+                @click="toggleButton()">
+                {{visButton.possibilities[visButton.count]}} </v-btn>
             </th>
           </template>
           <template v-slot:items="props">
@@ -95,17 +97,18 @@
               </v-btn>
             </td>
             <td class="text-xs-left hidden-sm-and-up pa-0">
-              <v-btn v-if="visButton.possibilities[visButton.count] === 'support'" fab small color="facebook" class="white--text"
-                v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
+              <v-btn v-if="visButton.possibilities[visButton.count] === 'support'" fab small color="facebook"
+                class="white--text very-small-button" v-on:click="openModal(universalMap(props.item.name, 'numberId'))">
                 <v-icon small color="white">
                   fab fa-facebook-square
                 </v-icon>
               </v-btn>
-              <v-btn fab medium v-else-if="visButton.possibilities[visButton.count] === 'final'" class="white--text"
-                color="primary_final_tab" v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
+              <v-btn fab small v-else-if="visButton.possibilities[visButton.count] === 'final'"
+                class="white--text very-small-button" color="primary_final_tab"
+                v-on:click="goToBet('betfinal',universalMap(props.item.name, 'numberId'))">
                 {{ (props.item.finalQuote)}}
               </v-btn>
-              <v-btn fab medium v-else class="white--text" color="primary_next_tab"
+              <v-btn fab small v-else class="white--text very-small-button" color="primary_next_tab"
                 v-on:click="goToBet('betnext',universalMap(props.item.name, 'numberId'))">
                 {{ (props.item.probability * 100).toFixed(2) + ' %'}}
               </v-btn>
@@ -349,10 +352,10 @@
       snackbarColor: "",
       snackbarTimeout: 6000,
       mapStatus: [],
-      visButton:{
+      visButton: {
         possibilities: ['support', 'next', 'final'],
         count: 0,
-        color: ['facebook','primary_next_tab','primary_final_tab']
+        color: ['facebook', 'primary_next_tab', 'primary_final_tab']
       }
     }),
     firebase: function () {
@@ -421,7 +424,8 @@
       },
       chosePhrase() {
         let random = Math.floor(Math.random() * this.phrases.length);
-        return this.phrases[random].replace("<placeholder>", this.universalMap(this.$store.state.selectedCountry));
+        return this.phrases[random].replace("<placeholder>", this.universalMap(this.$store.state.selectedCountry)) +
+          ' @Tron War Bot';
       },
     },
     mounted() {
@@ -435,3 +439,9 @@
     }
   }
 </script>
+
+<style>
+  .very-small-button {
+    font-size: 10px
+  }
+</style>

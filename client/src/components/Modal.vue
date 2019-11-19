@@ -506,10 +506,10 @@
 
         <!--/////////////////////////////////////////// News //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'news'">
-          <v-carousel v-if="news.length !== 0" :height="windowSize.y*0.6">
-            <v-carousel-item v-for="(n,i) in news" :key="i">
-              <v-img :src="n.src" class="image" :alt="i.toString()" :aspect-ratio="windowSize.x/(windowSize.y*0.675)">
-              </v-img>
+          <v-carousel v-if="news.length !== 0" :height="windowSize.x < windowSize.y ? windowSize.x : windowSize.y">
+            <v-carousel-item v-for="(n,i) in news" :key="i" :src="n.src" contain>
+              <!-- <v-img :src="n.src" class="image" :alt="i.toString()" :aspect-ratio="windowSize.x/(windowSize.y)">
+              </v-img> -->
             </v-carousel-item>
           </v-carousel>
           <v-text-field v-else value="There're no recent news" outline readonly></v-text-field>

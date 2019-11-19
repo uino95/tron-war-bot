@@ -34,9 +34,9 @@
       </v-card-text>
     </v-card>
     <v-card class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text" v-else-if="history != null && data.serverStatus == 500"
-      transition="scale-transition" color="blue">
-      <v-card-text class="pa-0 text-xs-center">
-        Battle in Progress
+      transition="scale-transition" color="#2c3e50">
+      <v-card-text class="pa-0 title text-xs-center">
+        Next run will start soon
       </v-card-text>
     </v-card>
   </v-flex>

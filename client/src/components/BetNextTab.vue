@@ -84,7 +84,7 @@
                   Battle in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">
                   Payout in progress...</v-btn>
-                <v-btn v-else-if="info.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over
+                <v-btn v-else-if="info.serverStatus == 500" dark color="primary_next_tab" @click="gameOver">Game Over
                 </v-btn>
               </v-form>
             </v-flex>
