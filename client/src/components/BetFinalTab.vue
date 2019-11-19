@@ -44,7 +44,7 @@
                   </v-flex>
 
                   <v-flex md3>
-                    <v-text-field :value="data.jackpot?(parseFloat(data.jackpot).toFixed(3) + ' TRX'):'loading...'"
+                    <v-text-field :value="this.$store.state.jackpot?(parseFloat(this.$store.state.jackpot).toFixed(3) + ' TRX'):'loading...'"
                       label="Current Jackpot" outline readonly></v-text-field>
                   </v-flex>
 
@@ -560,7 +560,7 @@
         if (this.currentCountry == null || this.countriesMap.length == 0) return 0;
         let bets = this.betsPerCountry
         let betsOnThatCountry = bets.find(el => (el.countryId === this.currentCountry))
-        return ((parseFloat(this.data.jackpot) + this.countriesMap[this.currentCountry].finalQuote) * (1 - this.$store.state.gameParams.finalBetParams.houseEdge) * 1 /
+        return ((parseFloat(this.$store.state.jackpot) + this.countriesMap[this.currentCountry].finalQuote) * (1 - this.$store.state.gameParams.finalBetParams.houseEdge) * 1 /
           Math.max(betsOnThatCountry.numberOfBets + 1, 1)).toFixed(3) + ' TRX';
       },
       currentCountry: {

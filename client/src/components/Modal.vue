@@ -563,7 +563,8 @@
 
     filters: {
       TRX: (amount) => {
-        return tronweb.fromSun(amount).toFixed(3) + ' TRX'
+        let result = tronweb.fromSun(amount).toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        return  result + ' TRX'
       },
       WAR: (amount) => {
         return amount != null ? amount.div("1000000000000000000").toFixed(3) + ' WAR' : 0 + ' WAR'
@@ -642,10 +643,10 @@
         return this.$store.state.loggedInAccount;
       },
       availableTRX() {
-        if(this.$store.state.jackpot == null){
+        if(this.$store.state.availableDividends == null){
           return tronweb.BigNumber('0')
         }
-        if(this.$store.state.jackpot != null){
+        if(this.$store.state.availableDividends != null){
           // BetFinal Jackpot + max((BetNext - deposit),0)
           const BetFinal = this.$store.state.jackpot.times(tronweb.BigNumber((this.$store.state.gameParams.finalBetParams.houseEdge)))
           const BetNext = this.$store.state.availableDividends

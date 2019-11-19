@@ -42,7 +42,7 @@
               </v-container>
             </th>
             <th class="hidden-sm-and-up pa-0" align="left">
-              <v-btn v-on="on" fab small :style="visButton.possibilities[visButton.count] == 'support' ? 'font-size: 8px' : 'font-size:10px'" class="white--text" :color="visButton.color[visButton.count]"
+              <v-btn  fab small :style="visButton.possibilities[visButton.count] == 'support' ? 'font-size: 8px' : 'font-size:10px'" class="white--text" :color="visButton.color[visButton.count]"
                 @click="toggleButton()">
                 {{visButton.possibilities[visButton.count]}} </v-btn>
             </th>
@@ -424,8 +424,7 @@
       },
       chosePhrase() {
         let random = Math.floor(Math.random() * this.phrases.length);
-        return this.phrases[random].replace("<placeholder>", this.universalMap(this.$store.state.selectedCountry)) +
-          ' @Tron War Bot';
+        return this.phrases[random].replace("<placeholder>", this.universalMap(this.$store.state.selectedCountry)) 
       },
     },
     mounted() {

@@ -48,6 +48,20 @@ function pollAccount(interval) {
   }, interval)
 }
 
+function pollJackpot(interval) {
+  setInterval(async () => {
+    try {
+      const jackpot = await tronWarBotInstance.jackpot("0").call()
+      const jackPotBigNumber = tronWebPublic.BigNumber(jackpot.toString())
+      store.commit('setJackpot', {
+        jackpot: jackPotBigNumber
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  },interval)
+}
+
 function pollBalance(interval) {
   setInterval(async () => {
     if (store.state.loggedInAccount !== null) {
@@ -86,15 +100,6 @@ async function pollDividends(interval){
       })
     } catch (error) {
       console.log("error is here in dividends ", error)
-    }
-    try {
-      const jackpot = await tronWarBotInstance.jackpot("0").call()
-      const jackPotBigNumber = tronWebPublic.BigNumber(jackpot.toString())
-      store.commit('setJackpot', {
-        jackpot: jackPotBigNumber
-      })
-    } catch (error) {
-      console.log(error)
     }
   }, interval)
 }
@@ -175,6 +180,7 @@ const pollForUpdate = async function () {
 
   getGameParams()
   pollTronWeb(500)
+  pollJackpot(2000)
 }
 
 export default pollForUpdate
