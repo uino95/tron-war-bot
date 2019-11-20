@@ -29,12 +29,14 @@
         <v-card-text v-if="path === 'referral'">
           Refer a friend by sharing your referral link with him.
           <br />Here is your referral link:
-          <v-chip v-if="this.$store.state.loggedInAccount != null" label outline color="primary">
-            https://tronwarbot.com/ref={{this.$store.state.loggedInAccount}}
-          </v-chip>
+          <v-text-field v-if="this.$store.state.loggedInAccount != null" ref='referralLink' append-icon="content_copy"
+            @click:append="copyToClipBoard(`https://tronwarbot.com/ref=${this.$store.state.loggedInAccount}`, 'referralLink')"
+            :value="`https://tronwarbot.com/ref=${this.$store.state.loggedInAccount}`" label="Referral Link" outline
+            readonly class="mb-0">
+          </v-text-field>
           <v-chip v-else label outline color="red">Login First</v-chip>
-          <br />
-          <br />You'll earn
+          <v-spacer/>
+          You'll earn
           <b>{{percentage}} % </b> out of each of his bets
           <b>forever</b>!
           <br />
@@ -81,7 +83,7 @@
               </v-container>
             </v-container>
 
-            <v-container v-else class="text-md-center">
+            <v-container v-else class="text-xs-center">
               <v-chip label outline color="red">Still no one played with your link... :(</v-chip>
             </v-container>
           </v-container>
@@ -148,21 +150,21 @@
 
           <v-divider />
 
-          <v-card mt-3 >
-            <v-layout align-center column >
-            <v-card-text style="text-align:center;">
-              At the end of the run you will be eligible to get your share of dividends by clicking the
-              button "Claim
-              your dividends".
-              <br />Currently, for every
-              <b>100 WAR you get
-                {{ availableTRX.div(totalWARSupply.div("1000000000000000000")).times('100') | TRX}}</b>
-            </v-card-text>
+          <v-card mt-3>
+            <v-layout align-center column>
+              <v-card-text style="text-align:center;">
+                At the end of the run you will be eligible to get your share of dividends by clicking the
+                button "Claim
+                your dividends".
+                <br />Currently, for every
+                <b>100 WAR you get
+                  {{ availableTRX.div(totalWARSupply.div("1000000000000000000")).times('100') | TRX}}</b>
+              </v-card-text>
 
-            <v-card-text v-if="account != null" class="text-xs-center">
-              <i>With your current WARs you will receive: </i>
-              <b>{{availableTRX.times(myWAR.div(totalWARSupply).toString()) | TRX }}</b>
-            </v-card-text>
+              <v-card-text v-if="account != null" class="text-xs-center">
+                <i>With your current WARs you will receive: </i>
+                <b>{{availableTRX.times(myWAR.div(totalWARSupply).toString()) | TRX }}</b>
+              </v-card-text>
 
             </v-layout>
           </v-card>
@@ -564,7 +566,7 @@
     filters: {
       TRX: (amount) => {
         let result = tronweb.fromSun(amount).toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-        return  result + ' TRX'
+        return result + ' TRX'
       },
       WAR: (amount) => {
         return amount != null ? amount.div("1000000000000000000").toFixed(3) + ' WAR' : 0 + ' WAR'
@@ -577,17 +579,17 @@
       })
     },
     watch: {
-      news: function(){
+      news: function () {
         this.$store.commit("updateNewsCount", this.news.length)
       },
       isVisible: function () {
-        if(this.isVisible){
-          if(this.path != 'dividends') this.$store.commit("setPollDivs", true);
-          if(this.path == 'dividends') {
+        if (this.isVisible) {
+          if (this.path != 'dividends') this.$store.commit("setPollDivs", true);
+          if (this.path == 'dividends') {
             this.$store.commit("setPollDivs", false)
             startPolling(1000)
           }
-          if(this.path == 'faq') this.$rtdbBind('fairness', db.ref('public/fairness'))
+          if (this.path == 'faq') this.$rtdbBind('fairness', db.ref('public/fairness'))
         } else {
           this.$store.commit("setPollDivs", true);
         }
@@ -646,19 +648,21 @@
         return this.$store.state.loggedInAccount;
       },
       availableTRX() {
-        if(this.$store.state.availableDividends == null){
+        if (this.$store.state.availableDividends == null) {
           return tronweb.BigNumber('0')
         }
-        if(this.$store.state.availableDividends != null){
+        if (this.$store.state.availableDividends != null) {
           // BetFinal Jackpot + max((BetNext - deposit),0)
-          const BetFinal = this.$store.state.jackpot.times(tronweb.BigNumber((this.$store.state.gameParams.finalBetParams.houseEdge)))
+          const BetFinal = this.$store.state.jackpot.times(tronweb.BigNumber((this.$store.state.gameParams
+            .finalBetParams.houseEdge)))
           const BetNext = this.$store.state.availableDividends
           const deposit = tronweb.toSun(this.info.deposit)
           return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
-        } 
+        }
       },
       myWAR() {
-        return this.$store.state.currentAddressWarBalance != null ? this.$store.state.currentAddressWarBalance : tronweb.BigNumber('0')
+        return this.$store.state.currentAddressWarBalance != null ? this.$store.state.currentAddressWarBalance : tronweb
+          .BigNumber('0')
       },
       totalWARSupply() {
         return this.$store.state.totalWARSupply != null ? this.$store.state.totalWARSupply : tronweb.BigNumber('0');
@@ -726,7 +730,7 @@
           let msg = {
             access_token: this.$store.state.fbStatus.fbAcessToken,
             country: this.currentCountry,
-            address: 'TPisPeMpZALp41Urg6un6S4kJJSZdtw6Kw',
+            address: this.$store.state.loggedInAccount,
             name: this.$store.state.fbStatus.fbUserName,
             id: this.$store.state.fbStatus.fbId,
             link: this.$store.state.fbStatus.fbLink
