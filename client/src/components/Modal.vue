@@ -82,7 +82,7 @@
               </v-container>
             </v-container>
 
-            <v-container v-else class="text-xs-center">
+            <v-container v-else class="pt-2 pl-0 pb-2 pr-0 ma-0 justify-start">
               <v-chip label outline color="red">Still no one played with your link... :(</v-chip>
             </v-container>
           </v-container>
@@ -331,9 +331,9 @@
                   <br />
                   <v-divider mt-3 />
                   <br />
-                  <span class="title">Previous Turn: {{info.turn - 1}} </span>
+                  <span v-if="info.previous" class="title">Previous Turn: {{info.turn - 1}} </span>
                   <br />
-                  <v-container fluid grid-list-sm>
+                  <v-container  v-if="info.previous" fluid grid-list-sm>
                     <v-flex sm 16>
                       <v-text-field ref='previousCountriesMap' append-icon="content_copy"
                         @click:append="copyToClipBoard(fairness.previous.mapState, 'previousCountriesMap')"
@@ -727,9 +727,14 @@
           // BetFinal Jackpot + max((BetNext - deposit),0)
           const BetFinal = this.$store.state.jackpot.times(tronweb.BigNumber((this.$store.state.gameParams
             .finalBetParams.houseEdge)))
+          console.log("BetFinal ", tronweb.fromSun(BetFinal).toString())
           const BetNext = this.$store.state.availableDividends
+          console.log("betNext: ", tronweb.fromSun(BetNext).toString())
           const deposit = tronweb.toSun(this.info.deposit)
-          return BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
+          console.log('deposit ',tronweb.fromSun(deposit).toString())
+          const availableTRX = BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
+          console.log(tronweb.fromSun(availableTRX).toFixed(3).toString())
+          return availableTRX
         }
       },
       myWAR() {

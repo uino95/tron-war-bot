@@ -45,13 +45,25 @@ Vue.mixin({
 
     async loggedInFb() {
       let fbAcessToken = localStorage.getItem('fbAcessToken')
+      console.log('fbAcessToken ',fbAcessToken)
+      if( fbAcessToken == null){
+        console.log('token not valid you have logout before or neve logged in before')
+        this.cleanFbStatus()
+        return false
+      }
       if (fbAcessToken != null) {
+        console.log('got a fbAccesToken, checking with api its validity')
         let fbUser = await axios.get("https://graph.facebook.com/v4.0/me?access_token=" + fbAcessToken + "&fields=id,name,link").catch(()=>{
           console.log("something went wrong")
           console.error
           this.cleanFbStatus()
           return false
         })
+        if(fbUser.status != 200){
+          console.log('acesstoken expired or something went wrong')
+          this.cleanFbStatus()
+          return false;
+        }
         if (fbUser.status == 200) {
           let fb = {
             fbAcessToken: localStorage.getItem('fbAcessToken'),
@@ -60,28 +72,23 @@ Vue.mixin({
             fbLink: localStorage.getItem('fbLink'),
             loggedIn: true
           }
+          console.log('token valid, here it is your information: ', fb)
           store.commit('setFbStatus', fb)
           return true;
         }
-        else {
-          //acesstoken expired or something went wrong
-          this.cleanFbStatus()
-          return false;
-        }
-      } else {
-        // you have logout before or neve logged in before
-        this.cleanFbStatus()
-        return false
       }
     },
 
     async loginToFb() {
       let loggedIn = await this.loggedInFb()
+      console.log('loggedIn: ',loggedIn)
       if (!loggedIn) {
-        // not logged in yet, proceed to Login
+        console.log('not logged in yet, proceed to Login')
         FB.login((response) => {
+          console.log("first response from login is: ", response)
           if (response.authResponse) {
             FB.api('/me?fields=link,name', (response) => {
+              console.log("response from api is: ", response)
               localStorage.setItem('fbId', response.id)
               localStorage.setItem('fbUserName', response.name)
               localStorage.setItem('fbLink', response.link)
@@ -94,7 +101,8 @@ Vue.mixin({
           }
         }, {
           scope: 'public_profile,email,user_link',
-          auth_type: 'reauthenticate'
+          auth_type: 'reauthenticate',
+
         })
       }
     },
