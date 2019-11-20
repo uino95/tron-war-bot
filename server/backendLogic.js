@@ -66,6 +66,7 @@ const prepareNextTurn = async () =>{
   let currentSecret = await firebase.secret.once('value').then(r=>r.val());
   let magic = utils.randomHex();
   let nextTurnBlock = cb.number + Math.ceil(config.timing.turn/3);
+  if (turn == 1 && !isNaN(parseInt(config.wwb.restart)) && config.wwb.restart>cb.number) nextTurnBlock = parseInt(config.wwb.restart);
   if (currentSecret && turn == currentSecret.turn) {
     magic = currentSecret.magic || magic;
     nextTurnBlock = currentSecret.block || nextTurnBlock;
@@ -100,7 +101,7 @@ const prepareNextTurn = async () =>{
     let b = await twb.getBlock(nextTurnBlock);
     launchNextTurn(b);
   }
-  console.log("[SCHEDULER]: ********* Preparing next turn finished! *********");
+  console.log("[SCHEDULER]: ********* Preparing next turn finished! Launching at block: " + nextTurnBlock + " *********");
 }
 
 const stopBets = async (block) => {
