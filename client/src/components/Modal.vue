@@ -19,8 +19,7 @@
             <br />
             <br />
             <v-alert :value="true" type="warning">Tron War Bot guarantees full proper functioning only with Google
-              Chrome and
-              TronLink/TronWallet mobile app.
+              Chrome and TronLink/TronWallet mobile app.
             </v-alert>
           </div>
         </v-card-text>
@@ -175,52 +174,125 @@
 
         <!--/////////////////////////////////////////// How To Play //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'howToPlay'">
-          Inspired by a popular Facebook page, named WorldWarBot2020, the game is a world war simulation
-          driven by a bot where users engagement affects the outcome of the war.
-          <br />
-          Each turn (5 minutes), the bot picks a country (in a provably fair manner)
-          and make it attack a foreign territory.
-          The probability of being chosen and the success of the attack
-          depends on the number of conquered territories and on the cohesion index of that country (check FAQ for
-          details).
-          The cohesion index is the most important factor in the game as it is entirely controlled by users through
-          their engagement on social media platforms (different rules apply on each platform).
-          <br />
-          <i>The game ends when the entire map has been conquered by a single country.</i>
-          <br />
+          <h4 class="text-xs-center">
+            Inspired by a popular Facebook page, the game is a world war simulation<br/>
+            driven by a bot, in a provably fair manner, where users engagement affects the outcome of the war.
+          </h4>
+          <br/>
+          Each turn, the bot select a country to attack a foreign territory and the battle might result
+          in a win <b>1</b>, loss <b>2</b> or a peaceful resolution <b>X</b>, with a probability
+          which depends on the number of conquered territories and on the cohesion index of that country.
+          <small><i>(Check 'Probabilities' section in FAQ)</i></small>
+          <br/>
+          The cohesion index is a very important factor in the game as it heavily affects war probabilities and it is almost
+          entirely controlled by users through their engagement on social media platforms.
+          <small><i>(Check 'Social media rules' section in FAQ)</i></small>
+          <br/>
+          <br/>
+          <h4 class="text-xs-center">
+            <b>The game ends when the entire map has been conquered by a single country.</b>
+          </h4>
+          <br/>
           An average World War simulation usually lasts about 40 days,
           however no precise estimate can be given upfront as the war is in large part
           controlled by users and their resiliency.
 
-          <br />
-          <br>
-          <b>What do I need to play?</b>
-          <br>There exists different game modes:
-          - Entertainment
-          - Social gaming
-          - Betting
-          - Value gaming
-          <br>In order to play, you must own TRX, the underlying cryptocurrency of TRON’s network. Make sure
-          you have a Tron Wallet.
-          For more information on how to create one, <a target="_blank"
-            href="https://chrome.google.com/webstore/detail/tronlink%EF%BC%88%E6%B3%A2%E5%AE%9D%E9%92%B1%E5%8C%85%EF%BC%89/ibnejdfjmmkpcnlpebklmnkoeoihofec">
-            click here </a>
-          <br>To play on mobile devices, please use <a target="_blank" href="https://www.tronwallet.me/">TronWallet</a>.
-
-          <br>
-          <br>
-
-          <b>How to get TRX</b>
-          <br>Are you running out of your skin to start gaming?
-          <br />Jump into the crypto world now!
-          <br />
-          <br />
-          <v-btn round color="primary" href="https://changelly.com/" target="_blank" dark pa-2>BUY TRX</v-btn>
-          <br />
-          <br />Once you start playing, your TRX are safe because you don’t move them on our website. They
-          remain in your secure wallet and moved out whenever you place a bet. So no need to trust us or
-          anyone, you
-          control your crypto assets. That's one of the nice things about using the blockchain.
+          <br/>
+          <br/>
+          <br/>
+          <h3>How can I play?</h3>
+          Well... there exist different gaming modes:
+          <br/>
+          <br/>
+          <v-expansion-panel>
+            <v-expansion-panel-content>
+              <template v-slot:header>
+                <b>Entertainment</b>
+              </template>
+              <v-card>
+                <v-card-text>
+                  <b>As simple as that!</b>
+                  <br/>
+                  TronWarBot is in first place a show and entertainment website.
+                  Check out our social media pages and groups on
+                  <a href="https://t.me/Tron_WarBot" target="_blank">Telegram</a>,
+                  <a href="https://www.facebook.com/TronWarBot/" target="_blank">Facebook</a>,
+                  <a href="https://twitter.com/TronWarBot_" target="_blank">Twitter</a>
+                  and <a href="https://www.instagram.com/tronwarbot/" target="_blank">Instagram</a>
+                  to be always up-to-date with the war status as well as with our brilliant fun facts and memes.
+                </v-card-text>
+              </v-card>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content>
+              <template v-slot:header>
+                <b>Social gaming</b>
+              </template>
+              <v-card>
+                <v-card-text>
+                  <b>From TronWarBot 2.0 you can finally be active part in the war!</b>
+                  <br/>
+                  All what you need to do is support your favorite country (or discourage your most hated one)
+                  by interacting through our pages or groups on our supported social media platforms,
+                  <a href="https://t.me/Tron_WarBot" target="_blank">Telegram</a>,
+                  <a href="https://www.facebook.com/TronWarBot/" target="_blank">Facebook</a>,
+                  <a href="https://twitter.com/TronWarBot_" target="_blank">Twitter</a>
+                  and <a href="https://www.instagram.com/tronwarbot/" target="_blank">Instagram</a>.
+                  And you might even <b><a href="/ambassador">become a country's ambassador</a></b>!
+                  <br/>
+                  <br/>
+                  We use a sentiment analysis engine which evaluates the mood positive/negative of messages and we attribute
+                  a cohesion reward (or penalty) to the mentioned country.
+                  However on every social media different rules apply.
+                  <br/>
+                  <br/>
+                  <i>Check them out in the 'Social Media Rules' section in FAQ.</i>
+                </v-card-text>
+              </v-card>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content>
+              <template v-slot:header>
+                <b>Betting</b>
+              </template>
+              <v-card>
+                <v-card-text>
+                  <b>Yes! And you can bet on who will conquer the world!</b>
+                  <br>
+                  <i>We support cryptocurrencies as they allow us to run this game in a fully provably fair manner while
+                  preserving the users' anonimity and identity,
+                  otherwise impossible if we were using traditional fiat currencies.</i>
+                  <br/>
+                  <br/>
+                  At the moment, we only support TRX, the underlying cryptocurrency of TRON’s network.
+                  <br/>
+                  Thus, in order to bet you must ensure you have a Tron Wallet installed, with a few bucks (TRX) on it.
+                  <br/>
+                  Check
+                  <a target="_blank"
+                    href="https://chrome.google.com/webstore/detail/tronlink%EF%BC%88%E6%B3%A2%E5%AE%9D%E9%92%B1%E5%8C%85%EF%BC%89/ibnejdfjmmkpcnlpebklmnkoeoihofec">here</a>
+                    on how to create one or, if you are playing from a mobile device, you can use <a target="_blank" href="https://www.tronwallet.me/">TronWallet</a>.
+                  <br>
+                  <br>
+                  <b>How to get TRX?</b>
+                  <br />Jump into the crypto world now!
+                  <br />
+                  <br />
+                  <v-btn round color="primary" href="https://changelly.com/" target="_blank" dark pa-2>BUY TRX</v-btn>
+                  <br />
+                  <br />
+                  Once you start playing, your TRX are safe with you as you don’t send them blindly to our website. Instead, they
+                  remain in your secure wallet and are sent to us exclusively and in the exact amount of the bet whenever it is placed,
+                  and you will be promptly asked confirmation by your own Tron wallet.
+                  <br/>So no need to trust us or anyone... <b>you own your assets</b>!
+                  That's a great thing about cryptocurrencies!
+                </v-card-text>
+              </v-card>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content>
+              <template v-slot:header>
+                <div>Value gaming - Coming soon @Suco</div>
+              </template>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
         </v-card-text>
 
         <!--/////////////////////////////////////////// FAQ //////////////////////////////////////////////////////////////////-->
