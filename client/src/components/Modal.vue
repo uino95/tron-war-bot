@@ -90,21 +90,19 @@
 
         <!--/////////////////////////////////////////// Dividends //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'dividends'">
-          We want to build this game together with our users, and that's why 100% of TronWarBot profits are
-          shared back
-          to token holders! (..but yes we detain around 50% of the current
-          token supply). After every stage you will need 50 more TRX to mine one WAR. WAR will be used in the
-          future runs.
-          <br />
-          <v-divider mt-3 />
-          <br />
-          <span class="headling">We are in stage 1 of 100. You need to play 500 TRX to mine 1 WAR</span>
-          <v-progress-linear color="primary" height="30" v-model="dividendStage"></v-progress-linear>
-          <v-divider mt-8 />
-          <br />
-          <v-layout row wrap justify-center>
+          <h4 class="text-xs-center">We don't simply want to build a game, but an ecosystem of passionate players and stakeholders,
+          </br>and that's why <u>we share our profits!</u></h4>
+          <br/>
+          Profits are shared among WAR token holders at the end of each war and
+          distributed proportionally to the amount of tokens hold by each user
+          within a snapshot taken at the end of the war.
+          <br/>
+          <br/>
+          Check your estimate share using the following data:
+          <br/>
+          <v-layout row wrap justify-center mt-2>
             <v-flex xs12 sm5>
-              <v-text-field :value="availableTRX | TRX" label=" Estimate Available Dividends" outline readonly>
+              <v-text-field :value="availableTRX | TRX" label=" Total Available Dividends" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="https://cdn.coinranking.com/behejNqQs/trx.svg" />
@@ -137,7 +135,7 @@
 
           <v-layout row wrap justify-center>
             <v-flex xs12 sm5>
-              <v-text-field :value="totalWARSupply | WAR" label="Total WAR mined" outline readonly>
+              <v-text-field :value="totalWARSupply | WAR" label="Total WAR supply" outline readonly>
                 <template v-slot:append>
                   <v-avatar class="pb-2" tile size="40">
                     <img src="/img/logo.png" />
@@ -146,27 +144,40 @@
               </v-text-field>
             </v-flex>
           </v-layout>
-
-          <v-divider />
-
-          <v-card mt-3>
-            <v-layout align-center column>
-              <v-card-text style="text-align:center;">
-                At the end of the run you will be eligible to get your share of dividends by clicking the
-                button "Claim
-                your dividends".
-                <br />Currently, for every
-                <b>100 WAR you get
-                  {{ availableTRX.div(totalWARSupply.div("1000000000000000000")).times('100') | TRX}}</b>
-              </v-card-text>
-
-              <v-card-text v-if="account != null" class="text-xs-center">
-                <i>With your current WARs you will receive: </i>
-                <b>{{availableTRX.times(myWAR.div(totalWARSupply).toString()) | TRX }}</b>
-              </v-card-text>
-
-            </v-layout>
-          </v-card>
+          <v-layout align-center column >
+            <div v-if="account != null" class="text-xs-center">
+              <i>At present, with your current WAR balance you would be entitled to
+              <b>{{availableTRX.times(myWAR.div(totalWARSupply).toString()) | TRX }}</b> of dividends </i>
+            </div>
+          </v-layout>
+          <br/>
+          <v-expansion-panel >
+            <v-expansion-panel-content>
+              <template v-slot:header>
+                <b>What is the WAR token and how is it mined?</b>
+              </template>
+              <v-card>
+                <v-card-text>
+                  The WAR is our purposefully crafted <b>TRC20</b> token.
+                  <br/>
+                  <br/>
+                  It is entirely mined by the players through any type of bets they put on TronWarBot platform.
+                  The mining rate starts at <b>1 WAR</b> mined for every <b>500 TRX</b> played on bets and it
+                  will gradually decrease over time, passing through several stages.
+                  After every stage you will need 50 TRX more to play on bet to mine 1 WAR.
+                  <br />
+                  <br />
+                  <span class="headling">We are in stage <b>1</b> of <b>100</b>. You need to play 500 TRX to mine 1 WAR</span>
+                  <v-progress-linear color="primary" height="30" v-model="dividendStage"></v-progress-linear>
+                  <br />
+                  <i>At the moment the WAR is only used to claim TronWarBot's dividends,
+                  but very soon the WAR will be integrated in our amazing game.</i>
+                  <br/>
+                  <b>Stay tuned to find out the details!</b>
+                </v-card-text>
+              </v-card>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
 
           <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
                     (end of the run)-->
@@ -231,7 +242,7 @@
                 <v-card-text>
                   <b>From TronWarBot 2.0 you can finally be active part in the war!</b>
                   <br/>
-                  All what you need to do is support your favorite country (or discourage your most hated one)
+                  All you need to do is support your favorite country (or discourage your most hated one)
                   by interacting through our pages or groups on our supported social media platforms,
                   <a href="https://t.me/Tron_WarBot" target="_blank">Telegram</a>,
                   <a href="https://www.facebook.com/TronWarBot/" target="_blank">Facebook</a>,
@@ -286,11 +297,6 @@
                   That's a great thing about cryptocurrencies!
                 </v-card-text>
               </v-card>
-            </v-expansion-panel-content>
-            <v-expansion-panel-content>
-              <template v-slot:header>
-                <div>Value gaming - Coming soon @Suco</div>
-              </template>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-card-text>
@@ -506,7 +512,7 @@
           <br v-if="isLoggedIn">
           <div class="mb-2">
             <h4 class=" text-xs-center">
-              <i>Have you ever dreamt of becoming the leader of your home country and guide it to conquer the world?</i>
+              <i>Have you ever dreamt of becoming the leader of your favorite country and guide it to conquer the world?</i>
               <br /> <b>Now you can!</b>
             </h4>
             <br />
@@ -515,7 +521,7 @@
             All you have to do is register through the steps below, and support your country in winning the game.
             <br />
             <br />
-            <b>How?</b>
+            <h4>How?</h4>
             Motivate your cadets to engage through social media so that your country gain cohesion points and increase
             the odds of winning the war.
           </div>
@@ -862,6 +868,11 @@
             "To know more read further.\n"
         },
         {
+          question: "How are probabilities calculated?",
+          answer: "You can bet that a state will attempt to conquer another country during the next turn. You choose how much to bet and your reward will be according to the probability of that country to be the actual conqueror next.\n" +
+          "<br><b>Example</b>: I think Japan will conquer another country in the next turn (doesn’t matter which one, you only care about the conqueror) so I choose Japan in the box “select country”, I choose how much to bet, then I place the bet.<br> Let’s say you bet 100TRX and the percentage of Japan to conquer next was 50%, if you win you’ll take away 190TRX! What about those missing 10TRX for a fair payout? Well, we put that in the Dividends Pool and at the end of the run they will be shared back to token holders!\n"
+        },
+        {
           question: "How does BetFinal work?",
           answer: "You can try to forecast the winner of the whole run, the country which will conquer the whole world.<br> 80% of the Final Jackpot is split among those who believed in that country and placed a bet on it, the remaining 20% goes into the Dividend Pool. The betting amount varies each turn depending on the probability a country has to win, so first movers have a huge advantage! We start with a fixed 20TRX at the beginning, then it keeps increasing as the run goes on! Please refer to the FAQ in you wanna have more details.\n"
         },
@@ -896,6 +907,10 @@
           answer: "It has not a fixed deadline, it depends on the development of the war itself. On average it takes 40 days having one turn every 5 minutes.\n"
         },
         {
+          question: "How can be used the WAR token?\n",
+          answer: "It has not a fixed deadline, it depends on the development of the war itself. On average it takes 40 days having one turn every 5 minutes.\n"
+        },
+        {
           question: "What do I do if I'm not able to place the bet?",
           answer: "Check if you have got enough Energy and Bandwidth. If you have no issue with your wallet you might be sending inconsistent transaction. Make sure you always generate transactions from our official website and make sure to have a good connection to use latest quotes available."
         },
@@ -916,6 +931,10 @@
                             select Energy instead of Bandwidth. If you are not going to be executing smart contracts,
                             there is no reason why you should select Energy. Those who are just TRX investors or users
                             should always select Bandwidth and not Energy when freezing their tokens.`
+        },
+        {
+          question: "What are the social media rules?",
+          answer: "Please reach us out on our offical <a href=\"https://t.me/Tron_WarBot\" target=\"_blank\">telegram group </a>! We would be very happy to answer your questions :)"
         },
         {
           question: "Couldn't find your answer?",

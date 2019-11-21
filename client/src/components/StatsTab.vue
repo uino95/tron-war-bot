@@ -130,19 +130,19 @@
           <v-card-text>
             <div class="title">
               Big news!
-              You can now support your country and help it winning the Tron World War!!
+              You can now help your country win the Tron World War!
             </div>
             <br>
             <div>
-              All you have to do is to engage with <b>Tron War Bot's </b><a
-                href="https://www.facebook.com/TronWarBot/">Facebook page</a> and mention your favorite
-              <b>country</b> in either a <i>post, a comment, a review or a share</i> of a page's post and encourage your
-              <b>country's
-                army</b> into doing its best with a great motivational message.
+              <h4>How?</h4>
+              Simply engage on Facebook, <u>specifying your favorite country</u>,
+              in either a <i>visitor post</i>, a <i>comment</i> or writing a <i>page review</i> on the official Tron War Bot's
+                <a href="https://www.facebook.com/TronWarBot/">Facebook page</a>, or <i>mention</i> &nbsp <b>@Tron War Bot</b> in a post on your timeline and encourage your
+              country into doing its best with a great motivational message.
               <br>
               <br>
-              As an example you can use this message, copy it and post it on <b>Tron War Bot's page feed</b> using the
-              share button below!
+              For example you can use the message below, copy it and post it mentioning <b>@Tron War Bot</b> on your timeline
+              or on Tron War Bot's page feed using the share button.
             </div>
             <br>
             <v-flex>
@@ -153,52 +153,52 @@
             </v-flex>
             <br>
             <div>
-              <b> TronWarBot </b> will automatically read your post/comment and update the <b>cohesion</b> of the
-              mentioned country
-              based on the energy of your message, which will drastically increase the winning odds for that country in
-              the <b>Tron World War!</b>
-              <br>
-              Be creative now!!
+              TronWarBot will read your post/comment and update the cohesion of the
+              mentioned country based on the energy of your message,
+              which will in turn drastically affect the winning odds for that country in the <i>Tron War.</i>
+              <br/>
+              <br/>
+              <h4>It's your turn now! Be creative!</h4>
             </div>
             <br>
             <v-expansion-panel>
               <v-expansion-panel-content v-for="(item,i) in 1" :key="i">
                 <template v-slot:header>
-                  <div> <b>Rules</b></div>
+                  <div> <b>Exact rules</b></div>
                 </template>
                 <v-card>
                   <v-card-text>
                     <div>
-
-                      The message, if valid, will update the cohesion of the mentioned country with the following
+                      The message, to be valid, must contain a reference as explicit as possible to the country
+                      and it will be scored by our sentiment analysis engine which will assess its positivity/negativity.
+                      <br/>
+                      If the message is valid and non neutral it will update the cohesion of the mentioned country with the following
                       criteria:
-                      <br>
+                      <br/>
+                      <br/>
                       <ul>
-                        <li><b>COMMENT</b> is worth <span style="color: green"><b>+/- 0.1%</b></span> cohesion point for
-                          the mentioned country </li>
-                        <li><b>VISITOR POST</b> on page's feed is worth <span style="color: green"><b>+/-
-                              0.2%</b></span> cohesion point for the mentioned country (or
-                          anything in
-                          between based on the message energy) </li>
-                        <li><b>REVIEW</b> is worth <span style="color: green"><b>+/- 0.5%</b></span> cohesion point for
-                          the mentioned country (or anything in between
-                          based on
-                          the
-                          message energy)</li>
-                        <li><b>SHARE</b> of a page's post is worth <span style="color: green"><b>+/- 1.0%</b></span>
-                          cohesion point for the mentioned country (or
-                          anything in
-                          between based on the message energy)</li>
+                        <li>
+                          up to <span style="color: green"><b>+/-0.1%</b></span>
+                          for a <b>comment</b> on any post of Tron War Bot's FB page.</li>
+                        <li>
+                          up to <span style="color: green"><b>+/-0.2%</b></span>
+                          for a <b>visitor post</b> on the FB page's feed
+                        </li>
+                        <li>
+                          up to <span style="color: green"><b>+/-0.5%</b></span>
+                          for a <b>page review</b> of Tron War Bot's FB page
+                        </li>
+                        <li>
+                          up to <span style="color: green"><b>+/-1.0%</b></span>
+                          for a <b>mention</b> of <b>@Tron War Bot</b> in a post on the user timeline
+                        </li>
                       </ul>
                       <br>
                       Beware that a negative message, will also make a country lose its cohesion!
                       <v-spacer />
                       <br>
-                      <i>P.S: Each facebook user is entitled to only one motivational comment plus one post and one
-                        share
-                        per
-                        day
-                        (UTC time), and a single page's review.</i>
+                      <i><u>P.S: Each facebook user is entitled to a single motivational comment and a single post or
+                        mention <b>per day</b> (UTC time), and an overall single page's review.</u></i>
                     </div>
                   </v-card-text>
                 </v-card>
@@ -209,7 +209,7 @@
             <v-spacer></v-spacer>
             <v-btn class="white--text" color="facebook" v-on:click="shareOnFb">
               <v-icon class="mr-2"> fab fa-facebook-square </v-icon>
-              Share 
+              Share
             </v-btn>
             <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
           </v-card-actions>
@@ -429,7 +429,7 @@
       },
       chosePhrase() {
         let random = Math.floor(Math.random() * this.phrases.length);
-        return this.phrases[random].replace("<placeholder>", this.universalMap(this.$store.state.selectedCountry)) 
+        return this.phrases[random].replace("<placeholder>", this.universalMap(this.$store.state.selectedCountry))
       },
     },
     mounted() {
