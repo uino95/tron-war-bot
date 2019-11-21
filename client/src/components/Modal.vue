@@ -29,8 +29,8 @@
           Refer a friend by sharing your referral link with him.
           <br />Here is your referral link:
           <v-text-field v-if="this.$store.state.loggedInAccount != null" ref='referralLink' append-icon="content_copy"
-            @click:append="copyToClipBoard(`https://tronwarbot.com/ref=${this.$store.state.loggedInAccount}`, 'referralLink')"
-            :value="`https://tronwarbot.com/ref=${this.$store.state.loggedInAccount}`" label="Referral Link" outline
+            @click:append="copyToClipBoard(`https://tronwarbot.com/ref=${account}`, 'referralLink')"
+            :value="`https://tronwarbot.com/ref=${account}`" label="Referral Link" outline
             readonly class="mb-0">
           </v-text-field>
           <v-chip v-else label outline color="red">Login First</v-chip>

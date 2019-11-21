@@ -439,7 +439,7 @@
         this.snackbar = true;
       },
       gameOver() {
-        this.snackbarText = "Game over. Be ready for the next run";
+        this.snackbarText = "Game over. Next run will start on 30/11";
         this.snackbarColor = "info";
         this.snackbarTimeout = 2000;
         this.snackbar = true;
