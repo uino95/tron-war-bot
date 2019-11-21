@@ -83,7 +83,9 @@ Vue.mixin({
       let loggedIn = await this.loggedInFb()
       console.log('loggedIn: ',loggedIn)
       if (!loggedIn) {
-        console.log('not logged in yet, proceed to Login')
+        // console.log('not logged in yet, proceed to Login')
+        // window.open('https://www.facebook.com/dialog/oauth/?client_id=1165517713645322&redirect_uri=http://localhost:8080/&state=YOUR_STATE_VALUE&response_type=token&scope=public_profile,email,user_link')
+        // // axios.get('https://graph.facebook.com/v5.0/oauth/access_token?client_id=1165517713645322&redirect_uri=https://test.tronwarbot.com/&client_secret={app-secret}&code=AQAJzmxVIeBDVkUXIDfXph6eu5E91jO9nUJmD54--E0UGvXhgRjqlnbiPPPVskYRFdF3Sl4m6wQbeXzuWeykFBRthYyv1JM1s8hZiB4eGl5U-g6_FubSFeCHFLYV07fHJBccci25cPmoxlVe9BVgFqxKuLj3aVmkHgsWJ-i6MOiDXxWR2lrKq-tQYAWjHGS9wIJXnhYWKaY-rSxSi-DyGKIAPyu4xQHdwH8dy5t6mhJ7pLkO_xkrxQYjX9C27kW06DBahvAFo3FPMUiIMuf55CWYNKZFtGJTVc5wlJdQmA6hf9CofRl0WKjjwSPNwPKl6TI')
         FB.login((response) => {
           console.log("first response from login is: ", response)
           if (response.authResponse) {
@@ -102,7 +104,7 @@ Vue.mixin({
         }, {
           scope: 'public_profile,email,user_link',
           auth_type: 'reauthenticate',
-
+          // popup, dialog, iframe, touch, async, hidden, none
         })
       }
     },
