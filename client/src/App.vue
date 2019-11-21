@@ -360,11 +360,6 @@
             pollForUpdate()
         },
         mounted() {
-            window.onstorage = () => {
-                // When local storage changes, dump the list to
-                // the console.
-                alert(window.localStorage.getItem('fbAcessToken'));
-            };
             this.loggedInFb()
             this.$store.commit('setIsMobile', this.isMobile());
             this.$root.$on('map_loaded', () => {
