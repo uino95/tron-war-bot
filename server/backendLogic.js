@@ -3,11 +3,10 @@ const firebase = require('./firebase')
 const fairness = require('./fairness')
 const wwb = require('./worldWarBot')
 const twb = require('./tronWarBot')
-const referral = require('./referral')
-const betValidator = require('./bet')
 const config = require('./config')
 const social = require('./social')
 const utils = require('./utils')
+const stats = require('./stats')
 
 console.log("[TIMING]: Stop bet duration is: " + (config.timing.txMargin) + "s");
 
@@ -26,8 +25,9 @@ const gameOver = async () => {
   await utils.sleep(60000);
   // GET WINNING BETS
   let _bets = await firebase.bets.getCurrentTurnBets(0, cr.round);
-  await twb.jackpotPayout(0, cr.round, winner, _bets);
+  let _winningBets = await twb.jackpotPayout(0, cr.round, winner, _bets);
   console.log("[SCHEDULER]: ********* Final payout finished! *********");
+  await stats.updateWinners(_winningBets)
   console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
 }
 
@@ -150,6 +150,7 @@ const launchNextTurn = async (block) =>{
   let _winningBetsBattle = td.battle ? (await twb.dealerPayout(2, cr2.round, td.battle.result, td.battle.quotes[td.battle.result], _betsBattle)) : [];
   // UPDATE RESULTS BET ON DB
   await updateResultsOnDB(_betsNext.concat(_betsBattle), _winningBetsNext.concat(_winningBetsBattle));
+  await stats.updateWinners(_winningBetsNext.concat(_winningBetsBattle))
   // PAYOUT FINAL
   console.log("[SCHEDULER]: ----- Payout finished! ------");
   if (go) return await gameOver();
@@ -169,40 +170,40 @@ module.exports.init = async () => {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // Watch new bets
-module.exports.watchBet = function () {
-  console.log("[LOGIC]: Watching user bets...")
-  return twb.watchEvents('Bet', async function (r) {
-    let bet = r.result
-    if (!(await betValidator.validate(bet)))
-      return console.error("[INVALID_BET]: Received an invalid bet for gameType: " + bet.gameType.toString() +
-        "\n\tof amount: " + twb.tronWeb.fromSun(bet.amount.toString()) +
-        "\n\tby: " + bet.from.toString() +
-        "\n\twith user choice: " + bet.userChoice.toString() +
-        "\n\tbetReference: " + bet.betReference.toString());
-    let isBetAlreadyOnDb = await firebase.bets.checkBetOnDb(r.transaction);
-    if (!!isBetAlreadyOnDb) return console.error("[GENERIC]: Bet " + r.transaction + " is already on DB");
-    let turn = wwb.currentTurn();
-    let betTime = new Date().getTime()
-    let betObj = {
-      from: twb.tronWeb.address.fromHex(bet.from),
-      amount: bet.amount,
-      userChoice: bet.userChoice,
-      round: bet.round,
-      betReference: bet.betReference,
-      result: -1,
-      time: betTime,
-      gameType: bet.gameType,
-      turn: turn,
-      alreadyUsed: false,
-    }
-    firebase.bets.child(r.transaction).set(betObj)
-    referral.updateReferral(betObj)
-    if (bet.gameType.toString() == "0") {
-      let jackpot = await twb.availableJackpot(0, bet.round);
-      jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
-      firebase.data.update({ jackpot })
-      console.info("Jackpot is: ", jackpot)
-    }
-    console.info("[BET]: Successfully registered bet in tx " + r.transaction + " at " + betTime)
-  });
-}
+// module.exports.watchBet = function () {
+//   console.log("[LOGIC]: Watching user bets...")
+//   return twb.watchEvents('Bet', async function (r) {
+//     let bet = r.result
+//     if (!(await betValidator.validate(bet)))
+//       return console.error("[INVALID_BET]: Received an invalid bet for gameType: " + bet.gameType.toString() +
+//         "\n\tof amount: " + twb.tronWeb.fromSun(bet.amount.toString()) +
+//         "\n\tby: " + bet.from.toString() +
+//         "\n\twith user choice: " + bet.userChoice.toString() +
+//         "\n\tbetReference: " + bet.betReference.toString());
+//     let isBetAlreadyOnDb = await firebase.bets.checkBetOnDb(r.transaction);
+//     if (!!isBetAlreadyOnDb) return console.error("[GENERIC]: Bet " + r.transaction + " is already on DB");
+//     let turn = wwb.currentTurn();
+//     let betTime = new Date().getTime()
+//     let betObj = {
+//       from: twb.tronWeb.address.fromHex(bet.from),
+//       amount: bet.amount,
+//       userChoice: bet.userChoice,
+//       round: bet.round,
+//       betReference: bet.betReference,
+//       result: -1,
+//       time: betTime,
+//       gameType: bet.gameType,
+//       turn: turn,
+//       alreadyUsed: false,
+//     }
+//     firebase.bets.child(r.transaction).set(betObj)
+//     referral.updateReferral(betObj)
+//     if (bet.gameType.toString() == "0") {
+//       let jackpot = await twb.availableJackpot(0, bet.round);
+//       jackpot = twb.tronWeb.fromSun(jackpot.availableJackpot.toString())
+//       firebase.data.update({ jackpot })
+//       console.info("Jackpot is: ", jackpot)
+//     }
+//     console.info("[BET]: Successfully registered bet in tx " + r.transaction + " at " + betTime)
+//   });
+// }

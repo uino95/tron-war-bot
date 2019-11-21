@@ -3,6 +3,7 @@ const utils = require('../utils')
 const q = require('../utils/quotes')
 const firebase = require('../firebase')
 const wwb = require('../worldWarBot')
+const twb = require('../tronWarBot')
 const telegram = require('../utils/telegram')
 const facebook = require('../utils/facebook')
 
@@ -96,7 +97,7 @@ module.exports.stats = async (td) =>{
   })
 
   let top3 = Object.values(u).sort(function(a, b){return b.wt - a.wt});
-  let j = await firebase.data.once("value").then(r=>r.val()['jackpot'] || 0);
+  let j = await twb.jackpot();
   let leaderboard = wwb.leaderboard();
   let countriesStillAlive = wwb.countriesStillAlive();
 

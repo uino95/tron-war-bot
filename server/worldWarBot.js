@@ -1,6 +1,6 @@
 // DB interface
 const firebase = require('./firebase')
-const t = require('./tronWarBot')
+const twb = require('./tronWarBot')
 const utils = require('./utils')
 const config = require('./config')
 const fairness = require('./fairness')
@@ -74,7 +74,7 @@ const init = async (restart) => {
     }
   });
   if (!restart)  await loadSavedState();
-  if (!simulation) ROUND = await t.getCurrentRound(0).then(r=>r.round);
+  if (!simulation) ROUND = await twb.getCurrentRound(0).then(r=>r.round);
   if (!simulation && restart) return await saveCurrentState();
 };
 
@@ -145,7 +145,7 @@ const preTurn = async () => {
 
 const postTurn = async (turnData) => {
   // GET JACKPOT
-  let jackpot = await firebase.data.child('jackpot').once("value").then(r=>r.val() || 0);
+  let jackpot = await twb.jackpot();
   let bets = (await firebase.bets.getCurrentTurnBets(0, ROUND) )|| [];
   let betsPerCountry = new Array(COUNTRIES).fill(0);
   bets.forEach((e,i)=>betsPerCountry[e.userChoice]+=1);

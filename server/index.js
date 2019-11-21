@@ -14,6 +14,7 @@ const scheduler = require('./scheduler')
 const facebook = require('./utils/facebook');
 const telegram = require('./utils/telegram');
 const chatbot = require('./chatbot');
+const betEngine = require('./bet');
 const social = require('./social');
 
 
@@ -43,7 +44,7 @@ app.get('/', (req, res) => {
 const init = async () => {
   try {
     await twb.init();
-    backendLogic.watchBet();
+    betEngine.watchBets();
     await twb.launchGame(0, false);
     await twb.launchGame(1, true);
     await twb.launchGame(2, true);
