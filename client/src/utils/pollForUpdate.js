@@ -86,7 +86,6 @@ function pollBalance(interval) {
 async function pollDividends(interval){
 
   let dividendsInterval = setInterval(async () => {
-    console.log("polling divs")
     try {
       if (store.state.pollDivsEndend) {
         clearInterval(dividendsInterval)
@@ -96,6 +95,8 @@ async function pollDividends(interval){
       const availableDividensInSunFromMaster = await tronWebPublic.trx.getBalance(masterAddress);
       const houseReserves = tronWebPublic.BigNumber(availableDividensInSunFromHouseReserves.toString())
       const masterBalance = tronWebPublic.BigNumber(availableDividensInSunFromMaster.toString())
+      console.log('masterBalance ', tronWebPublic.fromSun(masterBalance).toString())
+      console.log('houseReserves ', tronWebPublic.fromSun(houseReserves).toString())
       const availableDividensInSun = houseReserves.plus(masterBalance)
       store.commit('setAvailableDividends', {
         availableDividends: availableDividensInSun
@@ -108,7 +109,6 @@ async function pollDividends(interval){
 
 function pollMyWar(interval) {
   let warInterval = setInterval(async () => {
-    console.log("polling war")
     try {
       if (store.state.pollDivsEndend) {
         clearInterval(warInterval)
