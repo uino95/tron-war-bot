@@ -25,9 +25,13 @@ const out = {
   cohesion : db.ref('public/cohesion'),
   referral: db.ref('public/referral'),
   countriesMap : db.ref('public/countriesMap'),
+  stats : db.ref('public/stats'),
   timelapseMap : db.ref('public/timelapseMap')
 }
 
+out.getStatsRef = (s)=>{
+  return db.ref('public/stats/' + s)
+}
 
 out.bets.checkBetOnDb = async (txId) => out.bets.orderByKey().equalTo(txId).once('value').then((r) => r ? r.val() : false);
 

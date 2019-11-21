@@ -36,7 +36,7 @@ const startup = async  () => {
       block.number = b.block_header.raw_data.number;
       block.hash = b.blockID;
       block.timestamp = b.block_header.raw_data.timestamp;
-    } catch (err) { return console.error(err);}
+    } catch (err) { return }
     let awakeFn = blockQueue[block.number.toString()] || [];
     awakeFn = awakeFn.concat(blockQueue["0"] || []);
     awakeFn.forEach((fn)=>{
@@ -70,12 +70,18 @@ const onBlock = (bn, fn)=>{
 module.exports.onBlock = onBlock;
 
 const createEventsFilter = function(c){
-  return async function (opts = {}){
+  const retrieveEvents = async function (opts = {}, retry=0){
     opts.filters = opts.filters || {};
     for (var f of Object.keys(opts.filters)) opts.filters[f]=opts.filters[f].toString();
-    var r = await tronWeb.event.getEventsByContractAddress(c.address, opts);
-    return r.map(r=>{return {...r, ...r.result}});
+    try {
+      var r = await tronWeb.event.getEventsByContractAddress(c.address, opts);
+      return r.map(r=>{return {...r, ...r.result}});
+    } catch (e) {
+      if (retry>3) throw e;
+      return retrieveEvents(opts, (retry+1))
+    }
   }
+  return retrieveEvents;
 }
 
 const createWatchEvents = function(c){
@@ -213,6 +219,11 @@ module.exports.availableJackpot = async function (gameType, gameRound) {
     roundFunds.houseReserves = houseReserves;
     return roundFunds;
   } catch (e) {return this.availableJackpot(gameType, gameRound)}
+}
+
+module.exports.jackpot = async ()=> {
+  let j = await this.getCurrentRound(0);
+  return tronWeb.fromSun((j.availableJackpot || 0).toString());
 }
 
 //1. GET ALL BETS
