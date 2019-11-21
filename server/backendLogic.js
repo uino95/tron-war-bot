@@ -6,6 +6,7 @@ const twb = require('./tronWarBot')
 const config = require('./config')
 const social = require('./social')
 const utils = require('./utils')
+const stats = require('./stats')
 
 console.log("[TIMING]: Stop bet duration is: " + (config.timing.txMargin) + "s");
 

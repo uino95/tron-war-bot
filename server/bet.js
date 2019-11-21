@@ -3,6 +3,7 @@ const wwb = require('./worldWarBot')
 const firebase = require('./firebase')
 const twb = require('./tronWarBot')
 const referral = require('./referral')
+const stats = require('./stats')
 
 var turn, cMap;
 
