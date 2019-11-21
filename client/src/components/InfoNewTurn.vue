@@ -68,7 +68,7 @@
     },
     computed:{
       currentBattle: function(){
-        if(this.history[0]) return history[0].next
+        if(this.history[0]) return this.history[0].next
         return null
       }
     }

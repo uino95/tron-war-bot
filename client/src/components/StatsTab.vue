@@ -410,13 +410,12 @@
         if(!this.$store.state.isMobile){
           window.open('https://www.facebook.com/TronWarBot/', '_blank');
         } else {
-          //this.loginToFb()
-          await FB.ui({
-            method: 'feed',
-            link: 'https://tronwarbot.com',
-            display: 'touch',
-            to: '423138885180430',
-          }, function (response) {});
+          let app_id = 1165517713645322
+          let display = 'popup'
+          let link = this.$store.state.redirect_uri
+          let redirect_uri = this.$store.state.redirect_uri
+          let to = 423138885180430
+          window.open(`https://www.facebook.com/dialog/feed?app_id=${app_id}&display=${display}&link=${link}&redirect_uri=${redirect_uri}&to=${to}`,'_self')
         }
       },
     },

@@ -1,5 +1,6 @@
-<body> ciao sono io </body>
+<body>  </body>
 <script>
+    let test = false
     let href = window.location
     console.log(href)
     let newHref = href.toString().replace('#','')
@@ -16,7 +17,7 @@
     if(window.localStorage.getItem('state') == result.state){
         window.localStorage.setItem('fbAcessToken', result.access_token)
     }
-    console.log(result)
     let path = window.localStorage.getItem('path')
-    window.open(`https://test.tronwarbot.com/${path}`,'_self')
+    let uri = test ? `https://test.tronwarbot.com/${path}` : `https://tronwarbot.com/${path}`
+    window.open(uri,'_self')
 </script>

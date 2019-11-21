@@ -44,6 +44,9 @@ export default new Router({
       path: '/cohesion',
       name: 'cohesion',
       component: Cohesion
+    },
+    { path: "*", 
+      component: Stats 
     }
   ]
 })

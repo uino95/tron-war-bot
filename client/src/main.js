@@ -46,12 +46,10 @@ Vue.mixin({
     async loggedInFb() {
       let fbAcessToken = localStorage.getItem('fbAcessToken')
       if( fbAcessToken == null){
-        console.log('token not valid you have logout before or neve logged in before')
         this.cleanFbStatus()
         return false
       }
       if (fbAcessToken != null) {
-        console.log('got a fbAccesToken, checking with api its validity')
         let fbUser = await axios.get("https://graph.facebook.com/v4.0/me?access_token=" + fbAcessToken + "&fields=id,name,link").catch(()=>{
           console.log("something went wrong")
           console.error
@@ -85,7 +83,7 @@ Vue.mixin({
       if (!loggedIn) {
         
         let client_id = 1165517713645322
-        let redirect_uri = 'https://test.tronwarbot.com/login.html'
+        let redirect_uri = store.state.redirect_uri + '/login.html'
         let state = Math.random().toString(36).substr(2);
         let response_type = 'token'
         let scope = 'public_profile,email,user_link'
@@ -93,30 +91,8 @@ Vue.mixin({
 
         localStorage.setItem('state', state)
         localStorage.setItem('path', path)
-        console.log(state)
 
         window.open(`https://www.facebook.com/dialog/oauth/?client_id=${client_id}&redirect_uri=${redirect_uri}&state=${state}&response_type=${response_type}&scope=${scope}&auth_type=${auth_type}`,"_self")
-
-        // FB.login((response) => {
-        //   console.log("first response from login is: ", response)
-        //   if (response.authResponse) {
-        //     FB.api('/me?fields=link,name', (response) => {
-        //       console.log("response from api is: ", response)
-        //       localStorage.setItem('fbId', response.id)
-        //       localStorage.setItem('fbUserName', response.name)
-        //       localStorage.setItem('fbLink', response.link)
-        //       store.commit('setFbStatus', {fbId: response.id, fbUserName: response.name, fbLink: response.link})
-        //     });
-        //     localStorage.setItem('fbAcessToken', response.authResponse.accessToken)
-        //     store.commit('setFbStatus', {fbAcessToken: response.authResponse.accessToken, loggedIn: true})
-        //   } else {
-        //     throw ("User not logged in with facebook")
-        //   }
-        // }, {
-        //   scope: 'public_profile,email,user_link',
-        //   auth_type: 'reauthenticate',
-        //   // popup, dialog, iframe, touch, async, hidden, none
-        // })
       }
     },
     logoutFb() {

@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-export const test = true; //REMEBER TO SWITCH TO FALSE
+export const test = false; //REMEBER TO SWITCH TO FALSE ALSO in public/login.html
 
 export default new Vuex.Store({
   state: {
@@ -14,6 +14,7 @@ export default new Vuex.Store({
     isMobile: false,
     newsCount: 0,
     test: test, 
+    redirect_uri: test ? 'https://test.tronwarbot.com' : 'https://tronwarbot.com',
     contracts:{
       WarCoinAddress: test ? "TJ6kbSxQ8ctPGuHmRb3W92gUN42AooHeNt" : "TTbPmiq35XjAhQThatnukS45pNYd7xV2m1",
       TronWarBotAddress: test ? "TYUyBmkVZdtftSJf9c5StD8rMXFf37thab" : "TY7KWcSvmwA1J7pCy42S1wBbf9c1siCkMo",
@@ -64,7 +65,7 @@ export default new Vuex.Store({
       state.availableDividends = payload.availableDividends
     },
     setJackpot(state, payload) {
-      console.log(payload.jackpot)
+
       state.jackpot = payload.jackpot
     },
     setCurrentAddressWarBalance(state, payload) {
