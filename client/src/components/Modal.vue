@@ -548,8 +548,7 @@
             <v-stepper-step :complete="ambStep > 2" step="2">Login to Facebook</v-stepper-step>
 
             <v-stepper-content step="2">
-
-              <v-btn small color="facebook" class="white--text" @click="loginToFb">Facebook Login</v-btn>
+              <v-btn small color="facebook" class="white--text" @click="loginToFb('ambassador')">Facebook Login</v-btn>
             </v-stepper-content>
 
             <v-stepper-step :complete="ambStep > 3" step="3">Pick a country</v-stepper-step>

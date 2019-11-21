@@ -410,7 +410,7 @@
         if(!this.$store.state.isMobile){
           window.open('https://www.facebook.com/TronWarBot/', '_blank');
         } else {
-          this.loginToFb()
+          //this.loginToFb()
           await FB.ui({
             method: 'feed',
             link: 'https://tronwarbot.com',

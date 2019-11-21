@@ -63,8 +63,8 @@
                     style="color: white">WarBot</span></span>
             <v-spacer></v-spacer>
             <v-toolbar-items>
-                <v-menu offset-y >
-                    <template v-slot:activator="{ on }" >
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on }">
                         <v-btn flat dark v-on="on" class="hidden-xs-only">
                             Account
                         </v-btn>
@@ -86,7 +86,7 @@
                             <v-list-tile-avatar>
                                 <img src="/img/logo.png" alt="war" />
                             </v-list-tile-avatar>
-                            <v-list-tile-title >{{warBalance | WAR}}</v-list-tile-title>
+                            <v-list-tile-title>{{warBalance | WAR}}</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
                             <v-list-tile-avatar>
@@ -157,7 +157,7 @@
             drawer: null,
             isModalVisible: false,
             itemClicked: {},
-            news:[],
+            news: [],
             menuItems: [{
                     heading: 'My Info'
                 },
@@ -316,7 +316,7 @@
             warBalance() {
                 return this.$store.state.currentAddressWarBalance
             },
-            newsCount(){
+            newsCount() {
                 return this.$store.state.newsCount
             }
         },
@@ -360,6 +360,11 @@
             pollForUpdate()
         },
         mounted() {
+            window.onstorage = () => {
+                // When local storage changes, dump the list to
+                // the console.
+                alert(window.localStorage.getItem('fbAcessToken'));
+            };
             this.loggedInFb()
             this.$store.commit('setIsMobile', this.isMobile());
             this.$root.$on('map_loaded', () => {

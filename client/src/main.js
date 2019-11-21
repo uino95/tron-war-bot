@@ -45,7 +45,6 @@ Vue.mixin({
 
     async loggedInFb() {
       let fbAcessToken = localStorage.getItem('fbAcessToken')
-      console.log('fbAcessToken ',fbAcessToken)
       if( fbAcessToken == null){
         console.log('token not valid you have logout before or neve logged in before')
         this.cleanFbStatus()
@@ -67,45 +66,57 @@ Vue.mixin({
         if (fbUser.status == 200) {
           let fb = {
             fbAcessToken: localStorage.getItem('fbAcessToken'),
-            fbId: localStorage.getItem('fbId'),
-            fbUserName: localStorage.getItem('fbUserName'),
-            fbLink: localStorage.getItem('fbLink'),
+            fbId: fbUser.data.id,
+            fbUserName: fbUser.data.name,
+            fbLink: fbUser.data.link,
             loggedIn: true
           }
-          console.log('token valid, here it is your information: ', fb)
+          localStorage.setItem('fbId', fbUser.data.id)
+          localStorage.setItem('fbUserName', fbUser.data.name)
+          localStorage.setItem('fbLink', fbUser.data.link)
           store.commit('setFbStatus', fb)
           return true;
         }
       }
     },
 
-    async loginToFb() {
+    async loginToFb(path) {
       let loggedIn = await this.loggedInFb()
-      console.log('loggedIn: ',loggedIn)
       if (!loggedIn) {
-        // console.log('not logged in yet, proceed to Login')
-        // window.open('https://www.facebook.com/dialog/oauth/?client_id=1165517713645322&redirect_uri=http://localhost:8080/&state=YOUR_STATE_VALUE&response_type=token&scope=public_profile,email,user_link')
-        // // axios.get('https://graph.facebook.com/v5.0/oauth/access_token?client_id=1165517713645322&redirect_uri=https://test.tronwarbot.com/&client_secret={app-secret}&code=AQAJzmxVIeBDVkUXIDfXph6eu5E91jO9nUJmD54--E0UGvXhgRjqlnbiPPPVskYRFdF3Sl4m6wQbeXzuWeykFBRthYyv1JM1s8hZiB4eGl5U-g6_FubSFeCHFLYV07fHJBccci25cPmoxlVe9BVgFqxKuLj3aVmkHgsWJ-i6MOiDXxWR2lrKq-tQYAWjHGS9wIJXnhYWKaY-rSxSi-DyGKIAPyu4xQHdwH8dy5t6mhJ7pLkO_xkrxQYjX9C27kW06DBahvAFo3FPMUiIMuf55CWYNKZFtGJTVc5wlJdQmA6hf9CofRl0WKjjwSPNwPKl6TI')
-        FB.login((response) => {
-          console.log("first response from login is: ", response)
-          if (response.authResponse) {
-            FB.api('/me?fields=link,name', (response) => {
-              console.log("response from api is: ", response)
-              localStorage.setItem('fbId', response.id)
-              localStorage.setItem('fbUserName', response.name)
-              localStorage.setItem('fbLink', response.link)
-              store.commit('setFbStatus', {fbId: response.id, fbUserName: response.name, fbLink: response.link})
-            });
-            localStorage.setItem('fbAcessToken', response.authResponse.accessToken)
-            store.commit('setFbStatus', {fbAcessToken: response.authResponse.accessToken, loggedIn: true})
-          } else {
-            throw ("User not logged in with facebook")
-          }
-        }, {
-          scope: 'public_profile,email,user_link',
-          auth_type: 'reauthenticate',
-          // popup, dialog, iframe, touch, async, hidden, none
-        })
+        
+        let client_id = 1165517713645322
+        let redirect_uri = 'https://test.tronwarbot.com/login.html'
+        let state = Math.random().toString(36).substr(2);
+        let response_type = 'token'
+        let scope = 'public_profile,email,user_link'
+        let auth_type = 'reauthenticate'
+
+        localStorage.setItem('state', state)
+        localStorage.setItem('path', path)
+        console.log(state)
+
+        window.open(`https://www.facebook.com/dialog/oauth/?client_id=${client_id}&redirect_uri=${redirect_uri}&state=${state}&response_type=${response_type}&scope=${scope}&auth_type=${auth_type}`,"_self")
+
+        // FB.login((response) => {
+        //   console.log("first response from login is: ", response)
+        //   if (response.authResponse) {
+        //     FB.api('/me?fields=link,name', (response) => {
+        //       console.log("response from api is: ", response)
+        //       localStorage.setItem('fbId', response.id)
+        //       localStorage.setItem('fbUserName', response.name)
+        //       localStorage.setItem('fbLink', response.link)
+        //       store.commit('setFbStatus', {fbId: response.id, fbUserName: response.name, fbLink: response.link})
+        //     });
+        //     localStorage.setItem('fbAcessToken', response.authResponse.accessToken)
+        //     store.commit('setFbStatus', {fbAcessToken: response.authResponse.accessToken, loggedIn: true})
+        //   } else {
+        //     throw ("User not logged in with facebook")
+        //   }
+        // }, {
+        //   scope: 'public_profile,email,user_link',
+        //   auth_type: 'reauthenticate',
+        //   // popup, dialog, iframe, touch, async, hidden, none
+        // })
       }
     },
     logoutFb() {
