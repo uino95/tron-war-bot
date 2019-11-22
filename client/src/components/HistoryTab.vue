@@ -49,8 +49,8 @@
               </td>
             </template>
           </template>
-          <template v-if="!loaded" v-slot:actions-append>
-            <v-btn round flat dark color="primary_history_tab" v-on:click="loadAll"> Load all data </v-btn>
+          <template  v-slot:actions-append>
+            <v-btn round flat dark color="primary_history_tab" v-on:click="loadMore"> Load more data </v-btn>
           </template>
         </v-data-table>
 
@@ -101,7 +101,7 @@
       paginationHistory: {
         sortBy: 'turn',
         descending: true,
-        rowsPerPage: 10
+        rowsPerPage: 10,
       },
       searchHistory: '',
       limit: 30,
@@ -114,15 +114,14 @@
       }
     },
     methods: {
-      // loadMore() {
-      //   this.limit = this.limit + 10
-      //   this.$rtdbBind('history', db.ref('public/history').orderByChild('turn').limitToLast(this.limit))
-      //   this.paginationHistory.page = this.paginationHistory.page + 1
-      // },
-      loadAll() {
-        this.loaded = true
-        this.$rtdbBind('history', db.ref('public/history').orderByChild('turn'))
+      loadMore() {
+        this.limit = this.limit + 30
+        this.$rtdbBind('history', db.ref('public/history').orderByChild('turn').limitToLast(this.limit))
       },
+      // loadAll() {
+      //   this.loaded = true
+      //   this.$rtdbBind('history', db.ref('public/history').orderByChild('turn'))
+      // },
       computeWinnerPhrase(item) {
         //TODO understand in case of civilWar what is the correct battlefield but also the correct outcome in general also for cohesionTab
         if (item.civilWar) {
