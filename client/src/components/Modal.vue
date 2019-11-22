@@ -28,7 +28,11 @@
         <v-card-text v-if="path === 'referral'">
           Refer a friend by sharing your referral link with him.
           <br />Here is your referral link:
+<<<<<<< HEAD
           <v-text-field v-if="this.$store.state.loggedInAccount != null" ref='referralLink' append-icon="content_copy"
+=======
+          <v-text-field v-if="account != null" ref='referralLink' append-icon="content_copy"
+>>>>>>> 777bbd4d88a0f6fb156f171f1f104f5a6e3982a6
             @click:append="copyToClipBoard(`https://tronwarbot.com/ref=${account}`, 'referralLink')"
             :value="`https://tronwarbot.com/ref=${account}`" label="Referral Link" outline
             readonly class="mb-0">

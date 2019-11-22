@@ -1,7 +1,7 @@
 <template>
   <v-container grid-list-md text-xs-center class="outerTabContainer">
     <!-- History -->
-    <v-flex sm12 md12 lg12 >
+    <v-flex sm12 md12 lg12>
       <v-card>
         <v-toolbar color="primary_history_tab" dark>
           <v-toolbar-title>Recent History</v-toolbar-title>
@@ -9,48 +9,50 @@
           <v-text-field class="pa-2" v-model="searchHistory" append-icon="search" label="Search for a turn" single-line
             hide-details></v-text-field>
         </v-toolbar>
-        
-          <v-data-table :search="searchHistory" :headers="headersHistory" :items="history" :item-key="'turn'"
-            class="elevation-1" :pagination.sync="paginationHistory">
-            <template v-slot:items="props">
+
+        <v-data-table :search="searchHistory" :headers="headersHistory" :items="history" :item-key="'turn'"
+          class="elevation-1" :pagination.sync="paginationHistory">
+          <template v-slot:items="props">
+            <template v-if="props.item.turn != 1">
               <td class="text-xs-center">{{ props.item.turn - 1 }}</td>
               <td class="text-xs-center">
-                    <v-layout align-center justify-space-around row >
-                      <v-tooltip open-delay="600" top>
-                        <template v-slot:activator="{ on }">
-                          <v-flex xs5 class="greenText text-truncate" v-on="on"> {{universalMap(props.item.battle.o)}}
-                            {{props.item.battle.cohesion.o | cohesion}}
-                            </v-flex> 
-                        </template>
-                        <span>
-                          {{universalMap(props.item.battle.o)}} 
-                          {{props.item.battle.cohesion.o | cohesion}}
-                        </span>
-                      </v-tooltip>
-                      <v-flex xs2 v-if="props.item.battle.civilWar == 0"><b> VS </b></v-flex>
-                      <v-flex xs2 v-else><b> raised against </b></v-flex>
-                      <v-tooltip open-delay="600" top>
-                        <template v-slot:activator="{ on }">
-                          <v-flex xs5 class="redText text-truncate" v-on="on">{{universalMap(props.item.battle.d)}}
-                            {{props.item.battle.cohesion.d | cohesion}}
-                            </v-flex>
-                        </template>
-                        <span>
-                          {{universalMap(props.item.battle.d)}} 
-                          {{props.item.battle.cohesion.d | cohesion}}
-                        </span>
-                      </v-tooltip>
-                    </v-layout>
+                <v-layout align-center justify-space-around row>
+                  <v-tooltip open-delay="600" top>
+                    <template v-slot:activator="{ on }">
+                      <v-flex xs5 class="greenText text-truncate" v-on="on"> {{universalMap(props.item.battle.o)}}
+                        {{props.item.battle.cohesion.o | cohesion}}
+                      </v-flex>
+                    </template>
+                    <span>
+                      {{universalMap(props.item.battle.o)}}
+                      {{props.item.battle.cohesion.o | cohesion}}
+                    </span>
+                  </v-tooltip>
+                  <v-flex xs2 v-if="props.item.battle.civilWar == 0"><b> VS </b></v-flex>
+                  <v-flex xs2 v-else><b> raised against </b></v-flex>
+                  <v-tooltip open-delay="600" top>
+                    <template v-slot:activator="{ on }">
+                      <v-flex xs5 class="redText text-truncate" v-on="on">{{universalMap(props.item.battle.d)}}
+                        {{props.item.battle.cohesion.d | cohesion}}
+                      </v-flex>
+                    </template>
+                    <span>
+                      {{universalMap(props.item.battle.d)}}
+                      {{props.item.battle.cohesion.d | cohesion}}
+                    </span>
+                  </v-tooltip>
+                </v-layout>
               </td>
               <td class="text-xs-center">{{ props.item.battle.result | result}}</td>
               <td class="text-xs-right hidden-xs-only">
                 <div class="text-truncate" v-html="computeWinnerPhrase(props.item.battle)" />
               </td>
             </template>
-            <template v-if="!loaded" v-slot:actions-append>
-              <v-btn round flat dark color="primary_history_tab" v-on:click="loadAll"> Load all data </v-btn>
-            </template>
-          </v-data-table>
+          </template>
+          <template v-if="!loaded" v-slot:actions-append>
+            <v-btn round flat dark color="primary_history_tab" v-on:click="loadAll"> Load all data </v-btn>
+          </template>
+        </v-data-table>
 
       </v-card>
     </v-flex>
@@ -124,10 +126,12 @@
       computeWinnerPhrase(item) {
         //TODO understand in case of civilWar what is the correct battlefield but also the correct outcome in general also for cohesionTab
         if (item.civilWar) {
-          if(item.result == 1){
-            return '<span class="greenText">' + this.universalMap(item.o) + '</span>' + ' has rebelled against ' + '<span class="redText">' + this.universalMap(item.d) + '</span>'
+          if (item.result == 1) {
+            return '<span class="greenText">' + this.universalMap(item.o) + '</span>' + ' has rebelled against ' +
+              '<span class="redText">' + this.universalMap(item.d) + '</span>'
           }
-          return '<span class="greenText">' + this.universalMap(item.d) + '</span>' + ' has stop the rebellion of ' + '<span class="redText">' + this.universalMap(item.o) + '</span>'
+          return '<span class="greenText">' + this.universalMap(item.d) + '</span>' + ' has stop the rebellion of ' +
+            '<span class="redText">' + this.universalMap(item.o) + '</span>'
         }
         switch (item.result) {
           case 0:
@@ -141,7 +145,7 @@
         }
       }
     },
-    mounted(){
+    mounted() {
       db.ref('public/history').orderByChild('turn').limitToLast(this.limit).once('value', snap => {
         this.$root.$emit('loaded', true);
       })
@@ -149,7 +153,7 @@
     computed: {
       isMobile: function () {
         return this.$store.state.isMobile
-      }
+      },
     },
     filters: {
       result(battle) {
