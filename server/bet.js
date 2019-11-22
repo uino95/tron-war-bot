@@ -48,6 +48,7 @@ const watchBets =  () => {
     let isBetAlreadyOnDb = await firebase.bets.checkBetOnDb(r.transaction);
     if (!!isBetAlreadyOnDb) return console.error("[BET]: Bet " + r.transaction + " is already on DB");
     let turn = wwb.currentTurn();
+    let turnData = await wwb.currentTurnData();
     let betTime = new Date().getTime()
     let betObj = {
       from: twb.tronWeb.address.fromHex(bet.from),
@@ -61,6 +62,11 @@ const watchBets =  () => {
       turn: turn,
       alreadyUsed: false,
     }
+    if (bet.gameType==2)
+      betObj.battle = {
+        c: (bet.userChoice == 1 ) ? turnData.battle.o : ((bet.userChoice == 2 ) ? turnData.battle.d : undefined),
+        p: turnData.battle.probabilities[bet.userChoice]
+      } ;
     await firebase.bets.child(r.transaction).set(betObj);
     referral.updateReferral(betObj);
     stats.updateSpender(betObj);
