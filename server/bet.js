@@ -11,7 +11,7 @@ const validateFullRunWinner = async (b) => {
   if (!b || !b.amount) return false;
   cMap = await wwb.mapState();
   turn = wwb.currentTurn();
-  var fixedAmount = config.test ? "1" : cMap[parseInt(b.userChoice)].finalQuote;
+  var fixedAmount = cMap[parseInt(b.userChoice)].finalQuote;
   return b.amount.toString() == twb.tronWeb.toSun(fixedAmount);
 }
 
