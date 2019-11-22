@@ -59,7 +59,7 @@
 
                 <v-layout row wrap>
                   <v-flex xs12>
-                    <v-slider thumb-label v-model="betAmount" :min="betNextGameParam ? betNextGameParam.minimumBet : 1" :max="betNextGameParam ? betNextGameParam.maximumBet : 1"label="Bet Amount"></v-slider>
+                    <v-slider thumb-label v-model="betAmount" :min="betNextGameParam ? betNextGameParam.minimumBet : 1" :max="betNextGameParam ? betNextGameParam.maximumBet : 1" label="Bet Amount"></v-slider>
                   </v-flex>
                 </v-layout>
                 <!-- <v-layout row wrap>
@@ -78,8 +78,12 @@
 
 
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark
-                  @click="placeBet(currentCountry)">Bet {{betAmount}} TRX
-                  {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+                  @click="placeBet(currentCountry, betAmount)">
+                  <div v-bind:style="{'max-width': windowSize.x * 0.6 + 'px'}" class="text-truncate">
+                  Bet {{betAmount}} TRX
+                  {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}
+                  </div>
+                  </v-btn>
                 <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">
                   Battle in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">
@@ -111,7 +115,7 @@
             <v-spacer></v-spacer>
           </v-toolbar>
 
-          <v-container grid-list-md text-xs-centerm class="gameTab">
+          <v-container grid-list-md text-xs-center class="gameTab ">
 
             <!-- if the user is not logged in -->
             <v-layout v-if="account == null">
@@ -128,14 +132,14 @@
             </v-layout>
 
             <!-- else show the bets -->
-            <v-layout v-else row wrap class="gameTabHeader">
+            <v-layout v-else row wrap class="gameTabHeader ">
               <v-flex xs3 class="title">
                 Country
               </v-flex>
               <v-flex xs4 class="title">
                 Bet
               </v-flex>
-              <v-flex xs3 class="title">
+              <v-flex xs2 class="title">
                 Turn
               </v-flex>
               <v-flex xs2 class="title">
@@ -152,9 +156,9 @@
                     {{universalMap(bet.userChoice)}}
                   </v-flex>
                   <v-flex xs4 class="subheading">
-                    {{bet.amount | TRX}}
+                    {{bet.amount | TRXnotBIG}}
                   </v-flex>
-                  <v-flex xs3 class="subheading">
+                  <v-flex xs2 class="subheading">
                     {{bet.turn}}
                   </v-flex>
                   <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
@@ -214,7 +218,7 @@
                     <span>{{universalMap(bet.userChoice)}}</span>
                   </v-flex>
                   <v-flex xs3 class="subheading">
-                    <span>{{bet.amount | TRX}}</span>
+                    <span>{{bet.amount | TRXnotBIG}}</span>
                   </v-flex>
                   <v-flex xs3 class="subheading">
                     <span>{{bet.turn}}</span>
@@ -278,7 +282,7 @@
                   </v-flex>
 
                   <v-flex xs2 class="subheading">
-                    <span>{{bet.amount | TRX}}</span>
+                    <span>{{bet.amount | TRXnotBIG}}</span>
                   </v-flex>
 
                   <v-flex xs2 class="subheading">
@@ -337,17 +341,11 @@
       isWaitingForConfirm: false,
       currentTxId: null
     }),
-
-    firebase() {
-      return {
-        bets: db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30),
-        personalBets: db.ref('public/bets').orderByChild('from').equalTo(this.account),
-        info: db.ref('public/data'),
-        mapStatus: db.ref('public/countriesMap')
-      }
-    },
     mounted(){
       this.initBetAmount()
+      if(this.currentCountry == 241){
+        this.currentCountry = null
+      }
     },
     methods: {
       initBetAmount: function () {

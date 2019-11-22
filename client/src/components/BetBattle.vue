@@ -200,10 +200,10 @@
                   </v-hover>
                 </v-flex>
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_battle_tab" dark
-                  @click="placeBet(currentChoice)">
+                  @click="placeBet(currentChoice, betAmount)">
                   <div v-bind:style="{'max-width': windowSize.x * 0.6 + 'px'}" class="text-truncate">
                     Bet {{betAmount}} TRX
-                    {{currentCountry != null ?'on ' + (currentChoice ? universalMap(currentCountry) : 'DRAW')  :''}}
+                    {{currentCountry != null ?'on ' + (currentChoice != 0 ? universalMap(currentCountry) : 'DRAW')  :''}}
                   </div>
                 </v-btn>
                 <v-btn v-else-if="info.serverStatus == 300" dark color="primary_battle_tab" @click="battleInProgress">
@@ -255,8 +255,8 @@
 
             <!-- else show the bets -->
             <v-layout v-else row wrap class="gameTabHeader">
-              <v-flex xs3 class="title">
-                Country
+              <v-flex xs2 class="title">
+                Choice
               </v-flex>
               <v-flex xs4 class="title">
                 Bet
@@ -274,11 +274,11 @@
                 <v-layout row wrap
                   v-for="bet in myBets.slice(10 * currentMyBetPagination - 10, 10 * currentMyBetPagination)"
                   :key="bet.time">
-                  <v-flex xs3 class="subheading">
-                    {{universalMap(bet.userChoice)}}
+                  <v-flex xs2 class="subheading">
+                    {{bet.userChoice | CHOICE}}
                   </v-flex>
                   <v-flex xs4 class="subheading">
-                    {{bet.amount | TRX}}
+                    {{bet.amount | TRXnotBIG }}
                   </v-flex>
                   <v-flex xs3 class="subheading">
                     {{bet.turn}}
@@ -319,10 +319,10 @@
             </v-layout>
 
             <v-layout v-else row wrap class="gameTabHeader">
-              <v-flex xs6 class="title">
-                <span>Country</span>
-              </v-flex>
               <v-flex xs3 class="title">
+                <span>Choice</span>
+              </v-flex>
+              <v-flex xs6 class="title">
                 <span>Bet</span>
               </v-flex>
               <v-flex xs3 class="title">
@@ -336,11 +336,11 @@
                 <v-layout row wrap
                   v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)"
                   :key="bet.time">
-                  <v-flex xs6 class="subheading">
-                    <span>{{bet.userChoice | }}</span>
-                  </v-flex>
                   <v-flex xs3 class="subheading">
-                    <span>{{bet.amount | TRX}}</span>
+                    <span>{{bet.userChoice | CHOICE}}</span>
+                  </v-flex>
+                  <v-flex xs6 class="subheading">
+                    <span>{{bet.amount | TRXnotBIG }}</span>
                   </v-flex>
                   <v-flex xs3 class="subheading">
                     <span>{{bet.turn}}</span>
@@ -367,11 +367,11 @@
             </v-layout>
 
             <v-layout v-else row wrap class="gameTabHeader">
-              <v-flex xs3 class="title">
+              <v-flex xs4 class="title">
                 <span>Address</span>
               </v-flex>
-              <v-flex xs3 class="title">
-                <span>Country</span>
+              <v-flex xs2 class="title">
+                <span>Choice</span>
               </v-flex>
               <v-flex xs2 class="title">
                 <span>Bet</span>
@@ -390,7 +390,7 @@
                   v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)"
                   :key="bet.time">
 
-                  <v-flex xs3 class="subheading text-truncate">
+                  <v-flex xs4 class="subheading text-truncate">
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on }">
                         <span v-on="on" v-text="(bet.from)" v-bind:alt="(bet.from)"></span>
@@ -399,12 +399,12 @@
                     </v-tooltip>
                   </v-flex>
 
-                  <v-flex xs3 class="subheading">
-                    <span>{{universalMap(bet.userChoice)}}</span>
+                  <v-flex xs2 class="subheading">
+                    <span>{{bet.userChoice | CHOICE}}</span>
                   </v-flex>
 
                   <v-flex xs2 class="subheading">
-                    <span>{{bet.amount | TRX}}</span>
+                    <span>{{bet.amount | TRXnotBIG }}</span>
                   </v-flex>
 
                   <v-flex xs2 class="subheading">
@@ -464,29 +464,26 @@
         history: [],
         isWaitingForConfirm: false,
         currentTxId: null,
-        windowSize: {
-          x: window.innerWidth,
-          y: window.innerHeight
-        }
+        historyTurn:[]
       }
     },
-
+    filters:{
+      CHOICE : (userChoice)=> {
+        return userChoice == 0 ? 'X' : userChoice.toString()
+      }
+    },
     firebase: function () {
       return {
-        bets: db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30),
-        personalBets: db.ref('public/bets').orderByChild('from').equalTo(this.account),
-        info: db.ref('public/data'),
-        mapStatus: db.ref('public/countriesMap'),
         history: db.ref('public/history').orderByChild('turn').limitToLast(1)
       }
     },
 
     mounted() {
-      window.addEventListener('resize', () => {
-        this.windowSize.x = window.innerWidth
-        this.windowSize.y = window.innerHeight
-      })
       this.initBetAmount()
+      if(this.currentCountry != 241 && this.currentCountry != this.currentBattle.o && this.currentCountry != this.currentBattle.d){
+        this.currentChoice = null
+        this.currentCountry = null
+      }
     },
 
     methods: {
@@ -500,14 +497,9 @@
         }, 500)
       },
       toggle_country: function (country, choice) {
-        if (country < 240) {
-          this.currentCountry = country
-        }
+        this.currentCountry = country
         this.currentChoice = choice
       },
-      compare: function (a, b) {
-        return b.turn - a.turn
-      }
     },
 
     computed: {

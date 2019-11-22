@@ -10,10 +10,21 @@ export const betMixin = {
     components: {
         VLazyImage
     },
+    data: () => ({
+        windowSize: {
+            x: window.innerWidth,
+            y: window.innerHeight
+        },
+    }),
+
     mounted() {
         db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30).once('value', snap => {
             this.$root.$emit('loaded', true);
         })
+        window.addEventListener('resize', () => {
+            this.windowSize.x = window.innerWidth
+            this.windowSize.y = window.innerHeight
+          })
     },
 
     filters: {
@@ -25,11 +36,23 @@ export const betMixin = {
             }
         },
         TRX: (amount) => {
-            return tronweb.fromSun(amount) + 'TRX'
+            if(amount == 0) return 0
+            return tronweb.fromSun(amount).toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' TRX'
+        },
+        TRXnotBIG: (amount) => {
+            return tronweb.fromSun(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' TRX'
         },
         probability: (p) => {
             let P = p * 100
             return (P <= 0.1 && P > 0) ? 'very low' : P.toFixed(2) + ' %'
+        }
+    },
+    firebase: function () {
+        return {
+            bets: db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30),
+            personalBets: db.ref('public/bets').orderByChild('from').equalTo(this.account),
+            info: db.ref('public/data'),
+            mapStatus: db.ref('public/countriesMap'),
         }
     },
 
@@ -49,7 +72,7 @@ export const betMixin = {
                 .replaceAll("í", "i") + ".svg";
         },
 
-        async placeBet(userChoice) {
+        async placeBet(userChoice, betAmount) {
             this.isWaitingForConfirm = true
             if (this.$store.state.loggedInAccount == null) {
                 this.snackbarText = "Login First";
@@ -67,7 +90,7 @@ export const betMixin = {
                 this.snackbar = true;
                 try {
                     this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.gameType, userChoice, this.info.turn).send({
-                        callValue: window.tronWeb.toSun(this.betAmount)
+                        callValue: window.tronWeb.toSun(betAmount)
                     })
                 } catch (err) {
                     this.isWaitingForConfirm = false;
@@ -137,6 +160,7 @@ export const betMixin = {
             }
         },
         account() {
+            this.$rtdbBind('personalBets', db.ref('public/bets').orderByChild('from').equalTo(this.$store.state.loggedInAccount))
             return this.$store.state.loggedInAccount
         },
         isMobile: function () {
