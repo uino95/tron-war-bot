@@ -24,7 +24,7 @@
             <v-flex md10>
 
               <v-card class="mb-4">
-                <v-img class="white--text" :position="currentBattle.civilWar == 1 ? 'bottom 75% center' : 'center'"
+                <v-img v-if="info.serverStatus != 500" class="white--text" :position="currentBattle.civilWar == 1 ? 'bottom 75% center' : 'center'"
                   :aspect-ratio="this.windowSize.x/150"
                   :src=" currentBattle.civilWar == 1 ? 'img/civilWar9.png' : 'img/vs-battle.jpg'">
                   <v-layout class="mt-4" row wrap align-center justify-space-between>
@@ -151,6 +151,10 @@
                   </v-layout>
 
                   <core-timer class="mt-4" />
+                </v-img>
+                <v-img v-else :position="'bottom 55% center'"
+                  :aspect-ratio="this.windowSize.x/300"
+                  :src=" 'img/placeholder.jpg'">
                 </v-img>
               </v-card>
               <v-spacer />
@@ -594,7 +598,7 @@
       initBetAmount: function () {
         setTimeout(() => {
           if (this.betBattleGameParams) {
-            this.betAmount = this.betBattleParams.minimumBet
+            this.betAmount = this.betBattleGameParams.minimumBet
           } else {
             this.initBetAmount()
           }
