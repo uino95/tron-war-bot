@@ -57,10 +57,10 @@
                   </v-flex>
                 </v-layout>
 
-              <v-btn v-if="data.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet">Bet {{currentCountry != null && this.countriesMap.length != 0 ? this.countriesMap[this.currentCountry].finalQuote : ''}} {{currentCountry != null ? currency : ''}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
-              <v-btn v-else-if="data.serverStatus == 300" dark color="primary_final_tab" @click="battleInProgress">Battle in progress...</v-btn>
-              <v-btn v-else-if="data.serverStatus == 400" dark color="primary_final_tab" @click="payoutInProgress">Payout in progress...</v-btn>
-              <v-btn v-else-if="data.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over</v-btn>
+              <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" dark color="primary_final_tab" @click="placeBet(currentCountry)">Bet {{currentCountry != null && this.countriesMap.length != 0 ? this.countriesMap[this.currentCountry].finalQuote : ''}} {{currentCountry != null ? currency : ''}} {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}</v-btn>
+              <v-btn v-else-if="info.serverStatus == 300" dark color="primary_final_tab" @click="battleInProgress">Battle in progress...</v-btn>
+              <v-btn v-else-if="info.serverStatus == 400" dark color="primary_final_tab" @click="payoutInProgress">Payout in progress...</v-btn>
+              <v-btn v-else-if="info.serverStatus == 500" dark color="primary_final_tab" @click="gameOver">Game Over</v-btn>
               <!-- <v-flex md4>
                 <v-btn color="warning">Cannot bet at the moment</v-btn>
               </v-flex> -->
@@ -331,9 +331,7 @@
   }
   from '../plugins/firebase';
   import mapping from '../assets/mapping';
-  import axios from 'axios'
-  import VLazyImage from "v-lazy-image";
-  import tronweb from 'tronweb'
+  import {betMixin} from '../mixins/betMixin'
 
   String.prototype.replaceAll = function (search, replace) {
     if (replace === undefined) {
@@ -343,10 +341,7 @@
   };
 
   export default {
-    components: {
-      VLazyImage
-    },
-
+    mixins:[betMixin],
     data: () => ({
       currentRunPagination:1,
       currentLatestBetPagination: 1,
@@ -368,111 +363,19 @@
       gameType: 0,
       bets: [],
       personalBets:[],
-      data:{},
+      info:{},
       countriesMap:[],
       mapping: mapping,
     }),
-
     firebase: function() {
       return {
         bets: db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30),
         personalBets: db.ref('public/bets').orderByChild('from').equalTo(this.account),
-        data: db.ref('public/data'),
+        info: db.ref('public/data'),
         countriesMap: db.ref('public/countriesMap')
       }
     },
-
-    filters: {
-      TRX: (amount) => {
-        return tronweb.fromSun(amount) + 'TRX'
-      }
-    },
-
-
     methods: {
-      getFlagString(str) {
-        str = "/img/flags/" + str.toLowerCase()
-          .replaceAll(" ", "-")
-          .replaceAll("ã", "a")
-          .replaceAll("ì", "i")
-          .replaceAll("è", "e")
-          .replaceAll("ì", "i")
-          .replaceAll("å", "a")
-          .replaceAll("é", "e")
-          .replaceAll("í", "i") + ".svg"
-        return str;
-      },
-      placeBet: async function () {
-        this.isWaitingForConfirm = true
-        if (this.$store.state.loggedInAccount == null) {
-          this.snackbarText = "Login First";
-          this.snackbarColor = "error";
-          this.snackbar = true;
-          this.isWaitingForConfirm = false
-        } else if (this.currentCountry == null) {
-          this.snackbarText = "Select a country first";
-          this.snackbarColor = "error";
-          this.snackbar = true;
-          this.isWaitingForConfirm = false
-        } else {
-          this.snackbarText = "The blockchain is processing your bet. Please wait...";
-          this.snackbarColor = "info";
-          this.snackbar = true;
-          try {
-            this.currentTxId = await this.$store.state.contracts.TronWarBotInstance.bet(this.gameType, this.currentCountry, this.data.turn).send({
-              callValue: window.tronWeb.toSun(this.countriesMap[this.currentCountry].finalQuote)
-            })
-          } catch(err) {
-            console.log(err)
-            this.isWaitingForConfirm = false;
-            this.snackbarColor = "error";
-            this.snackbar = true;
-            this.snackbarText = "Failed to sign transaction: Confirmation declined by user"
-          }
-        }
-      },
-      async postReferral(txId) {
-        try {
-          await axios.post(this.$store.state.test ? `http://localhost:3000/referral` :
-            `https://api.tronwarbot.com/referral`, {
-              user_addr: this.account,
-              txId: txId,
-              referrer_addr: window.location.pathname.slice(5)
-            })
-        } catch (e) {
-          console.log(e)
-          try{
-            this.snackbarText = e.response.data.message + " \nSorry for the inconvinient. Please copy the error and Reach us on Telegram "
-            this.snackbarColor = "error";
-            this.snackbarTimeout = 10000;
-            this.snackbar = true;
-          } catch(err){
-            console.log(err)
-            this.snackbarText = "Connection error. Referral not done. \n Sorry for the inconvinient. Please copy the error and Reach us on Telegram"
-            this.snackbarColor = "error";
-            this.snackbarTimeout = 10000;
-            this.snackbar = true;
-          }
-        }
-      },
-      battleInProgress() {
-        this.snackbarText = "Battle in progress! Please wait...";
-        this.snackbarColor = "info";
-        this.snackbarTimeout = 2000;
-        this.snackbar = true;
-      },
-      payoutInProgress() {
-        this.snackbarText = "Payout in progress. Please wait a few more seconds...";
-        this.snackbarColor = "info";
-        this.snackbarTimeout = 2000;
-        this.snackbar = true;
-      },
-      gameOver(){
-        this.snackbarText = "Game over. Be ready for the next run";
-        this.snackbarColor = "info";
-        this.snackbarTimeout = 2000;
-        this.snackbar = true;
-      },
       convertResultBet: function (betResult) {
         if (betResult < 0) {
           return '-'
@@ -490,46 +393,9 @@
         min = min < 10 ? `0${min}` : min;
         return hours + ':' + min + ':' + sec
       },
-      compare: function(a,b){
-        return b.turn - a.turn
-      }
-    },
-    watch:{
-      myBets: function() {
-        let _this = this
-        if(this.currentTxId !== null){
-          const txId = this.currentTxId
-          window.tronWeb.trx.getTransaction(txId).then((tx) => {
-            console.log(tx)
-            if (tx.ret[0].contractRet == "SUCCESS") {
-              _this.snackbarColor = "success";
-              _this.snackbarText =
-                `Successfully placed a bet on ${_this.universalMap(_this.currentCountry)}!`;
-              if (window.location.pathname.startsWith('/ref')) {
-                _this.postReferral(txId)
-              }
-            } else {
-              _this.snackbarText = tx.ret[0].contractRet + "\n Sorry for the inconvinient. Please copy the error and Reach us on Telegram";
-              _this.snackbarColor = "error";
-            }
-            _this.snackbar = true
-            _this.isWaitingForConfirm = false
-          })
-          this.currentTxId = null
-        }
-      }
     },
     computed: {
-       account() {
-        return this.$store.state.loggedInAccount
-      },
-      myBets: function(){
-        let pBets = this.personalBets.sort(this.compare)
-        return pBets.filter((bet) => bet.gameType == this.gameType)
-      },
-      latestBets: function () {
-        return this.bets.sort(this.compare)
-      },
+
       //returns an array of objects [{countryId: "id", numberOfBets: x}, ...]
       betsPerCountry: function () {
         // it will contain all the countries for which there is at least one bet
@@ -563,19 +429,6 @@
         return ((parseFloat(this.$store.state.jackpot) + this.countriesMap[this.currentCountry].finalQuote) * (1 - this.$store.state.gameParams.finalBetParams.houseEdge) * 1 /
           Math.max(betsOnThatCountry.numberOfBets + 1, 1)).toFixed(3) + ' TRX';
       },
-      currentCountry: {
-        get() {
-          return this.$store.state.selectedCountry
-        },
-        set(value) {
-          this.$store.commit('setSelectedCountry', value)
-        }
-      }
     },
-    mounted() {
-      db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30).once('value', snap => {
-        this.$root.$emit('loaded', true);
-      })
-    }
   }
 </script>
