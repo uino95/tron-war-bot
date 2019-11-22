@@ -30,12 +30,12 @@ const updateSpender = async (bet) => {
   let weekIdx = "SPENDERS|" + getWeek(bet.time)
   let weekAmount = await firebase.getStatsRef(weekIdx).orderByKey().equalTo(bet.from).once('value');
   weekAmount = (weekAmount || 0) + bet.amount;
-  await firebase.stats.ref(weekIdx).child(bet.from).set(weekAmount);
+  await firebase.getStatsRef(weekIdx).child(bet.from).set(weekAmount);
 
   let fullIdx = "SPENDERS|FULL"
   let fullAmount = await firebase.getStatsRef(fullIdx).orderByKey().equalTo(bet.from).once('value');
   fullAmount = (fullAmount || 0) + bet.amount;
-  await firebase.stats.ref(fullIdx).child(bet.from).set(fullAmount);
+  await firebase.getStatsRef(fullIdx).child(bet.from).set(fullAmount);
 }
 
 const updateWinners = async (bets) => {
@@ -43,12 +43,12 @@ const updateWinners = async (bets) => {
     let weekIdx = "WINNERS|" + getWeek(bet.time)
     let weekAmount = await firebase.getStatsRef(weekIdx).orderByKey().equalTo(bet.from).once('value');
     weekAmount = (weekAmount || 0) + bet.win;
-    await firebase.stats.ref(weekIdx).child(bet.from).set(weekAmount);
+    await firebase.getStatsRef(weekIdx).child(bet.from).set(weekAmount);
 
     let fullIdx = "WINNERS|FULL"
     let fullAmount = await firebase.getStatsRef(fullIdx).orderByKey().equalTo(bet.from).once('value');
     fullAmount = (fullAmount || 0) + bet.win;
-    await firebase.stats.ref(fullIdx).child(bet.from).set(fullAmount);
+    await firebase.getStatsRef(fullIdx).child(bet.from).set(fullAmount);
   }
 }
 
