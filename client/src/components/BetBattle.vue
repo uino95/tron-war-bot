@@ -158,7 +158,7 @@
                 </v-img>
               </v-card>
               <v-spacer />
-              <v-form ref="form" v-model="valid" lazy-validation>
+              <v-form v-if="!currentBattle.placeHolder" ref="form" v-model="valid" lazy-validation>
 
                 <v-layout row wrap align-center justify-center>
                   <v-flex md4>

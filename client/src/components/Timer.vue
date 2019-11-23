@@ -41,12 +41,12 @@
           seconds = seconds < 10 ? `0${seconds}` : seconds
 
           // If the count down is finished, write some text
-          console.log(distance)
+          
           if (distance < 0) {
             this.timerValue = '#' + (this.info.turn || ' loading...') + ` in 00:00`
           } 
           else if(days > 0){
-            this.timerValue = '#' + (this.info.turn || ' loading...') + ` in ${days} days, ${hours} hours, and ${minutes}:${seconds}`
+            this.timerValue = '#' + (this.info.turn || ' loading...') + ` in ${days} days ${hours} hours and ${minutes}:${seconds}`
           }
           else if(hours > 0){
             this.timerValue = '#' + (this.info.turn || ' loading...') + ` in ${hours} hours and ${minutes}:${seconds} `
