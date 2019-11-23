@@ -74,7 +74,7 @@
             </v-alert>
           </template>
           <template  v-slot:actions-append>
-            <v-btn v-if="!loaded" round flat dark color="primary_cohesion_tab" v-on:click="loadAll"> Load all data </v-btn>
+            <v-btn  round flat dark color="primary_cohesion_tab" v-on:click="loadMore"> Load more data </v-btn>
           </template>
           <template v-slot:actions-prepend>
             <v-switch class="pt-4" color="primary_cohesion_tab" v-model="onlySocial" label="Only Social"></v-switch>
@@ -148,13 +148,16 @@
       placeholderFlag: "/img/flags/placeholder.svg",
       cohesionHistory: [],
       loaded: false,
-      onlySocial: false
+      onlySocial: false,
+      limit: 30
     }),
-    firebase: {
-      cohesionHistory: db.ref('public/cohesion').orderByChild('turn').limitToLast(30),
+    firebase: function() {
+      return {
+        cohesionHistory: db.ref('public/cohesion').orderByChild('turn').limitToLast(this.limit)
+      }
     },
     mounted() {
-      db.ref('public/cohesion').orderByChild('turn').limitToLast(30).once('value', snap => {
+      db.ref('public/cohesion').orderByChild('turn').limitToLast(this.limit).once('value', snap => {
         this.$root.$emit('loaded', true);
       })
     },
@@ -223,10 +226,14 @@
         });
         return items;
       },
-      loadAll() {
-        this.loaded = true
-        this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn'))
+      loadMore() {
+        this.limit = this.limit + 30
+        this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn').limitToLast(this.limit))
       },
+      // loadAll() {
+      //   this.loaded = true
+      //   this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn'))
+      // },
     },
     computed: {
       isMobile() {

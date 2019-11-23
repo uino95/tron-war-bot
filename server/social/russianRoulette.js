@@ -36,7 +36,7 @@ const getCbData = (e)=>{
 const pickCountry = (cmap, td) => {
   const COUNTRIES = cmap.length;
   const getImpact = (e) => {
-    return (1 + (e.territories/4)) * e.cohesion
+    return (1 + (e.territories/3)) * e.cohesion
   }
   let total = cmap.reduce((acc, v)=>acc+getImpact(v),0)
   let acc = 0;

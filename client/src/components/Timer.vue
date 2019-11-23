@@ -41,6 +41,7 @@
           seconds = seconds < 10 ? `0${seconds}` : seconds
 
           // If the count down is finished, write some text
+          console.log(distance)
           if (distance < 0) {
             this.timerValue = '#' + (this.info.turn || ' loading...') + ` in 00:00`
           } 

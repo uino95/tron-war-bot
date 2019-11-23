@@ -28,27 +28,27 @@ const getWeek = (n) => {
 
 const updateSpender = async (bet) => {
   let weekIdx = "SPENDERS|" + getWeek(bet.time)
-  let weekAmount = await firebase.getStatsRef(weekIdx).orderByKey().equalTo(bet.from).once('value');
-  weekAmount = (weekAmount || 0) + bet.amount;
-  await firebase.stats.ref(weekIdx).child(bet.from).set(weekAmount);
+  let weekAmount = await firebase.getStatsRef(weekIdx).orderByKey().equalTo(bet.from).once('value').then(r=>(r.val() || {})[bet.from]);
+  weekAmount = (parseInt(weekAmount) || 0) + parseInt(bet.amount);
+  await firebase.getStatsRef(weekIdx).child(bet.from).set(weekAmount);
 
   let fullIdx = "SPENDERS|FULL"
-  let fullAmount = await firebase.getStatsRef(fullIdx).orderByKey().equalTo(bet.from).once('value');
-  fullAmount = (fullAmount || 0) + bet.amount;
-  await firebase.stats.ref(fullIdx).child(bet.from).set(fullAmount);
+  let fullAmount = await firebase.getStatsRef(fullIdx).orderByKey().equalTo(bet.from).once('value').then(r=>(r.val() || {})[bet.from]);
+  fullAmount = (parseInt(fullAmount) || 0) + parseInt(bet.amount);
+  await firebase.getStatsRef(fullIdx).child(bet.from).set(fullAmount);
 }
 
 const updateWinners = async (bets) => {
   for (let bet of bets) {
     let weekIdx = "WINNERS|" + getWeek(bet.time)
-    let weekAmount = await firebase.getStatsRef(weekIdx).orderByKey().equalTo(bet.from).once('value');
-    weekAmount = (weekAmount || 0) + bet.win;
-    await firebase.stats.ref(weekIdx).child(bet.from).set(weekAmount);
+    let weekAmount = await firebase.getStatsRef(weekIdx).orderByKey().equalTo(bet.from).once('value').then(r=>(r.val() || {})[bet.from]);
+    weekAmount = (parseInt(weekAmount) || 0) + parseInt(bet.win);
+    await firebase.getStatsRef(weekIdx).child(bet.from).set(weekAmount);
 
     let fullIdx = "WINNERS|FULL"
-    let fullAmount = await firebase.getStatsRef(fullIdx).orderByKey().equalTo(bet.from).once('value');
-    fullAmount = (fullAmount || 0) + bet.win;
-    await firebase.stats.ref(fullIdx).child(bet.from).set(fullAmount);
+    let fullAmount = await firebase.getStatsRef(fullIdx).orderByKey().equalTo(bet.from).once('value').then(r=>(r.val() || {})[bet.from]);
+    fullAmount = (parseInt(fullAmount) || 0) + parseInt(bet.win);
+    await firebase.getStatsRef(fullIdx).child(bet.from).set(fullAmount);
   }
 }
 
