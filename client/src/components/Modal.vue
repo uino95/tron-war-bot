@@ -907,7 +907,7 @@
         },
         {
           question: "How can be used the WAR token?\n",
-          answer: "It has not a fixed deadline, it depends on the development of the war itself. On average it takes 40 days having one turn every 5 minutes.\n"
+          answer: "At the moment the WAR is only used to claim TronWarBot's dividends, but very soon the WAR will be integrated in our amazing game.\n"
         },
         {
           question: "What do I do if I'm not able to place the bet?",
