@@ -207,7 +207,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn  class="white--text" color="facebook" v-on:click="shareOnFb">
+            <v-btn class="white--text" color="facebook" v-on:click="shareOnFb">
               <v-icon class="mr-2"> fab fa-facebook-square </v-icon>
               Share
             </v-btn>

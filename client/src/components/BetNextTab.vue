@@ -364,7 +364,7 @@
       winChance: function () {
         let country = this.currentCountry
         if (country == null || this.mapStatus.length == 0) return 0;
-        let p = this.mapStatus[country].probability * 100
+        let p = this.mapStatus[country].probability 
         return p
       },
       multiplier: function () {
