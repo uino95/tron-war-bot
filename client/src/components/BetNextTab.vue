@@ -59,7 +59,8 @@
 
                 <v-layout row wrap>
                   <v-flex xs12>
-                    <v-slider thumb-label v-model="betAmount" :min="betNextGameParam ? betNextGameParam.minimumBet : 1" :max="betNextGameParam ? betNextGameParam.maximumBet : 1" label="Bet Amount"></v-slider>
+                    <v-slider thumb-label v-model="betAmount" :min="betNextGameParam ? betNextGameParam.minimumBet : 1"
+                      :max="betNextGameParam ? betNextGameParam.maximumBet : 1" label="Bet Amount"></v-slider>
                   </v-flex>
                 </v-layout>
                 <!-- <v-layout row wrap>
@@ -80,10 +81,10 @@
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_next_tab" dark
                   @click="placeBet(currentCountry, betAmount)">
                   <div v-bind:style="{'max-width': windowSize.x * 0.6 + 'px'}" class="text-truncate">
-                  Bet {{betAmount}} TRX
-                  {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}
+                    Bet {{betAmount}} TRX
+                    {{currentCountry != null ?'on ' + universalMap(currentCountry):''}}
                   </div>
-                  </v-btn>
+                </v-btn>
                 <v-btn v-else-if="info.serverStatus == 300" dark color="primary_next_tab" @click="battleInProgress">
                   Battle in progress...</v-btn>
                 <v-btn v-else-if="info.serverStatus == 400" dark color="primary_next_tab" @click="payoutInProgress">
@@ -106,207 +107,65 @@
 
 
     <v-layout row wrap>
-
-      <!-- My latest bets -->
-      <v-flex xs12 md6>
+      <v-flex>
         <v-card>
           <v-toolbar color="primary_next_tab" dark>
-            <v-toolbar-title>My Latest Bets</v-toolbar-title>
+            <v-toolbar-title>My Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
+          <v-data-table :headers="personalBetsHeaders" :items="myBets" :pagination.sync="paginationBets" class="elevation-1">
+            <template v-slot:items="props">
+              <td class="text-xs-left">{{ universalMap(props.item.userChoice) }}</td>
+              <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
+              <td class="text-xs-left">{{ props.item.turn }}</td>
+              <td class="text-xs-left"
+                v-bind:class="{greenText: props.item.result > 0, redText: props.item.result == 0}">
+                <span>{{props.item.result | RESULT}}</span>
+              </td>
+            </template>
 
-          <v-container grid-list-md text-xs-center class="gameTab ">
-
-            <!-- if the user is not logged in -->
-            <v-layout v-if="account == null">
-              <v-flex class="subheading">
-                <v-chip label outline color="red">Login First</v-chip>
-              </v-flex>
-            </v-layout>
-
-            <!-- if the user has already placed at least one bet -->
-            <v-layout v-else-if="myBets.length === 0">
-              <v-flex class="subheading">
-                <v-chip label outline color="red">No bets yet...</v-chip>
-              </v-flex>
-            </v-layout>
-
-            <!-- else show the bets -->
-            <v-layout v-else row wrap class="gameTabHeader ">
-              <v-flex xs3 class="title">
-                Country
-              </v-flex>
-              <v-flex xs4 class="title">
-                Bet
-              </v-flex>
-              <v-flex xs2 class="title">
-                Turn
-              </v-flex>
-              <v-flex xs2 class="title">
-                <span>Result</span>
-              </v-flex>
-
-              <v-divider class="gameTabDivider"></v-divider>
-
-              <v-container class="gameTabContent">
-                <v-layout row wrap
-                  v-for="bet in myBets.slice(10 * currentMyBetPagination - 10, 10 * currentMyBetPagination)"
-                  :key="bet.time">
-                  <v-flex xs3 class="subheading">
-                    {{universalMap(bet.userChoice)}}
-                  </v-flex>
-                  <v-flex xs4 class="subheading">
-                    {{bet.amount | TRXnotBIG}}
-                  </v-flex>
-                  <v-flex xs2 class="subheading">
-                    {{bet.turn}}
-                  </v-flex>
-                  <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                    <span>{{bet.result | RESULT}}</span>
-                  </v-flex>
-                </v-layout>
-
-                <v-container v-if="myBets.length > 10">
-                  <v-pagination v-model="currentMyBetPagination" :length="Math.ceil(myBets.length/10)"
-                    color="primary_next_tab"></v-pagination>
-                </v-container>
-              </v-container>
-
-            </v-layout>
-
-          </v-container>
+            <template v-slot:no-data>
+              <v-alert v-if="account == null" :value="true" color="error">
+                Login First
+              </v-alert>
+              <v-alert v-else :value="true" color="error" icon="warning">
+                No data availbale
+              </v-alert>
+            </template>
+          </v-data-table>
         </v-card>
       </v-flex>
-
       <!-- Latest bets -->
-      <v-flex xs12 md6>
+      <v-flex>
         <v-card>
           <v-toolbar color="primary_next_tab" dark>
             <v-toolbar-title>Latest Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
 
-          <!-- if the user is using a mobile device -->
-          <v-container v-if="this.$store.state.isMobile" grid-list-md text-xs-center class="gameTab">
+          <v-data-table :headers="latestBetsHeaders" :items="latestBets" :pagination.sync="paginationBets" class="elevation-1">
+            <template v-slot:items="props">
+              <td class="text-xs-left hidden-xs-only">{{ props.item.from }}</td>
+              <td class="text-xs-left">{{ universalMap(props.item.userChoice) }}</td>
+              <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
+              <td class="text-xs-left">{{ props.item.turn }}</td>
+              <td class="text-xs-left"
+                v-bind:class="{greenText: props.item.result > 0, redText: props.item.result == 0}">
+                <span>{{props.item.result | RESULT}}</span>
+              </td>
+            </template>
 
-            <!-- if there are no bets -->
-            <v-layout v-if="latestBets.length === 0">
-              <v-flex class="subheading">
-                <v-chip label outline color="red">No bets yet...</v-chip>
-              </v-flex>
-            </v-layout>
-
-            <v-layout v-else row wrap class="gameTabHeader">
-              <v-flex xs6 class="title">
-                <span>Country</span>
-              </v-flex>
-              <v-flex xs3 class="title">
-                <span>Bet</span>
-              </v-flex>
-              <v-flex xs3 class="title">
-                <span>Turn</span>
-              </v-flex>
-
-
-              <v-divider class="gameTabDivider"></v-divider>
-              <v-container class="gameTabContent" text-xs-center>
-
-                <v-layout row wrap
-                  v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)"
-                  :key="bet.time">
-                  <v-flex xs6 class="subheading">
-                    <span>{{universalMap(bet.userChoice)}}</span>
-                  </v-flex>
-                  <v-flex xs3 class="subheading">
-                    <span>{{bet.amount | TRXnotBIG}}</span>
-                  </v-flex>
-                  <v-flex xs3 class="subheading">
-                    <span>{{bet.turn}}</span>
-                  </v-flex>
-                </v-layout>
-
-              </v-container>
-              <v-container v-if="latestBets.length > 10">
-                <v-pagination v-model="currentLatestBetPagination" :length="Math.ceil(latestBets.length/10)"
-                  color="primary_next_tab">
-                </v-pagination>
-              </v-container>
-            </v-layout>
-          </v-container>
-
-          <!-- else, the user is on pc -->
-          <v-container v-else grid-list-md text-xs-center class="gameTab">
-
-            <!-- if there are no bets -->
-            <v-layout v-if="latestBets.length === 0">
-              <v-flex class="subheading">
-                <v-chip label outline color="red">No bets yet...</v-chip>
-              </v-flex>
-            </v-layout>
-
-            <v-layout v-else row wrap class="gameTabHeader">
-              <v-flex xs3 class="title">
-                <span>Address</span>
-              </v-flex>
-              <v-flex xs3 class="title">
-                <span>Country</span>
-              </v-flex>
-              <v-flex xs2 class="title">
-                <span>Bet</span>
-              </v-flex>
-              <v-flex xs2 class="title">
-                <span>Turn</span>
-              </v-flex>
-              <v-flex xs2 class="title">
-                <span>Result</span>
-              </v-flex>
-
-              <v-divider class="gameTabDivider"></v-divider>
-
-              <v-container class="gameTabContent" text-xs-center>
-                <v-layout row wrap
-                  v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)"
-                  :key="bet.time">
-
-                  <v-flex xs3 class="subheading text-truncate">
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on" v-text="(bet.from)" v-bind:alt="(bet.from)"></span>
-                      </template>
-                      <span>{{bet.from}}</span>
-                    </v-tooltip>
-                  </v-flex>
-
-                  <v-flex xs3 class="subheading">
-                    <span>{{universalMap(bet.userChoice)}}</span>
-                  </v-flex>
-
-                  <v-flex xs2 class="subheading">
-                    <span>{{bet.amount | TRXnotBIG}}</span>
-                  </v-flex>
-
-                  <v-flex xs2 class="subheading">
-                    <span>{{bet.turn}}</span>
-                  </v-flex>
-
-                  <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                    <span>{{bet.result | RESULT}}</span>
-                  </v-flex>
-
-                </v-layout>
-              </v-container>
-
-              <v-container v-if="latestBets.length > 10">
-                <v-pagination v-model="currentLatestBetPagination" :length="Math.ceil(latestBets.length/10)"
-                  color="primary_next_tab"></v-pagination>
-              </v-container>
-
-            </v-layout>
-          </v-container>
-
+            <template v-slot:no-data>
+              <v-alert v-if="account == null" :value="true" color="error">
+                Login First
+              </v-alert>
+              <v-alert v-else :value="true" color="error" icon="warning">
+                No data availbale
+              </v-alert>
+            </template>
+          </v-data-table>
         </v-card>
       </v-flex>
-
     </v-layout>
   </v-container>
 </template>
@@ -317,10 +176,12 @@
   }
   from '../plugins/firebase';
   import mapping from '../assets/mapping';
-  import {betMixin} from '../mixins/betMixin'
+  import {
+    betMixin
+  } from '../mixins/betMixin'
 
   export default {
-    mixins:[betMixin],
+    mixins: [betMixin],
     data: () => ({
       currentMyBetPagination: 1,
       currentLatestBetPagination: 1,
@@ -339,11 +200,89 @@
       mapStatus: [],
       mapping: mapping,
       isWaitingForConfirm: false,
-      currentTxId: null
+      currentTxId: null,
+      paginationBets: {
+        sortBy: 'turn',
+        descending: true,
+      },
+      latestBetsHeaders: [{
+          text: 'Address',
+          value: 'address',
+          id: 0,
+          sortable: false,
+          align: 'left',
+          class: 'body-1 pa-0 pl-3 hidden-xs-only'
+        },
+        {
+          text: 'Country',
+          id: 1,
+          value: 'country',
+          sortable: false,
+          align: 'left',
+          class: 'body-1 pa-0 pl-3'
+        },
+        {
+          text: 'Amount',
+          value: 'bet',
+          id: 2,
+          sortable: false,
+          align: 'left',
+          class: 'body-1 pa-0'
+        },
+        {
+          text: 'Turn',
+          value: 'turn',
+          id: 3,
+          sortable: false,
+          align: 'left',
+          class: 'body-1 pa-0'
+        },
+        {
+          text: 'Result',
+          value: 'result',
+          id: 4,
+          sortable: false,
+          align: 'left',
+          class: 'body-1 pa-0'
+        },
+      ],
+      personalBetsHeaders: [{
+          text: 'Country',
+          id: 1,
+          value: 'country',
+          sortable: false,
+          align: 'left',
+          class: 'body-1 pa-0 pl-3'
+        },
+        {
+          text: 'Amount',
+          value: 'bet',
+          id: 2,
+          sortable: false,
+          align: 'left',
+          class: 'body-1 pa-0'
+        },
+        {
+          text: 'Turn',
+          value: 'turn',
+          id: 3,
+          sortable: false,
+          align: 'left',
+          class: 'body-1 pa-0'
+        },
+        {
+          text: 'Result',
+          value: 'result',
+          id: 4,
+          sortable: false,
+          align: 'left',
+          class: 'body-1 pa-0'
+        },
+      ]
     }),
-    mounted(){
+    mounted() {
       this.initBetAmount()
-      if(this.currentCountry == 241){
+      if (this.currentCountry == 241) {
         this.currentCountry = null
       }
     },
@@ -360,11 +299,11 @@
     },
 
     computed: {
-      
+
       winChance: function () {
         let country = this.currentCountry
         if (country == null || this.mapStatus.length == 0) return 0;
-        let p = this.mapStatus[country].probability 
+        let p = this.mapStatus[country].probability
         return p
       },
       multiplier: function () {
@@ -381,7 +320,7 @@
         if (win == Infinity) return 0 + " TRX";
         else return win + " TRX";
       },
-      
+
       betNextGameParam() {
         return this.$store.state.gameParams.betNextParams
       },
