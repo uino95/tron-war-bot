@@ -95,7 +95,8 @@
     </v-layout>
 
     <v-layout row wrap>
-      <v-flex md6 column wrap>
+      <v-flex md7 column wrap>
+        <v-flex>
         <v-card>
           <v-toolbar color="primary_final_tab" dark>
             <v-toolbar-title>My Bets</v-toolbar-title>
@@ -118,6 +119,7 @@
             </template>
           </v-data-table>
         </v-card>
+        </v-flex>
 
         <!-- Latest bets -->
         <v-flex>
@@ -149,7 +151,7 @@
       </v-flex>
 
       <!-- Number of bets per country -->
-      <v-flex xs12 md6>
+      <v-flex xs12 md5>
         <v-card>
           <v-toolbar color="primary_final_tab" dark>
             <v-toolbar-title>Number of bets per country</v-toolbar-title>
@@ -158,13 +160,13 @@
             :item-key="'bets'" :pagination.sync="paginationNumberOfBets" :rows-per-page-items="[10,20,50]" >
             <template v-slot:items="props">
               <td class="text-xs-left">
-                <v-avatar>
-                  <v-lazy-image :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
-                    :src="getFlagString(universalMap(props.item.countryId))" :alt="props.item.countryId" />
+                <v-avatar size="40">
+                  <v-img :lazy-src="placeholderFlag" 
+                    :src="getFlagString(universalMap(props.item.countryId))" :alt="universalMap(props.item.countryId)" />
                 </v-avatar>
               </td>
               <td class="text-xs-left">{{ universalMap(props.item.countryId) }}</td>
-              <td class="text-xs-left">{{ props.item.numberOfBets  }}</td>
+              <td class="text-xs-left">{{ props.item.numberOfBets }}</td>
             </template>
           </v-data-table>
         </v-card>

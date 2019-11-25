@@ -107,7 +107,7 @@
 
 
     <v-layout row wrap>
-      <v-flex>
+      <v-flex md5>
         <v-card>
           <v-toolbar color="primary_next_tab" dark>
             <v-toolbar-title>My Bets</v-toolbar-title>
@@ -136,7 +136,7 @@
         </v-card>
       </v-flex>
       <!-- Latest bets -->
-      <v-flex>
+      <v-flex md7>
         <v-card>
           <v-toolbar color="primary_next_tab" dark>
             <v-toolbar-title>Latest Bets</v-toolbar-title>

@@ -48,9 +48,9 @@
             </th>
           </template>
           <template v-slot:items="props">
-            <td class="text-xs-right pa-0">
-              <v-avatar>
-                <v-lazy-image class="pa-1" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+            <td class="text-xs-right pa-0 pr-1">
+              <v-avatar size="40">
+                <v-img  :lazy-src="placeholderFlag" 
                   :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
               </v-avatar>
             </td>
@@ -228,7 +228,6 @@
   }
   from '../plugins/firebase';
   import mapping from '../assets/mapping';
-  import VLazyImage from "v-lazy-image";
 
   String.prototype.replaceAll = function (search, replace) {
     if (replace === undefined) {
@@ -238,9 +237,6 @@
   };
 
   export default {
-    components: {
-      VLazyImage,
-    },
     data: () => ({
       windowSize: {
         x: window.innerWidth,

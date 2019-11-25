@@ -1,15 +1,11 @@
 import axios from 'axios'
 import tronweb from 'tronweb'
-import VLazyImage from "v-lazy-image";
 import {
     db
 }
 from '../plugins/firebase';
 
 export const betMixin = {
-    components: {
-        VLazyImage
-    },
     data: () => ({
         windowSize: {
             x: window.innerWidth,
