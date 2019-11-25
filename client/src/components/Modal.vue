@@ -91,7 +91,7 @@
         <!--/////////////////////////////////////////// Dividends //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'dividends'">
           <h4 class="text-xs-center">We don't simply want to build a game, but an ecosystem of passionate players and stakeholders,
-          </br>and that's why <u>we share our profits!</u></h4>
+          <br/>and that's why <u>we share our profits!</u></h4>
           <br/>
           Profits are shared among WAR token holders at the end of each war and
           distributed proportionally to the amount of tokens hold by each user
@@ -585,7 +585,7 @@
 
         <!--/////////////////////////////////////////// News //////////////////////////////////////////////////////////////////-->
         <v-card-text v-if="path === 'news'">
-          <v-carousel v-if="news.length !== 0" :height="windowSize.x < windowSize.y ? windowSize.x : windowSize.y">
+          <v-carousel v-if="news.length !== 0" height="375px">
             <v-carousel-item v-for="(n,i) in news" :key="i" :src="n.src" contain>
               <!-- <v-img :src="n.src" class="image" :alt="i.toString()" :aspect-ratio="windowSize.x/(windowSize.y)">
               </v-img> -->
