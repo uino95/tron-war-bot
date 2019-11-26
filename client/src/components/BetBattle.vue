@@ -24,7 +24,8 @@
             <v-flex md10>
 
               <v-card class="mb-4">
-                <v-img v-if="info.serverStatus != 500 && !currentBattle.placeHolder" class="white--text" :position="currentBattle.civilWar == 1 ? 'bottom 75% center' : 'center'"
+                <v-img v-if="info.serverStatus != 500 && !currentBattle.placeHolder" class="white--text"
+                  :position="currentBattle.civilWar == 1 ? 'bottom 75% center' : 'center'"
                   :aspect-ratio="this.windowSize.x/150"
                   :src=" currentBattle.civilWar == 1 ? 'img/civilWar9.png' : 'img/vs-battle.jpg'">
                   <v-layout class="mt-4" row wrap align-center justify-space-between>
@@ -152,8 +153,7 @@
 
                   <core-timer class="mt-4" />
                 </v-img>
-                <v-img v-else :position="'bottom 55% center'"
-                  :aspect-ratio="this.windowSize.x/300"
+                <v-img v-else :position="'bottom 55% center'" :aspect-ratio="this.windowSize.x/300"
                   :src=" 'img/placeholder.jpg'">
                 </v-img>
               </v-card>
@@ -178,8 +178,9 @@
 
                 <v-layout row wrap>
                   <v-flex xs12>
-                    <v-slider thumb-label v-model="betAmount" :min="betBattleGameParams ? betBattleGameParams.minimumBet : 1" :max="betBattleGameParams ? betBattleGameParams.maximumBet : 1"
-                      label="Bet Amount"></v-slider>
+                    <v-slider thumb-label v-model="betAmount"
+                      :min="betBattleGameParams ? betBattleGameParams.minimumBet : 1"
+                      :max="betBattleGameParams ? betBattleGameParams.maximumBet : 1" label="Bet Amount"></v-slider>
                   </v-flex>
                 </v-layout>
                 <v-flex xs12 class="text-xs-center pa-2">
@@ -228,207 +229,66 @@
 
 
     <v-layout row wrap>
-
-      <!-- My latest bets -->
-      <v-flex xs12 md6>
+      <v-flex md5>
         <v-card>
           <v-toolbar color="primary_battle_tab" dark>
-            <v-toolbar-title>My Latest Bets</v-toolbar-title>
+            <v-toolbar-title>My Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
+          <v-data-table :headers="personalBetsHeaders" :pagination.sync="paginationBets" :items="myBets" class="elevation-1">
+            <template v-slot:items="props" >
+              <td class="text-xs-left">{{ props.item.userChoice | CHOICE}}</td>
+              <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
+              <td class="text-xs-left">{{ props.item.turn }}</td>
+              <td class="text-xs-left"
+                v-bind:class="{greenText: props.item.result > 0, redText: props.item.result == 0}">
+                <span>{{props.item.result | RESULT}}</span>
+              </td>
+            </template>
 
-          <v-container grid-list-md text-xs-centerm class="gameTab">
-
-            <!-- if the user is not logged in -->
-            <v-layout v-if="account == null">
-              <v-flex class="subheading">
-                <v-chip label outline color="red">Login First</v-chip>
-              </v-flex>
-            </v-layout>
-
-            <!-- if the user has already placed at least one bet -->
-            <v-layout v-else-if="myBets.length === 0">
-              <v-flex class="subheading">
-                <v-chip label outline color="red">No bets yet...</v-chip>
-              </v-flex>
-            </v-layout>
-
-            <!-- else show the bets -->
-            <v-layout v-else row wrap class="gameTabHeader">
-              <v-flex xs2 class="title">
-                Choice
-              </v-flex>
-              <v-flex xs4 class="title">
-                Bet
-              </v-flex>
-              <v-flex xs3 class="title">
-                Turn
-              </v-flex>
-              <v-flex xs2 class="title">
-                <span>Result</span>
-              </v-flex>
-
-              <v-divider class="gameTabDivider"></v-divider>
-
-              <v-container class="gameTabContent">
-                <v-layout row wrap
-                  v-for="bet in myBets.slice(10 * currentMyBetPagination - 10, 10 * currentMyBetPagination)"
-                  :key="bet.time">
-                  <v-flex xs2 class="subheading">
-                    {{bet.userChoice | CHOICE}}
-                  </v-flex>
-                  <v-flex xs4 class="subheading">
-                    {{bet.amount | TRXnotBIG }}
-                  </v-flex>
-                  <v-flex xs3 class="subheading">
-                    {{bet.turn}}
-                  </v-flex>
-                  <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                    <span>{{bet.result | RESULT}}</span>
-                  </v-flex>
-                </v-layout>
-
-                <v-container v-if="myBets.length > 10">
-                  <v-pagination v-model="currentMyBetPagination" :length="Math.ceil(myBets.length/10)"
-                    color="primary_battle_tab"></v-pagination>
-                </v-container>
-              </v-container>
-
-            </v-layout>
-
-          </v-container>
+            <template v-slot:no-data>
+              <v-alert v-if="account == null" :value="true" color="error">
+                Login First
+              </v-alert>
+              <v-alert v-else :value="true" color="error" icon="warning">
+                No data availbale
+              </v-alert>
+            </template>
+          </v-data-table>
         </v-card>
       </v-flex>
 
       <!-- Latest bets -->
-      <v-flex xs12 md6>
+      <v-flex md7>
         <v-card>
           <v-toolbar color="primary_battle_tab" dark>
             <v-toolbar-title>Latest Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
 
-          <!-- if the user is using a mobile device -->
-          <v-container v-if="this.$store.state.isMobile" grid-list-md text-xs-center class="gameTab">
+          <v-data-table :headers="latestBetsHeaders" :pagination.sync="paginationBets" :items="latestBets" class="elevation-1">
+            <template v-slot:items="props" >
+              <td class="text-xs-left hidden-xs-only">{{ props.item.from }}</td>
+              <td class="text-xs-left">{{ props.item.userChoice | CHOICE }}</td>
+              <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
+              <td class="text-xs-left">{{ props.item.turn }}</td>
+              <td class="text-xs-left"
+                v-bind:class="{greenText: props.item.result > 0, redText: props.item.result == 0}">
+                <span>{{props.item.result | RESULT}}</span>
+              </td>
+            </template>
 
-            <!-- if there are no bets -->
-            <v-layout v-if="latestBets.length === 0">
-              <v-flex class="subheading">
-                <v-chip label outline color="red">No bets yet...</v-chip>
-              </v-flex>
-            </v-layout>
-
-            <v-layout v-else row wrap class="gameTabHeader">
-              <v-flex xs3 class="title">
-                <span>Choice</span>
-              </v-flex>
-              <v-flex xs6 class="title">
-                <span>Bet</span>
-              </v-flex>
-              <v-flex xs3 class="title">
-                <span>Turn</span>
-              </v-flex>
-
-
-              <v-divider class="gameTabDivider"></v-divider>
-              <v-container class="gameTabContent" text-xs-center>
-
-                <v-layout row wrap
-                  v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)"
-                  :key="bet.time">
-                  <v-flex xs3 class="subheading">
-                    <span>{{bet.userChoice | CHOICE}}</span>
-                  </v-flex>
-                  <v-flex xs6 class="subheading">
-                    <span>{{bet.amount | TRXnotBIG }}</span>
-                  </v-flex>
-                  <v-flex xs3 class="subheading">
-                    <span>{{bet.turn}}</span>
-                  </v-flex>
-                </v-layout>
-
-              </v-container>
-              <v-container v-if="latestBets.length > 10">
-                <v-pagination v-model="currentLatestBetPagination" :length="Math.ceil(latestBets.length/10)"
-                  color="primary_battle_tab">
-                </v-pagination>
-              </v-container>
-            </v-layout>
-          </v-container>
-
-          <!-- else, the user is on pc -->
-          <v-container v-else grid-list-md text-xs-center class="gameTab">
-
-            <!-- if there are no bets -->
-            <v-layout v-if="latestBets.length === 0">
-              <v-flex class="subheading">
-                <v-chip label outline color="red">No bets yet...</v-chip>
-              </v-flex>
-            </v-layout>
-
-            <v-layout v-else row wrap class="gameTabHeader">
-              <v-flex xs4 class="title">
-                <span>Address</span>
-              </v-flex>
-              <v-flex xs2 class="title">
-                <span>Choice</span>
-              </v-flex>
-              <v-flex xs2 class="title">
-                <span>Bet</span>
-              </v-flex>
-              <v-flex xs2 class="title">
-                <span>Turn</span>
-              </v-flex>
-              <v-flex xs2 class="title">
-                <span>Result</span>
-              </v-flex>
-
-              <v-divider class="gameTabDivider"></v-divider>
-
-              <v-container class="gameTabContent" text-xs-center>
-                <v-layout row wrap
-                  v-for="bet in latestBets.slice(10 * currentLatestBetPagination - 10, 10 * currentLatestBetPagination)"
-                  :key="bet.time">
-
-                  <v-flex xs4 class="subheading text-truncate">
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on }">
-                        <span v-on="on" v-text="(bet.from)" v-bind:alt="(bet.from)"></span>
-                      </template>
-                      <span>{{bet.from}}</span>
-                    </v-tooltip>
-                  </v-flex>
-
-                  <v-flex xs2 class="subheading">
-                    <span>{{bet.userChoice | CHOICE}}</span>
-                  </v-flex>
-
-                  <v-flex xs2 class="subheading">
-                    <span>{{bet.amount | TRXnotBIG }}</span>
-                  </v-flex>
-
-                  <v-flex xs2 class="subheading">
-                    <span>{{bet.turn}}</span>
-                  </v-flex>
-
-                  <v-flex xs2 class="subheading" v-bind:class="{greenText: bet.result > 0, redText: bet.result == 0}">
-                    <span>{{bet.result | RESULT}}</span>
-                  </v-flex>
-
-                </v-layout>
-              </v-container>
-
-              <v-container v-if="latestBets.length > 10">
-                <v-pagination v-model="currentLatestBetPagination" :length="Math.ceil(latestBets.length/10)"
-                  color="primary_battle_tab"></v-pagination>
-              </v-container>
-
-            </v-layout>
-          </v-container>
-
+            <template v-slot:no-data>
+              <v-alert v-if="account == null" :value="true" color="error">
+                Login First
+              </v-alert>
+              <v-alert v-else :value="true" color="error" icon="warning">
+                No data availbale
+              </v-alert>
+            </template>
+          </v-data-table>
         </v-card>
       </v-flex>
-
     </v-layout>
   </v-container>
 </template>
@@ -438,12 +298,14 @@
     db
   }
   from '../plugins/firebase';
-  import {betMixin} from '../mixins/betMixin'
+  import {
+    betMixin
+  } from '../mixins/betMixin'
 
   export default {
 
-    mixins:[betMixin],
-    
+    mixins: [betMixin],
+
     data() {
       return {
         currentMyBetPagination: 1,
@@ -464,11 +326,89 @@
         history: [],
         isWaitingForConfirm: false,
         currentTxId: null,
-        historyTurn:[]
+        historyTurn: [],
+        paginationBets: {
+          sortBy: 'turn',
+          descending: true,
+        },
+        latestBetsHeaders: [{
+            text: 'Address',
+            value: 'address',
+            id: 0,
+            sortable: false,
+            align: 'left',
+            class: 'body-1 pa-0 pl-3 hidden-xs-only'
+          },
+          {
+            text: 'Choice',
+            id: 1,
+            value: 'choice',
+            sortable: false,
+            align: 'left',
+            class: 'body-1 pa-0 pl-3'
+          },
+          {
+            text: 'Amount',
+            value: 'bet',
+            id: 2,
+            sortable: false,
+            align: 'left',
+            class: 'body-1 pa-0 pl-3'
+          },
+          {
+            text: 'Turn',
+            value: 'turn',
+            id: 3,
+            sortable: false,
+            align: 'left',
+            class: 'body-1 pa-0'
+          },
+          {
+            text: 'Result',
+            value: 'result',
+            id: 4,
+            sortable: false,
+            align: 'left',
+            class: 'body-1 pa-0'
+          },
+        ],
+        personalBetsHeaders: [{
+            text: 'Choice',
+            id: 1,
+            value: 'choice',
+            sortable: false,
+            align: 'left',
+            class: 'body-1 pa-0 pl-3'
+          },
+          {
+            text: 'Amount',
+            value: 'bet',
+            id: 2,
+            sortable: false,
+            align: 'left',
+            class: 'body-1 pa-0 pl-3'
+          },
+          {
+            text: 'Turn',
+            value: 'turn',
+            id: 3,
+            sortable: false,
+            align: 'left',
+            class: 'body-1 pa-0'
+          },
+          {
+            text: 'Result',
+            value: 'result',
+            id: 4,
+            sortable: false,
+            align: 'left',
+            class: 'body-1 pa-0'
+          },
+        ]
       }
     },
-    filters:{
-      CHOICE : (userChoice)=> {
+    filters: {
+      CHOICE: (userChoice) => {
         return userChoice == 0 ? 'X' : userChoice.toString()
       }
     },
@@ -480,7 +420,8 @@
 
     mounted() {
       this.initBetAmount()
-      if(this.currentCountry != 241 && this.currentCountry != this.currentBattle.o && this.currentCountry != this.currentBattle.d){
+      if (this.currentCountry != 241 && this.currentCountry != this.currentBattle.o && this.currentCountry != this
+        .currentBattle.d) {
         this.currentChoice = null
         this.currentCountry = null
       }
@@ -518,11 +459,11 @@
           "dt": 0,
           "o": 0,
           "ot": 0,
-          "probabilities": [0,0,0],
-          "quotes": [0,0,0]
+          "probabilities": [0, 0, 0],
+          "quotes": [0, 0, 0]
         }
       },
-      
+
       winChance: function () {
         if (this.currentChoice == null) return 0;
         return this.currentBattle.probabilities[this.currentChoice]

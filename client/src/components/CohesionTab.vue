@@ -33,7 +33,7 @@
               <v-tooltip right>
                 <template v-slot:activator="{ on }">
                   <v-avatar size="40" v-on="on">
-                    <v-img class="ma-2" :src-placeholder="placeholderFlag" @error="src = placeholderFlag"
+                    <v-img class="ma-2" :lazy-src="placeholderFlag" 
                       :src="getFlagString(universalMap(props.item.country))" :alt="universalMap(props.item.country)" />
                   </v-avatar>
                 </template>
@@ -91,7 +91,6 @@
   }
   from '../plugins/firebase';
   import mapping from '../assets/mapping';
-  import VLazyImage from "v-lazy-image";
 
   String.prototype.replaceAll = function (search, replace) {
     if (replace === undefined) {
@@ -101,9 +100,6 @@
   };
 
   export default {
-    components: {
-      VLazyImage,
-    },
     data: () => ({
       headers: [{
           text: 'Update',
