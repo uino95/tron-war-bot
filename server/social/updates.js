@@ -186,7 +186,8 @@ module.exports.startWar = async (td)=>{
   f += "This is when " + utils.universalMap(td.next.o) + " decided to invade " + utils.universalMap(td.next.dt) + ".\n"
   f += "This is the begin of a long lasting world conflict.\n\n"
   f += "⚔️ This is the Tron World War ⚔️";
-  await facebook.post(f).catch(console.error);
+  let img = utils.imgUrl('start.jpg');
+  await facebook.postWithPhoto(img, f).catch(console.error);
   await telegram.sendMessage(t, {parse_mode: "HTML", disable_web_page_preview: true}).catch(console.error);
 }
 
