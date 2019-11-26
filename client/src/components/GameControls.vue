@@ -1,14 +1,14 @@
 <template>
   <v-card flat>
     <v-toolbar color="secondary" dark flat >
-      <v-tabs dark color="secondary" show-arrows fixed-tabs slider-color="primary" v-model="activeMainTab">
+      <v-tabs  dark color="secondary" show-arrows fixed-tabs slider-color="primary" v-model="activeMainTab">
         <v-tab v-for="tab of tabs" :key="tab.name" flat replace :to="tab.path">
           <v-icon :color="tab.color">{{tab.symbol}}</v-icon> {{tab.name}}
         </v-tab>
       </v-tabs>
     </v-toolbar>
 
-    <v-tabs v-if="activeMainTab == 'stats' " dark color="secondary" show-arrows fixed-tabs hide-slider>
+    <v-tabs hide-slider  v-if="activeMainTab == 'stats' "   dark color="secondary" show-arrows fixed-tabs >
       <v-tab flat replace to="/cohesion">
         <v-icon color="primary_cohesion_tab">control_point</v-icon> Cohesion
       </v-tab>
@@ -20,7 +20,7 @@
       </v-tab>
     </v-tabs>
 
-    <v-tabs v-else dark color="light_secondary" show-arrows fixed-tabs hide-slider>
+    <v-tabs hide-slider v-else dark color="light_secondary"  show-arrows fixed-tabs >
       <v-tab flat replace to="/betfinal">
         <v-icon color="primary_final_tab">public</v-icon> Final
       </v-tab>
@@ -53,11 +53,11 @@
         },
         {
           name: 'Bets',
-          path: 'betBattle',
+          path: 'betbattle',
           color: 'primary_battle_tab',
           symbol: 'attach_money'
         }
-      ]
+      ],
     }),
     computed:{
       activeMainTab:{
