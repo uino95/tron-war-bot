@@ -110,12 +110,8 @@
             </template>
 
             <template v-slot:no-data>
-              <v-alert v-if="account == null" :value="true" color="error">
-                Login First
-              </v-alert>
-              <v-alert v-else :value="true" color="error" icon="warning">
-                No data availbale
-              </v-alert>
+              <v-chip v-if="account == null" label outline color="red">Login First</v-chip>
+              <v-chip v-else label outline color="red"> No Bets Yet </v-chip>
             </template>
           </v-data-table>
         </v-card>
@@ -138,12 +134,8 @@
               </template>
 
               <template v-slot:no-data>
-                <v-alert v-if="account == null" :value="true" color="error">
-                  Login First
-                </v-alert>
-                <v-alert v-else :value="true" color="error" icon="warning">
-                  No data availbale
-                </v-alert>
+                <v-chip v-if="account == null" label outline  color="red">Login First</v-chip>
+              <v-chip v-else label outline color="red"> No Bets Yet </v-chip>
               </template>
             </v-data-table>
           </v-card>
@@ -241,7 +233,7 @@
           text: '# Bets',
           id: 3,
           value: 'bets',
-          sortable: true,
+          sortable: false,
           align: 'left',
           class: 'body-1 pa-0 pl-3'
         },
