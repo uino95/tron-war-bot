@@ -60,7 +60,7 @@ const webhooks = async (req, res, next) => {
 
 const getUpdateData = (update)=>{
   switch (update.field){
-    case "rating":
+    case "ratings":
       if (update.value.verb!="add") return;
       // REVIEW
       return {
@@ -68,7 +68,7 @@ const getUpdateData = (update)=>{
         text: update.value.review_text,
         user_id : update.value.reviewer_id,
         user_name : update.value.reviewer_name,
-        link: "https://facebook.com/" + update.value.comment_id
+        link: "https://facebook.com/" + update.value.open_graph_story_id
       }
     case "feed":
       if (update.value.verb!="add") return;
@@ -78,7 +78,7 @@ const getUpdateData = (update)=>{
         text: update.value.message,
         user_id : update.value.from.id,
         user_name : update.value.from.name,
-        link: update.value.post.permalink_url + "?comment_id=" + update.value.comment_id.split('_')[1]
+        link: (update.value.post.permalink_url.split("?")[0]) + "?comment_id=" + update.value.comment_id.split('_')[1]
       }
       //POST
       if (update.value.item == "post") return {

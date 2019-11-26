@@ -5,7 +5,7 @@ const utils = require('../utils')
 const takeScreenshot = async () => {
   const browser = await puppeteer.launch({headless: true})
   const page = await browser.newPage();
-  await page.goto('https://test.tronwarbot.com');
+  await page.goto('https://tronwarbot.com');
   await page.waitFor('#chartdiv',{visible:true, timeout: 60000});
   await utils.sleep(5000)
   // const chart = await page.$('#chartdiv');
