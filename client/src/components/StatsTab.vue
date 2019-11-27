@@ -50,7 +50,7 @@
           <template v-slot:items="props">
             <td class="text-xs-right pa-0 pr-1">
               <v-avatar size="40">
-                <v-img  :lazy-src="placeholderFlag" 
+                <v-img  :lazy-src="placeholderFlag" ref="img" @error="err"
                   :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
               </v-avatar>
             </td>
@@ -360,6 +360,10 @@
       }
     },
     methods: {
+      err(e){
+        console.log(this.$refs.img.src)
+        console.log("HEY, you got: ", e)
+      },
       changeSort(column) {
         if (this.paginationStats.sortBy === column) {
           this.paginationStats.descending = !this.paginationStats.descending
@@ -374,17 +378,6 @@
           return;
         }
         this.visButton.count = this.visButton.count + 1
-      },
-      getFlagString(str) {
-        return "/img/flags/" + str.toLowerCase()
-          .replaceAll(" ", "-")
-          .replaceAll("ã", "a")
-          .replaceAll("ì", "i")
-          .replaceAll("è", "e")
-          .replaceAll("ì", "i")
-          .replaceAll("å", "a")
-          .replaceAll("é", "e")
-          .replaceAll("í", "i") + ".svg";
       },
       goToBet(path, country) {
         this.$store.commit('setSelectedCountry', country)
