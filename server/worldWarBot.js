@@ -106,7 +106,7 @@ const addAmbassador = (u)=>{
     return false;
   if (!u.link) delete u.link;
   countriesMap[u.country].ambassador = u;
-  firebase.countriesMap.set(countriesMap);
+  firebase.countriesMap.child(u.country).set(countriesMap[u.country]);
   console.log("[WWB]: Added new Ambassador " + u.name + " for " + utils.universalMap(u.country));
   return true;
 }
@@ -212,7 +212,11 @@ const editCohesion = (country, delta, threshold) => {
   let n = countriesMap[country].nextCohesion + (delta);
   countriesMap[country].nextCohesion = Math.min(Math.max(n, (threshold.lower/100)),(threshold.upper/100));
   if (old == countriesMap[country].nextCohesion) return;
-  if (!simulation) console.log("[WWB]: Updating cohesion of " + utils.universalMap(country) +  "("+utils.toPercent(countriesMap[country].cohesion)+") by: " + utils.toPercent(delta)+ "\tnew value: " +  utils.toPercent(countriesMap[country].nextCohesion));
+  if (!simulation) {
+    //Save on db
+    firebase.countriesMap.child(country).set(countriesMap[country]);
+    console.log("[WWB]: Updating cohesion of " + utils.universalMap(country) +  "("+utils.toPercent(countriesMap[country].cohesion)+") by: " + utils.toPercent(delta)+ "\tnew value: " +  utils.toPercent(countriesMap[country].nextCohesion));
+  }
   return {
     turn: turn,
     country: country,
