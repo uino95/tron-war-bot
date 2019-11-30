@@ -62,11 +62,11 @@ const watchBets =  () => {
       turn: turn,
       alreadyUsed: false,
     }
-    if (bet.gameType==2)
-      betObj.battle = {
-        c: (bet.userChoice == 1 ) ? turnData.battle.o : ((bet.userChoice == 2 ) ? turnData.battle.d : undefined),
-        p: turnData.battle.probabilities[bet.userChoice]
-      } ;
+    // if (bet.gameType==2)
+    //   betObj.battle = {
+    //     c: (bet.userChoice == 1 ) ? turnData.battle.o : ((bet.userChoice == 2 ) ? turnData.battle.d : undefined),
+    //     p: turnData.battle.probabilities[bet.userChoice]
+    //   } ;
     await firebase.bets.child(r.transaction).set(betObj);
     referral.updateReferral(betObj);
     stats.updateSpender(betObj);
