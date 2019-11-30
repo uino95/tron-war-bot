@@ -14,7 +14,7 @@
           class="elevation-1" :pagination.sync="paginationHistory">
           <template v-slot:items="props">
             <template v-if="props.item.turn != 1">
-              <td class="text-xs-center">{{ props.item.turn - 1 }}</td>
+              <td class="text-xs-center">{{ props.item.turn  }}</td>
               <td class="text-xs-center">
                 <v-layout align-center justify-space-around row>
                   <v-tooltip open-delay="600" top>
