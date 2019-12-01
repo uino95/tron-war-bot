@@ -9,9 +9,9 @@
             <template v-slot:activator="{ on }">
               <v-icon color="secondary-cohesion-tab" dark v-on="on">info</v-icon>
             </template>
-            <span> todo:
-              Here you can see how the cohesion have been modified during the current run. It can be modified by your
-              interaction by posting, sharing or liking a post or it can be moified by the result of a battle itself
+            <span>
+              Here you can see how the cohesion has been modified during the current run. <br> 
+              It can be modified by a comment, post, mention or review on the official facebook page of <a href="https://www.facebook.com/TronWarBot/" target="blank" style="color: white">  TronWarBot </a>. <br> Or it can be moified by the result of a battle itself
             </span>
           </v-tooltip>
           <v-spacer />
@@ -178,17 +178,6 @@
           return '<span> <b>' + this.universalMap(battle.d) + '</b> defended against <b>' + this.universalMap(battle
             .o) + '</b> </span>'
         }
-      },
-      getFlagString(str) {
-        return "/img/flags/" + str.toLowerCase()
-          .replaceAll(" ", "-")
-          .replaceAll("ã", "a")
-          .replaceAll("ì", "i")
-          .replaceAll("è", "e")
-          .replaceAll("ì", "i")
-          .replaceAll("å", "a")
-          .replaceAll("é", "e")
-          .replaceAll("í", "i") + ".svg";
       },
       getInteractionImg(str) {
         switch (str) {

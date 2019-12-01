@@ -48,7 +48,7 @@
             </th>
           </template>
           <template v-slot:items="props">
-            <td class="text-xs-right pa-0 pr-1">
+            <td class="text-xs-right pa-0 pl-1 pr-1">
               <v-avatar size="40">
                 <v-img  :lazy-src="placeholderFlag" ref="img" @error="err"
                   :src="getFlagString(universalMap(props.item['.key']))" :alt="universalMap(props.item['.key'])" />
@@ -67,11 +67,9 @@
                   <br />check out the rules in the <i>Ambassador</i> section in the menu.</i>
               </v-tooltip>
             </td>
-            <td class="text-xs-left && font-weight-bold text-truncate pr-0 pl-1"
+            <td class="text-xs-left && font-weight-bold pr-2 pl-2"
               v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}">
-              <v-layout row>
-                <div> {{props.item.name}} </div>
-              </v-layout>
+                <div > {{props.item.name}} </div>
             </td>
             <td class="text-xs-left pa-0">{{ props.item.territories }}</td>
             <td class="text-xs-left text-truncate pa-0">{{ (props.item.cohesion * 100).toFixed(1) + ' %'}}</td>
