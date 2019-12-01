@@ -45,7 +45,6 @@
         data.occupiedBy = this.universalMap(data.occupiedBy)
         this.polygonSeries.data[data.idx] = data
         this.polygonSeries.invalidateData()
-
       })
 
       // initialize the array
