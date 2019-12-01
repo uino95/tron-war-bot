@@ -19,7 +19,7 @@
             hide-details></v-text-field>
         </v-toolbar>
 
-        <v-data-table :search="searchCohesion" :headers="headers" :items="filteredCohesion" :item-key="'turn'"
+        <v-data-table :search="searchCohesion" :headers="headers" :items="cohesionHistory" :item-key="'turn'"
           :custom-sort="customSort" class="elevation-1" :pagination.sync="pagination" :rows-per-page-items="[10,20,50]">
           <template v-slot:items="props">
             <!-- Update type -->
@@ -77,7 +77,7 @@
             <v-btn  round flat dark color="primary_cohesion_tab" v-on:click="loadMore"> Load more data </v-btn>
           </template>
           <template v-slot:actions-prepend>
-            <v-switch class="pt-4" color="primary_cohesion_tab" v-model="onlySocial" label="Only Social"></v-switch>
+            <v-switch class="pt-4" color="primary_cohesion_tab" @change="filterCohesion" v-model="onlySocial" label="Only Social"></v-switch>
           </template>
         </v-data-table>
       </v-card>
@@ -213,8 +213,16 @@
       },
       loadMore() {
         this.limit = this.limit + 30
-        this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn').limitToLast(this.limit))
+        this.filterCohesion()
       },
+      filterCohesion() {
+        if (this.onlySocial) {
+          this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('battle').equalTo(null).limitToLast(this.limit))
+          console.log(cohesionHistory)
+        } else {
+          this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn').limitToLast(this.limit))
+        }
+      }
       // loadAll() {
       //   this.loaded = true
       //   this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn'))
@@ -223,14 +231,6 @@
     computed: {
       isMobile() {
         return this.$store.state.isMobile
-      },
-      filteredCohesion() {
-        if (this.onlySocial) {
-          return this.cohesionHistory.filter(el => {
-            return el.update_type != "BATTLE"
-          })
-        }
-        return this.cohesionHistory
       }
     },
     filters: {
