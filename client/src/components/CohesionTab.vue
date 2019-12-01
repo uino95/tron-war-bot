@@ -218,7 +218,6 @@
       filterCohesion() {
         if (this.onlySocial) {
           this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('battle').equalTo(null).limitToLast(this.limit))
-          console.log(cohesionHistory)
         } else {
           this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn').limitToLast(this.limit))
         }
