@@ -74,6 +74,7 @@
     }
     from '../plugins/firebase';
     import tronweb from 'tronweb'
+    const MS_PER_DAY = 24 * 60 * 60 * 1000
 
     export default {
         data: () => ({
@@ -144,11 +145,12 @@
             },
             initDates() {
                 let now = Date.now()
-                let currentMonday = now - ((new Date(now).getDay() - 1) * 24 * 60 * 60 * 1000)
+                let daysToPreviousMonday = new Date(now).getDay() - 1
+                let currentMonday = now - (daysToPreviousMonday >= 0 ? daysToPreviousMonday * MS_PER_DAY : 6 * MS_PER_DAY)
                 this.date = new Date(currentMonday).toISOString().slice(0, 10)
                 while (currentMonday >= this.firstMonday) {
                     this.dates.push(new Date(currentMonday).toISOString().slice(0, 10))
-                    currentMonday = currentMonday - (7 * 24 * 60 * 60 * 1000)
+                    currentMonday = currentMonday - (7 * MS_PER_DAY)
                 }
                 this.dates.push('All Time')
             },
