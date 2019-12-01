@@ -14,13 +14,13 @@
         <v-card>
 
           <v-toolbar color="primary_next_tab" dark>
-            <v-toolbar-title>Bet on Next Conqueror
+            <v-toolbar-title>Bet on Next Offender
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                   <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
                 </template>
-                <span>If you feel like who the next Conqueror is going to be, you came to the right place. Every 5 mins
-                  the Bot spits out one new Battle. Bet on who will make the conquer next in this tab.</span>
+                <span>If you feel like who the next Offender is going to be, you came to the right place. <br> Every 5 mins
+                  the Bot spits out one new Battle. <br> Bet on who will make the first move and will attack or raise against another county in this tab.</span>
               </v-tooltip>
             </v-toolbar-title>
             <v-spacer></v-spacer>
@@ -59,8 +59,14 @@
 
                 <v-layout row wrap>
                   <v-flex xs12>
-                    <v-slider thumb-label v-model="betAmount" :min="betNextGameParam ? betNextGameParam.minimumBet : 1"
-                      :max="betNextGameParam ? betNextGameParam.maximumBet : 1" label="Bet Amount"></v-slider>
+                    <v-flex text-xs-center>
+                      <span class="subheading pb-0 pl-2 mr-1">Bet Amount</span>
+                    </v-flex>
+                    <v-slider class="mt-0" thumb-label v-model="betAmount"
+                      :min="betNextGameParam ? betNextGameParam.minimumBet : 1"
+                      :max="betNextGameParam ? betNextGameParam.maximumBet : 1" append-icon="fa-plus"
+                      prepend-icon="fa-minus" @click:append="betAmount ++" @click:prepend="betAmount --">
+                      </v-slider>
                   </v-flex>
                 </v-layout>
                 <!-- <v-layout row wrap>

@@ -176,13 +176,6 @@
                   </v-flex>
                 </v-layout>
 
-                <v-layout row wrap>
-                  <v-flex xs12>
-                    <v-slider thumb-label v-model="betAmount"
-                      :min="betBattleGameParams ? betBattleGameParams.minimumBet : 1"
-                      :max="betBattleGameParams ? betBattleGameParams.maximumBet : 1" label="Bet Amount"></v-slider>
-                  </v-flex>
-                </v-layout>
                 <v-flex xs12 class="text-xs-center pa-2">
                   <div class="title pb-2"> Choose your guess </div>
                   <v-hover>
@@ -200,6 +193,18 @@
                     </v-btn>
                   </v-hover>
                 </v-flex>
+                <v-layout row wrap>
+                  <v-flex xs12>
+                    <v-flex text-xs-center>
+                      <span class="subheading pb-0 pl-2 mr-1">Bet Amount</span>
+                    </v-flex>
+                    <v-slider class="mt-0" thumb-label v-model="betAmount"
+                      :min="betBattleGameParams ? betBattleGameParams.minimumBet : 1"
+                      :max="betBattleGameParams ? betBattleGameParams.maximumBet : 1" append-icon="fa-plus"
+                      prepend-icon="fa-minus" @click:append="betAmount ++" @click:prepend="betAmount --">
+                      </v-slider>
+                  </v-flex>
+                </v-layout>
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_battle_tab" dark
                   @click="placeBet(currentChoice, betAmount)">
                   <div v-bind:style="{'max-width': windowSize.x * 0.6 + 'px'}" class="text-truncate">
@@ -235,8 +240,9 @@
             <v-toolbar-title>My Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
-          <v-data-table :headers="personalBetsHeaders" :pagination.sync="paginationBets" :items="myBets" class="elevation-1">
-            <template v-slot:items="props" >
+          <v-data-table :headers="personalBetsHeaders" :pagination.sync="paginationBets" :items="myBets"
+            class="elevation-1">
+            <template v-slot:items="props">
               <td class="text-xs-left">{{ props.item.userChoice | CHOICE}}</td>
               <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
               <td class="text-xs-left">{{ props.item.turn }}</td>
@@ -262,8 +268,9 @@
             <v-spacer></v-spacer>
           </v-toolbar>
 
-          <v-data-table :headers="latestBetsHeaders" :pagination.sync="paginationBets" :items="latestBets" class="elevation-1">
-            <template v-slot:items="props" >
+          <v-data-table :headers="latestBetsHeaders" :pagination.sync="paginationBets" :items="latestBets"
+            class="elevation-1">
+            <template v-slot:items="props">
               <td class="text-xs-left hidden-xs-only">{{ props.item.from }}</td>
               <td class="text-xs-left">{{ props.item.userChoice | CHOICE }}</td>
               <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
