@@ -23,6 +23,7 @@ module.exports.runUpdate = async (cmap, td) => {
 module.exports.init = async () =>{
   // LOAD STATUS
   await russianRoulette.init();
+  await updates.init();
 }
 
 module.exports.shares = shares;

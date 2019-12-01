@@ -81,7 +81,7 @@ const prepareNextTurn = async () =>{
   await firebase.fairness.update({next});
 
   let stopBetsBlock = nextTurnBlock - Math.ceil(config.timing.txMargin/3);
-  let ts = cb.timestamp + ((stopBetsBlock - cb.number) * 3000);
+  let ts = cb.timestamp + ((stopBetsBlock - cb.number) * 3000) + (config.timing.blockConfirmation * 3000);
   let nextTurnTime = new Date(ts);
   cb = await twb.getBlock();
   console.log("[PREPARE]: Current block is: " + cb.number + "  nextTurn at: " + nextTurnBlock + " stopBets at: " + stopBetsBlock);

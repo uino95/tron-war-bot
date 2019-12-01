@@ -110,6 +110,31 @@ module.exports.stats = async (td) =>{
   await facebook.postWithPhoto(img, f).catch(console.error);
 }
 
+module.exports.init = async () => {
+  let td = await wwb.currentTurnData();
+  if (!(td.turn%config.social.updates.battleFreq)) return;
+  let history = await firebase.history.orderByChild('turn').limitToLast(td.turn%config.social.updates.battleFreq).once("value").then(r=>r.val());
+  for (let td of Object.values(history)) {
+    if (td.battle && td.battle.result) {
+      let w,l;
+      switch (td.battle.result){
+        case 1:
+        if (td.battle.civilWar) insurrections.push(td.battle);
+        w=td.battle.o;
+        l=td.battle.d;
+        break;
+        case 2:
+        w=td.battle.d;
+        l=td.battle.o;
+        break;
+      }
+      partials[w] = (partials[w] || 0) + 1
+      partials[l] = (partials[l] || 0) - 1
+    }
+    if (td.battle && td.battle.probabilities[td.battle.result]<0.05) epic.push(td.battle);
+  }
+}
+
 module.exports.battleUpdate = async (cmap, td) => {
   let n = "BU" + Math.floor(td.turn/config.social.updates.battleFreq);
   if (!(td.turn%config.social.updates.battleFreq)) {

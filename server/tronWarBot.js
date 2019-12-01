@@ -2,6 +2,7 @@
 const TronWeb = require('tronweb');
 const TronGrid = require('trongrid');
 const config = require('./config');
+const telegram = require('./utils/telegram')
 const utils = require('./utils');
 const BLOCK_CONFIRMATION = config.timing.blockConfirmation;
 
@@ -184,10 +185,10 @@ module.exports.startGame = async function (gameType, playAgainstDealer) {
   if (!twb || !war) await isReady();
   var round = await this.getCurrentRound(gameType);
   if (!round.stoppedAt) throw "Game must be stopped before a new round can be started";
-  let txId = await this.twb.startGame(gameType, !!playAgainstDealer).send();
+  let txId = await this.twb.startGame(gameType, !!playAgainstDealer).send().catch(console.error);
   await utils.sleep(10000);
-  let tx = await this.tronWeb.trx.getTransaction(txId)
-  if (tx.ret[0].contractRet!="SUCCESS") throw tx;
+  let tx = await this.tronWeb.trx.getTransaction(txId).catch(console.error)
+  if (!tx || tx.ret[0].contractRet!="SUCCESS") throw tx;
   return round.round;
 }
 
@@ -195,10 +196,10 @@ module.exports.endGame = async function (gameType) {
   if (!twb || !war) await isReady();
   var round = await this.getCurrentRound(gameType);
   if (!!round.stoppedAt) throw "Game must be started before it can be stopped";
-  let txId = await this.twb.endGame(gameType,tronWeb.toSun(config.game.preservedJackpotRateForNextTurn)).send();
+  let txId = await this.twb.endGame(gameType,tronWeb.toSun(config.game.preservedJackpotRateForNextTurn)).send().catch(console.error);
   await utils.sleep(10000);
-  let tx = await this.tronWeb.trx.getTransaction(txId)
-  if (tx.ret[0].contractRet!="SUCCESS") throw tx;
+  let tx = await this.tronWeb.trx.getTransaction(txId).catch(console.error)
+  if (!tx || tx.ret[0].contractRet!="SUCCESS") throw tx;
   return round.round;
 }
 
@@ -261,10 +262,10 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
   if (a.playAgainstDealer) throw "This is not a jackpot payout type of game! Use house payout instead.";
   if (!a.finalJackpot.eq(a.availableFunds)) throw "Payout has already been paid";
   if (!winningBets.length) {
-    let txId = await this.twb.payout(gameType, gameRound, this.twb.address, a.finalJackpot.toString()).send();
+    let txId = await this.twb.payout(gameType, gameRound, this.twb.address, a.finalJackpot.toString()).send().catch(console.error);
     await utils.sleep(10000);
-    let tx = await this.tronWeb.trx.getTransaction(txId);
-    if (tx.ret[0].contractRet!="SUCCESS") {
+    let tx = await this.tronWeb.trx.getTransaction(txId).catch(console.error);
+    if (!txId || !tx || tx.ret[0].contractRet!="SUCCESS") {
       console.error("[PAYOUT ERROR]" +
         "\n\tNo winners at this turn. Funds did NOT return to the jackpot." +
         "\n\tPayout txId => " + txId )
@@ -288,25 +289,30 @@ module.exports.jackpotPayout = async function (gameType, gameRound, winningChoic
       console.error("Funds are no longer available!");
       skip = true;
     }
-    if (!skip) {
-      if (win.gt("0")) txId = await this.twb.payout(gameType, gameRound, b.from, win.toString()).send();
+    if (!skip && win.gt("0")) txId = await this.twb.payout(gameType, gameRound, b.from, win.toString()).send().catch(console.error);
+    if (txId){
       await utils.sleep(10000);
-      tx = await this.tronWeb.trx.getTransaction(txId)
-      console.info("[PAYOUT SUCCESSFUL]" +
-        "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
-        "\n\tWinning Choice => " +  winningChoice.toString() +
-        "\n\tBet txId => " + b.txId +
-        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
-        "\n\tWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
-        "\n\tPayout txId => " + txId)
+      tx = await this.tronWeb.trx.getTransaction(txId).catch(console.error)
     }
-    if (skip || tx.ret[0].contractRet!="SUCCESS")
-      console.error("[PAYOUT ERROR] - PAYMENT TO USER HAS NOT GONE THROUGH!" +
-        "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
-        "\n\tWinning Choice => " +  winningChoice.toString() +
-        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
-        "\n\tExpectedWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
-        "\n\tTxId => " + b.txId);
+    if (tx && tx.ret[0].contractRet=="SUCCESS"){
+        console.info("[PAYOUT SUCCESSFUL]" +
+            "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
+            "\n\tWinning Choice => " +  winningChoice.toString() +
+            "\n\tBet txId => " + b.txId +
+            "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
+            "\n\tWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
+            "\n\tPayout txId => " + txId)
+        continue;
+    }
+    let errMsg = "[PAYOUT ERROR] - PAYMENT TO USER POSSIBLY GONE THROUGH!" +
+      "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
+      "\n\tWinning Choice => " +  winningChoice.toString() +
+      "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
+      "\n\tExpectedWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
+      "\n\tTxId => " + b.txId +
+      "\n\tPayout attempt Tx => " + txId;
+    console.error(errMsg);
+    telegram.sendMessage(config.telegram.adminGroup, errMsg, {parse_mode: "HTML"});
   }
   return winningBets;
 
@@ -357,25 +363,30 @@ module.exports.dealerPayout = async function (gameType, gameRound, winningChoice
       console.error("Funds are no longer available!");
       skip = true;
     }
-    if (!skip) {
-      if (win.gt("0")) txId = await this.twb.payout(gameType, gameRound, b.from, win.toString()).send();
+    if (!skip && win.gt("0")) txId = await this.twb.payout(gameType, gameRound, b.from, win.toString()).send().catch(console.error);
+    if (txId) {
       await utils.sleep(10000);
-      tx = await this.tronWeb.trx.getTransaction(txId)
-      console.info("[PAYOUT SUCCESSFUL]" +
-        "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
-        "\n\tWinning Choice => " +  winningChoice.toString() +
-        "\n\tBet txId => " + b.txId +
-        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
-        "\n\tWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
-        "\n\tPayout txId => " + txId)
+      tx = await this.tronWeb.trx.getTransaction(txId).catch(console.error)
     }
-    if (skip || tx.ret[0].contractRet!="SUCCESS")
-      console.error("[PAYOUT ERROR] - PAYMENT TO USER HAS NOT GONE THROUGH!" +
-        "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
-        "\n\tWinning Choice => " +  winningChoice.toString() +
-        "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
-        "\n\tExpectedWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
-        "\n\tTxId => " + b.txId);
+    if (tx && tx.ret[0].contractRet=="SUCCESS"){
+      console.info("[PAYOUT SUCCESSFUL]" +
+      "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
+      "\n\tWinning Choice => " +  winningChoice.toString() +
+      "\n\tBet txId => " + b.txId +
+      "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
+      "\n\tWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
+      "\n\tPayout txId => " + txId)
+      continue;
+    }
+    let errMsg = "[PAYOUT ERROR] - PAYMENT TO USER POSSIBLY GONE WRONG!" +
+      "\n\tGame => " + gameType.toString() + " Round: " + gameRound.toString() +
+      "\n\tWinning Choice => " +  winningChoice.toString() +
+      "\n\tBet => user: " + b.from  + " userChoice: " + b.userChoice.toString() + " amount: " + tronWeb.fromSun(b.amount.toString()) + " TRX" +
+      "\n\tExpectedWin => " + tronWeb.fromSun(win.toString()) + " TRX" +
+      "\n\tBet TxId => " + b.txId +
+      "\n\tPayout attempt Tx => " + txId;
+    console.error(errMsg);
+    telegram.sendMessage(config.telegram.adminGroup, errMsg, {parse_mode: "HTML"});
   }
   return winningBets;
 }

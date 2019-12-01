@@ -10,7 +10,7 @@ module.exports.getMode = (ctx, next)=>{
   if (ctx.chat.id == config.telegram.group) ctx.mode = 'GROUP'
   else if (ctx.chat.id == config.telegram.adminGroup) ctx.mode = 'ADMIN_GROUP'
   else if (ctx.chat.id > 0) ctx.mode = 'PRIVATE'
-  else return reject(ctx, "Invalid mode");
+  else return reject(ctx, "Invalid mode. Chat id: " + ctx.chat.id);
   return next(ctx);
 }
 
