@@ -10,6 +10,11 @@
       },
       "cohesion":{
         ".indexOn": "turn" 
+      },
+      "stats":{
+        "$anykey": {
+         	".indexOn": ".value" 
+        }
       }
     },
     "secret":{
