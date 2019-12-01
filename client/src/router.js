@@ -14,7 +14,7 @@ export default new Router({
   routes: [{
       path: '/',
       name: 'home',
-      component: Stats
+      redirect: "/stats"
     },
     {
       path: '/betfinal',
@@ -51,7 +51,9 @@ export default new Router({
       name: 'spenderswinners',
       component: SpendersWinners
     },
-    { path: "*", 
+    { 
+      redirect: "/stats",
+      path: "*", 
       component: Stats 
     }
   ]
