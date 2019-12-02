@@ -20,7 +20,7 @@ Vue.use(Vuetify, {
     primary_stats_tab: "#e67e22",
     secondary_stats_tab: "#FFFFFF",
     primary_battle_tab: "#2980b9",
-    secondary_battle_tab: "#001542",
+    secondary_battle_tab: "#174665",
     primary_cohesion_tab: "#d84315",
     secondary_cohesion_tab: "#FFFFFF",
     primary_history_tab: "#ffd54f",

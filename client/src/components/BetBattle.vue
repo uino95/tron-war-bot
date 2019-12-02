@@ -22,10 +22,9 @@
 
           <v-card-title primary-title class="justify-center">
             <v-flex md10>
-              <!-- color="#2c3e50" -->
               <v-card class="mb-2 white--text card-rounded" color="primary_battle_tab">
                 <v-card-text class="pt-2 text-xs-center ">
-                  <i>Latest Turn: #{{history[0].turn }} </i><br>
+                  <i>Previous Turn Result: <b>{{history[0].battle.result }} </b></i><br>
                   <div v-html="computeWinnerPhrase(history[0].battle)" />
                 </v-card-text>
               </v-card >
