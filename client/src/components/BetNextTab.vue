@@ -119,7 +119,7 @@
             <v-toolbar-title>My Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
-          <v-data-table :headers="personalBetsHeaders" :items="myBets" :pagination.sync="paginationBets" class="elevation-1">
+          <v-data-table :headers="personalBetsHeaders" :items="myBets" :pagination.sync="paginationMyBets" class="elevation-1">
             <template v-slot:items="props">
               <td class="text-xs-left">{{ universalMap(props.item.userChoice) }}</td>
               <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
@@ -145,7 +145,7 @@
             <v-spacer></v-spacer>
           </v-toolbar>
 
-          <v-data-table :headers="latestBetsHeaders" :items="latestBets" :pagination.sync="paginationBets" class="elevation-1">
+          <v-data-table :headers="latestBetsHeaders" :items="latestBets" :pagination.sync="paginationLatestBets" class="elevation-1">
             <template v-slot:items="props">
               <td class="text-xs-left hidden-xs-only">{{ props.item.from }}</td>
               <td class="text-xs-left">{{ universalMap(props.item.userChoice) }}</td>
@@ -199,7 +199,11 @@
       mapping: mapping,
       isWaitingForConfirm: false,
       currentTxId: null,
-      paginationBets: {
+      paginationMyBets: {
+        sortBy: 'turn',
+        descending: true,
+      },
+      paginationLatestBets: {
         sortBy: 'turn',
         descending: true,
       },

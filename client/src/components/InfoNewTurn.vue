@@ -5,10 +5,6 @@
       <v-card-text class="pa-0 mb-2 text-xs-center ">
         <core-timer />
       </v-card-text>
-      <!-- <v-card-text class="pa-0 text-xs-center "> Latest conquest: Turn {{history[0].turn}} -
-        <b>{{universalMap(history[0].battle.o)}}</b> has conquered
-        <b>{{universalMap(history[0].battle.dt)}}</b>
-        previously owned by <b>{{universalMap(history[0].battle.d)}}</b></v-card-text> -->
       <v-container v-if="currentBattle != null">
         <v-card-text v-if="currentBattle.civilWar == 1" class=" pa-0 text-xs-center ">
           Current Battle: Turn {{history[0].turn}} -

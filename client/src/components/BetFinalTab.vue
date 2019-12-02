@@ -97,24 +97,25 @@
     <v-layout row wrap>
       <v-flex md7 column wrap>
         <v-flex>
-        <v-card>
-          <v-toolbar color="primary_final_tab" dark>
-            <v-toolbar-title>My Bets</v-toolbar-title>
-            <v-spacer></v-spacer>
-          </v-toolbar>
-          <v-data-table :headers="personalBetsHeaders" :items="myBets" :pagination.sync="paginationBets" class="elevation-1">
-            <template v-slot:items="props">
-              <td class="text-xs-left">{{ universalMap(props.item.userChoice) }}</td>
-              <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
-              <td class="text-xs-left">{{ props.item.turn }}</td>
-            </template>
+          <v-card>
+            <v-toolbar color="primary_final_tab" dark>
+              <v-toolbar-title>My Bets</v-toolbar-title>
+              <v-spacer></v-spacer>
+            </v-toolbar>
+            <v-data-table :headers="personalBetsHeaders" :items="myBets" :pagination.sync="paginationMyBets"
+              class="elevation-1">
+              <template v-slot:items="props">
+                <td class="text-xs-left">{{ universalMap(props.item.userChoice) }}</td>
+                <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
+                <td class="text-xs-left">{{ props.item.turn }}</td>
+              </template>
 
-            <template v-slot:no-data>
-              <v-chip v-if="account == null" label outline color="red">Login First</v-chip>
-              <v-chip v-else label outline color="red"> No Bets Yet </v-chip>
-            </template>
-          </v-data-table>
-        </v-card>
+              <template v-slot:no-data>
+                <v-chip v-if="account == null" label outline color="red">Login First</v-chip>
+                <v-chip v-else label outline color="red"> No Bets Yet </v-chip>
+              </template>
+            </v-data-table>
+          </v-card>
         </v-flex>
 
         <!-- Latest bets -->
@@ -125,8 +126,9 @@
               <v-spacer></v-spacer>
             </v-toolbar>
 
-            <v-data-table :headers="latestBetsHeaders" :items="latestBets" :pagination.sync="paginationBets" class="elevation-1">
-              <template v-slot:items="props" >
+            <v-data-table :headers="latestBetsHeaders" :items="latestBets" :pagination.sync="paginationLatestBets"
+              class="elevation-1">
+              <template v-slot:items="props">
                 <td class="text-xs-left hidden-xs-only">{{ props.item.from }}</td>
                 <td class="text-xs-left">{{ universalMap(props.item.userChoice) }}</td>
                 <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
@@ -134,8 +136,8 @@
               </template>
 
               <template v-slot:no-data>
-                <v-chip v-if="account == null" label outline  color="red">Login First</v-chip>
-              <v-chip v-else label outline color="red"> No Bets Yet </v-chip>
+                <v-chip v-if="account == null" label outline color="red">Login First</v-chip>
+                <v-chip v-else label outline color="red"> No Bets Yet </v-chip>
               </template>
             </v-data-table>
           </v-card>
@@ -148,13 +150,13 @@
           <v-toolbar color="primary_final_tab" dark>
             <v-toolbar-title>Number of bets per country</v-toolbar-title>
           </v-toolbar>
-          <v-data-table :headers="betsPerCountryHeader" :items="betsPerCountry" class="elevation-1"
-            :item-key="'bets'" :pagination.sync="paginationNumberOfBets" :rows-per-page-items="[10,20,50]" >
+          <v-data-table :headers="betsPerCountryHeader" :items="betsPerCountry" class="elevation-1" :item-key="'bets'"
+            :pagination.sync="paginationNumberOfBets" :rows-per-page-items="[10,20,50]">
             <template v-slot:items="props">
               <td class="text-xs-left">
                 <v-avatar size="40">
-                  <v-img :lazy-src="placeholderFlag" 
-                    :src="getFlagString(universalMap(props.item.countryId))" :alt="universalMap(props.item.countryId)" />
+                  <v-img :lazy-src="placeholderFlag" :src="getFlagString(universalMap(props.item.countryId))"
+                    :alt="universalMap(props.item.countryId)" />
                 </v-avatar>
               </td>
               <td class="text-xs-left">{{ universalMap(props.item.countryId) }}</td>
@@ -209,7 +211,11 @@
         sortBy: 'bets',
         descending: true,
       },
-      paginationBets: {
+      paginationLatestBets: {
+        sortBy: 'turn',
+        descending: true,
+      },
+      paginationMyBets: {
         sortBy: 'turn',
         descending: true,
       },

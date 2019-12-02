@@ -22,6 +22,13 @@
 
           <v-card-title primary-title class="justify-center">
             <v-flex md10>
+              <!-- color="#2c3e50" -->
+              <v-card class="mb-2 white--text card-rounded" color="primary_battle_tab">
+                <v-card-text class="pt-2 text-xs-center ">
+                  <i>Latest Turn: #{{history[0].turn }} </i><br>
+                  <div v-html="computeWinnerPhrase(history[0].battle)" />
+                </v-card-text>
+              </v-card >
 
               <v-card class="mb-4">
                 <v-img v-if="info.serverStatus != 500 && !currentBattle.placeHolder" class="white--text"
@@ -179,15 +186,18 @@
                 <v-flex xs12 class="text-xs-center pa-2">
                   <div class="title pb-2"> Choose your guess </div>
                   <v-hover>
-                    <v-btn fab dark color="primary_battle_tab" v-on:click="toggle_country(currentBattle.o,1)">
+                    <v-btn fab dark :color="currentChoice == 1 ? 'secondary_battle_tab' : 'primary_battle_tab'"
+                      v-on:click="toggle_country(currentBattle.o,1)">
                       <div class="title white--text"> 1 </div>
                     </v-btn>
                   </v-hover>
-                  <v-btn fab dark color="primary_battle_tab" v-on:click="toggle_country(241,0)">
+                  <v-btn fab dark :color="currentChoice == 0 ? 'secondary_battle_tab' : 'primary_battle_tab'"
+                    v-on:click="toggle_country(241,0)">
                     <div class="title white--text"> x </div>
                   </v-btn>
                   <v-hover>
-                    <v-btn v-if="currentBattle.civilWar != 1" fab dark color="primary_battle_tab"
+                    <v-btn v-if="currentBattle.civilWar != 1" fab dark
+                      :color="currentChoice == 2 ? 'secondary_battle_tab' : 'primary_battle_tab'"
                       v-on:click="toggle_country(currentBattle.d,2)">
                       <div class="title white--text"> 2 </div>
                     </v-btn>
@@ -202,7 +212,7 @@
                       :min="betBattleGameParams ? betBattleGameParams.minimumBet : 1"
                       :max="betBattleGameParams ? betBattleGameParams.maximumBet : 1" append-icon="fa-plus"
                       prepend-icon="fa-minus" @click:append="betAmount ++" @click:prepend="betAmount --">
-                      </v-slider>
+                    </v-slider>
                   </v-flex>
                 </v-layout>
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_battle_tab" dark
@@ -240,7 +250,7 @@
             <v-toolbar-title>My Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
-          <v-data-table :headers="personalBetsHeaders" :pagination.sync="paginationBets" :items="myBets"
+          <v-data-table :headers="personalBetsHeaders" :pagination.sync="paginationMyBets" :items="myBets"
             class="elevation-1">
             <template v-slot:items="props">
               <td class="text-xs-left">{{ props.item.userChoice | CHOICE}}</td>
@@ -268,7 +278,7 @@
             <v-spacer></v-spacer>
           </v-toolbar>
 
-          <v-data-table :headers="latestBetsHeaders" :pagination.sync="paginationBets" :items="latestBets"
+          <v-data-table :headers="latestBetsHeaders" :pagination.sync="paginationLatestBets" :items="latestBets"
             class="elevation-1">
             <template v-slot:items="props">
               <td class="text-xs-left hidden-xs-only">{{ props.item.from }}</td>
@@ -325,8 +335,11 @@
         history: [],
         isWaitingForConfirm: false,
         currentTxId: null,
-        historyTurn: [],
-        paginationBets: {
+        paginationLatestBets: {
+          sortBy: 'turn',
+          descending: true,
+        },
+        paginationMyBets: {
           sortBy: 'turn',
           descending: true,
         },
@@ -440,6 +453,26 @@
         this.currentCountry = country
         this.currentChoice = choice
       },
+      computeWinnerPhrase(item) {
+        if (item.civilWar) {
+          if (item.result == 1) {
+            return '<b>' + this.universalMap(item.o) + '</b>' + ' has rebelled against ' +
+              '<b>' + this.universalMap(item.d) + '</b>'
+          }
+          return '<b>' + this.universalMap(item.d) + '</b>' + ' has stop the rebellion of ' +
+            '<b>' + this.universalMap(item.o) + '</b>'
+        }
+        switch (item.result) {
+          case 0:
+            return 'The battle between <b>' + this.universalMap(item.o) + '</b>  and <b> ' + this.universalMap(item.d) + '</b> has been solved peacefully without a winner';
+          case 1:
+            return '<b>' + this.universalMap(item.o) + '</b>' + ' has conquered ' +
+              '<b>' + this.universalMap(item.dt) + '</b> previously owned by <b>' + this.universalMap(item.d) + '</b>';
+          case 2:
+            return '<b>' + this.universalMap(item.d) + '</b>' + ' has conquered ' +
+              '<b>' + this.universalMap(item.ot) + '</b> previously owned by <b>' + this.universalMap(item.o) + '</b>';
+        }
+      }
     },
 
     computed: {
@@ -497,4 +530,11 @@
     width: 100%;
     height: 300px;
   }
+  .card-rounded {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+
 </style>
