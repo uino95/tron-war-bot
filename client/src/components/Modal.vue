@@ -942,6 +942,10 @@
         {
           question: "Is there a whitepaper?",
           answer: "<a href=\"/files/WhitePaper.pdf\" target=\"_blank\">Click here to view the whitepaper<a/>"
+        },
+        {
+          question: "Is there a Privacy Policy?",
+          answer: "<a href=\"/files/PrivacyPolicy.pdf\" target=\"_blank\">Click here to view our privacy policy<a/>"
         }
       ],
       partners: [],
