@@ -134,17 +134,6 @@
                         </core-modal>
                     </v-flex>
                 </v-layout>
-                <v-bottom-sheet inset persistent :value="showCookieDialog">
-                    <v-card dark>
-                        <v-layout row justify-space-between align-center>
-                            <v-card-text> You can find more about our privacy policy 
-                                <a href="https://www.privacypolicytemplate.net/live.php?token=bN3hf5y54347N3oNK6DypGQHY9AkY3Xa" target="blank" style="color: white"> 
-                                here </a>
-                            </v-card-text>
-                            <v-btn  @click="acceptCookies"> Accept Cookies </v-btn>
-                        </v-layout>
-                    </v-card>
-                </v-bottom-sheet>
             </v-container>
         </v-content>
     </v-app>
@@ -363,10 +352,6 @@
                     this.toDisplay = "flex"
                 }, 4000)
             },
-            acceptCookies(){
-                this.showCookieDialog = false;
-                window.localStorage.setItem('cookieAccepted', true)
-            },
             isMobile() {
                 var check = false;
                 (function (a) {
@@ -384,9 +369,6 @@
         mounted() {
             this.loggedInFb()
             this.$store.commit('setIsMobile', this.isMobile());
-            if(window.localStorage.getItem('cookieAccepted') == null){
-                this.showCookieDialog = true
-            }
             this.$root.$on('map_loaded', () => {
                 this.loading = false;
                 this.toDisplay = "flex"
