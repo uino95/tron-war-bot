@@ -243,12 +243,6 @@
                     link: false,
                     body: 'WIP'
                 },
-                {
-                    icon: 'security',
-                    text: 'Privacy Policy',
-                    link: true,
-                    body: 'https://www.privacypolicytemplate.net/live.php?token=bN3hf5y54347N3oNK6DypGQHY9AkY3Xa'
-                },
                 /*      {
                         icon: 'assignment',
                         text: 'Whitepaper',

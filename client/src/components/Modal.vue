@@ -945,7 +945,7 @@
         },
         {
           question: "Is there a Privacy Policy?",
-          answer: "<a href=\"/files/PrivacyPolicy.pdf\" target=\"_blank\">Click here to view our privacy policy<a/>"
+          answer: "<a href=\"/files/PrivacyPolicy.html\" target=\"_blank\">Click here to view our privacy policy<a/>"
         }
       ],
       partners: [],
