@@ -209,6 +209,7 @@ const editCohesion = (country, delta, threshold) => {
   if (!delta) return;
   delta = delta/100;
   let old = countriesMap[country].nextCohesion;
+  if ((old <= (threshold.lower/100)) || (old >= (threshold.upper/100))) return;
   let n = countriesMap[country].nextCohesion + (delta);
   countriesMap[country].nextCohesion = Math.min(Math.max(n, (threshold.lower/100)),(threshold.upper/100));
   if (old == countriesMap[country].nextCohesion) return;
