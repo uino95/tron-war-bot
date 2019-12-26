@@ -37,7 +37,7 @@ const startup = async  () => {
       block.number = b.block_header.raw_data.number;
       block.hash = b.blockID;
       block.timestamp = b.block_header.raw_data.timestamp;
-    } catch (err) { return }
+    } catch (err) { return await cycle(); }
     let awakeFn = blockQueue[block.number.toString()] || [];
     awakeFn = awakeFn.concat(blockQueue["0"] || []);
     awakeFn.forEach((fn)=>{

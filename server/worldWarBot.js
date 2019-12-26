@@ -204,14 +204,14 @@ const updateCohesion = (battle, next) => {
 }
 
 
-const editCohesion = (country, delta, threshold) => {
-  threshold = threshold || {upper: 100, lower: 0.1};
+const editCohesion = (country, delta, threshold={upper: 100, lower: 0.1}) => {
   if (!delta) return;
   delta = delta/100;
   let old = countriesMap[country].nextCohesion;
-  if ((old <= (threshold.lower/100)) || (old >= (threshold.upper/100))) return;
+  threshold.upper = Math.max(old, (threshold.upper/100));
+  threshold.lower = Math.min(old, (threshold.lower/100));
   let n = countriesMap[country].nextCohesion + (delta);
-  countriesMap[country].nextCohesion = Math.min(Math.max(n, (threshold.lower/100)),(threshold.upper/100));
+  countriesMap[country].nextCohesion = Math.min(Math.max(n, threshold.lower),threshold.upper);
   if (old == countriesMap[country].nextCohesion) return;
   if (!simulation) {
     //Save on db
