@@ -206,13 +206,14 @@ const updateCohesion = (battle, next) => {
 
 const editCohesion = (country, delta, threshold={upper: 100, lower: 0.1}) => {
   if (!delta) return;
-  delta = delta/100;
   let old = countriesMap[country].nextCohesion;
-  threshold.upper = Math.max(old, (threshold.upper/100));
-  threshold.lower = Math.min(old, (threshold.lower/100));
-  let n = countriesMap[country].nextCohesion + (delta);
-  countriesMap[country].nextCohesion = Math.min(Math.max(n, threshold.lower),threshold.upper);
-  if (old == countriesMap[country].nextCohesion) return;
+  delta = delta/100;
+  const upper = Math.max(old, (threshold.upper/100));
+  const lower = Math.min(old, (threshold.lower/100));
+  let _new = old + delta;
+  _new = Math.max(Math.min(_new, upper), lower);
+  if (old == _new) return;
+  countriesMap[country].nextCohesion = _new;
   if (!simulation) {
     //Save on db
     firebase.countriesMap.child(country).set(countriesMap[country]);
@@ -222,8 +223,8 @@ const editCohesion = (country, delta, threshold={upper: 100, lower: 0.1}) => {
     turn: turn,
     country: country,
     old,
-    new: countriesMap[country].nextCohesion,
-    delta: countriesMap[country].nextCohesion - old
+    new: _new,
+    delta: _new - old
   }
 }
 
