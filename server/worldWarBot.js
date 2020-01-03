@@ -158,7 +158,7 @@ const postTurn = async (turnData) => {
     let discountFactor = (betsPerCountry[i]+1)/(betsPerCountry[i]+2);
     countriesMap[i].finalQuote = Math.round((((jackpot * pf)/(betsPerCountry[i]+1)) + 50) * discountFactor);
   })
-  turnData.next.quotes = turnData.next.probabilities.map(e=>utils.quoteFromProbability(e));
+  if (turnData.next) turnData.next.quotes = turnData.next.probabilities.map(e=>utils.quoteFromProbability(e));
   //CALL EXTERNAL SCHEDULED FUNCTIONS
   let awakeFn = turnQueue[turnData.turn.toString()] || [];
   awakeFn = awakeFn.concat(turnQueue["0"] || []);
