@@ -265,7 +265,7 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
   await postTurn(turnData);
   await saveCurrentState();
 
-  if (turnData.next.civilWar) console.log("[WWB]:KABOOM! " + turnData.next.o + " is rebelling on " + turnData.next.d);
+  if (turnData.next && turnData.next.civilWar) console.log("[WWB]:KABOOM! " + turnData.next.o + " is rebelling on " + turnData.next.d);
   return turnData.winner != null;
 }
 
