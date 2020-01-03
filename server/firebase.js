@@ -46,9 +46,9 @@ out.bets.getCurrentTurnBets = async (gameType, round, turn) => {
       if (!snapshot) return [];
       r = Object.keys(snapshot);
       return r.forEach(key => {
-        if (gameType && snapshot[key].gameType.toString() != gameType.toString()) return;
-        if (round && snapshot[key].round.toString() != round.toString()) return;
-        if (turn && snapshot[key].betReference.toString() != turn.toString()) return;
+        if (gameType!=undefined && snapshot[key].gameType.toString() != gameType.toString()) return;
+        if (round!=undefined  && snapshot[key].round.toString() != round.toString()) return;
+        if (turn!=undefined  && snapshot[key].betReference.toString() != turn.toString()) return;
         snapshot[key].txId = key
         bets.push(snapshot[key])
       })
