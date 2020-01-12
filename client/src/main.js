@@ -10,6 +10,7 @@ import '@fortawesome/fontawesome-free/css/all.css'
 
 import App from './App.vue'
 import VueAnalytics from 'vue-analytics'
+import missingFlags from './assets/missingFlags'
 
 Vue.config.productionTip = false;
 
@@ -41,6 +42,22 @@ Vue.mixin({
             return mapping[id]['name'];
         }
       } catch (error) {}
+    },
+
+    getFlagString(str) {
+      let res = "/img/flags/" + str.toLowerCase()
+        .replaceAll(" ", "-")
+        .replaceAll("ã", "a")
+        .replaceAll("ì", "i")
+        .replaceAll("è", "e")
+        .replaceAll("ì", "i")
+        .replaceAll("å", "a")
+        .replaceAll("é", "e")
+        .replaceAll("í", "i") + ".svg";
+      if(missingFlags.includes(res)){
+        return "/img/flags/placeholder.svg"
+      }
+      return res
     },
 
     async loggedInFb() {
@@ -120,3 +137,5 @@ new Vue({
   render: h => h(App),
   iconfont: 'fab'
 }).$mount('#app');
+
+

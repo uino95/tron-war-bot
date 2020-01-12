@@ -9,7 +9,12 @@
         ".indexOn": ["gameType", "betReference", "from", "round"]
       },
       "cohesion":{
-        ".indexOn": "turn" 
+        ".indexOn": ["turn", "battle"] 
+      },
+      "stats":{
+        "$anykey": {
+         	".indexOn": ".value" 
+        }
       }
     },
     "secret":{

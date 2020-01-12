@@ -14,13 +14,13 @@
         <v-card>
 
           <v-toolbar color="primary_next_tab" dark>
-            <v-toolbar-title>Bet on Next Conqueror
+            <v-toolbar-title>Bet on Next Offender
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                   <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
                 </template>
-                <span>If you feel like who the next Conqueror is going to be, you came to the right place. Every 5 mins
-                  the Bot spits out one new Battle. Bet on who will make the conquer next in this tab.</span>
+                <span>If you feel like who the next Offender is going to be, you came to the right place. <br> Every 5 mins
+                  the Bot spits out one new Battle. <br> Bet on who will make the first move and will attack or raise against another county in this tab.</span>
               </v-tooltip>
             </v-toolbar-title>
             <v-spacer></v-spacer>
@@ -59,8 +59,14 @@
 
                 <v-layout row wrap>
                   <v-flex xs12>
-                    <v-slider thumb-label v-model="betAmount" :min="betNextGameParam ? betNextGameParam.minimumBet : 1"
-                      :max="betNextGameParam ? betNextGameParam.maximumBet : 1" label="Bet Amount"></v-slider>
+                    <v-flex text-xs-center>
+                      <span class="subheading pb-0 pl-2 mr-1">Bet Amount</span>
+                    </v-flex>
+                    <v-slider class="mt-0" thumb-label v-model="betAmount"
+                      :min="betNextGameParam ? betNextGameParam.minimumBet : 1"
+                      :max="betNextGameParam ? betNextGameParam.maximumBet : 1" append-icon="fa-plus"
+                      prepend-icon="fa-minus" @click:append="betAmount ++" @click:prepend="betAmount --">
+                      </v-slider>
                   </v-flex>
                 </v-layout>
                 <!-- <v-layout row wrap>
@@ -113,7 +119,7 @@
             <v-toolbar-title>My Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
-          <v-data-table :headers="personalBetsHeaders" :items="myBets" :pagination.sync="paginationBets" class="elevation-1">
+          <v-data-table :headers="personalBetsHeaders" :items="myBets" :pagination.sync="paginationMyBets" class="elevation-1">
             <template v-slot:items="props">
               <td class="text-xs-left">{{ universalMap(props.item.userChoice) }}</td>
               <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
@@ -125,12 +131,8 @@
             </template>
 
             <template v-slot:no-data>
-              <v-alert v-if="account == null" :value="true" color="error">
-                Login First
-              </v-alert>
-              <v-alert v-else :value="true" color="error" icon="warning">
-                No data availbale
-              </v-alert>
+              <v-chip v-if="account == null" label outline color="red">Login First</v-chip>
+              <v-chip v-else label outline color="red"> No Bets Yet </v-chip>
             </template>
           </v-data-table>
         </v-card>
@@ -143,7 +145,7 @@
             <v-spacer></v-spacer>
           </v-toolbar>
 
-          <v-data-table :headers="latestBetsHeaders" :items="latestBets" :pagination.sync="paginationBets" class="elevation-1">
+          <v-data-table :headers="latestBetsHeaders" :items="latestBets" :pagination.sync="paginationLatestBets" class="elevation-1">
             <template v-slot:items="props">
               <td class="text-xs-left hidden-xs-only">{{ props.item.from }}</td>
               <td class="text-xs-left">{{ universalMap(props.item.userChoice) }}</td>
@@ -156,12 +158,8 @@
             </template>
 
             <template v-slot:no-data>
-              <v-alert v-if="account == null" :value="true" color="error">
-                Login First
-              </v-alert>
-              <v-alert v-else :value="true" color="error" icon="warning">
-                No data availbale
-              </v-alert>
+              <v-chip v-if="account == null" label outline  color="red">Login First</v-chip>
+              <v-chip v-else label outline color="red"> No Bets Yet </v-chip>
             </template>
           </v-data-table>
         </v-card>
@@ -201,7 +199,11 @@
       mapping: mapping,
       isWaitingForConfirm: false,
       currentTxId: null,
-      paginationBets: {
+      paginationMyBets: {
+        sortBy: 'turn',
+        descending: true,
+      },
+      paginationLatestBets: {
         sortBy: 'turn',
         descending: true,
       },

@@ -1,6 +1,6 @@
 var fs = require('fs');
 const utils = require('../utils/index')
-const UPDATE_EVERY = 50
+const UPDATE_EVERY = 20
 
 function writeToFile(object){
     var jsonContent = JSON.stringify(object);
@@ -41,11 +41,9 @@ const parse = function(){
       })
     })
 
-    history[history.length - 1].forEach((el,index) => {
-        result[index]["12607"] = el.territories
-    })
-  
-    
+    // history[history.length - 1].forEach((el,index) => {
+    //     result[index]["12607"] = el.territories
+    // })
   
     writeToFile(result)
 }

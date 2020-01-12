@@ -5,10 +5,6 @@
       <v-card-text class="pa-0 mb-2 text-xs-center ">
         <core-timer />
       </v-card-text>
-      <!-- <v-card-text class="pa-0 text-xs-center "> Latest conquest: Turn {{history[0].turn}} -
-        <b>{{universalMap(history[0].battle.o)}}</b> has conquered
-        <b>{{universalMap(history[0].battle.dt)}}</b>
-        previously owned by <b>{{universalMap(history[0].battle.d)}}</b></v-card-text> -->
       <v-container v-if="currentBattle != null">
         <v-card-text v-if="currentBattle.civilWar == 1" class=" pa-0 text-xs-center ">
           Current Battle: Turn {{history[0].turn}} -
@@ -38,7 +34,10 @@
     <v-card class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text" v-else-if="history != null && data.serverStatus == 500"
       transition="scale-transition" color="#2c3e50">
       <v-card-text class="pa-0 title text-xs-center">
-        Next war will start on 30/11
+       Game Over 
+      </v-card-text>
+      <v-card-text class="pa-0 pt-2 text-xs-center">
+        🎉 Winner of current war is Lesotho 🇱🇸 🎉 
       </v-card-text>
     </v-card>
   </v-flex>

@@ -6,6 +6,7 @@ import Cohesion from './components/CohesionTab.vue'
 import BetFinal from './components/BetFinalTab.vue'
 import BetBattle from './components/BetBattle.vue'
 import BetNext from './components/BetNextTab.vue'
+import SpendersWinners from './components/SpendersTab.vue'
 
 Vue.use(Router)
 
@@ -13,7 +14,7 @@ export default new Router({
   routes: [{
       path: '/',
       name: 'home',
-      component: Stats
+      redirect: "/stats"
     },
     {
       path: '/betfinal',
@@ -45,7 +46,14 @@ export default new Router({
       name: 'cohesion',
       component: Cohesion
     },
-    { path: "*", 
+    {
+      path: '/spenderswinners',
+      name: 'spenderswinners',
+      component: SpendersWinners
+    },
+    { 
+      redirect: "/stats",
+      path: "*", 
       component: Stats 
     }
   ]
