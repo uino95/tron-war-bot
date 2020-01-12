@@ -6,16 +6,16 @@ const cors = require('cors');
 const path = require('path');
 const xhub = require('express-x-hub');
 
-const config = require('./config');
-const twb = require('./tronWarBot');
-const referral = require('./referral');
-const backendLogic = require('./backendLogic')
-const scheduler = require('./scheduler')
-const facebook = require('./utils/facebook');
-const telegram = require('./utils/telegram');
-const chatbot = require('./chatbot');
-const betEngine = require('./bet');
-const social = require('./social');
+const config = require('./src/config');
+const twb = require('./src/tronWarBot');
+const referral = require('./src/referral');
+const backendLogic = require('./src/backendLogic')
+const scheduler = require('./src/scheduler')
+const facebook = require('./src/utils/facebook');
+const telegram = require('./src/utils/telegram');
+const chatbot = require('./src/chatbot');
+const betEngine = require('./src/bet');
+const social = require('./src/social');
 
 
 app.use(cors());
