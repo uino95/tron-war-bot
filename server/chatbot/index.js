@@ -18,6 +18,8 @@ module.exports.init = async () =>{
   bot.on('callback_query', actions.handleCbQuery)
   bot.start(auth.checkStartPermissions);
   bot.start(actions.start);
+  bot.hears('hi', (ctx) => ctx.reply('Hey there Uino')) // answer every time u use hi
+  bot.command('hi', (ctx) => ctx.reply('Hello from the dark')) // answer every time u use /hi
   bot.catch(console.error);
   bot.launch()
 }
