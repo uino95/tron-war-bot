@@ -1,7 +1,7 @@
 <template>
   <v-text-field v-if="isTurnTimer" :value="timerValue" label="Next Turn" outline readonly></v-text-field>
   <v-chip disabled dark v-else-if="isRunTimer">{{this.timerValue}}</v-chip>
-  <div v-else> Next Turn: <b>{{this.timerValue}} </b></div>
+  <div class="title " v-else> Next Turn: <b>{{this.timerValue}} </b></div>
 
 </template>
 
@@ -28,20 +28,31 @@
       updateTurnTimer: function () {
         var now = new Date().getTime();
 
-        // Find the distance between now and the count down date
-        var distance = this.info.turnTime - now;
+        if (this.info) {
+          // Find the distance between now and the count down date
+          var distance = this.info.turnTime - now;
 
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+          var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        minutes = minutes < 10 ? `0${minutes}` : minutes
-        seconds = seconds < 10 ? `0${seconds}` : seconds
+          minutes = minutes < 10 ? `0${minutes}` : minutes
+          seconds = seconds < 10 ? `0${seconds}` : seconds
 
-        // If the count down is finished, write some text
-        if (distance < 0) {
-          this.timerValue = '#' + (this.info.turn || ' loading...') + ` in 00:00`
-        } else {
-          this.timerValue = '#' + (this.info.turn || ' loading...') + ` in ${minutes}:${seconds}`
+          // If the count down is finished, write some text
+          
+          if (distance < 0) {
+            this.timerValue = '#' + (this.info.turn || ' loading...') + ` in 00:00`
+          } 
+          else if(days > 0){
+            this.timerValue = '#' + (this.info.turn || ' loading...') + ` in ${days} days ${hours} hours and ${minutes}:${seconds}`
+          }
+          else if(hours > 0){
+            this.timerValue = '#' + (this.info.turn || ' loading...') + ` in ${hours} hours and ${minutes}:${seconds} `
+          } else {
+            this.timerValue = '#' + (this.info.turn || ' loading...') + ` in ${minutes}:${seconds}`
+          }
         }
         setTimeout(() => {
           this.updateTurnTimer();

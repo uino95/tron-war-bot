@@ -1,0 +1,42 @@
+version: '3.7'
+networks:
+  default:
+    name: tron-war
+services:
+  server:
+    image: tron-war-server
+    volumes:
+      - ./server/src:/opt/src
+    build:
+      context: ./server
+      dockerfile: ./Dockerfile
+      args:
+        - NODE_ENV=${NODE_ENV}
+    environment:
+        - RESTART=${RESTART}
+        - TRON_PRIVATE_KEY=${TRON_PRIVATE_KEY}
+        - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+        - TELEGRAM_GROUP=${TELEGRAM_GROUP}
+        - TELEGRAM_ADMIN_GROUP=${TELEGRAM_ADMIN_GROUP}
+        - FB_WEBHOOKS_TOKEN=${FB_WEBHOOKS_TOKEN}
+        - FB_PAGE_ACCESS_TOKEN=${FB_PAGE_ACCESS_TOKEN}
+        - FB_APP_ID=${FB_APP_ID}
+        - FB_APP_SECRET=${FB_APP_SECRET}
+    ports:
+      - "3000:3000"
+    hostname: server
+    restart: always
+
+  client:
+    image: tron-war-client
+    volumes:
+      - ./client/src:/opt/src
+    build:
+      context: ./client
+      dockerfile: ./Dockerfile
+      args:
+        - NODE_ENV=${NODE_ENV}
+    hostname: client
+    ports:
+      - "8080:8080"
+    restart: always
