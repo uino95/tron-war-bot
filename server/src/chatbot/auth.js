@@ -7,6 +7,7 @@ const reject = (ctx, e='Not Allowed') => {
 }
 
 module.exports.getMode = (ctx, next)=>{
+  console.log("heeeeey", ctx.chat.id)
   if (ctx.chat.id == config.telegram.group) ctx.mode = 'GROUP'
   else if (ctx.chat.id == config.telegram.adminGroup) ctx.mode = 'ADMIN_GROUP'
   else if (ctx.chat.id > 0) ctx.mode = 'PRIVATE'
