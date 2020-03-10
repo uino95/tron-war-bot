@@ -9,9 +9,9 @@
             <template v-slot:activator="{ on }">
               <v-icon color="secondary-cohesion-tab" dark v-on="on">info</v-icon>
             </template>
-            <span> todo:
-              Here you can see how the cohesion have been modified during the current run. It can be modified by your
-              interaction by posting, sharing or liking a post or it can be moified by the result of a battle itself
+            <span>
+              Here you can see how the cohesion has been modified during the current run. <br> 
+              It can be modified by a comment, post, mention or review on the official facebook page of <a href="https://www.facebook.com/TronWarBot/" target="blank" style="color: white">  TronWarBot </a>. <br> Or it can be moified by the result of a battle itself
             </span>
           </v-tooltip>
           <v-spacer />
@@ -19,7 +19,7 @@
             hide-details></v-text-field>
         </v-toolbar>
 
-        <v-data-table :search="searchCohesion" :headers="headers" :items="filteredCohesion" :item-key="'turn'"
+        <v-data-table :search="searchCohesion" :headers="headers" :items="cohesionHistory" :item-key="'turn'"
           :custom-sort="customSort" class="elevation-1" :pagination.sync="pagination" :rows-per-page-items="[10,20,50]">
           <template v-slot:items="props">
             <!-- Update type -->
@@ -77,7 +77,7 @@
             <v-btn  round flat dark color="primary_cohesion_tab" v-on:click="loadMore"> Load more data </v-btn>
           </template>
           <template v-slot:actions-prepend>
-            <v-switch class="pt-4" color="primary_cohesion_tab" v-model="onlySocial" label="Only Social"></v-switch>
+            <v-switch class="pt-4" color="primary_cohesion_tab" @change="filterCohesion" v-model="onlySocial" label="Only Social"></v-switch>
           </template>
         </v-data-table>
       </v-card>
@@ -179,17 +179,6 @@
             .o) + '</b> </span>'
         }
       },
-      getFlagString(str) {
-        return "/img/flags/" + str.toLowerCase()
-          .replaceAll(" ", "-")
-          .replaceAll("ã", "a")
-          .replaceAll("ì", "i")
-          .replaceAll("è", "e")
-          .replaceAll("ì", "i")
-          .replaceAll("å", "a")
-          .replaceAll("é", "e")
-          .replaceAll("í", "i") + ".svg";
-      },
       getInteractionImg(str) {
         switch (str) {
           case 'BATTLE':
@@ -224,8 +213,15 @@
       },
       loadMore() {
         this.limit = this.limit + 30
-        this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn').limitToLast(this.limit))
+        this.filterCohesion()
       },
+      filterCohesion() {
+        if (this.onlySocial) {
+          this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('battle').equalTo(null).limitToLast(this.limit))
+        } else {
+          this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn').limitToLast(this.limit))
+        }
+      }
       // loadAll() {
       //   this.loaded = true
       //   this.$rtdbBind('cohesionHistory', db.ref('public/cohesion').orderByChild('turn'))
@@ -234,14 +230,6 @@
     computed: {
       isMobile() {
         return this.$store.state.isMobile
-      },
-      filteredCohesion() {
-        if (this.onlySocial) {
-          return this.cohesionHistory.filter(el => {
-            return el.update_type != "BATTLE"
-          })
-        }
-        return this.cohesionHistory
       }
     },
     filters: {

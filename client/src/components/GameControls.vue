@@ -8,7 +8,7 @@
       </v-tabs>
     </v-toolbar>
 
-    <v-tabs hide-slider  v-if="activeMainTab == 'stats' "   dark color="secondary" show-arrows fixed-tabs >
+    <v-tabs hide-slider v-if="activeMainTab == 'stats' "   dark color="secondary" show-arrows fixed-tabs >
       <v-tab flat replace to="/cohesion">
         <v-icon color="primary_cohesion_tab">control_point</v-icon> Cohesion
       </v-tab>
@@ -46,13 +46,13 @@
     data: () => ({
       tabs:[
         {
-          name: 'Stats',
+          name: 'stats',
           path: 'stats',
           color: 'primary_stats_tab',
           symbol: 'poll'
         },
         {
-          name: 'Bets',
+          name: 'bets',
           path: 'betbattle',
           color: 'primary_battle_tab',
           symbol: 'attach_money'

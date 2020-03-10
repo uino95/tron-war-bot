@@ -1,22 +1,20 @@
-const admin = require('firebase-admin');
-const config = require('../config');
 const firebase = require('../firebase')
 const utils = require('../utils')
-const UPDATE_EVERY = 50;
-const VERSION = 1;
+const UPDATE_EVERY = 20;
+const VERSION = 2;
 const WRITE_DB = "TestDatabase";
 var fs = require('fs');
 
-admin.initializeApp({
-  credential: admin.credential.cert(config.firebase),
-  databaseURL: 'https://tron-war-bot.firebaseio.com/'
-}, WRITE_DB);
+// admin.initializeApp({
+//   credential: admin.credential.cert(config.firebase),
+//   databaseURL: 'https://tron-war-bot.firebaseio.com/'
+// }, WRITE_DB);
 
-const db = admin.database(admin.app(WRITE_DB));
-const testDB = {
-  data: db.ref('public/data'),
-  timelapseMap: db.ref('public/timelapseMap')
-}
+// const db = admin.database(admin.app(WRITE_DB));
+// const testDB = {
+//   data: db.ref('public/data'),
+//   timelapseMap: db.ref('public/timelapseMap')
+// }
 
 
 const COUNTRIES = 241;
@@ -52,6 +50,7 @@ const timelapse = async () => {
   await init();
   console.log('Fetching data...');
   let feed = await fetchData();
+
   console.log('Waiting 5s before running...');
   // await utils.sleep(5000)
   console.log('Running... ');
@@ -149,8 +148,9 @@ const fetchDataV2 = async () => {
   let history = await firebase.history.once('value').then(r => r.val());
   let cohesion = await firebase.cohesion.once('value').then(r => r.val());
   return Object.values(history)
-    .concat(Object.values(cohesion))
-    .sort((a, b) => (a.turn - b.turn) || (!!b.delta - !!a.delta));
+    // .concat(Object.values(cohesion))
+    // .sort((a, b) => (a.turn - b.turn) || (!!b.delta - !!a.delta));
+    .sort((a, b) => (a.turn - b.turn))
 }
 
 const fetchDataV1 = async () => {

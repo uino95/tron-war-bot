@@ -56,17 +56,6 @@ export const betMixin = {
         compare: function (a, b) {
             return b.turn - a.turn
         },
-        getFlagString(str) {
-            return "/img/flags/" + str.toLowerCase()
-                .replaceAll(" ", "-")
-                .replaceAll("ã", "a")
-                .replaceAll("ì", "i")
-                .replaceAll("è", "e")
-                .replaceAll("ì", "i")
-                .replaceAll("å", "a")
-                .replaceAll("é", "e")
-                .replaceAll("í", "i") + ".svg";
-        },
 
         async placeBet(userChoice, betAmount) {
             this.isWaitingForConfirm = true

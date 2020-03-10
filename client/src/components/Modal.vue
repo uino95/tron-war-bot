@@ -178,6 +178,10 @@
               </v-card>
             </v-expansion-panel-content>
           </v-expansion-panel>
+          
+          <v-card-text v-if="info.serverStatus == 500">
+          Run is over! Post your address followed by #divs on the official telegram group to claim your divs. You have time until {{info.deadline}}
+          </v-card-text>
 
           <!-- There is a total of 104 WAR eligible for dividen sharing. Every 10 WAR you'll get 100 TRX at dividend payout
                     (end of the run)-->
@@ -598,11 +602,12 @@
           <v-spacer></v-spacer>
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-              <v-btn v-if="path === 'dividends'" color="blue darken-1" flat="flat" v-on="on">Claim
+              <v-btn v-if="path === 'dividends'" color="blue darken-1" flat="flat" v-on="on" v-on:click="goToTelegram" >Claim
                 your Dividends
               </v-btn>
             </template>
-            <span>It will be available when the run is finished</span>
+            <span v-if="info.serverStatus != 500">It will be available when the run is finished</span>
+            <span v-else>Run is over! Post your address followed by #divs on the official telegram group to claim your divs. You have time until {{info.deadline}}</span>
           </v-tooltip>
           <v-btn color="success" @click.stop="isVisible = false">Close</v-btn>
         </v-card-actions>
@@ -786,6 +791,9 @@
         this.snackbarTimeout = 3000;
         this.snackbar = true
       },
+      goToTelegram(){
+        if(this.info.serverStatus == 500) window.open("https://t.me/joinchat/J8ocIxZoXsD4stn4nxg24A")
+      },
       async becomeAnAmbassador() {
         if (!this.isLoggedIn) {
           this.snackbarText = "Login to facebook First";
@@ -942,6 +950,10 @@
         {
           question: "Is there a whitepaper?",
           answer: "<a href=\"/files/WhitePaper.pdf\" target=\"_blank\">Click here to view the whitepaper<a/>"
+        },
+        {
+          question: "Is there a Privacy Policy?",
+          answer: "<a href=\"/files/PrivacyPolicy.html\" target=\"_blank\">Click here to view our privacy policy<a/>"
         }
       ],
       partners: [],

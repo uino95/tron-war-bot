@@ -22,6 +22,13 @@
 
           <v-card-title primary-title class="justify-center">
             <v-flex md10>
+              <!-- color="#2c3e50" -->
+              <v-card class="mb-2 white--text card-rounded" color="primary_battle_tab">
+                <v-card-text class="pt-2 text-xs-center ">
+                  <i>Latest Turn: #{{history[0].turn }} </i><br>
+                  <div v-html="computeWinnerPhrase(history[0].battle)" />
+                </v-card-text>
+              </v-card >
 
               <v-card class="mb-4">
                 <v-img v-if="info.serverStatus != 500 && !currentBattle.placeHolder" class="white--text"
@@ -176,30 +183,38 @@
                   </v-flex>
                 </v-layout>
 
-                <v-layout row wrap>
-                  <v-flex xs12>
-                    <v-slider thumb-label v-model="betAmount"
-                      :min="betBattleGameParams ? betBattleGameParams.minimumBet : 1"
-                      :max="betBattleGameParams ? betBattleGameParams.maximumBet : 1" label="Bet Amount"></v-slider>
-                  </v-flex>
-                </v-layout>
                 <v-flex xs12 class="text-xs-center pa-2">
                   <div class="title pb-2"> Choose your guess </div>
                   <v-hover>
-                    <v-btn fab dark color="primary_battle_tab" v-on:click="toggle_country(currentBattle.o,1)">
+                    <v-btn fab dark :color="currentChoice == 1 ? 'secondary_battle_tab' : 'primary_battle_tab'"
+                      v-on:click="toggle_country(currentBattle.o,1)">
                       <div class="title white--text"> 1 </div>
                     </v-btn>
                   </v-hover>
-                  <v-btn fab dark color="primary_battle_tab" v-on:click="toggle_country(241,0)">
+                  <v-btn fab dark :color="currentChoice == 0 ? 'secondary_battle_tab' : 'primary_battle_tab'"
+                    v-on:click="toggle_country(241,0)">
                     <div class="title white--text"> x </div>
                   </v-btn>
                   <v-hover>
-                    <v-btn v-if="currentBattle.civilWar != 1" fab dark color="primary_battle_tab"
+                    <v-btn v-if="currentBattle.civilWar != 1" fab dark
+                      :color="currentChoice == 2 ? 'secondary_battle_tab' : 'primary_battle_tab'"
                       v-on:click="toggle_country(currentBattle.d,2)">
                       <div class="title white--text"> 2 </div>
                     </v-btn>
                   </v-hover>
                 </v-flex>
+                <v-layout row wrap>
+                  <v-flex xs12>
+                    <v-flex text-xs-center>
+                      <span class="subheading pb-0 pl-2 mr-1">Bet Amount</span>
+                    </v-flex>
+                    <v-slider class="mt-0" thumb-label v-model="betAmount"
+                      :min="betBattleGameParams ? betBattleGameParams.minimumBet : 1"
+                      :max="betBattleGameParams ? betBattleGameParams.maximumBet : 1" append-icon="fa-plus"
+                      prepend-icon="fa-minus" @click:append="betAmount ++" @click:prepend="betAmount --">
+                    </v-slider>
+                  </v-flex>
+                </v-layout>
                 <v-btn v-if="info.serverStatus == 200" :loading="isWaitingForConfirm" color="primary_battle_tab" dark
                   @click="placeBet(currentChoice, betAmount)">
                   <div v-bind:style="{'max-width': windowSize.x * 0.6 + 'px'}" class="text-truncate">
@@ -235,8 +250,9 @@
             <v-toolbar-title>My Bets</v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
-          <v-data-table :headers="personalBetsHeaders" :pagination.sync="paginationBets" :items="myBets" class="elevation-1">
-            <template v-slot:items="props" >
+          <v-data-table :headers="personalBetsHeaders" :pagination.sync="paginationMyBets" :items="myBets"
+            class="elevation-1">
+            <template v-slot:items="props">
               <td class="text-xs-left">{{ props.item.userChoice | CHOICE}}</td>
               <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
               <td class="text-xs-left">{{ props.item.turn }}</td>
@@ -247,12 +263,8 @@
             </template>
 
             <template v-slot:no-data>
-              <v-alert v-if="account == null" :value="true" color="error">
-                Login First
-              </v-alert>
-              <v-alert v-else :value="true" color="error" icon="warning">
-                No data availbale
-              </v-alert>
+              <v-chip v-if="account == null" label outline color="red">Login First</v-chip>
+              <v-chip v-else label outline color="red"> No Bets Yet </v-chip>
             </template>
           </v-data-table>
         </v-card>
@@ -266,8 +278,9 @@
             <v-spacer></v-spacer>
           </v-toolbar>
 
-          <v-data-table :headers="latestBetsHeaders" :pagination.sync="paginationBets" :items="latestBets" class="elevation-1">
-            <template v-slot:items="props" >
+          <v-data-table :headers="latestBetsHeaders" :pagination.sync="paginationLatestBets" :items="latestBets"
+            class="elevation-1">
+            <template v-slot:items="props">
               <td class="text-xs-left hidden-xs-only">{{ props.item.from }}</td>
               <td class="text-xs-left">{{ props.item.userChoice | CHOICE }}</td>
               <td class="text-xs-left">{{ props.item.amount | TRXnotBIG }}</td>
@@ -279,12 +292,8 @@
             </template>
 
             <template v-slot:no-data>
-              <v-alert v-if="account == null" :value="true" color="error">
-                Login First
-              </v-alert>
-              <v-alert v-else :value="true" color="error" icon="warning">
-                No data availbale
-              </v-alert>
+              <v-chip v-if="account == null" label outline color="red">Login First</v-chip>
+              <v-chip v-else label outline color="red"> No Bets Yet </v-chip>
             </template>
           </v-data-table>
         </v-card>
@@ -326,8 +335,11 @@
         history: [],
         isWaitingForConfirm: false,
         currentTxId: null,
-        historyTurn: [],
-        paginationBets: {
+        paginationLatestBets: {
+          sortBy: 'turn',
+          descending: true,
+        },
+        paginationMyBets: {
           sortBy: 'turn',
           descending: true,
         },
@@ -441,6 +453,26 @@
         this.currentCountry = country
         this.currentChoice = choice
       },
+      computeWinnerPhrase(item) {
+        if (item.civilWar) {
+          if (item.result == 1) {
+            return '<b>' + this.universalMap(item.o) + '</b>' + ' has rebelled against ' +
+              '<b>' + this.universalMap(item.d) + '</b>'
+          }
+          return '<b>' + this.universalMap(item.d) + '</b>' + ' has stop the rebellion of ' +
+            '<b>' + this.universalMap(item.o) + '</b>'
+        }
+        switch (item.result) {
+          case 0:
+            return 'The battle between <b>' + this.universalMap(item.o) + '</b>  and <b> ' + this.universalMap(item.d) + '</b> has been solved peacefully without a winner';
+          case 1:
+            return '<b>' + this.universalMap(item.o) + '</b>' + ' has conquered ' +
+              '<b>' + this.universalMap(item.dt) + '</b> previously owned by <b>' + this.universalMap(item.d) + '</b>';
+          case 2:
+            return '<b>' + this.universalMap(item.d) + '</b>' + ' has conquered ' +
+              '<b>' + this.universalMap(item.ot) + '</b> previously owned by <b>' + this.universalMap(item.o) + '</b>';
+        }
+      }
     },
 
     computed: {
@@ -498,4 +530,11 @@
     width: 100%;
     height: 300px;
   }
+  .card-rounded {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+
 </style>
