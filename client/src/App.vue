@@ -13,7 +13,7 @@
                         </v-flex>
                     </v-layout>
                     <v-divider :class="item.class" v-else-if="item.divider" :key="i" dark class="my-3"></v-divider>
-                    <v-list-tile :class="item.class" v-else-if="item.loginFb" :key="i">
+                    <!-- <v-list-tile :class="item.class" v-else-if="item.loginFb" :key="i">
                         <v-list-tile-action>
                             <v-icon>fab fa-facebook-square</v-icon>
                         </v-list-tile-action>
@@ -37,7 +37,7 @@
                                 {{ item.text }}
                             </span>
                         </v-list-tile-content>
-                    </v-list-tile>
+                    </v-list-tile> -->
                     <v-list-tile :class="item.class" v-else :key="i" @click="openLink(item.body)">
                         <v-list-tile-action>
                             <v-icon>{{ item.icon }}</v-icon>
@@ -63,7 +63,7 @@
                     style="color: white">WarBot</span></span>
             <v-spacer></v-spacer>
             <v-toolbar-items>
-                <v-menu offset-y>
+                <!-- <v-menu offset-y>
                     <template v-slot:activator="{ on }">
                         <v-btn flat dark v-on="on" class="hidden-xs-only">
                             Account
@@ -114,6 +114,9 @@
                         <template v-slot:badge><span>🎖</span></template>
                         Ambassador
                     </v-badge>
+                </v-btn> -->
+                <v-btn icon dark @click="openLink('https://t.me/joinchat/J8ocIxZoXsD4stn4nxg24A')">
+                    <v-icon >fab fa-telegram</v-icon>
                 </v-btn>
             </v-toolbar-items>
         </v-toolbar>
@@ -154,104 +157,105 @@
             loading: true,
             noShowMap: true,
             toDisplay: 'none',
-            drawer: null,
+            drawer: false,
             isModalVisible: false,
             itemClicked: {},
             news: [],
             showCookieDialog: false,
-            menuItems: [{
-                    heading: 'My Info'
-                },
-                {
-                    icon: 'fa-paper-plane',
-                    text: 'Login To Facebook',
-                    path: 'fbLogin',
-                    link: false,
-                    loginFb: true,
-                    class: "hidden-sm-and-up"
-                },
-                {
-                    icon: 'fa-paper-plane',
-                    text: 'Login To Your Wallet',
-                    path: 'walletLogin',
-                    link: false,
-                    login: true,
-                    class: "hidden-sm-and-up"
-                },
-                {
-                    icon: 'people',
-                    text: 'Referral',
-                    path: 'referral',
-                    link: false,
-                    body: 'WIP'
-                },
-                {
-                    icon: 'attach_money',
-                    text: 'Dividends',
-                    path: 'dividends',
-                    link: false,
-                    body: 'WIP'
-                },
-                {
-                    divider: true,
-                    class: "hidden-sm-and-up"
-                },
-                {
-                    heading: 'General',
-                    class: "hidden-sm-and-up"
-                },
-                {
-                    icon: 'fa-medal',
-                    text: '🎖 Become an Ambassador 🎖',
-                    path: 'ambassador',
-                    link: false,
-                    body: 'WIP',
-                    class: "hidden-sm-and-up"
-                },
-                {
-                    icon: 'fa-newspaper',
-                    text: 'News',
-                    path: 'news',
-                    link: false,
-                    body: 'WIP',
-                    class: "hidden-sm-and-up"
-                },
-                {
-                    divider: true
-                },
-                {
-                    heading: 'Help'
-                },
-                {
-                    icon: 'fa-gamepad',
-                    text: 'How To Play',
-                    path: 'howToPlay',
-                    link: false,
-                    body: 'WIP'
-                },
-                {
-                    icon: 'help',
-                    text: 'FAQ',
-                    path: 'faq',
-                    link: false,
-                    body: 'WIP'
-                },
-                {
-                    icon: 'fa-hands-helping',
-                    text: 'Partners',
-                    path: 'partners',
-                    link: false,
-                    body: 'WIP'
-                },
-                /*      {
-                        icon: 'assignment',
-                        text: 'Whitepaper',
-                        link: false,
-                        body: 'WIP'
-                      },*/
-                {
-                    divider: true
-                },
+            menuItems: [
+                // {
+                //     heading: 'My Info'
+                // },
+                // {
+                //     icon: 'fa-paper-plane',
+                //     text: 'Login To Facebook',
+                //     path: 'fbLogin',
+                //     link: false,
+                //     loginFb: true,
+                //     class: "hidden-sm-and-up"
+                // },
+                // {
+                //     icon: 'fa-paper-plane',
+                //     text: 'Login To Your Wallet',
+                //     path: 'walletLogin',
+                //     link: false,
+                //     login: true,
+                //     class: "hidden-sm-and-up"
+                // },
+                // {
+                //     icon: 'people',
+                //     text: 'Referral',
+                //     path: 'referral',
+                //     link: false,
+                //     body: 'WIP'
+                // },
+                // {
+                //     icon: 'attach_money',
+                //     text: 'Dividends',
+                //     path: 'dividends',
+                //     link: false,
+                //     body: 'WIP'
+                // },
+                // {
+                //     divider: true,
+                //     class: "hidden-sm-and-up"
+                // },
+                // {
+                //     heading: 'General',
+                //     class: "hidden-sm-and-up"
+                // },
+                // {
+                //     icon: 'fa-medal',
+                //     text: '🎖 Become an Ambassador 🎖',
+                //     path: 'ambassador',
+                //     link: false,
+                //     body: 'WIP',
+                //     class: "hidden-sm-and-up"
+                // },
+                // {
+                //     icon: 'fa-newspaper',
+                //     text: 'News',
+                //     path: 'news',
+                //     link: false,
+                //     body: 'WIP',
+                //     class: "hidden-sm-and-up"
+                // },
+                // {
+                //     divider: true
+                // },
+                // {
+                //     heading: 'Help'
+                // },
+                // {
+                //     icon: 'fa-gamepad',
+                //     text: 'How To Play',
+                //     path: 'howToPlay',
+                //     link: false,
+                //     body: 'WIP'
+                // },
+                // {
+                //     icon: 'help',
+                //     text: 'FAQ',
+                //     path: 'faq',
+                //     link: false,
+                //     body: 'WIP'
+                // },
+                // {
+                //     icon: 'fa-hands-helping',
+                //     text: 'Partners',
+                //     path: 'partners',
+                //     link: false,
+                //     body: 'WIP'
+                // },
+                // /*      {
+                //         icon: 'assignment',
+                //         text: 'Whitepaper',
+                //         link: false,
+                //         body: 'WIP'
+                //       },*/
+                // {
+                //     divider: true
+                // },
                 {
                     heading: 'Social'
                 },

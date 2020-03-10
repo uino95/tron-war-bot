@@ -60,8 +60,8 @@
             j = this.colors.length - 1
           }
         })
-        // assign a color to a particular country
-        this.colorsDefault[90] = "#009688"
+        // // assign a color to a particular country
+        // this.colorsDefault[90] = "#009688"
         data.map(el => {
           el['controllerCohesion'] = (data[el['occupiedBy']]['cohesion']);
           el['color'] = this.colorsDefault[el['occupiedBy']];

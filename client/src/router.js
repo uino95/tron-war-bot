@@ -3,10 +3,10 @@ import Router from 'vue-router'
 import Stats from './components/StatsTab.vue'
 import History from './components/HistoryTab.vue'
 import Cohesion from './components/CohesionTab.vue'
-import BetFinal from './components/BetFinalTab.vue'
-import BetBattle from './components/BetBattle.vue'
-import BetNext from './components/BetNextTab.vue'
-import SpendersWinners from './components/SpendersTab.vue'
+// import BetFinal from './components/BetFinalTab.vue'
+// import BetBattle from './components/BetBattle.vue'
+// import BetNext from './components/BetNextTab.vue'
+// import SpendersWinners from './components/SpendersTab.vue'
 
 Vue.use(Router)
 
@@ -15,11 +15,6 @@ export default new Router({
       path: '/',
       name: 'home',
       redirect: "/stats"
-    },
-    {
-      path: '/betfinal',
-      name: 'betfinal',
-      component: BetFinal
     },
     {
       path: '/stats',
@@ -32,24 +27,9 @@ export default new Router({
       component: History
     },
     {
-      path: '/betnext',
-      name: 'betnext',
-      component: BetNext
-    },
-    {
-      path: '/betbattle',
-      name: 'betbattle',
-      component: BetBattle
-    },
-    {
       path: '/cohesion',
       name: 'cohesion',
       component: Cohesion
-    },
-    {
-      path: '/spenderswinners',
-      name: 'spenderswinners',
-      component: SpendersWinners
     },
     { 
       redirect: "/stats",
