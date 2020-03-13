@@ -143,12 +143,13 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
   battle.fatality = FATALITY_RATE;
   battle.transmission = TRANSMISSION_RATE;
   battle.recovery = RECOVERY_RATE;
-  battle.stats = new Array(countriesMap.length);
+  battle.stats = {};
 
   for (var c of countriesMap) {
-    battle.stats[c.idx] = {}
+    let stats = {}
     // SKIP STUPID COUNTRIES
     if (c.population == 1) continue;
+    battle.stats[c.idx] = stats;
 
     // EVALUATE RESISTANCE
     let resistance = (0.5 + c.cohesion)**3
@@ -159,7 +160,7 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
     c.infected = c.infected - newDeaths;
     c.active = c.population - c.deaths;
 
-    battle.stats[c.idx].deaths = newDeaths;
+    stats.deaths = newDeaths;
     if (c.active <= 0 ) continue;
     // EVALUATE NEW RECOVERED
     let newRecovered = Math.floor(c.infected * RECOVERY_RATE * resistance);
@@ -171,9 +172,9 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
     // SHAKE RESISTANCE
     let delta = (newRecovered-newInfected)/c.active * ((c.infected/c.active)**(1/3))
 
-    battle.stats[c.idx].infected = newInfected;
-    battle.stats[c.idx].recovered = newRecovered;
-    battle.stats[c.idx].delta = delta;
+    stats.infected = newInfected;
+    stats.recovered = newRecovered;
+    stats.delta = delta;
 
   }
 
