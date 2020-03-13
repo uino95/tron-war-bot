@@ -69,10 +69,10 @@ const init = async (restart) => {
       // nextQuote: 200, // MULTIPLIER FOR BET ON NEXT CONQUERER
       // territories: 1,
       probability: (1/COUNTRIES),
-      population:10, //total population
+      population:100, //total population
       deaths:0, // total deaths
       infected:0, // active * infection rate
-      active:10,  // total pop - deaths
+      active:100,  // total pop - deaths
     }
   });
   if (!restart)  await loadSavedState();
