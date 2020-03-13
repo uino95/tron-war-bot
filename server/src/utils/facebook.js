@@ -50,11 +50,11 @@ const webhooks = async (req, res, next) => {
   let bd = req.body;
   if (bd.object != "page" || !bd.entry || !bd.entry[0] || !bd.entry[0].changes) return res.send("");
   // IF MULTIPLE ENTRIES
-  for (var el of bd.entry[0].changes) {
-    let u = getUpdateData(el);
-    if (!u) continue;
-    await shares.update(u.text, u.user_id, u.user_name, u.update_type, "FB", u.link)
-  }
+  // for (var el of bd.entry[0].changes) {
+  //   let u = getUpdateData(el);
+  //   if (!u) continue;
+  //   await shares.update(u.text, u.user_id, u.user_name, u.update_type, "FB", u.link)
+  // }
   return res.send("");
 }
 

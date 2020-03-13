@@ -31,10 +31,7 @@ const currentTurnData = async () => {if (!countriesMap) await init(); return JSO
 const mapState = async () => {if (!countriesMap) await init(); return JSON.parse(JSON.stringify(countriesMap));}
 
 // Returns array of countryIndexes
-const conquerableTerritoriesOf = (c) => fairness.conquerableTerritoriesOf(countriesMap, c);
-const conqueredTerritoriesOf = (c) => fairness.conqueredTerritoriesOf(countriesMap, c);
-const countriesOnTheBorders = () => fairness.countriesOnTheBorders(countriesMap);
-const countriesStillAlive = () => fairness.countriesStillAlive(countriesMap);
+// const countriesStillAlive = () => fairness.countriesStillAlive(countriesMap);
 
 const pdf = () => fairness.pdf(countriesMap);
 const cumulatedPdf = () => fairness.cumulatedPdf(countriesMap);
@@ -42,21 +39,21 @@ const realPdf = () => fairness.realPdf(countriesMap);
 
 const winner = () => fairness.winner(countriesMap);
 
-const compressedState = async ()=>{
-  let cMap = await mapState();
-  let td = await currentTurnData();
-  let mapCompressedCopy = new Array(COUNTRIES).fill({});
-  cMap.forEach((e, idx)=>{
-    mapCompressedCopy[idx] = {
-      c: e.cohesion,
-      o: e.occupiedBy
-    }
-  });
-  if (td.battle && td.battle.quotes) delete td.battle.quotes;
-  if (td.next && td.next.quotes) delete td.battle.quotes;
-  let o = {countriesMap : mapCompressedCopy, turnData: td}
-  return Buffer.from(JSON.stringify(o), "ascii").toString("base64");
-}
+// const compressedState = async ()=>{
+//   let cMap = await mapState();
+//   let td = await currentTurnData();
+//   let mapCompressedCopy = new Array(COUNTRIES).fill({});
+//   cMap.forEach((e, idx)=>{
+//     mapCompressedCopy[idx] = {
+//       c: e.cohesion,
+//       o: e.occupiedBy
+//     }
+//   });
+//   if (td.battle && td.battle.quotes) delete td.battle.quotes;
+//   if (td.next && td.next.quotes) delete td.battle.quotes;
+//   let o = {countriesMap : mapCompressedCopy, turnData: td}
+//   return Buffer.from(JSON.stringify(o), "ascii").toString("base64");
+// }
 
 const init = async (restart) => {
   if(restart) console.warn("[WWB]: Restarting game...")
@@ -64,13 +61,18 @@ const init = async (restart) => {
   turnData = {};
   countriesMap = new Array(COUNTRIES).fill(0).map((e,idx)=>{
     return {
-      occupiedBy: idx,
-      cohesion: 0.5,
+      // occupiedBy: idx,
+      idx,
+      cohesion: 0.5, // infection rate
       nextCohesion: 0.5,
-      finalQuote: 25, // PRICE OF FINAL BET
-      nextQuote: 200, // MULTIPLIER FOR BET ON NEXT CONQUERER
-      territories: 1,
-      probability: (1/COUNTRIES)
+      // finalQuote: 25, // PRICE OF FINAL BET
+      // nextQuote: 200, // MULTIPLIER FOR BET ON NEXT CONQUERER
+      // territories: 1,
+      probability: (1/COUNTRIES),
+      population:10, //total population
+      deaths:0, // total deaths
+      infected:0, // active * infection rate
+      active:10,  // total pop - deaths
     }
   });
   if (!restart)  await loadSavedState();
@@ -92,7 +94,7 @@ const saveCurrentState = async () => {
 
 
 const printStatus = ()=>{
-  countriesMap.forEach((c,idx)=>console.log(idx + " => " + c.occupiedBy + "  cohesion:" + c.cohesion.toFixed(4)));
+  // countriesMap.forEach((c,idx)=>console.log(idx + " => " + c.occupiedBy + "  cohesion:" + c.cohesion.toFixed(4)));
 }
 
 const isValidAmbassador = (u) => {
@@ -112,12 +114,11 @@ const addAmbassador = (u)=>{
 }
 
 const leaderboard = ()=>{
-  return countriesMap.map((e,idx)=>{
-    e.idx = idx;
-    return e;
-  }).sort((a, b)=>{
-    return b.territories - a.territories;
-  });
+  return countriesMap
+      .map((e,idx)=>{ return e })
+      .sort((a, b)=>{
+        return (b.deaths/b.population) - (a.deaths/a.population);
+      });
 }
 
 
@@ -145,20 +146,20 @@ const preTurn = async () => {
 
 const postTurn = async (turnData) => {
   // GET JACKPOT
-  let jackpot = await twb.jackpot();
-  let bets = (await firebase.bets.getCurrentTurnBets(0, ROUND) )|| [];
-  let betsPerCountry = new Array(COUNTRIES).fill(0);
-  bets.forEach((e,i)=>betsPerCountry[e.userChoice]+=1);
+  // let jackpot = await twb.jackpot();
+  // let bets = (await firebase.bets.getCurrentTurnBets(0, ROUND) )|| [];
+  // let betsPerCountry = new Array(COUNTRIES).fill(0);
+  // bets.forEach((e,i)=>betsPerCountry[e.userChoice]+=1);
 
   // CALCULATE NEW EXACT PDF AND QUOTES
   realPdf().forEach((e,i)=>{
     countriesMap[i].probability = e;
-    let pf = countriesMap[i].territories/COUNTRIES;
-    countriesMap[i].nextQuote = utils.quoteFromProbability(e);
-    let discountFactor = (betsPerCountry[i]+1)/(betsPerCountry[i]+2);
-    countriesMap[i].finalQuote = Math.round((((jackpot * pf)/(betsPerCountry[i]+1)) + 50) * discountFactor);
+    // let pf = countriesMap[i].territories/COUNTRIES;
+    // countriesMap[i].nextQuote = utils.quoteFromProbability(e);
+    // let discountFactor = (betsPerCountry[i]+1)/(betsPerCountry[i]+2);
+    // countriesMap[i].finalQuote = Math.round((((jackpot * pf)/(betsPerCountry[i]+1)) + 50) * discountFactor);
   })
-  if (turnData.next) turnData.next.quotes = turnData.next.probabilities.map(e=>utils.quoteFromProbability(e));
+  // if (turnData.next) turnData.next.quotes = turnData.next.probabilities.map(e=>utils.quoteFromProbability(e));
   //CALL EXTERNAL SCHEDULED FUNCTIONS
   let awakeFn = turnQueue[turnData.turn.toString()] || [];
   awakeFn = awakeFn.concat(turnQueue["0"] || []);
@@ -172,39 +173,19 @@ const postTurn = async (turnData) => {
   delete turnQueue[turn.toString()];
 }
 
-// UPDATE STATE AND TERRITORIES
-const updateMap = (battle, next) => {
-  if (!battle) return;
-  switch (battle.result) {
-    case 0:
-      if (!simulation) console.log("[WWB]: BATTLE -> X : " + utils.universalMap(battle.o) +  " (" + battle.o + ") peacefully resolved with " + utils.universalMap(battle.d) +  " (" + battle.d + ")");
-      break;
-    case 1:
-      countriesMap[battle.dt].occupiedBy = battle.o;
-      countriesMap[battle.o].territories += 1;
-      countriesMap[battle.d].territories -= 1;
-      if (!simulation) console.log("[WWB]: BATTLE -> 1 :  " + utils.universalMap(battle.o) +  " (" + battle.o + ") => " + utils.universalMap(battle.dt) +  " (" + battle.dt + ")")
-      break;
-    case 2:
-      countriesMap[battleData.ot].occupiedBy = battleData.d;
-      countriesMap[battle.o].territories -= 1;
-      countriesMap[battle.d].territories += 1;
-      if (!simulation) console.log("[WWB]: BATTLE -> 2 :  " + utils.universalMap(battle.d) +  " (" + battle.d + ") => " + utils.universalMap(battle.ot) +  " (" + battle.ot + ")")
-      break;
-  }
-}
 
 const updateCohesion = (battle, next) => {
-  if (!battle) return;
-  saveCohesion(editCohesion(battle.o, config.cohesion.battle[battle.result.toString()].o, config.cohesion.battle.threshold), battle)
-  saveCohesion(editCohesion(battle.ot, config.cohesion.battle[battle.result.toString()].ot, config.cohesion.battle.threshold), battle)
-  saveCohesion(editCohesion(battle.d, config.cohesion.battle[battle.result.toString()].d, config.cohesion.battle.threshold), battle)
-  saveCohesion(editCohesion(battle.dt, config.cohesion.battle[battle.result.toString()].dt, config.cohesion.battle.threshold), battle)
-  countriesMap.forEach((e,i)=>{countriesMap[i].cohesion = countriesMap[i].nextCohesion;});
+  // @TODO
+  countriesMap.forEach((e,i)=>{
+    let delta = ((battle.stats[i] || {}).delta || 0);
+    if (i==next.receiver) delta += next.cohesion;
+    editCohesion(i, delta, undefined, false);
+    countriesMap[i].cohesion = countriesMap[i].nextCohesion;
+  });
 }
 
 
-const editCohesion = (country, delta, threshold={upper: 100, lower: 0.1}) => {
+const editCohesion = (country, delta, threshold={upper: 100, lower: 0.1}, save=true) => {
   if (!delta) return;
   let old = countriesMap[country].nextCohesion;
   delta = delta/100;
@@ -214,7 +195,7 @@ const editCohesion = (country, delta, threshold={upper: 100, lower: 0.1}) => {
   _new = Math.max(Math.min(_new, upper), lower);
   if (old == _new) return;
   countriesMap[country].nextCohesion = _new;
-  if (!simulation) {
+  if (save && !simulation) {
     //Save on db
     firebase.countriesMap.child(country).set(countriesMap[country]);
     console.log("[WWB]: Updating cohesion of " + utils.universalMap(country) +  "("+utils.toPercent(countriesMap[country].cohesion)+") by: " + utils.toPercent(delta)+ "\tnew value: " +  utils.toPercent(countriesMap[country].nextCohesion));
@@ -247,16 +228,21 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
   if (fairness.winner(countriesMap)!=null) return true;
 
 
-
+  let nextData, battleData, computedRandom;
   // COMPUTE NEW TURN
+  // Mutate virus. Determines fatality and spreading rate
   [battleData, computedRandom] = fairness.resolveNextBattle(countriesMap, turnData, _entropy1, _entropy2);
-  updateMap(battleData);
+  // Send virus pack to another county or open a virus box or quarantine the country
   [nextData, computedRandom] = fairness.resolveNextConqueror(countriesMap, turnData, _entropy1, _entropy2);
+  console.log(battleData)
+  console.log(nextData)
+  // Update new infection levels
   updateCohesion(battleData, nextData);
+
   turnData = {};
   turnData.turn = turn - 1;
   turnData.battle = battleData || "";
-  turnData.next = nextData;
+  turnData.next = nextData || "";
   turnData.winner = fairness.winner(countriesMap);
 
   if (simulation) return turnData.winner != null;
@@ -265,7 +251,7 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
   await postTurn(turnData);
   await saveCurrentState();
 
-  if (turnData.next && turnData.next.civilWar) console.log("[WWB]:KABOOM! " + turnData.next.o + " is rebelling on " + turnData.next.d);
+  // if (turnData.next && turnData.next.civilWar) console.log("[WWB]:KABOOM! " + turnData.next.o + " is rebelling on " + turnData.next.d);
   return turnData.winner != null;
 }
 
@@ -338,14 +324,11 @@ module.exports = {
   onTurn,
   launchNextTurn,
   editCohesion,
-  countriesStillAlive,
-  conquerableTerritoriesOf,
-  conqueredTerritoriesOf,
-  countriesOnTheBorders,
+  // countriesStillAlive,
   cumulatedPdf,
   printStatus,
   pdf,
   simulate,
-  compressedState,
+  // compressedState,
   winner
 }

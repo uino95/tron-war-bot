@@ -59,9 +59,9 @@ const config = {
     txMargin: 15
   },
   timingTest: {
-    turn: 30,
-    blockConfirmation: 2,
-    txMargin: 5
+    turn: 15,
+    blockConfirmation: 1,
+    txMargin: 3
   },
   social:{
     updates:{
@@ -97,8 +97,24 @@ const config = {
     }
   },
   wwb:{
-    battleWeight: [0.15, 0.56, 0.29],
-    civilWarLikelihood: 0.04,
+    fatality : {
+      min: 0.01,
+      initial: 0.03,
+      spread: 0.2,
+      bias: 0.1
+    },
+    recovery : {
+      min: 0.1,
+      initial: 1,
+      spread: 0.2,
+      bias: -0.01
+    },
+    transmission : {
+      min: 0.1,
+      initial: 3,
+      spread: 0.2,
+      bias: 0.01
+    },
     restart: JSON.parse(process.env.RESTART || false)
   }
 }

@@ -1,61 +1,77 @@
 const config = require("./config");
-const CIVIL_WAR_LIKELIHOOD = config.wwb.civilWarLikelihood;
-const BATTLE_WEIGHT = config.wwb.battleWeight;
+// const CIVIL_WAR_LIKELIHOOD = config.wwb.civilWarLikelihood;
+// const BATTLE_WEIGHT = config.wwb.battleWeight;
+var FATALITY_RATE = config.wwb.fatality.initial;
+var TRANSMISSION_RATE = config.wwb.transmission.initial;
+var RECOVERY_RATE = config.wwb.recovery.initial;
+
 const neighborCountries = require('./map-utilities/neighborCountries');
 const utils = require("./utils");
 
 const initTurnData = () => {
   return {
-    civilWar: false,
-    o: null,
-    ot: null,
-    d: null,
-    dt: null,
-    probabilities: []
+    sender: null,
+    receiver: null,
+    description: "this is a dummy description",
+    cohesion: null,
+    infected: null,
+    deaths: null
   };
 }
 
 const conquerableTerritoriesOf = (countriesMap, c) => {
   return neighborCountries[c].filter((t)=>{
-    return countriesMap[t].occupiedBy != countriesMap[c].occupiedBy;
+    return countriesMap[t].population != 1;
+    // return countriesMap[t].occupiedBy != countriesMap[c].occupiedBy;
   })
 }
 
-const conqueredTerritoriesOf = (countriesMap, c) => {
-  return Object.keys(countriesMap).filter((t)=>countriesMap[t].occupiedBy==c);
-}
+// const conqueredTerritoriesOf = (countriesMap, c) => {
+//   return Object.keys(countriesMap).filter((t)=>countriesMap[t].occupiedBy==c);
+// }
 
 
-const countriesOnTheBorders = (countriesMap) => {
+const deadCountries = (countriesMap) => {
   return Object.keys(countriesMap).filter((c)=>{
-    return conquerableTerritoriesOf(countriesMap, c).length;
+    return countriesMap[c].active == 0;
   })
 }
 
-const countriesStillAlive = (countriesMap) => {
-  return [...new Set(
-    countriesMap.map((c)=>{return c.occupiedBy;})
-  )];
-}
+// const countriesStillAlive = (countriesMap) => {
+//   return [...new Set(
+//     countriesMap.map((c)=>{return c.occupiedBy;})
+//   )];
+// }
 
 const rawPdf = (countriesMap) => {
   return countriesMap.map((c,idx)=>{
-    let pOfConquest = Math.min(conquerableTerritoriesOf(countriesMap, idx).length,1) * countriesMap[c.occupiedBy].cohesion * (1 - CIVIL_WAR_LIKELIHOOD);
-    let pOfCivilWar =  (c.occupiedBy != idx ? 1 : 0) * Math.max(((0.5 + c.cohesion)**3 - 0.5), 0) * CIVIL_WAR_LIKELIHOOD;
-    return [pOfConquest,  pOfCivilWar];
+    // let pOfConquest = Math.min(conquerableTerritoriesOf(countriesMap, idx).length,1) * countriesMap[c.occupiedBy].cohesion * (1 - CIVIL_WAR_LIKELIHOOD);
+    // let pOfCivilWar =  (c.occupiedBy != idx ? 1 : 0) * Math.max(((0.5 + c.cohesion)**3 - 0.5), 0) * CIVIL_WAR_LIKELIHOOD;
+    if (c.population == 1) return [0,0];
+    let pOfConquest = 1;
+    let pOfCivilWar = 0
+    return [pOfConquest,  pOfCivilWar]; //NUMBER OF SCENARIOS TYPES
   })
 }
 
 const pdf = (countriesMap) => {
   let r = rawPdf(countriesMap);
-  let total = r.reduce((acc, c) => acc + c[0] + c[1], 0);
-  return r.map(c=>[c[0]/total, c[1]/total]);
+  let total = r.reduce((acc, c) => {
+    return acc + c.reduce((a,v)=>a+v,0);
+  }, 0);
+  return r.map(c=>{
+    let o = []
+    for (var i in c) o.push(c[i]/total)
+    return o;
+  });
 }
 
 const cumulatedPdf = (countriesMap) => {
   let cumulated = 0;
   return pdf(countriesMap).map(c=>{
-    return [cumulated += c[0], cumulated += c[1]]
+    let r = []
+    for (var i in c) r.push(cumulated += c[i])
+    return r;
   });
 }
 
@@ -70,7 +86,7 @@ const realPdf = (countriesMap) => {
 }
 
 const winner = (countriesMap) => {
-  if (!countriesOnTheBorders(countriesMap).length) return countriesMap[0].occupiedBy;
+  if (deadCountries(countriesMap).length) return deadCountries(countriesMap)[0].idx;
   return null;
 }
 
@@ -110,74 +126,112 @@ const resolveScenario = (cpdf, random) => {
 }
 
 const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) => {
-  if (!turnData.next) return [undefined, undefined];
-  let battleData = turnData.next;
+  let battle = {};
   let rand0 = computeRandom(firstEntropy, secondEntropy, 0);
-  let cpdf = cumulatedBattlePdf(countriesMap, battleData);
-  let scenario = resolveScenario(cpdf, rand0);
-  battleData.result = scenario;
-  return [battleData, [rand0]];
+  let rand1 = computeRandom(firstEntropy, secondEntropy, 1);
+  let rand2 = computeRandom(firstEntropy, secondEntropy, 2);
+
+  let deltaFatality = 1 + (((rand0-0.5) + config.wwb.fatality.bias) * config.wwb.fatality.spread)
+  FATALITY_RATE = Math.max(config.wwb.fatality.min, Math.min(0.99, FATALITY_RATE *  deltaFatality))
+
+  let deltaRecovery = 1 + (((rand1-0.5) + config.wwb.recovery.bias) * config.wwb.recovery.spread)
+  RECOVERY_RATE = Math.max(config.wwb.recovery.min, (RECOVERY_RATE *  deltaRecovery))
+
+  let deltaTransmission = 1 + (((rand2-0.5) + config.wwb.transmission.bias) * config.wwb.transmission.spread)
+  TRANSMISSION_RATE = Math.max(config.wwb.transmission.min, TRANSMISSION_RATE *  deltaTransmission)
+
+  battle.fatality = FATALITY_RATE;
+  battle.transmission = TRANSMISSION_RATE;
+  battle.recovery = RECOVERY_RATE;
+  battle.stats = new Array(countriesMap.length);
+
+  for (var c of countriesMap) {
+    battle.stats[c.idx] = {}
+    // SKIP STUPID COUNTRIES
+    if (c.population == 1) continue;
+
+    // EVALUATE RESISTANCE
+    let resistance = (0.5 + c.cohesion)**3
+
+    // EVALUATE NEW DEATHS
+    let newDeaths = Math.ceil( c.infected * FATALITY_RATE / resistance);
+    c.deaths = c.deaths + newDeaths;
+    c.infected = c.infected - newDeaths;
+    c.active = c.population - c.deaths;
+
+    battle.stats[c.idx].deaths = newDeaths;
+    if (c.active <= 0 ) continue;
+    // EVALUATE NEW RECOVERED
+    let newRecovered = Math.floor(c.infected * RECOVERY_RATE * resistance);
+
+    // EVALUATE NEW INFECTIONS
+    let newInfected = Math.ceil( (c.active - c.infected) * (c.infected/c.active) * (TRANSMISSION_RATE / resistance) );
+    c.infected = c.infected + newInfected - newRecovered;
+
+    // SHAKE RESISTANCE
+    let delta = (newRecovered-newInfected)/c.active * ((c.infected/c.active)**(1/3))
+
+    battle.stats[c.idx].infected = newInfected;
+    battle.stats[c.idx].recovered = newRecovered;
+    battle.stats[c.idx].delta = delta;
+
+  }
+
+  return [battle, [rand0, rand1, rand2]];
 }
 
 // returns [newCountriesMap, nextData]
 const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntropy) => {
+  // @TODO
   if (winner(countriesMap)!=null) return [undefined, undefined];
   let nextData = initTurnData();
-
   let rand1 = computeRandom(firstEntropy, secondEntropy, 1);
   let rand2 = computeRandom(firstEntropy, secondEntropy, 2);
 
-  let cpdf = cumulatedPdf(countriesMap).reduce((acc, val) => acc.concat(val), []);
+  let _cpdf = cumulatedPdf(countriesMap);
+  let _scenarios = _cpdf[0].length;
+  let cpdf = _cpdf.reduce((acc, val) => acc.concat(val), []);
   let scenario = resolveScenario(cpdf, rand1);
+  let _height = scenario % _scenarios; //Type of scenario picked
+  let _width = Math.floor(scenario / _scenarios); // Country picked
 
-  nextData.civilWar = scenario % 2;
-  let ot = Math.floor(scenario / 2);
-  if (nextData.civilWar) {
-    nextData.ot = ot;
-    nextData.o = ot;
-    nextData.dt = ot;
-    nextData.d = countriesMap[ot].occupiedBy;
-  } else {
-    nextData.ot = ot;
-    nextData.o = countriesMap[ot].occupiedBy;
-    let cts = conquerableTerritoriesOf(countriesMap, nextData.ot);
-    nextData.dt = cts[getIntegerFrom(rand2, cts.length)];
-    nextData.d = countriesMap[nextData.dt].occupiedBy;
-  }
-  nextData.cohesion = {
-    ot:countriesMap[nextData.ot].cohesion,
-    o:countriesMap[nextData.o].cohesion,
-    d:countriesMap[nextData.d].cohesion,
-    dt:countriesMap[nextData.dt].cohesion
-  }
-  nextData.probabilities = battlePdf(countriesMap, nextData);
-
+  nextData.sender = _width;
+  let cts = conquerableTerritoriesOf(countriesMap, nextData.sender);
+  nextData.receiver = cts[getIntegerFrom(rand2, cts.length)];
+  nextData.description = "this is a dummy description";
+  nextData.cohesion = -0.01;
+  nextData.infected = countriesMap[nextData.receiver].active * 0.1;
+  nextData.deaths = 0;
+  countriesMap[nextData.receiver].deaths = countriesMap[nextData.receiver].deaths + nextData.deaths;
+  countriesMap[nextData.receiver].active = countriesMap[nextData.receiver].population - countriesMap[nextData.receiver].deaths;
+  countriesMap[nextData.receiver].infected = countriesMap[nextData.receiver].infected + nextData.infected;
   return [nextData, [rand1, rand2]];
 }
 
 
-const computeFairResult = (mapState, firstEntropy, secondEntropy) => {
-  let m = JSON.parse(Buffer.from(mapState, 'base64').toString('ascii'));
-  let countriesMap = m.countriesMap.map((e)=>{return {occupiedBy:e.o, cohesion : e.c}});
-  [battle, random] = resolveNextBattle(countriesMap, m.turnData, firstEntropy, secondEntropy);
-  [next, random] = resolveNextConqueror(countriesMap, m.turnData, firstEntropy, secondEntropy);
-  // console.log("Previous Battle:  " + utils.universalMap(battle.o) + " vs " + utils.universalMap(battle.d) + " ended with a " + (battle.result || "X" ) );
-  // if (next.civilWar) console.log("Next is a civil war:  " + utils.universalMap(next.o) + " is rebelling on " + utils.universalMap(next.d));
-  // else console.log("Next conqueror is:  " + utils.universalMap(next.o) + " attacking " + utils.universalMap(next.d) + " from: " + utils.universalMap(next.ot) + " to control: " + utils.universalMap(next.dt) );
-  return [battle, next];
-}
+
+// const computeFairResult = (mapState, firstEntropy, secondEntropy) => {
+//   let m = JSON.parse(Buffer.from(mapState, 'base64').toString('ascii'));
+//   let countriesMap = m.countriesMap.map((e)=>{return {occupiedBy:e.o, cohesion : e.c}});
+//   [battle, random] = resolveNextBattle(countriesMap, m.turnData, firstEntropy, secondEntropy);
+//   [next, random] = resolveNextConqueror(countriesMap, m.turnData, firstEntropy, secondEntropy);
+//   // console.log("Previous Battle:  " + utils.universalMap(battle.o) + " vs " + utils.universalMap(battle.d) + " ended with a " + (battle.result || "X" ) );
+//   // if (next.civilWar) console.log("Next is a civil war:  " + utils.universalMap(next.o) + " is rebelling on " + utils.universalMap(next.d));
+//   // else console.log("Next conqueror is:  " + utils.universalMap(next.o) + " attacking " + utils.universalMap(next.d) + " from: " + utils.universalMap(next.ot) + " to control: " + utils.universalMap(next.dt) );
+//   return [battle, next];
+// }
 
 
 module.exports = {
-  countriesStillAlive,
+  // countriesStillAlive,
   conquerableTerritoriesOf,
-  conqueredTerritoriesOf,
-  countriesOnTheBorders,
+  // conqueredTerritoriesOf,
+  deadCountries,
   cumulatedPdf,
   pdf,
   realPdf,
   resolveNextBattle,
   resolveNextConqueror,
-  computeFairResult,
+  // computeFairResult,
   winner
 }

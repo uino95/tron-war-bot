@@ -99,7 +99,8 @@ module.exports.stats = async (td) =>{
   let top3 = Object.values(u).sort(function(a, b){return b.wt - a.wt});
   let j = await twb.jackpot();
   let leaderboard = wwb.leaderboard();
-  let countriesStillAlive = wwb.countriesStillAlive();
+  // let countriesStillAlive = wwb.countriesStillAlive();
+  let countriesStillAlive = 241;
 
   let t = buildTgStats(td, leaderboard, countriesStillAlive, j, top3, civilWar);
   let m = { 'inline_keyboard': [[{'text': '🌎 Place a bet now', 'url': 'https://tronwarbot.com'}]]};

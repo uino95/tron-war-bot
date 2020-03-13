@@ -44,10 +44,10 @@ app.get('/', (req, res) => {
 const init = async () => {
   try {
     await twb.init();
-    betEngine.watchBets();
-    await twb.launchGame(0, false);
-    await twb.launchGame(1, true);
-    await twb.launchGame(2, true);
+    // betEngine.watchBets();
+    // await twb.launchGame(0, false);
+    // await twb.launchGame(1, true);
+    // await twb.launchGame(2, true);
     await backendLogic.init();
     if (!config.test) await facebook.me();
     await telegram.getMe();
