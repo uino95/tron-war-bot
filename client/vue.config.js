@@ -3,13 +3,11 @@ module.exports = {
   chainWebpack: config => {
     config
       .plugin('VuetifyLoaderPlugin')
-      .tap(args => {
+      .tap(() => {
         return [{
           match(originalTag, {
             kebabTag,
             camelTag,
-            path,
-            component
           }) {
             if (kebabTag.startsWith('core-')) {
               return [camelTag, `import ${camelTag} from '@/components/${camelTag.substring(4)}.vue'`]
