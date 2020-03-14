@@ -3,6 +3,7 @@
         <loading :active.sync="loading" color="#ffffff" :opacity="1" background-color="#001537" :is-full-page="true">
         </loading>
         <v-navigation-drawer v-model="drawer" fixed clipped class="secondary" app dark>
+            <v-icon class="mt-4 ml-4" @click="drawer = !drawer" dark>fa-times</v-icon>
             <v-list dense class="secondary" dark>
                 <template v-for="(item, i) in menuItems">
                     <v-layout :class="item.class" v-if="item.heading" :key="i" row align-center>
@@ -59,7 +60,7 @@
                 <img src="/img/logo.png">
             </v-avatar>
 
-            <span class="headline ml-3 mr-5" style="color: white">Tron<span class="font-weight-light"
+            <span class="headline ml-3 mr-2" style="color: white">Tron<span class="font-weight-light"
                     style="color: white">WarBot</span></span>
             <v-spacer></v-spacer>
             <v-toolbar-items>
@@ -133,8 +134,8 @@
                             <core-game-map v-bind:style="{ display: toDisplay }"></core-game-map>
                         </div>
                         <core-game-controls @showModal="showModal(menuItems[1])"></core-game-controls>
-                        <core-modal v-model="isModalVisible" :header-tile="itemClicked.text" :path="itemClicked.path">
-                        </core-modal>
+                        <!-- <core-modal v-model="isModalVisible" :header-tile="itemClicked.text" :path="itemClicked.path">
+                        </core-modal> -->
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -144,7 +145,7 @@
 
 
 <script>
-    import pollForUpdate from './utils/pollForUpdate'
+    // import pollForUpdate from './utils/pollForUpdate'
     import Loading from 'vue-loading-overlay';
     import 'vue-loading-overlay/dist/vue-loading.css';
 
@@ -291,7 +292,6 @@
                     let item = this.menuItems.filter(el => {
                         return el.path === window.location.pathname.slice(1)
                     })
-                    console.log(item)
                     if (item.length > 0) {
                         this.showModal(item[0])
                     }
@@ -304,26 +304,24 @@
             }
         },
         computed: {
-            fbUserName() {
-                return this.$store.state.fbStatus.fbUserName
-            },
-            fbLink() {
-                return this.$store.state.fbStatus.fbLink
-            },
-            isLoggedIn() {
-                return this.$store.state.fbStatus.loggedIn
-            },
+            // fbUserName() {
+            //     return this.$store.state.fbStatus.fbUserName
+            // },
+            // fbLink() {
+            //     return this.$store.state.fbStatus.fbLink
+            // },
+            // isLoggedIn() {
+            //     return this.$store.state.fbStatus.loggedIn
+            // },
             windowPath() {
-                console.log("hey")
-                console.log(window.location)
                 return window.location
             },
-            warBalance() {
-                return this.$store.state.currentAddressWarBalance
-            },
-            newsCount() {
-                return this.$store.state.newsCount
-            }
+            // warBalance() {
+            //     return this.$store.state.currentAddressWarBalance
+            // },
+            // newsCount() {
+            //     return this.$store.state.newsCount
+            // }
         },
         methods: {
             showModal(item) {
@@ -361,11 +359,11 @@
                 return check;
             }
         },
-        beforeCreate() {
-            pollForUpdate()
-        },
+        // beforeCreate() {
+        //     pollForUpdate()
+        // },
         mounted() {
-            this.loggedInFb()
+            //this.loggedInFb()
             this.$store.commit('setIsMobile', this.isMobile());
             this.$root.$on('map_loaded', () => {
                 this.loading = false;
@@ -378,7 +376,7 @@
                 this.$root.$on('loaded', () => {
                     this.loading = false;
                     this.toDisplay = "flex"
-                    console.log('all loaded')
+                    // console.log('all loaded')
                 });
             }
             this.track()

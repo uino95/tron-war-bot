@@ -170,7 +170,7 @@
             })
             this.initDates()
             db.ref('public/stats/SPENDERS|' + this.date).limitToLast(this.limit).once('value',
-                snap => {
+                () => {
                     this.$root.$emit('loaded', true);
                 })
             this.loadDataByDate('spenders')

@@ -169,10 +169,6 @@
 </template>
 
 <script>
-  import {
-    db
-  }
-  from '../plugins/firebase';
   import mapping from '../assets/mapping';
   import {
     betMixin

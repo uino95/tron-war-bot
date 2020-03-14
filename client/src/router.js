@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Stats from './components/StatsTab.vue'
-import History from './components/HistoryTab.vue'
-import Cohesion from './components/CohesionTab.vue'
+// import History from './components/HistoryTab.vue'
+// import Cohesion from './components/CohesionTab.vue'
 // import BetFinal from './components/BetFinalTab.vue'
 // import BetBattle from './components/BetBattle.vue'
 // import BetNext from './components/BetNextTab.vue'
@@ -21,16 +21,16 @@ export default new Router({
       name: 'stats',
       component: Stats
     },
-    {
-      path: '/history',
-      name: 'history',
-      component: History
-    },
-    {
-      path: '/cohesion',
-      name: 'cohesion',
-      component: Cohesion
-    },
+    // {
+    //   path: '/history',
+    //   name: 'history',
+    //   component: History
+    // },
+    // {
+    //   path: '/cohesion',
+    //   name: 'cohesion',
+    //   component: Cohesion
+    // },
     { 
       redirect: "/stats",
       path: "*", 

@@ -14,7 +14,7 @@ export const betMixin = {
     }),
 
     mounted() {
-        db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30).once('value', snap => {
+        db.ref('public/bets').orderByChild('gameType').equalTo(this.gameType.toString()).limitToLast(30).once('value', () => {
             this.$root.$emit('loaded', true);
         })
         window.addEventListener('resize', () => {
@@ -94,14 +94,14 @@ export const betMixin = {
                         referrer_addr: window.location.pathname.slice(5)
                     })
             } catch (e) {
-                console.log(e)
+                // console.log(e)
                 try {
                     this.snackbarText = "[REFERRAL] " + e.response.data.message
                     this.snackbarColor = "error";
                     this.snackbarTimeout = 10000;
                     this.snackbar = true;
                 } catch (err) {
-                    console.log(err)
+                    // console.log(err)
                     this.snackbarText = "[REFERRAL] Connection error. Referral not done"
                     this.snackbarColor = "error";
                     this.snackbarTimeout = 10000;

@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-export const test = false; //REMEBER TO SWITCH TO FALSE ALSO in public/login.html
+export const test = true; //REMEBER TO SWITCH TO FALSE ALSO in public/login.html
 
 export default new Vuex.Store({
   state: {
@@ -75,7 +75,7 @@ export default new Vuex.Store({
       state.totalWARSupply = payload.totalWARSupply
     },
     setTronWebInstance(state, payload){
-      console.log("tronweb set")
+      // console.log("tronweb set")
       state.tronWeb = payload
     },
     setGameParams(state,payload){
@@ -116,7 +116,7 @@ export default new Vuex.Store({
     async registerContractsInstance({commit, state}){
       const tronWarBotInstance = await state.tronWeb.contract().at(state.contracts.TronWarBotAddress)
       const warCoinInstance = await state.tronWeb.contract().at(state.contracts.WarCoinAddress)
-      console.log("setting contracts instances")
+      // console.log("setting contracts instances")
       commit('setContractsInstance', {
         warCoin: warCoinInstance,
         tronWarBot: tronWarBotInstance

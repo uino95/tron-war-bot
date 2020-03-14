@@ -65,7 +65,6 @@
     db
   }
   from '../plugins/firebase';
-  import mapping from '../assets/mapping';
 
   export default {
     data: () => ({
@@ -145,7 +144,7 @@
       }
     },
     mounted() {
-      db.ref('public/history').orderByChild('turn').limitToLast(this.limit).once('value', snap => {
+      db.ref('public/history').orderByChild('turn').limitToLast(this.limit).once('value', () => {
         this.$root.$emit('loaded', true);
       })
     },

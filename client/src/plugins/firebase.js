@@ -12,7 +12,7 @@ import {
 Vue.use(rtdbPlugin)
 let config
 if (test) {
-    console.log("TEST MODE")
+    // console.log("TEST MODE")
     // config = {
     //     apiKey: "AIzaSyC7n-39bx5kEnxZELCgxB2BIBNkElfUPWw",
     //     authDomain: "tron-war-bot-test.firebaseapp.com",

@@ -90,7 +90,6 @@
     db
   }
   from '../plugins/firebase';
-  import mapping from '../assets/mapping';
 
   String.prototype.replaceAll = function (search, replace) {
     if (replace === undefined) {
@@ -153,7 +152,7 @@
       }
     },
     mounted() {
-      db.ref('public/cohesion').orderByChild('turn').limitToLast(this.limit).once('value', snap => {
+      db.ref('public/cohesion').orderByChild('turn').limitToLast(this.limit).once('value', () => {
         this.$root.$emit('loaded', true);
       })
     },

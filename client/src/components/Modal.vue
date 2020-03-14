@@ -737,15 +737,16 @@
           // BetFinal Jackpot + max((BetNext - deposit),0)
           const BetFinal = this.$store.state.jackpot.times(tronweb.BigNumber((this.$store.state.gameParams
             .finalBetParams.houseEdge)))
-          console.log("BetFinal ", tronweb.fromSun(BetFinal).toString())
+          // console.log("BetFinal ", tronweb.fromSun(BetFinal).toString())
           const BetNext = this.$store.state.availableDividends
-          console.log("betNext: ", tronweb.fromSun(BetNext).toString())
+          // console.log("betNext: ", tronweb.fromSun(BetNext).toString())
           const deposit = tronweb.toSun(this.info.deposit)
-          console.log('deposit ',tronweb.fromSun(deposit).toString())
+          // console.log('deposit ',tronweb.fromSun(deposit).toString())
           const availableTRX = BetFinal.plus(tronweb.BigNumber.maximum(BetNext.minus(deposit), tronweb.BigNumber('0')));
-          console.log(tronweb.fromSun(availableTRX).toFixed(3).toString())
+          // console.log(tronweb.fromSun(availableTRX).toFixed(3).toString())
           return availableTRX
         }
+        throw "Something really strane has happened"
       },
       myWAR() {
         return this.$store.state.currentAddressWarBalance != null ? this.$store.state.currentAddressWarBalance : tronweb
@@ -828,8 +829,6 @@
           await axios.post(`https://api.tronwarbot.com/ambassador`, msg)
           this.allDone = true
         } catch (e) {
-          console.log(e)
-          console.log(e.response)
           try {
             this.htmlText = true
             this.snackbarText = e.response.data
@@ -837,7 +836,7 @@
             this.snackbarTimeout = 10000;
             this.snackbar = true;
           } catch (err) {
-            console.log(err)
+            // console.log(err)
             this.snackbarText =
               "Connection error. Ambassador not registered"
             this.snackbarColor = "error";
@@ -897,7 +896,7 @@
           answer: "It uses a probability density function (PDF) to determine next conqueror state.\n" +
             "PDF for a country is based on number of the conquered territories and its cohesion index.\nTo put it simply the formula looks similar to this:\n\n" +
             "<br><br><code>PDF = (NUMBER OF TERRITORIES CONQUERED ON THE BORDER) * (COHESION INDEX + PROBABILITY OF INSURRECTION BY THE FOREIGN STATE)</code>\n" +
-            "<br>However, if you wanna check the full algorithm we'd like to invite you to have a look at our <a href=\"https://jsfiddle.net/tronwarbot/d82915un/\" target=\"_blank\">open source war engine<\a>.\n\nCan you do something about it? Yes! Read more onto 'Modify the outcome of the War'"
+            "<br>However, if you wanna check the full algorithm we'd like to invite you to have a look at our <a href=\"https://jsfiddle.net/tronwarbot/d82915un/\" target=\"_blank\">open source war engine<\\a>.\n\nCan you do something about it? Yes! Read more onto 'Modify the outcome of the War'"
         },
         {
           question: "What is the cohesion index?",

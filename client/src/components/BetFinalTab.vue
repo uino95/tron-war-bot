@@ -172,10 +172,6 @@
 </template>
 
 <script>
-  import {
-    db
-  }
-  from '../plugins/firebase';
   import mapping from '../assets/mapping';
   import {
     betMixin
@@ -367,7 +363,7 @@
           .$store.state.gameParams.finalBetParams.houseEdge) * dividend
         midResult = tronweb.BigNumber(midResult)
         let result = (((this.$store.state.jackpot).plus(finalQuoteSun)).times(midResult))
-        console.log(result.toString())
+        // console.log(result.toString())
         return result
       },
     },

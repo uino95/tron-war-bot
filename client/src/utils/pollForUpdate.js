@@ -21,7 +21,7 @@ async function pollTronWeb(interval) {
         await store.dispatch('registerContractsInstance')
       }
     } catch (error) {
-      console.log('tronweb not found')
+      // console.log('tronweb not found')
     }
   }, interval)
 
@@ -40,7 +40,7 @@ function pollAccount(interval) {
         })
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       store.commit('setLoggedInAccount', {
         accountAddress: null
       })
@@ -59,7 +59,7 @@ function pollJackpot(interval) {
         })
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   },interval)
 }
@@ -95,14 +95,14 @@ async function pollDividends(interval){
       const availableDividensInSunFromMaster = await tronWebPublic.trx.getBalance(masterAddress);
       const houseReserves = tronWebPublic.BigNumber(availableDividensInSunFromHouseReserves.toString())
       const masterBalance = tronWebPublic.BigNumber(availableDividensInSunFromMaster.toString())
-      console.log('masterBalance ', tronWebPublic.fromSun(masterBalance).toString())
-      console.log('houseReserves ', tronWebPublic.fromSun(houseReserves).toString())
+      // console.log('masterBalance ', tronWebPublic.fromSun(masterBalance).toString())
+      // console.log('houseReserves ', tronWebPublic.fromSun(houseReserves).toString())
       const availableDividensInSun = houseReserves.plus(masterBalance)
       store.commit('setAvailableDividends', {
         availableDividends: availableDividensInSun
       })
     } catch (error) {
-      console.log("error is here in dividends ", error)
+      // console.log("error is here in dividends ", error)
     }
   }, interval)
 }
@@ -118,7 +118,7 @@ function pollMyWar(interval) {
         totalWARSupply: tronWebPublic.BigNumber(currentTotalWARSupply)
       })
     } catch (error) {
-      console.log("error is here in TOTAL WAR SUPPLY ", error)
+      // console.log("error is here in TOTAL WAR SUPPLY ", error)
     }
     try{
       // update current address war balance
@@ -133,7 +133,7 @@ function pollMyWar(interval) {
         })
       }
     } catch (error) {
-      console.log("error is here in MY WAR ", error)
+      // console.log("error is here in MY WAR ", error)
     }
   }, interval)
 }
@@ -165,8 +165,8 @@ async function getGameParams() {
         maximumBet: tronWeb.fromSun(betBattleParams.maximumBet)
       }
     })
-  } catch {
-    console.log("something went wrong while retrieving game Params ", error)
+  } catch(error) {
+    // console.log("something went wrong while retrieving game Params ", error)
   }
 }
 

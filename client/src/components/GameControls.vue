@@ -1,23 +1,23 @@
 <template>
   <v-card flat>
-    <v-toolbar color="secondary" dark flat >
-      <!-- <v-tabs  dark color="secondary" show-arrows fixed-tabs slider-color="primary" v-model="activeMainTab">
+    <!--- <v-toolbar color="secondary" dark flat >
+      <v-tabs  dark color="secondary" show-arrows fixed-tabs slider-color="primary" v-model="activeMainTab">
         <v-tab v-for="tab of tabs" :key="tab.name" flat replace :to="tab.path">
           <v-icon :color="tab.color">{{tab.symbol}}</v-icon> {{tab.name}}
         </v-tab>
-      </v-tabs> -->
+      </v-tabs> 
       <v-tabs dark color="secondary" show-arrows fixed-tabs slider-color="primary"  >
         <v-tab flat replace to="/cohesion">
           <v-icon color="primary_cohesion_tab">control_point</v-icon> Cohesion
-        </v-tab>
+        </v-tab> 
         <v-tab flat replace to="/stats">
           <v-icon color="primary_stats_tab">poll</v-icon> Standings
-        </v-tab>
+        </v-tab> 
         <v-tab flat replace to="/history">
           <v-icon color="primary_history_tab">history</v-icon> History
-        </v-tab>
+        </v-tab> 
       </v-tabs>
-    </v-toolbar>
+    </v-toolbar> -->
 
     <!-- <v-tabs hide-slider v-else dark color="light_secondary"  show-arrows fixed-tabs >
       <v-tab flat replace to="/betfinal">
