@@ -42,8 +42,8 @@
               <v-tooltip bottom v-if="header.description != null">
                 <template v-slot:activator="{ on }">
                   <v-container v-on="on" class="pa-0">
-                    {{ header.text }}
-                    <v-icon v-if="header.sortable" small>arrow_upward</v-icon>
+                    {{header.text}}
+                    <v-icon  v-if="header.sortable" small>arrow_upward</v-icon>
                   </v-container>
                 </template>
                 <span>{{header.description}}</span>
@@ -62,18 +62,24 @@
                 :color="visButton.color[visButton.count]"
                 @click="toggleButton()"
               >{{visButton.possibilities[visButton.count]}}</v-btn>
-            </th> -->
+            </th>-->
           </template>
           <template v-slot:items="props">
-            <td class="text-xs-center pa-0 pl-1 pr-1">
-              <v-avatar size="40">
-                <v-img
-                  :lazy-src="placeholderFlag"
-                  ref="img"
-                  :src="getFlagString(universalMap(props.item['.key']))"
-                  :alt="universalMap(props.item['.key'])"
-                />
-              </v-avatar>
+            <td class="text-xs-center pa-0 pl-2 pr-2">
+              <v-tooltip class="hidden-sm-and-up" right>
+                <template v-slot:activator="{ on }">
+                  <v-avatar size="40" v-on="on">
+                    <v-img
+                      class="ma-2"
+                      :lazy-src="placeholderFlag"
+                      ref="img"
+                      :src="getFlagString(universalMap(props.item['.key']))"
+                      :alt="universalMap(props.item['.key'])"
+                    />
+                  </v-avatar>
+                </template>
+                <span>{{universalMap(props.item['.key'])}}</span>
+              </v-tooltip>
             </td>
             <!-- <td class="text-xs-left pa-0">
               <v-tooltip v-if="props.item.ambassador" close-delay="1000" bottom>
@@ -98,17 +104,28 @@
                   <i>Ambassador</i> section in the menu.
                 </i>
               </v-tooltip>
-            </td> -->
+            </td>-->
             <td
-              class="text-xs-left && font-weight-bold pr-2 pl-2"
+              class="text-xs-left && font-weight-bold pr-2 pl-2 hidden-sm-and-down"
               v-bind:style="{'max-width': ((windowSize.x / 12) * 3)  + 'px'}"
             >
               <div>{{props.item.name}}</div>
             </td>
-            <td class="text-xs-left pa-0">{{ props.item.deaths }}</td>
-            <td
-              class="text-xs-left text-truncate pa-0"
-            >{{(props.item.infected)}}</td>
+            <td class="text-xs-left pa-0">{{ props.item.population }}</td>
+            <td class="text-xs-left pa-0">{{ props.item.active }}</td>
+            <td class="text-xs-left pa-0 pr-2">
+              <v-layout row>
+              {{ props.item.deaths}}
+              <div class="ml-2 redText">{{'(+ ' + props.item.stats.deaths + ')' }}</div>
+              </v-layout>
+            </td>
+            <td class="text-xs-left pa-0 pr-2">
+              <v-layout row>
+              {{(props.item.infected)}}
+              <div class="ml-2 redText">{{'(+ ' + props.item.stats.infected + ')' }}</div>
+              </v-layout>
+            </td>
+            <td class="greenText text-xs-left pa-0">{{ props.item.stats.recovered }}</td>
             <!-- <td class="text-xs-left hidden-xs-only pa-0">
               <v-btn
                 class="white--text"
@@ -159,7 +176,7 @@
                 color="primary_next_tab"
                 v-on:click="goToBet('betnext',universalMap(props.item.name, 'numberId'))"
               >{{ (props.item.probability * 100).toFixed(2) + ' %'}}</v-btn>
-            </td> -->
+            </td>-->
           </template>
           <template v-slot:no-results>
             <v-alert
@@ -297,7 +314,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </v-layout> -->
+    </v-layout>-->
     <v-snackbar v-model="snackbar" :color="'info'" :timeout="3000" vertical bottom>
       <span class="title">Copied to clipboard</span>
     </v-snackbar>
@@ -320,12 +337,6 @@ export default {
       x: window.innerWidth,
       y: window.innerHeight
     },
-    phrases: [
-      "<placeholder> is best country ever",
-      "I love <placeholder> and all of its super cute penguins",
-      "I think nothing is stronger than <placeholder> with all of its wonderful yet explosive nuclear bombs!!!",
-      "I am in love with <placeholder>'s army and all the strong and charming soldiers"
-    ],
     headersStats: [
       {
         text: "",
@@ -336,64 +347,160 @@ export default {
         class: "pa-0",
         description: null
       },
-      // {
-      //   text: "",
-      //   id: 1,
-      //   value: "ambassador",
-      //   sortable: false,
-      //   align: "left",
-      //   class: "pa-0",
-      //   description: null
-      // },
       {
         text: "Country",
         value: "name",
         id: 1,
         sortable: false,
         align: "left",
-        class: "body-1 pa-0",
+        class: "body-1 pa-0 hidden-sm-and-down",
         description: null
       },
       {
-        text: "Deaths",
-        value: "deaths",
-        id: 2,
-        sortable: true,
-        align: "left",
-        class: "body-1 pa-0 hidden-xs-only",
-        description:
-          "Deaths: \n It represents the number of Deaths of a country. The first country whose deaths is equal to its population wins "
-      },
-      {
-        text: "Infected",
-        value: "infected",
+        text: "Population",
+        value: "population",
         id: 3,
         sortable: true,
         align: "left",
         class: "body-1 pa-0 hidden-xs-only",
+        description: "Population: \n It represents the population of a country."
+      },
+      {
+        text: "Active Population",
+        value: "population",
+        id: 4,
+        sortable: true,
+        align: "left",
+        class: "body-1 pa-0 hidden-xs-only",
+        description:
+          "Active Population: \n It represents the remaining population of a country."
+      },
+      {
+        text: "Total Deaths",
+        value: "deaths",
+        id: 5,
+        sortable: true,
+        align: "left",
+        class: "body-1 pa-0 hidden-xs-only",
+        description:
+          "Deaths: \n It represents the number of Deaths of a country. The first country whose deaths is equal to its population wins "
+      },
+      // {
+      //   text: "New Deaths",
+      //   value: "new_deaths",
+      //   id: 6,
+      //   sortable: true,
+      //   align: "left",
+      //   class: "body-1 pa-0 hidden-xs-only",
+      //   description:
+      //     "New Deaths: \n It represents the new number of Deaths of a country."
+      // },
+      {
+        text: "Infected",
+        value: "infected",
+        id: 7,
+        sortable: true,
+        align: "left",
+        class: "body-1 pa-0 hidden-xs-only",
         description:
           "Infected:\n It represents the number of people infected by the virus"
+      },
+      // {
+      //   text: "New Infected",
+      //   value: "new_infected",
+      //   id: 8,
+      //   sortable: true,
+      //   align: "left",
+      //   class: "body-1 pa-0 hidden-xs-only",
+      //   description:
+      //     "New Infected: \n It represents the new number of Infected of a country."
+      // },
+      {
+        text: "Recovered",
+        value: "recovered",
+        id: 9,
+        sortable: true,
+        align: "left",
+        class: "body-1 pa-0 hidden-xs-only",
+        description:
+          "Recovered: \n It represents the number of Recovered from the virus."
+      },
+      {
+        text: 'P',
+        value: "population",
+        id: 10,
+        sortable: true,
+        align: "left",
+        class: "body-1 pa-0 hidden-sm-and-up",
+        icon: "fa-users",
+        description: "Population: \n It represents the population of a country."
+      },
+      {
+        text: "A",
+        value: "active_population",
+        id: 11,
+        sortable: true,
+        align: "left",
+        class: "body-1 pa-0 hidden-sm-and-up",
+        icon: "fa-user-friends",
+        description:
+          "Active Population: \n It represents the remaining population of a country."
       },
       {
         text: "D",
         value: "deaths",
-        id: 4,
+        id: 12,
         sortable: true,
         align: "left",
         class: "body-1 pa-0 hidden-sm-and-up",
+        icon: "fa-skull-crossbones",
         description:
           "Deaths: \n It represents the number of Deaths of a country. The first country whose deaths is equal to its population wins "
       },
+      // {
+      //   text: "d",
+      //   value: "new_deaths",
+      //   id: 13,
+      //   sortable: true,
+      //   align: "left",
+      //   class: "body-1 pa-0 hidden-sm-and-up",
+      //   icon: "fa-plus",
+      //   description:
+      //     "New Deaths: \n It represents the new number of Deaths of a country."
+      // },
       {
         text: "I",
         value: "infected",
-        id: 5,
+        id: 14,
         sortable: true,
         align: "left",
         class: "body-1 pa-0 hidden-sm-and-up",
+        icon: "fa-dna",
         description:
           "Infected:\n It represents the number of people infected by the virus"
       },
+      // {
+      //   text: "i",
+      //   value: "new_infected",
+      //   id: 15,
+      //   sortable: true,
+      //   align: "left",
+      //   class: "body-1 pa-0 hidden-sm-and-up",
+      //   icon: "fa-plus",
+      //   description:
+      //     "New Infected: \n It represents the new number of Infected of a country."
+      // },
+      {
+        text: "R",
+        value: "recovered",
+        id: 16,
+        sortable: true,
+        align: "left",
+        class: "body-1 pa-0 hidden-sm-and-up",
+        icon: "fa-heart",
+        description:
+          "Recovered: \n It represents the number of Recovered from the virus."
+      }
     ],
     paginationStats: {
       sortBy: "deaths",
@@ -415,7 +522,8 @@ export default {
   }),
   firebase: function() {
     return {
-      mapStatus: db.ref("public/countriesMap").orderByChild("deaths")
+      mapStatus: db.ref("public/countriesMap").orderByChild("deaths"),
+      update: db.ref("public/data/turnData/battle/stats")
     };
   },
   methods: {
@@ -453,7 +561,7 @@ export default {
       document.execCommand("selectAll");
       this.copied = document.execCommand("copy");
       this.snackbar = true;
-    },
+    }
     // shareOnFb: async function() {
     //   if (!this.$store.state.isMobile) {
     //     window.open("https://www.facebook.com/TronWarBot/", "_blank");
@@ -474,6 +582,7 @@ export default {
     countryStatus: function() {
       return this.mapStatus.map(country => {
         country.name = this.universalMap(country[".key"]);
+        country.stats = this.update[country[".key"]];
         return country;
       });
     },
