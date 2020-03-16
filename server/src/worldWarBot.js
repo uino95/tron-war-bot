@@ -177,9 +177,15 @@ const postTurn = async (turnData) => {
 const updateCohesion = (battle, next) => {
   // @TODO
   countriesMap.forEach((e,i)=>{
-    let delta = ((battle.stats[i] || {}).delta || 0);
-    if (i==next.receiver) delta += next.cohesion;
-    editCohesion(i, delta, undefined, false);
+    if (next && i==next.receiver){
+      //TO UPDATE FRONTEND AS +/- GETS SHOWN UNDER battle.stats
+      battle.stats[i].deaths += next.deaths;
+      battle.stats[i].infected += next.infected;
+      battle.stats[i].cohesion += next.cohesion;
+    }
+    let delta = ((battle.stats[i] || {}).cohesion || 0);
+    let nc = editCohesion(i, delta, undefined, false);
+    battle.stats[i].cohesion = (nc || {}).delta || 0;
     countriesMap[i].cohesion = countriesMap[i].nextCohesion;
   });
 }
@@ -188,6 +194,7 @@ const updateCohesion = (battle, next) => {
 const editCohesion = (country, delta, threshold={upper: 100, lower: 0.1}, save=true) => {
   if (!delta) return;
   let old = countriesMap[country].nextCohesion;
+  delta = parseFloat(delta.toFixed(1));
   delta = delta/100;
   const upper = Math.max(old, (threshold.upper/100));
   const lower = Math.min(old, (threshold.lower/100));
@@ -234,8 +241,6 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
   [battleData, computedRandom] = fairness.resolveNextBattle(countriesMap, turnData, _entropy1, _entropy2);
   // Send virus pack to another county or open a virus box or quarantine the country
   [nextData, computedRandom] = fairness.resolveNextConqueror(countriesMap, turnData, _entropy1, _entropy2);
-  console.log(battleData)
-  console.log(nextData)
   // Update new infection levels
   updateCohesion(battleData, nextData);
 
@@ -244,7 +249,6 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
   turnData.battle = battleData || "";
   turnData.next = nextData || "";
   turnData.winner = fairness.winner(countriesMap);
-
   if (simulation) return turnData.winner != null;
 
   // UPDATE EXTERNAL DATA
@@ -275,15 +279,15 @@ const simulate = async () => {
     do {
       preTurn();
       go = await launchNextTurn()
-      if (!(turn % 5)) editCohesion(utils.randomInt(15), (utils.randomInt(12)-2)/10)
+      // if (!(turn % 5)) editCohesion(utils.randomInt(15), (utils.randomInt(12)-2)/10)
       // if (!(turn % 100)) {saveCurrentState(), await utils.sleep(5000)}
-      if (!(turn % 100)) {
+      if (!(turn % 2)) {
         realPdf().forEach((e,i)=>{
           countriesMap[i].probability = e;
         })
         let l = leaderboard();
         leaders[l[0].idx] = l[0];
-        console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion of: " + utils.toPercent(l[0].cohesion) + " and territories " + l[0].territories + " and prob: " + utils.toPercent(l[0].probability))
+        console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion: " + utils.toPercent(l[0].cohesion) + " deaths: " + l[0].deaths + " and infected: " + l[0].infected)
       }
       let d = turnData;
       if (d.next) {

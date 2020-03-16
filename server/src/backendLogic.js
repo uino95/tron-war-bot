@@ -17,19 +17,19 @@ const stopGame = async ()=>{
   // await twb.endGame(2);
 }
 
-// const gameOver = async () => {
-//   console.log("[SCHEDULER]: ********* Final payout! *********");
-//   var cr = await twb.cachedCurrentRound(0);
-//   var winner = wwb.winner();
-//   console.log("[LOGIC]: Sleeping one minute before automatic jackpot payout...");
-//   await utils.sleep(60000);
-//   // GET WINNING BETS
-//   let _bets = await firebase.bets.getCurrentTurnBets(0, cr.round);
-//   let _winningBets = await twb.jackpotPayout(0, cr.round, winner, _bets);
-//   console.log("[SCHEDULER]: ********* Final payout finished! *********");
-//   await stats.updateWinners(_winningBets)
-//   console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
-// }
+const gameOver = async () => {
+  // console.log("[SCHEDULER]: ********* Final payout! *********");
+  // var cr = await twb.cachedCurrentRound(0);
+  // var winner = wwb.winner();
+  // console.log("[LOGIC]: Sleeping one minute before automatic jackpot payout...");
+  // await utils.sleep(60000);
+  // // GET WINNING BETS
+  // let _bets = await firebase.bets.getCurrentTurnBets(0, cr.round);
+  // let _winningBets = await twb.jackpotPayout(0, cr.round, winner, _bets);
+  // console.log("[SCHEDULER]: ********* Final payout finished! *********");
+  // await stats.updateWinners(_winningBets)
+  console.log("[GAME OVER]: The game is f***ing over... cit. Six Riddles");
+}
 
 const updateResultsOnDB = (_b, _wb) => {
   _wb = _wb.reduce((o,el)=>{o[el.txId]=el; return o;}, {})
@@ -154,7 +154,7 @@ const launchNextTurn = async (block) =>{
   // await stats.updateWinners(_winningBetsNext.concat(_winningBetsBattle))
   // PAYOUT FINAL
   // console.log("[SCHEDULER]: ----- Payout finished! ------");
-  // if (go) return await gameOver();
+  if (go) return await gameOver();
   prepareNextTurn();
 }
 

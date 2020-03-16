@@ -100,19 +100,19 @@ const config = {
     fatality : {
       min: 0.01,
       initial: 0.03,
-      spread: 0.2,
+      spread: 0.05,
       bias: 0.1
     },
     recovery : {
-      min: 0.1,
-      initial: 1,
-      spread: 0.2,
-      bias: -0.01
+      min: 0.001,
+      initial: 0.1,
+      spread: 0.05,
+      bias: -0.05
     },
     transmission : {
       min: 0.1,
-      initial: 3,
-      spread: 0.2,
+      initial: 2.5,
+      spread: 0.05,
       bias: 0.01
     },
     restart: JSON.parse(process.env.RESTART || false)

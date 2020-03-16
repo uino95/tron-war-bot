@@ -1,11 +1,12 @@
 const config = require("./config");
+const fakeNews = require("./fakeNews");
 // const CIVIL_WAR_LIKELIHOOD = config.wwb.civilWarLikelihood;
 // const BATTLE_WEIGHT = config.wwb.battleWeight;
 var FATALITY_RATE = config.wwb.fatality.initial;
 var TRANSMISSION_RATE = config.wwb.transmission.initial;
 var RECOVERY_RATE = config.wwb.recovery.initial;
 
-const neighborCountries = require('./map-utilities/neighborCountries');
+// const neighborCountries = require('./map-utilities/neighborCountries');
 const utils = require("./utils");
 
 const initTurnData = () => {
@@ -20,8 +21,8 @@ const initTurnData = () => {
 }
 
 const conquerableTerritoriesOf = (countriesMap, c) => {
-  return neighborCountries[c].filter((t)=>{
-    return countriesMap[t].population != 1;
+  return countriesMap.filter((t)=>{
+    return t.population != 1 && t.idx != c;
     // return countriesMap[t].occupiedBy != countriesMap[c].occupiedBy;
   })
 }
@@ -43,16 +44,6 @@ const deadCountries = (countriesMap) => {
 //   )];
 // }
 
-const rawPdf = (countriesMap) => {
-  return countriesMap.map((c,idx)=>{
-    // let pOfConquest = Math.min(conquerableTerritoriesOf(countriesMap, idx).length,1) * countriesMap[c.occupiedBy].cohesion * (1 - CIVIL_WAR_LIKELIHOOD);
-    // let pOfCivilWar =  (c.occupiedBy != idx ? 1 : 0) * Math.max(((0.5 + c.cohesion)**3 - 0.5), 0) * CIVIL_WAR_LIKELIHOOD;
-    if (c.population == 1) return [0,0];
-    let pOfConquest = 1;
-    let pOfCivilWar = 0
-    return [pOfConquest,  pOfCivilWar]; //NUMBER OF SCENARIOS TYPES
-  })
-}
 
 const pdf = (countriesMap) => {
   let r = rawPdf(countriesMap);
@@ -86,7 +77,7 @@ const realPdf = (countriesMap) => {
 }
 
 const winner = (countriesMap) => {
-  if (deadCountries(countriesMap).length) return deadCountries(countriesMap)[0].idx;
+  if (deadCountries(countriesMap).length) return deadCountries(countriesMap)[0];
   return null;
 }
 
@@ -135,7 +126,7 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
   FATALITY_RATE = Math.max(config.wwb.fatality.min, Math.min(0.99, FATALITY_RATE *  deltaFatality))
 
   let deltaRecovery = 1 + (((rand1-0.5) + config.wwb.recovery.bias) * config.wwb.recovery.spread)
-  RECOVERY_RATE = Math.max(config.wwb.recovery.min, (RECOVERY_RATE *  deltaRecovery))
+  RECOVERY_RATE = Math.max(config.wwb.recovery.min, Math.min(0.99, RECOVERY_RATE *  deltaRecovery))
 
   let deltaTransmission = 1 + (((rand2-0.5) + config.wwb.transmission.bias) * config.wwb.transmission.spread)
   TRANSMISSION_RATE = Math.max(config.wwb.transmission.min, TRANSMISSION_RATE *  deltaTransmission)
@@ -146,10 +137,15 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
   battle.stats = {};
 
   for (var c of countriesMap) {
-    let stats = {}
+    let stats = {
+      deaths:0,
+      infected:0,
+      recovered:0,
+      cohesion:0,
+    }
+    battle.stats[c.idx] = stats;
     // SKIP STUPID COUNTRIES
     if (c.population == 1) continue;
-    battle.stats[c.idx] = stats;
 
     // EVALUATE RESISTANCE
     let resistance = (0.5 + c.cohesion)**3
@@ -157,8 +153,8 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
     // EVALUATE NEW DEATHS
     let newDeaths = Math.ceil( c.infected * FATALITY_RATE / resistance);
     c.deaths = c.deaths + newDeaths;
-    c.infected = c.infected - newDeaths;
     c.active = c.population - c.deaths;
+    c.infected = Math.min(c.infected - newDeaths, c.active);
 
     stats.deaths = newDeaths;
     if (c.active <= 0 ) continue;
@@ -167,27 +163,40 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
 
     // EVALUATE NEW INFECTIONS
     let newInfected = Math.ceil( (c.active - c.infected) * (c.infected/c.active) * (TRANSMISSION_RATE / resistance) );
-    c.infected = c.infected + newInfected - newRecovered;
+    c.infected = Math.min(c.infected + newInfected - newRecovered, c.active);
 
     // SHAKE RESISTANCE
-    let delta = (newRecovered-newInfected)/c.active * ((c.infected/c.active)**(1/3))
+    let delta = (newRecovered-newInfected)/c.active * ((c.infected/c.active)**(1/3)) * 100
+    delta = Math.min(Math.max(-3, delta), 3)
 
     stats.infected = newInfected;
     stats.recovered = newRecovered;
-    stats.delta = delta;
+    stats.cohesion = delta;
 
   }
 
   return [battle, [rand0, rand1, rand2]];
 }
 
+const rawPdf = (countriesMap) => {
+  return countriesMap.map((c,idx)=>{
+    if (c.population == 1) return [0,0,0,0];
+    let popLog = Math.log(c.population);
+    let pOfDeaths = popLog * (c.infected + 1) / c.population;
+    let pOfInfected = popLog * (c.active + 1) / c.population;
+    let pOfCohesion = popLog * (c.deaths + 1) / c.population;
+    let pOfRandom = popLog / c.population;
+    return [pOfDeaths,  pOfInfected, pOfCohesion, pOfRandom]; //NUMBER OF SCENARIOS TYPES
+  })
+}
+
 // returns [newCountriesMap, nextData]
 const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntropy) => {
-  // @TODO
   if (winner(countriesMap)!=null) return [undefined, undefined];
   let nextData = initTurnData();
   let rand1 = computeRandom(firstEntropy, secondEntropy, 1);
   let rand2 = computeRandom(firstEntropy, secondEntropy, 2);
+  let rand3 = computeRandom(firstEntropy, secondEntropy, 3);
 
   let _cpdf = cumulatedPdf(countriesMap);
   let _scenarios = _cpdf[0].length;
@@ -196,17 +205,54 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
   let _height = scenario % _scenarios; //Type of scenario picked
   let _width = Math.floor(scenario / _scenarios); // Country picked
 
-  nextData.sender = _width;
-  let cts = conquerableTerritoriesOf(countriesMap, nextData.sender);
-  nextData.receiver = cts[getIntegerFrom(rand2, cts.length)];
-  nextData.description = "this is a dummy description";
-  nextData.cohesion = -0.01;
-  nextData.infected = countriesMap[nextData.receiver].active * 0.1;
+  nextData.receiver = _width;
+  let cts = conquerableTerritoriesOf(countriesMap, nextData.receiver);
+  nextData.sender = cts[getIntegerFrom(rand2, cts.length)].idx;
+  nextData.cohesion = 0;
+  nextData.infected = 0;
   nextData.deaths = 0;
-  countriesMap[nextData.receiver].deaths = countriesMap[nextData.receiver].deaths + nextData.deaths;
-  countriesMap[nextData.receiver].active = countriesMap[nextData.receiver].population - countriesMap[nextData.receiver].deaths;
-  countriesMap[nextData.receiver].infected = countriesMap[nextData.receiver].infected + nextData.infected;
-  return [nextData, [rand1, rand2]];
+
+  let rcv = countriesMap[nextData.receiver];
+
+  switch(_height) {
+    case 0:
+      // Deaths impact
+      {
+        let popLog = Math.log(rcv.active || 1);
+        let _d = Math.floor(popLog * (rand3 + 0.5));
+        nextData.deaths = Math.floor(Math.min(Math.max(1, _d), rcv.active));
+      }
+      break;
+    case 1:
+      // Infected/recovered impacts
+      {
+        let popLog = Math.log(rcv.active || 1);
+        let _d = Math.floor(popLog * (rand3 - 0.2));
+        let newInfected = Math.min(Math.max(0, (rcv.infected + _d)), rcv.active);
+        nextData.infected = newInfected - rcv.infected;
+      }
+      break;
+    case 2:
+      // Cohesion weakening/strengthening impacts
+      {
+        let popLog = Math.log(rcv.deaths || 1);
+        let _d = Math.sign(rand3 - 0.7) * (rand3**(1/3));
+        nextData.cohesion =  _d * 7;
+      }
+      break;
+    default:
+      // Random generic news. Do nothing.
+  }
+
+  nextData.description = fakeNews.generate(nextData);
+  let originalInfected = rcv.infected;
+
+  countriesMap[nextData.receiver].deaths = rcv.deaths + nextData.deaths;
+  countriesMap[nextData.receiver].active = rcv.population - rcv.deaths;
+  countriesMap[nextData.receiver].infected = Math.min(rcv.infected + nextData.infected, countriesMap[nextData.receiver].active);
+  //Correction as non infected people can also dies
+  nextData.infected = countriesMap[nextData.receiver].infected - originalInfected;
+  return [nextData, [rand1, rand2, rand3]];
 }
 
 
