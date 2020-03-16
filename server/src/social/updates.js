@@ -122,7 +122,7 @@ module.exports.battleUpdate = async (cmap, td) => {
 
   if (utils.randomInt(30) == 0){
     //POST ON FACEBOOK
-    return await facebook.post(td.next.description).catch(console.error);
+    await facebook.post(td.next.description).catch(console.error);
   }
   if (utils.randomInt(20) == 0){
     // POST ON TELEGRAM
