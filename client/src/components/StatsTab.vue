@@ -111,8 +111,8 @@
             >
               <div>{{props.item.name}}</div>
             </td>
-            <td class="text-xs-left pa-0">{{ props.item.population }}</td>
-            <td class="text-xs-left pa-0">{{ props.item.active }}</td>
+            <td class="text-xs-left pa-0">{{ props.item.population | NUMBER }}</td>
+            <td class="text-xs-left pa-0">{{ props.item.active | NUMBER }}</td>
             <td class="text-xs-left pa-0 pr-2">
               <v-layout row>
               {{ props.item.deaths}}
@@ -323,6 +323,7 @@
 
 <script>
 import { db } from "../plugins/firebase";
+import {format} from "../utils/NumberUtils";
 
 String.prototype.replaceAll = function(search, replace) {
   if (replace === undefined) {
@@ -525,6 +526,11 @@ export default {
       mapStatus: db.ref("public/countriesMap").orderByChild("deaths"),
       update: db.ref("public/data/turnData/battle/stats")
     };
+  },
+  filters:{
+    NUMBER(n){
+      return format(n);
+    }
   },
   methods: {
     // err(e) {
