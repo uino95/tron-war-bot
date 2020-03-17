@@ -59,7 +59,7 @@ const config = {
     txMargin: 3
   },
   timingTest: {
-    turn: 60,
+    turn: 15,
     blockConfirmation: 1,
     txMargin: 3
   },

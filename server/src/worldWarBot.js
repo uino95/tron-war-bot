@@ -75,14 +75,15 @@ const init = async (restart) => {
       active:utils.universalMap(idx, 'population'),  // total pop - deaths
     }
   });
-  if (!restart)  await loadSavedState();
-  if (!simulation) ROUND = await twb.getCurrentRound(0).then(r=>r.round);
+  if (!simulation && !restart)  await loadSavedState();
+  // if (!simulation) ROUND = await twb.getCurrentRound(0).then(r=>r.round);
   if (!simulation && restart) return await saveCurrentState();
 };
 
-const loadSavedState = async () => {
-  let r = await firebase.data.once('value').then(r=>r.val());
+const loadSavedState = async (mapOnly=false) => {
   countriesMap = await firebase.countriesMap.once('value').then(r=>r.val());
+  if (mapOnly) return;
+  let r = await firebase.data.once('value').then(r=>r.val());
   turn = r["turn"];
   turnData = r["turnData"] || {};
 };
@@ -245,7 +246,8 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
   paused = false;
 
   if (!countriesMap) await init();
-  if (!simulation) await loadSavedState();
+  await loadSavedState(true);
+
   // GAME IS ALREADY OVER
   if (fairness.winner(countriesMap)!=null) return true;
 
