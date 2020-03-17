@@ -46,10 +46,13 @@ export default {
     db.ref("public/countriesMap").on("child_changed", snapshot => {
       let data = snapshot.val();
       data["id"] = this.universalMap(data.idx, "charId");
-      data["percentagesOfDeath"] = parseFloat(
-        Math.round(data.deaths / data.population).toFixed(3)
+      data["percentagesOfDeath"] =
+        parseFloat((data.deaths / data.population).toFixed(3)) * 100;
+      data["color"] = hslToHex(
+        210,
+        100,
+        (100 - data.percentagesOfDeath) / (100 / 75)
       );
-      data["color"] = hslToHex(210, 100, data.percentagesOfDeath * 100);
       this.polygonSeries.data[data.idx] = data;
       this.polygonSeries.invalidateData();
     });
@@ -58,10 +61,13 @@ export default {
       let data = snapshot.val();
       data.map((el, index) => {
         el["id"] = this.universalMap(index, "charId");
-        el["percentagesOfDeath"] = parseFloat(
-          (el.deaths / el.population).toFixed(3)
-        ) * 100;
-        el["color"] = hslToHex(210, 100, (100 - (el.percentagesOfDeath)) / (100/75));
+        el["percentagesOfDeath"] =
+          parseFloat((el.deaths / el.population).toFixed(3)) * 100;
+        el["color"] = hslToHex(
+          210,
+          100,
+          (100 - el.percentagesOfDeath) / (100 / 75)
+        );
       });
       // // assign a color to a particular country
       // this.colorsDefault[90] = "#009688"
@@ -95,7 +101,7 @@ export default {
 
       //chart.background.fill = "#37474f";
       // chart.background.fill = "#B3E5FC";
-      chart.background.fill =	"#585858";
+      chart.background.fill = "#585858";
       chart.background.fillOpacity = 1;
 
       /* Create map polygon series */

@@ -6,9 +6,9 @@
       transition="scale-transition"
       color="#2c3e50"
     >
-      <!-- <v-card-text class="pa-0 mb-2 text-xs-center ">
+      <v-card-text class="pa-0 mb-2 text-xs-center ">
         <core-timer></core-timer>
-      </v-card-text>-->
+      </v-card-text>
       <!-- <v-container v-if="currentBattle != null">
         <v-card-text v-if="currentBattle.civilWar == 1" class=" pa-0 text-xs-center ">
           Current Turn: {{history[0].turn}} -
@@ -53,7 +53,7 @@
                 <div v-on="on">
                   <v-icon class="mr-2" small dark>fa-heart</v-icon>
                   <b class="hidden-xs-only">Recovery rate:</b>
-                  {{turnData.battle.recovery.toFixed(2)}}
+                  {{(turnData.battle.recovery  * 100).toFixed(2) + ' %'}}
                 </div>
               </template>
               <span>Recovery Rate</span>
@@ -75,7 +75,7 @@
       </v-card-text>
     </v-card>
     <v-card
-      class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text"
+      class="mt-0 pb-2 pt-2  white--text"
       v-else-if="data.serverStatus == 300"
       transition="scale-transition"
       color="error"
@@ -85,7 +85,7 @@
       </v-card-text>
     </v-card>
     <v-card
-      class="mt-0 ml-2 mr-2 pb-2 pt-2 card-rounded white--text"
+      class="mt-0 pb-2 pt-2  white--text"
       v-else-if="data.serverStatus == 500"
       transition="scale-transition"
       color="#2c3e50"
@@ -93,7 +93,7 @@
       <v-card-text class="pa-0 title text-xs-center">Game Over</v-card-text>
       <v-card-text
         class="pa-0 pt-2 text-xs-center"
-      >🎉 Winner of current Covid Olympics is Lesotho 🇱🇸 🎉</v-card-text>
+      >🎉 Winner of Covid Olympics is {{data.turnData.winner}} 🇱🇸 🎉</v-card-text>
     </v-card>
   </v-flex>
 </template>
