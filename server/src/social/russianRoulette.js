@@ -69,7 +69,7 @@ const closePreviousRoulette = async (cmap, td) => {
       total += (current.votes[e] * multiplier(e))
     })
     msg += "\n"
-    if (!total)     msg += '<b>Dammit! That was a tie! No fun at this round... </b>'
+    // if (!total)     msg += '<b>Dammit! That was a tie! No fun at this round... </b>'
     if (total > 0)  msg += `Seems like ${utils.universalMap(current.country)} received a proper cleaning...`
     if (total < 0)  msg += `Hell yeah! Seems like in <b>${utils.universalMap(current.country)}</b> they really want to extinguish themselves!`
     total += (ROULETTE.bonus*Math.sign(total))
@@ -92,11 +92,11 @@ const closePreviousRoulette = async (cmap, td) => {
     msg += `\n\n<b>${res.recovered}</b> temporarily recovered.`
   }
   if (res.deaths) {
-    msg += `\n\nOps! Someone played a bit too much with matches... ${res.deaths} plague-riddens were burnt alive!`
+    msg += `\n\nOps! Someone played a bit too much with matches... <b>${res.deaths}</b> plague-riddens (or maybe not) were burnt alive!`
     let f = `
-      A hard sentence was given to ${res.deaths} sick men in ${utils.universalMap(current.country)} stuck in an absolutely unintentional fire inside a hospital. 🔥🔥
+A hard sentence was given to ${res.deaths} sick men in ${utils.universalMap(current.country)} stuck in an absolutely unintentional fire inside a hospital. 🔥🔥
 
-      Check it at https://t.me/Tron_WarBot/${current.messageId}`
+Check it at https://t.me/Tron_WarBot/${current.messageId}`
     await facebook.post(f);
   }
 
@@ -135,7 +135,7 @@ module.exports.next = async (cmap, td)=>{
 Deaths toll: <b>${cmap[current.country].deaths} </b> (${utils.toPercent(cmap[current.country].deaths/cmap[current.country].population)})
 Infected: <b>${cmap[current.country].infected}</b>
 
-You have got 6 hours to express your useless opinion...
+You have got ${Math.floor(config.social.updates.rouletteFreq/3600)} hours to express your useless opinion...
 Should we quarantine them (😷) or wildly sneeze on them (🤧)?
 
 You can also squirt them with dubious sanitizing fluid (💦) or perform public excrements spreading (💩) for a better performance.
@@ -146,7 +146,10 @@ Or you might simply set them on 🔥 for a true deep cleaning!
 
   // PICK A COUNTRY
   // CREATE TEXT AND KEYBOARD
-  let m = { 'inline_keyboard': [Object.keys(current.votes).map(e=> {return {'text':e, 'callback_data': getCbData(e)}})]};
+  let m = { 'inline_keyboard': [
+    ['💦','💩','🔥'].map(e=> {return {'text':e, 'callback_data': getCbData(e)}}),
+      ['😷','🤧'].map(e=> {return {'text':e, 'callback_data': getCbData(e)}})
+    ]};
   let r = await telegram.sendMessage(msg, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true, reply_to_message_id: current.messageId})
   current.messageId = r.message_id;
   firebase.data.update({roulette: current})
@@ -172,7 +175,10 @@ module.exports.onUpdate = async (ctx, next)=>{
   // SAVE IT
   firebase.data.update({roulette: current})
   // EDIT MESSAGE KEYBOARD
-  let m = { 'inline_keyboard': [Object.keys(current.votes).map(e=> {return {'text': (e + " " + (current.votes[e] || '')), 'callback_data': getCbData(e)}})]};
+  let m = { 'inline_keyboard': [
+    ['💦','💩','🔥'].map(e=> {return {'text': (e + " " + (current.votes[e] || '')), 'callback_data': getCbData(e)}}),
+    ['😷','🤧'].map(e=> {return {'text': (e + " " + (current.votes[e] || '')), 'callback_data': getCbData(e)}})
+  ]};
   await telegram.editMessageReplyMarkup(current.messageId, undefined, m);
   return telegram.answerCbQuery(ctx.update.callback_query.id, "Excellent!");
 }

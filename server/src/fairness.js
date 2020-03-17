@@ -8,6 +8,7 @@ var RECOVERY_RATE = config.wwb.recovery.initial;
 
 //The rates are daily assumptions thus must be scaled for the number of iterations in a day.
 const RATE_MULTIPLIER = Math.floor(24*60*60/(config.timing.turn || 1))
+// const RATE_MULTIPLIER = Math.floor(24*60*60/(3600|| 1))
 
 // const neighborCountries = require('./map-utilities/neighborCountries');
 const utils = require("./utils");
@@ -92,22 +93,22 @@ const getIntegerFrom = (random, odds) => {
   return Math.floor(random * odds);
 }
 
-const battlePdf = (countriesMap, nextData) => {
-  let _1 = BATTLE_WEIGHT[1] * countriesMap[nextData.o].cohesion
-  let _2 = BATTLE_WEIGHT[2] * countriesMap[nextData.d].cohesion
-  let _x = BATTLE_WEIGHT[0] * (countriesMap[nextData.ot].cohesion + countriesMap[nextData.dt].cohesion)/2
-  if (nextData.civilWar) {
-    _x = _2;
-    _2 = 0;
-  }
-  let _tot = _x + _1 + _2;
-  return [_x/_tot, _1/_tot, _2/_tot];
-}
-
-const cumulatedBattlePdf = (countriesMap, nextData) => {
-  let cumulated = 0;
-  return battlePdf(countriesMap, nextData).map(c=>cumulated += c);
-}
+// const battlePdf = (countriesMap, nextData) => {
+//   let _1 = BATTLE_WEIGHT[1] * countriesMap[nextData.o].cohesion
+//   let _2 = BATTLE_WEIGHT[2] * countriesMap[nextData.d].cohesion
+//   let _x = BATTLE_WEIGHT[0] * (countriesMap[nextData.ot].cohesion + countriesMap[nextData.dt].cohesion)/2
+//   if (nextData.civilWar) {
+//     _x = _2;
+//     _2 = 0;
+//   }
+//   let _tot = _x + _1 + _2;
+//   return [_x/_tot, _1/_tot, _2/_tot];
+// }
+//
+// const cumulatedBattlePdf = (countriesMap, nextData) => {
+//   let cumulated = 0;
+//   return battlePdf(countriesMap, nextData).map(c=>cumulated += c);
+// }
 
 const resolveScenario = (cpdf, random) => {
   let scenario = cpdf.length - 1;
@@ -151,7 +152,7 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
     if (c.population == 1) continue;
 
     // EVALUATE RESISTANCE
-    let resistance = (0.5 + c.cohesion)**3
+    let resistance = (0.5 + c.cohesion)**4
 
     // EVALUATE NEW DEATHS
     let newDeaths = Math.ceil( c.infected * (FATALITY_RATE/RATE_MULTIPLIER) / resistance);
@@ -166,11 +167,13 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
 
     // EVALUATE NEW INFECTIONS
     let newInfected = Math.ceil( (c.active - c.infected) * (c.infected/c.active) * ((TRANSMISSION_RATE/RATE_MULTIPLIER) / resistance) );
-    c.infected = Math.min(c.infected + newInfected - newRecovered, c.active);
 
     // SHAKE RESISTANCE
-    let delta = (newRecovered-newInfected)/c.active * ((c.infected/c.active)**(1/3)) * 100
-    delta = Math.min(Math.max(-3, delta), 3)
+    let delta = (((newRecovered+newDeaths-newInfected)/c.infected)**(1/2) + config.wwb.cohesion.battle.bias) * Math.log(c.population)**2
+    // let delta = (((newRecovered)/c.infected)**(1/2) + config.wwb.cohesion.battle.bias) * 100
+    delta = Math.min(Math.max(-config.wwb.cohesion.battle.spread, delta), config.wwb.cohesion.battle.spread)
+
+    c.infected = Math.min(c.infected + newInfected - newRecovered, c.active);
 
     stats.infected = newInfected;
     stats.recovered = newRecovered;
@@ -184,7 +187,7 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
 const rawPdf = (countriesMap) => {
   return countriesMap.map((c,idx)=>{
     if (c.population == 1) return [0,0,0,0];
-    let popLog = Math.log(c.population);
+    let popLog = c.population**(1/2);
     let pOfDeaths = popLog * (c.infected + 1) / c.population;
     let pOfInfected = popLog * (c.active + 1) / c.population;
     let pOfCohesion = popLog * (c.deaths + 1) / c.population;
@@ -221,16 +224,16 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
     case 0:
       // Deaths impact
       {
-        let popLog = Math.log(rcv.active || 1);
-        let _d = Math.floor(popLog * (rand3 + 0.5));
+        let popLog = Math.log(rcv.active||1);
+        let _d = Math.floor(popLog * (rand3 + 0.5 - config.wwb.cohesion.next.bias));
         nextData.deaths = Math.floor(Math.min(Math.max(1, _d), rcv.active));
       }
       break;
     case 1:
       // Infected/recovered impacts
       {
-        let popLog = Math.log(rcv.active || 1);
-        let _d = Math.floor(popLog * (rand3 - 0.2));
+        let popLog = Math.log(rcv.active||1);
+        let _d = Math.floor(popLog * (rand3 - config.wwb.cohesion.next.bias));
         let newInfected = Math.min(Math.max(0, (rcv.infected + _d)), rcv.active);
         nextData.infected = newInfected - rcv.infected;
       }
@@ -238,9 +241,9 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
     case 2:
       // Cohesion weakening/strengthening impacts
       {
-        let popLog = Math.log(rcv.deaths || 1);
-        let _d = Math.sign(rand3 - 0.7) * (rand3**(1/3));
-        nextData.cohesion =  _d * 7;
+        let popLog = rcv.deaths/rcv.population;
+        let _d = Math.sign((rand3 - 0.5)*2 + config.wwb.cohesion.next.bias + popLog) * (rand3**(1/3));
+        nextData.cohesion =  _d * config.wwb.cohesion.next.spread;
       }
       break;
     default:

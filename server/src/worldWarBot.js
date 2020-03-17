@@ -8,7 +8,7 @@ const neighborCountries = require('./map-utilities/neighborCountries');
 const COUNTRIES = neighborCountries.length;
 var ROUND = 0;
 // SIMULATION PARAMS
-const SIMULATIONS = 5;
+const SIMULATIONS = 10;
 const EXPECTED_TURN_DURATION = config.timing.turn;
 
 var countriesMap, turnData;
@@ -191,13 +191,13 @@ const updateCohesion = (battle, next) => {
 
 const editPopulation =  (country, params) => {
   let c = countriesMap[country]
-  let deaths = Math.min(Math.ceil(params.deaths * 0.01 * c.active), c.active);
+  let deaths = Math.min(Math.ceil(params.deaths * 0.001 * c.active), c.active);
   countriesMap[country].deaths = c.deaths + deaths;
   countriesMap[country].active = c.population - c.deaths;
   countriesMap[country].infected = Math.max(0,c.infected - deaths);
 
-  let infected = Math.min((c.active - c.infected), Math.ceil(params.infected * 0.01 * (c.active - c.infected)))
-  let recovered = Math.min(c.infected, Math.ceil(params.recovered * 0.01 * c.infected));
+  let infected = Math.min((c.active - c.infected), Math.ceil(params.infected * 0.001 * (c.active - c.infected)))
+  let recovered = Math.min(c.infected, Math.ceil(params.recovered * 0.001 * c.infected));
   countriesMap[country].infected = c.infected + infected - recovered;
 
   firebase.countriesMap.child(country).set(countriesMap[country]);
@@ -245,6 +245,7 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
   paused = false;
 
   if (!countriesMap) await init();
+  if (!simulation) await loadSavedState();
   // GAME IS ALREADY OVER
   if (fairness.winner(countriesMap)!=null) return true;
 
@@ -283,6 +284,7 @@ const simulate = async () => {
   var cohesion = new Array(COUNTRIES).fill(0);
   var rounds = 0;
   var maxRounds = 0;
+  var leads = 0;
   var minRounds = 99999999;
   var civilWars = 0;
   simulation = true;
@@ -312,6 +314,7 @@ const simulate = async () => {
     } while (!go);
     let c_tot = countriesMap.reduce((acc, c) => acc + c.cohesion, 0);
     console.log("[WWB]:Winner is:  " + winner() + " in turns: " + turn + "  g_cohesion: " + (c_tot/COUNTRIES).toFixed(3) + " with: " + Object.keys(leaders).length + " different leaders!");
+    leads += Object.keys(leaders).length;
     if (turn > maxRounds) maxRounds = turn;
     if (turn < minRounds) minRounds = turn;
     wins[winner()]+=1;
@@ -321,12 +324,13 @@ const simulate = async () => {
   cohesion = cohesion.map((e,idx)=> e / rounds);
   conquest = conquest.map((e,idx)=> e / SIMULATIONS);
   console.log("[WWB]:###########  Results ###########")
-  console.log("[WWB]: Wins:   Conquest:   \tAvg.Cohesion: ")
-  wins.forEach((c,idx)=>{if (c) console.log(idx + " => \t" + c + "    \t" + (conquest[idx]).toFixed(2) + "    \t" + (cohesion[idx]).toFixed(5))});
-  console.log("\n[WWB]: Using civil War Likelihood: " + config.wwb.civilWarLikelihood);
+  console.log("[WWB]: Wins:   Population:   \tAvg.Cohesion: ")
+  wins.forEach((c,idx)=>{if (c) console.log(idx + " => \t" + c + "    \t" + (utils.universalMap(idx,"population")/1000000).toFixed(2) + "M    \t" + (cohesion[idx]).toFixed(5))});
+  // console.log("\n[WWB]: Using civil War Likelihood: " + config.wwb.civilWarLikelihood);
   console.log("\n[WWB]: Turns => min: " + minRounds + "  avg: " + rounds/SIMULATIONS + "  max:" + maxRounds);
-  console.log("[WWB]:Average civil wars: " + civilWars/SIMULATIONS);
-  console.log("[WWB]:Civil wars a posteriori likelihood: " + (civilWars*100/rounds).toFixed(2) + "%");
+  console.log("[WWB]: Average different leaders => " + leads/SIMULATIONS)
+  // console.log("[WWB]:Average civil wars: " + civilWars/SIMULATIONS);
+  // console.log("[WWB]:Civil wars a posteriori likelihood: " + (civilWars*100/rounds).toFixed(2) + "%");
   console.log("\n[WWB]: Expected full run duration: (" + ((EXPECTED_TURN_DURATION * minRounds)/86400).toFixed(2) + ") => " + ((EXPECTED_TURN_DURATION * rounds/SIMULATIONS)/86400).toFixed(2) + " => (" + ((EXPECTED_TURN_DURATION * maxRounds)/86400).toFixed(2) +")  days\n\n");
 }
 

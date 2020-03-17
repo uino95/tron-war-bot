@@ -120,15 +120,15 @@ module.exports.stats = async (td) =>{
 module.exports.battleUpdate = async (cmap, td) => {
   if (!td.next || !td.next.description) return;
 
-  if (utils.randomInt(30) == 0){
+  // if (utils.randomInt(30) == 0){
     //POST ON FACEBOOK
-    await facebook.post(td.next.description).catch(console.error);
-  }
-  if (utils.randomInt(20) == 0){
+  await facebook.post(td.next.description).catch(console.error);
+  // }
+  // if (utils.randomInt(20) == 0){
     // POST ON TELEGRAM
-    let m = "<i>" + td.next.description + "</i>";
-    await telegram.sendMessage(m, {parse_mode: "HTML", disable_web_page_preview: true, disable_notification:true}).catch(console.error);
-  }
+  let m = "<i>" + td.next.description + "</i>";
+  await telegram.sendMessage(m, {parse_mode: "HTML", disable_web_page_preview: true, disable_notification:true}).catch(console.error);
+  // }
 }
 
 module.exports.startWar = async (td)=>{

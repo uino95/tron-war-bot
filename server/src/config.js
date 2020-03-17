@@ -54,21 +54,21 @@ const config = {
     appSecret: process.env.FB_APP_SECRET,
   },
   timing: {
-    turn: 300,
-    blockConfirmation: 4,
-    txMargin: 15
+    turn: 3600,
+    blockConfirmation: 1,
+    txMargin: 3
   },
   timingTest: {
-    turn: 15,
+    turn: 60,
     blockConfirmation: 1,
     txMargin: 3
   },
   social:{
     updates:{
-      statsFreq  : 100,
-      battleFreq : 100,
-      quotesFreq : 419,
-      rouletteFreq : 72
+      statsFreq  : 43200,
+      battleFreq : 43200,
+      // quotesFreq : 419,
+      rouletteFreq : 21600
     },
     promotions : {
       ambassadorFreq: 987
@@ -85,27 +85,16 @@ const config = {
       review: 0.5,
     }
   },
-  cohesion:{
-    battle:{
-      "0":{ o:0.1, ot:0, d:0, dt:0 },
-      "1":{ o:-0.1, ot:0, d:0, dt:0 },
-      "2":{ o:0, ot:0, d:0.2, dt:0 },
-      threshold: {
-        upper:70,
-        lower:30
-      }
-    }
-  },
   wwb:{
     fatality : {
       min: 0.01,
-      initial: 0.03,
+      initial: 0.02,
       spread: 0.05,
       bias: 0.1
     },
     recovery : {
       min: 0.001,
-      initial: 0.1,
+      initial: 0.3,
       spread: 0.05,
       bias: -0.05
     },
@@ -114,6 +103,16 @@ const config = {
       initial: 2.5,
       spread: 0.05,
       bias: 0.01
+    },
+    cohesion:{
+      battle: {
+        spread:0.15,
+        bias:0.2
+      },
+      next: {
+        spread:15,
+        bias:-0.5
+      }
     },
     restart: JSON.parse(process.env.RESTART || false)
   }
