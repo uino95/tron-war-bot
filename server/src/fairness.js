@@ -6,6 +6,9 @@ var FATALITY_RATE = config.wwb.fatality.initial;
 var TRANSMISSION_RATE = config.wwb.transmission.initial;
 var RECOVERY_RATE = config.wwb.recovery.initial;
 
+//The rates are daily assumptions thus must be scaled for the number of iterations in a day.
+const RATE_MULTIPLIER = Math.floor(24*60*60/(config.timing.turn || 1))
+
 // const neighborCountries = require('./map-utilities/neighborCountries');
 const utils = require("./utils");
 
@@ -151,7 +154,7 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
     let resistance = (0.5 + c.cohesion)**3
 
     // EVALUATE NEW DEATHS
-    let newDeaths = Math.ceil( c.infected * FATALITY_RATE / resistance);
+    let newDeaths = Math.ceil( c.infected * (FATALITY_RATE/RATE_MULTIPLIER) / resistance);
     c.deaths = c.deaths + newDeaths;
     c.active = c.population - c.deaths;
     c.infected = Math.min(c.infected - newDeaths, c.active);
@@ -159,10 +162,10 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
     stats.deaths = newDeaths;
     if (c.active <= 0 ) continue;
     // EVALUATE NEW RECOVERED
-    let newRecovered = Math.floor(c.infected * RECOVERY_RATE * resistance);
+    let newRecovered = Math.floor(c.infected * (RECOVERY_RATE/RATE_MULTIPLIER) * resistance);
 
     // EVALUATE NEW INFECTIONS
-    let newInfected = Math.ceil( (c.active - c.infected) * (c.infected/c.active) * (TRANSMISSION_RATE / resistance) );
+    let newInfected = Math.ceil( (c.active - c.infected) * (c.infected/c.active) * ((TRANSMISSION_RATE/RATE_MULTIPLIER) / resistance) );
     c.infected = Math.min(c.infected + newInfected - newRecovered, c.active);
 
     // SHAKE RESISTANCE

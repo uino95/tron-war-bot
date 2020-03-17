@@ -13,6 +13,8 @@ const utils = {
         return getFlag(mapping[id]['cc']);
       case 'full':
         return getFlag(mapping[id]['cc']) + ' ' +  mapping[id]['name'] ;
+      case 'population':
+        return mapping[id]['population'];
 			case 'numberId':
         id = id.replace(/ |-/g, "").toLowerCase()
 				for (var i = mapping.length - 1; i >= 0; i--) {

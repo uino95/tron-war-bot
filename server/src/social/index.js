@@ -10,7 +10,7 @@ const map = require('../map-utilities/map')
 
 module.exports.runUpdate = async (cmap, td) => {
   try {
-    // if (wwb.winner()) return updates.endWar();
+    if (wwb.winner()) return updates.endWar();
     // if (td.turn == 1) await updates.startWar(td);
     if (!(td.turn % 10)) await map.takeScreenshot();
     if (!(td.turn % config.social.updates.statsFreq)) await updates.stats(td).catch(console.error);

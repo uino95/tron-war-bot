@@ -9,7 +9,7 @@ const COUNTRIES = neighborCountries.length;
 var ROUND = 0;
 // SIMULATION PARAMS
 const SIMULATIONS = 5;
-const EXPECTED_TURN_DURATION = 300;
+const EXPECTED_TURN_DURATION = config.timing.turn;
 
 var countriesMap, turnData;
 const turnQueue = {};
@@ -69,10 +69,10 @@ const init = async (restart) => {
       // nextQuote: 200, // MULTIPLIER FOR BET ON NEXT CONQUERER
       // territories: 1,
       probability: (1/COUNTRIES),
-      population:100, //total population
+      population:utils.universalMap(idx, 'population'), //total population
       deaths:0, // total deaths
       infected:0, // active * infection rate
-      active:100,  // total pop - deaths
+      active:utils.universalMap(idx, 'population'),  // total pop - deaths
     }
   });
   if (!restart)  await loadSavedState();
