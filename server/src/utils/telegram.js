@@ -65,6 +65,7 @@ const sendMessageWithPhoto = async (path, message, options={})=>{
 }
 
 module.exports.chatId = chatId;
+
 module.exports.sendOrUpdate = sendOrUpdate;
 module.exports.sendMessage = sendMessage;
 module.exports.sendMessageWithPhoto = sendMessageWithPhoto;

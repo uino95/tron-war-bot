@@ -5,6 +5,7 @@ const utils = require('./utils')
 const vader = require('vader-sentiment');
 const fuzz = require('fuzzball');
 
+
 let map = JSON.parse(JSON.stringify(utils.map))
 const FUZZYMATCHER = map.map(e=>e.name).map(e=>e.toLowerCase()).map(e=>e.replace(/-/g," "))
 const REGEXPMATCHER = map.sort((a,b)=>{return b.name.split(/ |-/g).length - a.name.split(/ |-/g).length}).map(e=>e.name.toLowerCase().replace(/ |-/g,"")).toString().replace(/,/g,"|")
@@ -65,7 +66,14 @@ const update = async (country, delta, platform, text, extra={})=>{
   return c;
 }
 
+
+const editPopulation = async (country, params) => {
+  let r = await wwb.editPopulation(country, params);
+  return r;
+}
+
 module.exports = {
   analyze,
+  editPopulation,
   update
 }

@@ -175,7 +175,6 @@ const postTurn = async (turnData) => {
 
 
 const updateCohesion = (battle, next) => {
-  // @TODO
   countriesMap.forEach((e,i)=>{
     if (next && i==next.receiver){
       //TO UPDATE FRONTEND AS +/- GETS SHOWN UNDER battle.stats
@@ -188,6 +187,21 @@ const updateCohesion = (battle, next) => {
     battle.stats[i].cohesion = (nc || {}).delta || 0;
     countriesMap[i].cohesion = countriesMap[i].nextCohesion;
   });
+}
+
+const editPopulation =  (country, params) => {
+  let c = countriesMap[country]
+  let deaths = Math.min(Math.ceil(params.deaths * 0.01 * c.active), c.active);
+  countriesMap[country].deaths = c.deaths + deaths;
+  countriesMap[country].active = c.population - c.deaths;
+  countriesMap[country].infected = Math.max(0,c.infected - deaths);
+
+  let infected = Math.min((c.active - c.infected), Math.ceil(params.infected * 0.01 * (c.active - c.infected)))
+  let recovered = Math.min(c.infected, Math.ceil(params.recovered * 0.01 * c.infected));
+  countriesMap[country].infected = c.infected + infected - recovered;
+
+  firebase.countriesMap.child(country).set(countriesMap[country]);
+  return {deaths, infected, recovered};
 }
 
 
@@ -327,6 +341,7 @@ module.exports = {
   preTurn,
   onTurn,
   launchNextTurn,
+  editPopulation,
   editCohesion,
   // countriesStillAlive,
   cumulatedPdf,

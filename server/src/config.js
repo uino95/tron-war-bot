@@ -68,7 +68,7 @@ const config = {
       statsFreq  : 100,
       battleFreq : 100,
       quotesFreq : 419,
-      rouletteFreq : 72
+      rouletteFreq : 1
     },
     promotions : {
       ambassadorFreq: 987
@@ -76,7 +76,7 @@ const config = {
     roulette: {
       superVote:0.5,
       vote: 0.1,
-      bonus: 10
+      bonus: 20
     },
     shares:{
       comment: 0.1,

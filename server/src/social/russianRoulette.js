@@ -4,6 +4,7 @@ const utils = require('../utils')
 const cohesion = require('../cohesion')
 const firebase = require('../firebase')
 const telegram = require('../utils/telegram')
+const facebook = require('../utils/facebook')
 
 const ROULETTE = config.social.roulette
 
@@ -18,16 +19,17 @@ var current;
 // }
 
 const isValidVote = (v) => {
-  return (v == '🌟') || (v == '😡') || (v == '👍🏻') || (v == '👎🏻')
+  return (v == '💦') || (v == '💩') || (v == '😷') || (v == '🤧') || (v == '🔥')
 }
 const isSuperVote = (v) => {
-  return (v == '🌟') || (v == '😡')
+  return (v == '💦') || (v == '💩') || (v == '🔥')
 }
 const multiplier = (v) => {
-  if (v=='👍🏻') return ROULETTE.vote
-  if (v=='👎🏻') return -ROULETTE.vote
-  if (v=='🌟') return ROULETTE.superVote
-  if (v=='😡') return -ROULETTE.superVote
+  if (v=='😷') return ROULETTE.vote
+  if (v=='🤧') return -ROULETTE.vote
+  if (v=='💦') return ROULETTE.superVote
+  if (v=='💩') return -ROULETTE.superVote
+  if (v=='🔥') return 0;
 }
 const getCbData = (e)=>{
   return JSON.stringify({action:'RR_VOTE', vote:e});
@@ -36,7 +38,8 @@ const getCbData = (e)=>{
 const pickCountry = (cmap, td) => {
   const COUNTRIES = cmap.length;
   const getImpact = (e) => {
-    return (1 + (e.territories/3)) * e.cohesion
+    if (e.population == 1) return 0
+    return (1 + (e.deaths/e.population)/3) * e.cohesion
   }
   let total = cmap.reduce((acc, v)=>acc+getImpact(v),0)
   let acc = 0;
@@ -53,34 +56,51 @@ const closePreviousRoulette = async (cmap, td) => {
   // - EDIT AND CLOSE MESSAGE
   let votes = Object.values(current.votes).reduce((acc, e) => acc + e, 0);
   let total = 0
-  let msg = "<b>⏱ ROULETTE TIME ⏱</b>"
-  let text = "Roulette: "
-  msg += "\nSupport time for <b>" + utils.universalMap(current.country, "full") + "</b> is over!\n"
-  msg += "Territories: <b>"+ cmap[current.country].territories +"</b>\n\n"
+  let msg = "⏱ TIME IS OVER ⏱\n"
+  msg += `<b>${utils.universalMap(current.country, "full")}</b>\n\n`
+  let cohesionText = "Roulette: "
   // - COUNT VOTES
   if (votes){
     msg += "<b>Results:</b>\n"
     Object.keys(current.votes).forEach(e=>{
       if (!current.votes[e]) return
-      msg += e + ': <b>' + current.votes[e] + '</b>   =>  '+ utils.formatNumber(current.votes[e] * multiplier(e)) +'\n'
-      text += current.votes[e] + e + ' ';
+      msg += e + ': <b>' + current.votes[e] + '</b>\n'
+      cohesionText += current.votes[e] + e + ' ';
       total += (current.votes[e] * multiplier(e))
     })
-    msg += "\nFinal count: <b>"+ utils.formatNumber(total) +"%</b> ➡️ "
-    if (!total) msg += '<b>FULL TIE!</b>'
-    if (total>0) msg += '<b>Bonus: +'+ROULETTE.bonus+'%</b>'
-    if (total<0) msg += '<b>Bonus: -'+ROULETTE.bonus+'%</b>'
+    msg += "\n"
+    if (!total)     msg += '<b>Dammit! That was a tie! No fun at this round... </b>'
+    if (total > 0)  msg += `Seems like ${utils.universalMap(current.country)} received a proper cleaning...`
+    if (total < 0)  msg += `Hell yeah! Seems like in <b>${utils.universalMap(current.country)}</b> they really want to extinguish themselves!`
     total += (ROULETTE.bonus*Math.sign(total))
   } else { msg += 'No votes at this round... 😢\n'}
-  msg += "\n\nTotal Cohesion Boost: <b>" + utils.formatNumber(total) + "%</b>\n";
-  text += ' => Boost: '+ utils.formatNumber(total) + "%";
+  cohesionText += ' => Boost: '+ utils.formatNumber(total) + "%";
   // - EDIT COHESION
   let extra = {
     link: 'https://t.me/Tron_WarBot/'+current.messageId,
     update_type: 'ROULETTE'
   }
-  let n = await cohesion.update(current.country, total, 'TG', text, extra)
-  if (n) msg += "New cohesion: <b>" + utils.toPercent(n.new) + "</b>\n"
+
+  let deaths = utils.randomInt(current.votes['🔥']**2) + current.votes['🔥']
+  let recovered = utils.randomInt(current.votes['💦']**2) + current.votes['💦']
+  let infected = utils.randomInt(current.votes['💩']**2) + current.votes['💩']
+  let res = await cohesion.editPopulation(current.country, {deaths, recovered, infected});
+  if (res.infected) {
+    msg += `\n\n<b>+${res.infected}</b> infected after tasting feces.`
+  }
+  if (res.recovered) {
+    msg += `\n\n<b>${res.recovered}</b> temporarily recovered.`
+  }
+  if (res.deaths) {
+    msg += `\n\nOps! Someone played a bit too much with matches... ${res.deaths} plague-riddens were burnt alive!`
+    let f = `
+      A hard sentence was given to ${res.deaths} sick men in ${utils.universalMap(current.country)} stuck in an absolutely unintentional fire inside a hospital. 🔥🔥
+
+      Check it at https://t.me/Tron_WarBot/${current.messageId}`
+    await facebook.post(f);
+  }
+
+  let n = await cohesion.update(current.country, total, 'TG', cohesionText, extra)
   await telegram.editMessageText(current.messageId, undefined, msg,  {parse_mode: "HTML", reply_markup: { 'inline_keyboard': [[]]}});
   return utils.universalMap(current.country, "full") + " received a <b>" + utils.formatNumber(total) + "% </b> cohesion boost!\n"
 }
@@ -100,26 +120,34 @@ module.exports.next = async (cmap, td)=>{
   current = {
     country:c,
     votes:{
-      '🌟':0,
-      '👍🏻':0,
-      '👎🏻':0,
-      '😡':0
+      '😷':0,
+      '🤧':0,
+      '💦':0,
+      '💩':0,
+      '🔥':0
     },
     users:{},
   }
-  let msg = "<b>⏱ ROULETTE TIME ⏱</b>"
-  msg += "\nIt's time to show your support for:\n\n"
-  msg += "<b>" + utils.universalMap(current.country, "full") + "</b>\n"
-  msg += "Territories: <b>" + cmap[current.country].territories + "</b>\n"
-  msg += "Cohesion: <b>" + utils.toPercent(cmap[current.country].cohesion)+"</b>\n\n"
-  msg += "<i>You have got 6 hours to like (or dislike).\n"
-  msg += "Likes (👍🏻/👎🏻) gives ±"+ROULETTE.vote+"% cohesion point\n"
-  msg += "Superlikes (🌟/😡) gives ±"+ROULETTE.superVote+"% (can only use once per day)</i>\n"
-  msg += "A <b>±"+ROULETTE.bonus+"% cohesion bonus</b> will be given on top"
+  let msg = `<b>⏱ ROULETTE TIME ⏱</b>
+<i>It's time to clean some cockroaches... or set them on 🔥!</i>
+
+<b> ${utils.universalMap(current.country, "full")}</b>
+Deaths toll: <b>${cmap[current.country].deaths} </b> (${utils.toPercent(cmap[current.country].deaths/cmap[current.country].population)})
+Infected: <b>${cmap[current.country].infected}</b>
+
+You have got 6 hours to express your useless opinion...
+Should we quarantine them (😷) or wildly sneeze on them (🤧)?
+
+You can also squirt them with dubious sanitizing fluid (💦) or perform public excrements spreading (💩) for a better performance.
+Or you might simply set them on 🔥 for a true deep cleaning!
+
+<i>Supervotes (💦/💩/🔥) can only be used once per day</i>
+  `
+
   // PICK A COUNTRY
   // CREATE TEXT AND KEYBOARD
   let m = { 'inline_keyboard': [Object.keys(current.votes).map(e=> {return {'text':e, 'callback_data': getCbData(e)}})]};
-  let r = await telegram.sendMessage(msg, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true})
+  let r = await telegram.sendMessage(msg, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true, reply_to_message_id: current.messageId})
   current.messageId = r.message_id;
   firebase.data.update({roulette: current})
 }
