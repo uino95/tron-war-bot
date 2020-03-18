@@ -8,8 +8,8 @@ const ambassador = require('./ambassador')
 const telegram = require('../utils/telegram')
 const map = require('../map-utilities/map')
 
-const STATS_FREQ = Math.floor(config.social.updates.statsFreq/config.timing.turn)
-const ROULETTE_FREQ = Math.floor(config.social.updates.rouletteFreq/config.timing.turn)
+const STATS_FREQ = Math.floor(config.social.updates.statsFreq/config.timingProd.turn)
+const ROULETTE_FREQ = Math.floor(config.social.updates.rouletteFreq/config.timingProd.turn)
 
 module.exports.runUpdate = async (cmap, td) => {
   try {

@@ -9,7 +9,7 @@ const COUNTRIES = neighborCountries.length;
 var ROUND = 0;
 // SIMULATION PARAMS
 const SIMULATIONS = 10;
-const EXPECTED_TURN_DURATION = config.timing.turn;
+const EXPECTED_TURN_DURATION = config.timingProd.turn;
 
 var countriesMap, turnData;
 const turnQueue = {};
@@ -192,16 +192,24 @@ const updateCohesion = (battle, next) => {
 
 const editPopulation =  (country, params) => {
   let c = countriesMap[country]
-  let deaths = Math.min(Math.ceil(params.deaths * 0.001 * c.active), c.active);
+  let deaths = Math.min(Math.ceil(params.deaths * 0.0005 * c.active), c.active);
   countriesMap[country].deaths = c.deaths + deaths;
   countriesMap[country].active = c.population - c.deaths;
   countriesMap[country].infected = Math.max(0,c.infected - deaths);
 
-  let infected = Math.min((c.active - c.infected), Math.ceil(params.infected * 0.001 * (c.active - c.infected)))
-  let recovered = Math.min(c.infected, Math.ceil(params.recovered * 0.001 * c.infected));
+  let infected = Math.min((c.active - c.infected), Math.ceil(params.infected * 0.0005 * (c.active - c.infected)))
+  let recovered = Math.min(c.infected, Math.ceil(params.recovered * 0.0005 * c.infected));
   countriesMap[country].infected = c.infected + infected - recovered;
 
   firebase.countriesMap.child(country).set(countriesMap[country]);
+
+  if (turnData && turnData.battle && turnData.battle.stats){
+    let _c = turnData.battle.stats[country];
+    _c.infected += infected;
+    _c.deaths += deaths;
+    _c.recovered += recovered;
+    saveCurrentState();
+  }
   return {deaths, infected, recovered};
 }
 
@@ -246,7 +254,7 @@ const launchNextTurn = async (_entropy1=utils.randomHex(), _entropy2=utils.rando
   paused = false;
 
   if (!countriesMap) await init();
-  await loadSavedState(true);
+  if (!simulation) await loadSavedState(true);
 
   // GAME IS ALREADY OVER
   if (fairness.winner(countriesMap)!=null) return true;
@@ -305,7 +313,7 @@ const simulate = async () => {
         })
         let l = leaderboard();
         leaders[l[0].idx] = l[0];
-        console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion: " + utils.toPercent(l[0].cohesion) + " deaths: " + l[0].deaths + " and infected: " + l[0].infected)
+        console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion: " + utils.toPercent(l[0].cohesion) + " deaths: " + utils.toPercent(l[0].deaths/l[0].population) + " and infected: " + utils.toPercent(l[0].infected/l[0].active))
       }
       let d = turnData;
       if (d.next) {

@@ -7,8 +7,7 @@ var TRANSMISSION_RATE = config.wwb.transmission.initial;
 var RECOVERY_RATE = config.wwb.recovery.initial;
 
 //The rates are daily assumptions thus must be scaled for the number of iterations in a day.
-const RATE_MULTIPLIER = Math.floor(24*60*60/(config.timing.turn || 1))
-// const RATE_MULTIPLIER = Math.floor(24*60*60/(3600|| 1))
+const RATE_MULTIPLIER = Math.floor(24*60*60/(config.timingProd.turn || 1))
 
 // const neighborCountries = require('./map-utilities/neighborCountries');
 const utils = require("./utils");
@@ -169,10 +168,18 @@ const resolveNextBattle = (countriesMap, turnData, firstEntropy, secondEntropy) 
     let newInfected = Math.ceil( (c.active - c.infected) * (c.infected/c.active) * ((TRANSMISSION_RATE/RATE_MULTIPLIER) / resistance) );
 
     // SHAKE RESISTANCE
-    let delta = (((newRecovered+newDeaths-newInfected)/c.infected)**(1/2) + config.wwb.cohesion.battle.bias) * Math.log(c.population)**2
-    // let delta = (((newRecovered)/c.infected)**(1/2) + config.wwb.cohesion.battle.bias) * 100
-    delta = Math.min(Math.max(-config.wwb.cohesion.battle.spread, delta), config.wwb.cohesion.battle.spread)
-
+    // let delta = (((newRecovered+newDeaths-newInfected)/c.infected)**(1/2) + config.wwb.cohesion.battle.bias) * Math.log(c.population)**2
+    // let delta =  - Math.cos((0.34 + c.deaths/c.population) * 1.15 * Math.PI) + config.wwb.cohesion.battle.bias
+    let rate = (c.deaths/c.population)
+    delta = rate > 0.001 ? -1 : -1.5;
+    delta = rate > 0.002 ? 0 : delta;
+    delta = rate > 0.003 ? 1 : delta;
+    delta = rate > 0.997 ? 1 : delta;
+    delta = rate > 0.998 ? -0.3 : delta;
+    delta = rate > 0.999 ? -0.6 : delta;
+    delta = rate > 0.99995 ? 1 : delta;
+    // delta = Math.min(Math.max(-config.wwb.cohesion.battle.spread, delta), config.wwb.cohesion.battle.spread)
+    delta = delta * config.wwb.cohesion.battle.spread * ((1 + (c.infected/c.active))**(2))
     c.infected = Math.min(c.infected + newInfected - newRecovered, c.active);
 
     stats.infected = newInfected;
@@ -225,15 +232,15 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
       // Deaths impact
       {
         let popLog = Math.log(rcv.active||1);
-        let _d = Math.floor(popLog * (rand3 + 0.5 - config.wwb.cohesion.next.bias));
+        let _d = Math.floor(popLog * (rand3 + 1 - config.wwb.cohesion.next.bias));
         nextData.deaths = Math.floor(Math.min(Math.max(1, _d), rcv.active));
       }
       break;
     case 1:
       // Infected/recovered impacts
       {
-        let popLog = Math.log(rcv.active||1);
-        let _d = Math.floor(popLog * (rand3 - config.wwb.cohesion.next.bias));
+        let popLog = rcv.active**(1/4);
+        let _d = Math.floor(popLog * ((rand3 - 0.5)*2 - config.wwb.cohesion.next.bias));
         let newInfected = Math.min(Math.max(0, (rcv.infected + _d)), rcv.active);
         nextData.infected = newInfected - rcv.infected;
       }
@@ -242,7 +249,7 @@ const resolveNextConqueror = (countriesMap, turnData, firstEntropy, secondEntrop
       // Cohesion weakening/strengthening impacts
       {
         let popLog = rcv.deaths/rcv.population;
-        let _d = Math.sign((rand3 - 0.5)*2 + config.wwb.cohesion.next.bias + popLog) * (rand3**(1/3));
+        let _d = Math.sign(popLog - rand3 + config.wwb.cohesion.next.bias) * (rand3**(1/3));
         nextData.cohesion =  _d * config.wwb.cohesion.next.spread;
       }
       break;
