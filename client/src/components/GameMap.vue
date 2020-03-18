@@ -39,8 +39,10 @@ export default {
       "#FF5722",
       "#9E9E9E",
       "#607D8B"
-    ]
+    ],
+    defaultColor: 55
   }),
+
   mounted() {
     // subscribe to chanhges
     db.ref("public/countriesMap").on("child_changed", snapshot => {
@@ -49,7 +51,7 @@ export default {
       data["percentagesOfDeath"] =
         parseFloat((data.deaths / data.population).toFixed(3)) * 100;
       data["color"] = hslToHex(
-        210,
+        this.defaultColor,
         100,
         (100 - data.percentagesOfDeath) / (100 / 75)
       );
@@ -64,9 +66,9 @@ export default {
         el["percentagesOfDeath"] =
           parseFloat((el.deaths / el.population).toFixed(3)) * 100;
         el["color"] = hslToHex(
-          210,
+          this.defaultColor,
           100,
-          (100 - el.percentagesOfDeath) / (100 / 75)
+          (100 - el.percentagesOfDeath) / (100 / 75) - 15 
         );
       });
       // // assign a color to a particular country
@@ -130,8 +132,8 @@ export default {
       polygonTemplate.events.on("hit", this.clicked);
 
       /* Create selected and hover states and set alternative fill color */
-      var ss = polygonTemplate.states.create("active");
-      ss.properties.fill = chart.colors.getIndex(2);
+      // var ss = polygonTemplate.states.create("active");
+      // ss.properties.fill = chart.colors.getIndex(2);
 
       var hs = polygonTemplate.states.create("hover");
       hs.properties.fill = chart.colors.getIndex(4);

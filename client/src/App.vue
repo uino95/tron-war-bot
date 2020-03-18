@@ -1,19 +1,19 @@
 <template>
-    <v-app id="keep">
-        <loading :active.sync="loading" color="#ffffff" :opacity="1" background-color="#001537" :is-full-page="true">
+    <v-app id="keep" >
+        <loading :active.sync="loading" color="#ffffff" :opacity="1" background-color="#7f0000" :is-full-page="true">
         </loading>
-        <v-navigation-drawer v-model="drawer" fixed clipped class="secondary" app dark>
-            <v-icon class="mt-4 ml-4" @click="drawer = !drawer" dark>fa-times</v-icon>
-            <v-list dense class="secondary" dark>
+        <v-navigation-drawer class="secondary " v-model="drawer" fixed clipped app light>
+            <v-icon class="mt-4 ml-4 text_secondary--text" @click="drawer = !drawer" light>fa-times</v-icon>
+            <v-list dense light>
                 <template v-for="(item, i) in menuItems">
                     <v-layout :class="item.class" v-if="item.heading" :key="i" row align-center>
                         <v-flex xs6>
-                            <v-subheader v-if="item.heading">
+                            <v-subheader class="text_secondary--text" v-if="item.heading">
                                 {{ item.heading }}
                             </v-subheader>
                         </v-flex>
                     </v-layout>
-                    <v-divider :class="item.class" v-else-if="item.divider" :key="i" dark class="my-3"></v-divider>
+                    <v-divider :class="item.class" v-else-if="item.divider" :key="i" light class="my-3 "></v-divider>
                     <!-- <v-list-tile :class="item.class" v-else-if="item.loginFb" :key="i">
                         <v-list-tile-action>
                             <v-icon>fab fa-facebook-square</v-icon>
@@ -39,12 +39,12 @@
                             </span>
                         </v-list-tile-content>
                     </v-list-tile> -->
-                    <v-list-tile :class="item.class" v-else :key="i" @click="openLink(item.body)">
+                    <v-list-tile :class="item.class" v-else :key="i" @click="openLink(item.body)" light>
                         <v-list-tile-action>
-                            <v-icon>{{ item.icon }}</v-icon>
+                            <v-icon class="text_secondary--text">{{ item.icon }}</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-content>
-                            <v-list-tile-title class="grey--text">
+                            <v-list-tile-title class="text_secondary--text">
                                 {{ item.text }}
                             </v-list-tile-title>
                         </v-list-tile-content>
@@ -53,15 +53,15 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-toolbar color="#2c3e50" app fixed clipped-left>
+        <v-toolbar color="primary_dark" dark app fixed clipped-left>
             <v-toolbar-side-icon @click="drawer = !drawer" style="color: white"></v-toolbar-side-icon>
 
             <v-avatar class="ml-3">
                 <img src="/img/logo.png">
             </v-avatar>
 
-            <span class="headline ml-3 mr-2" style="color: white">Tron<span class="font-weight-light"
-                    style="color: white">WarBot</span></span>
+            <span class="headline ml-3 mr-2" style="color: white">Covid<span class="font-weight-light"
+                    style="color: white">Olympics</span></span>
             <v-spacer></v-spacer>
             <v-toolbar-items>
                 <!-- <v-menu offset-y>
@@ -116,7 +116,7 @@
                         Ambassador
                     </v-badge>
                 </v-btn> -->
-                <v-btn icon dark @click="openLink('https://t.me/joinchat/J8ocIxZoXsD4stn4nxg24A')">
+                <v-btn class="hidden-xs-only" icon dark @click="openLink('https://t.me/joinchat/J8ocIxZoXsD4stn4nxg24A')">
                     <v-icon >fab fa-telegram</v-icon>
                 </v-btn>
             </v-toolbar-items>
@@ -128,7 +128,7 @@
                 <v-layout justify-center align-center>
                     <v-flex>
                         <div class="btn-mobile" round v-if="this.$store.state.isMobile && noShowMap">
-                            <v-btn v-on:click="showMobileMap()"> Load Map</v-btn>
+                            <v-btn color="secondary" class="black--text" v-on:click="showMobileMap()"> Load Map</v-btn>
                         </div>
                         <div v-else-if="!noShowMap">
                             <core-game-map v-bind:style="{ display: toDisplay }"></core-game-map>
