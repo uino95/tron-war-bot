@@ -1,13 +1,13 @@
 <template>
-  <v-container grid-list-md text-xs-center class="outerTabContainer">
+  <v-container grid-list-md text-xs-center class="background outerTabContainer">
     <!-- Countries -->
     <v-flex sm12 md12 lg12 shrink>
       <v-card>
-        <v-toolbar color="secondary_light" class="text_secondary--text" light>
+        <v-toolbar color="primary" class="text_primary--text" dark>
           <v-toolbar-title>Current Status</v-toolbar-title>
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-              <v-icon color="text_secondary" light v-on="on">info</v-icon>
+              <v-icon color="text_primary" dark v-on="on">info</v-icon>
             </template>
             <span>Here you can see some interisting insight</span>
           </v-tooltip>

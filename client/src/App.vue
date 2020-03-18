@@ -1,19 +1,19 @@
 <template>
-    <v-app id="keep" >
-        <loading :active.sync="loading" color="#ffffff" :opacity="1" background-color="#7f0000" :is-full-page="true">
+    <v-app id="keep" dark>
+        <loading :active.sync="loading" color="#ffffff" :opacity="1" background-color="#455a64" :is-full-page="true">
         </loading>
-        <v-navigation-drawer class="secondary " v-model="drawer" fixed clipped app light>
-            <v-icon class="mt-4 ml-4 text_secondary--text" @click="drawer = !drawer" light>fa-times</v-icon>
-            <v-list dense light>
+        <v-navigation-drawer class="primary" v-model="drawer" fixed clipped app dark>
+            <v-icon class="mt-4 ml-4 text_primary--text" @click="drawer = !drawer" dark>fa-times</v-icon>
+            <v-list dense dark>
                 <template v-for="(item, i) in menuItems">
                     <v-layout :class="item.class" v-if="item.heading" :key="i" row align-center>
                         <v-flex xs6>
-                            <v-subheader class="text_secondary--text" v-if="item.heading">
+                            <v-subheader class="text_primary--text" v-if="item.heading">
                                 {{ item.heading }}
                             </v-subheader>
                         </v-flex>
                     </v-layout>
-                    <v-divider :class="item.class" v-else-if="item.divider" :key="i" light class="my-3 "></v-divider>
+                    <v-divider :class="item.class" v-else-if="item.divider" :key="i" dark class="my-3 "></v-divider>
                     <!-- <v-list-tile :class="item.class" v-else-if="item.loginFb" :key="i">
                         <v-list-tile-action>
                             <v-icon>fab fa-facebook-square</v-icon>
@@ -39,12 +39,12 @@
                             </span>
                         </v-list-tile-content>
                     </v-list-tile> -->
-                    <v-list-tile :class="item.class" v-else :key="i" @click="openLink(item.body)" light>
+                    <v-list-tile :class="item.class" v-else :key="i" @click="openLink(item.body)" dark>
                         <v-list-tile-action>
-                            <v-icon class="text_secondary--text">{{ item.icon }}</v-icon>
+                            <v-icon class="text_primary--text">{{ item.icon }}</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-content>
-                            <v-list-tile-title class="text_secondary--text">
+                            <v-list-tile-title class="text_primary--text">
                                 {{ item.text }}
                             </v-list-tile-title>
                         </v-list-tile-content>
@@ -53,7 +53,7 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-toolbar color="primary_dark" dark app fixed clipped-left>
+        <v-toolbar color="primary" dark app fixed clipped-left>
             <v-toolbar-side-icon @click="drawer = !drawer" style="color: white"></v-toolbar-side-icon>
 
             <v-avatar class="ml-3">
@@ -70,7 +70,7 @@
                             Account
                         </v-btn>
                     </template>
-                    <v-list class="secondary" dark>
+                    <v-list class="primary" dark>
                         <v-list-tile v-if="$store.state.loggedInAccount!=null">
                             <v-list-tile-avatar>
                                 <v-icon>fa-paper-plane</v-icon>
@@ -124,11 +124,11 @@
 
 
         <v-content>
-            <v-container fluid fill-height fill-width class="grey pa-0 ma-0">
+            <v-container fluid fill-height fill-width class="background pa-0 ma-0">
                 <v-layout justify-center align-center>
                     <v-flex>
                         <div class="btn-mobile" round v-if="this.$store.state.isMobile && noShowMap">
-                            <v-btn color="secondary" class="black--text" v-on:click="showMobileMap()"> Load Map</v-btn>
+                            <v-btn color="primary_light"  v-on:click="showMobileMap()"> Load Map</v-btn>
                         </div>
                         <div v-else-if="!noShowMap">
                             <core-game-map v-bind:style="{ display: toDisplay }"></core-game-map>

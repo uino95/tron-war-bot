@@ -31,7 +31,7 @@
       </v-tab>
     </v-tabs> -->
 
-    <v-card style="background-color:rgb(158, 158, 158);">
+    <v-card class="background">
       <core-info-new-turn></core-info-new-turn>
       <transition name="fade" mode="out-in">
         <router-view></router-view>
