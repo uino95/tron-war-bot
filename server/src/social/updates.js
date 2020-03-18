@@ -38,7 +38,7 @@ const buildFbStats = (td, leaderboard) => {
   4th ${utils.universalMap(leaderboard[3].idx, "full")}: ${leaderboard[3].deaths} (${utils.toPercent(leaderboard[3].deaths/leaderboard[3].population)} of pop.)
   5th ${utils.universalMap(leaderboard[4].idx, "full")}: ${leaderboard[4].deaths} (${utils.toPercent(leaderboard[4].deaths/leaderboard[4].population)} of pop.)
 
-  Stay up to date at https://covidolympics.com
+  Stay up to date at https://covidolympics2020.com
   #covid #coronavirus #outbreak #gaming #simulation #bot`
   return f;
 }
@@ -56,7 +56,7 @@ const buildTgStats = (td, leaderboard) => {
   <i>4th</i> <b>${utils.universalMap(leaderboard[3].idx, "full")}</b>: ${leaderboard[3].deaths} (${utils.toPercent(leaderboard[3].deaths/leaderboard[3].population)} of pop.)
   <i>5th</i> <b>${utils.universalMap(leaderboard[4].idx, "full")}</b>: ${leaderboard[4].deaths} (${utils.toPercent(leaderboard[4].deaths/leaderboard[4].population)} of pop.)
 
-  Stay up to date at https://covidolympics.com
+  Stay up to date at https://covidolympics2020.com
   Who will get extinct?
   🎖👇👇👇👇👇👇👇🎖`;
   return t
@@ -84,7 +84,7 @@ module.exports.stats = async (td) =>{
   let leaderboard = wwb.leaderboard();
 
   let t = buildTgStats(td, leaderboard);
-  let m = { 'inline_keyboard': [[{'text': '🌎 Check it out', 'url': 'https://covidolympics.com'}]]};
+  let m = { 'inline_keyboard': [[{'text': '🌎 Check it out', 'url': 'https://covidolympics2020.com'}]]};
   await telegram.sendMessage(t, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true}).catch(console.error);
 
   let f = buildFbStats(td, leaderboard);
@@ -127,7 +127,7 @@ module.exports.battleUpdate = async (cmap, td) => {
   // if (utils.randomInt(20) == 0){
     // POST ON TELEGRAM
   let m = "<i>" + td.next.description + "</i>";
-  await telegram.sendMessage(m, {parse_mode: "HTML", disable_web_page_preview: true, disable_notification:true}).catch(console.error);
+  if (!config.test) await telegram.sendMessage(m, {parse_mode: "HTML", disable_web_page_preview: true, disable_notification:true}).catch(console.error);
   // }
 }
 

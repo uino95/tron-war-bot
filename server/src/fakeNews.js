@@ -8,11 +8,15 @@ const templates = {
   //Deaths
   '122': [
     "$receiver$. Dead bodies found around a dining table stuffed with vegan food. +$deaths$ deaths.",
+    "$receiver$. Hobo fight for the last bottle of whiskey turns into a massacre. +$deaths$ deaths."
   ],
   //Infected
   '212': [
     "Man surprised by policemen in $receiver$ while eating bat's poo. +$infected$ infected.",
     "$receiver$'s special agents opened a mysterious box from $sender$ with stated 'Do not open me!'. It was full of viruses! +$infected$ infected.",
+    "$receiver$'s health organization declares the novel virus form can only be defeated through extensive hugging. +$infected$ infected.",
+    "In $receiver$ people have invaded the streets as an official strike against the virus' oppression. +$infected$ infected.",
+    "Ambassador of $sender$ found positive to virus test while visiting $receiver$'s president. +$infected$ infected.",
   ],
   //Recovered
   '232': [
@@ -46,7 +50,7 @@ const generate = (params={sender:null, receiver:null, deaths:0, infected:0, cohe
   let s = templates[type][_rand];
   if (params.sender) s = s.replace(/\$sender\$/g, utils.universalMap(params.sender))
   if (params.receiver) s = s.replace(/\$receiver\$/g, utils.universalMap(params.receiver))
-  if (params.infected) s = s.replace(/\$infected\$/g, params.infected).replace(/\$recovered\$/g, params.recovered)
+  if (params.infected) s = s.replace(/\$infected\$/g, params.infected).replace(/\$recovered\$/g, -params.infected)
   if (params.deaths) s = s.replace(/\$deaths\$/g, params.deaths)
   if (params.cohesion) s = s.replace(/\$cohesion\$/g, params.cohesion)
   return s;
