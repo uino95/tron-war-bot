@@ -1,13 +1,13 @@
 <template>
-  <v-container grid-list-md text-xs-center class="outerTabContainer">
+  <v-container grid-list-md text-xs-center class="background outerTabContainer">
     <!-- Countries -->
     <v-flex sm12 md12 lg12 shrink>
       <v-card>
-        <v-toolbar color="primary_stats_tab" dark>
+        <v-toolbar color="primary" class="text_primary--text" dark>
           <v-toolbar-title>Current Status</v-toolbar-title>
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-              <v-icon color="secondary-next-tab" dark v-on="on">info</v-icon>
+              <v-icon color="text_primary" dark v-on="on">info</v-icon>
             </template>
             <span>Here you can see some interisting insight</span>
           </v-tooltip>
@@ -111,21 +111,25 @@
             >
               <div>{{props.item.name}}</div>
             </td>
-            <td class="text-xs-left pa-0">{{ props.item.population | NUMBER }}</td>
-            <td class="text-xs-left pa-0">{{ props.item.active | NUMBER }}</td>
-            <td class="text-xs-left pa-0 pr-2">
+            <td class="text-xs-left pa-0">
               <v-layout row>
-              {{ props.item.deaths}}
-              <div class="ml-2 redText">{{'(+ ' + props.item.stats.deaths + ')' }}</div>
+                {{ props.item.active | NUMBER }}
+                <div class="ml-2 hidden-xs-only">{{'(' + ((props.item.active / props.item.population) * 100).toFixed(2)  + ' %)' }}</div>
               </v-layout>
             </td>
             <td class="text-xs-left pa-0 pr-2">
               <v-layout row>
-              {{(props.item.infected)}}
-              <div class="ml-2 redText">{{'(+ ' + props.item.stats.infected + ')' }}</div>
+              {{ props.item.deaths | NUMBER}}
+              <div class="ml-2 redText hidden-xs-only">{{data.turnData.battle.stats[props.item['.key']].deaths | NUMBER_WITH_PLUS }}</div>
               </v-layout>
             </td>
-            <td class="greenText text-xs-left pa-0">{{ props.item.stats.recovered }}</td>
+            <td class="text-xs-left pa-0 pr-2">
+              <v-layout row>
+              {{props.item.infected | NUMBER}}
+              <div class="ml-2 redText hidden-xs-only"> {{data.turnData.battle.stats[props.item['.key']].infected | NUMBER_WITH_PLUS}} </div>
+              </v-layout>
+            </td>
+            <td class="greenText text-xs-left pa-0">{{ data.turnData.battle.stats[props.item['.key']].recovered | NUMBER }}</td>
             <!-- <td class="text-xs-left hidden-xs-only pa-0">
               <v-btn
                 class="white--text"
@@ -358,23 +362,14 @@ export default {
         description: null
       },
       {
-        text: "Population",
-        value: "population",
-        id: 3,
-        sortable: true,
-        align: "left",
-        class: "body-1 pa-0 hidden-xs-only",
-        description: "Population: \n It represents the population of a country."
-      },
-      {
-        text: "Active Population",
+        text: "Remaining Population",
         value: "population",
         id: 4,
         sortable: true,
         align: "left",
         class: "body-1 pa-0 hidden-xs-only",
         description:
-          "Active Population: \n It represents the remaining population of a country."
+          "Remaining Population: \n It represents the remaining population of a country."
       },
       {
         text: "Total Deaths",
@@ -427,17 +422,7 @@ export default {
           "Recovered: \n It represents the number of Recovered from the virus."
       },
       {
-        text: 'P',
-        value: "population",
-        id: 10,
-        sortable: true,
-        align: "left",
-        class: "body-1 pa-0 hidden-sm-and-up",
-        icon: "fa-users",
-        description: "Population: \n It represents the population of a country."
-      },
-      {
-        text: "A",
+        text: "P",
         value: "active_population",
         id: 11,
         sortable: true,
@@ -524,12 +509,15 @@ export default {
   firebase: function() {
     return {
       mapStatus: db.ref("public/countriesMap").orderByChild("deaths"),
-      update: db.ref("public/data/turnData/battle/stats")
+      data: db.ref("public/data")
     };
   },
   filters:{
     NUMBER(n){
       return format(n);
+    },
+    NUMBER_WITH_PLUS(n){
+      return '(+ ' + format(n) + ')';
     }
   },
   methods: {
@@ -588,9 +576,8 @@ export default {
     countryStatus: function() {
       return this.mapStatus.map(country => {
         country.name = this.universalMap(country[".key"]);
-        country.stats = this.update[country[".key"]];
         return country;
-      });
+      }).filter(c => c.population > 1);
     },
     chosePhrase() {
       let random = Math.floor(Math.random() * this.phrases.length);

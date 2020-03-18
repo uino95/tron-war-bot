@@ -39,19 +39,21 @@ export default {
       "#FF5722",
       "#9E9E9E",
       "#607D8B"
-    ]
+    ],
+    defaultColor: 12
   }),
+
   mounted() {
     // subscribe to chanhges
     db.ref("public/countriesMap").on("child_changed", snapshot => {
       let data = snapshot.val();
       data["id"] = this.universalMap(data.idx, "charId");
       data["percentagesOfDeath"] =
-        parseFloat((data.deaths / data.population).toFixed(3)) * 100;
+        parseFloat((data.active / data.population).toFixed(3)) * 100;
       data["color"] = hslToHex(
-        210,
+        this.defaultColor,
         100,
-        (100 - data.percentagesOfDeath) / (100 / 75)
+        (data.percentagesOfDeath) 
       );
       this.polygonSeries.data[data.idx] = data;
       this.polygonSeries.invalidateData();
@@ -62,11 +64,11 @@ export default {
       data.map((el, index) => {
         el["id"] = this.universalMap(index, "charId");
         el["percentagesOfDeath"] =
-          parseFloat((el.deaths / el.population).toFixed(3)) * 100;
+          parseFloat((el.active / el.population).toFixed(3)) * 100;
         el["color"] = hslToHex(
-          210,
+          this.defaultColor,
           100,
-          (100 - el.percentagesOfDeath) / (100 / 75)
+          (el.percentagesOfDeath) 
         );
       });
       // // assign a color to a particular country
@@ -101,7 +103,7 @@ export default {
 
       //chart.background.fill = "#37474f";
       // chart.background.fill = "#B3E5FC";
-      chart.background.fill = "#585858";
+      chart.background.fill = "#455a64";
       chart.background.fillOpacity = 1;
 
       /* Create map polygon series */
@@ -121,7 +123,7 @@ export default {
       polygonTemplate.togglable = true;
 
       polygonTemplate.tooltipText =
-        "[bold]{name}[/] ({percentagesOfDeath} %) \nDeaths: [bold]{deaths}\n Infected: [bold]{infected}\n Population: [bold]{population}";
+        "[bold]{name}[/] ({percentagesOfDeath} %) \n Deaths:[bold]{deaths}[/]\n Infected: [bold]{infected}[/]\n Population: [bold]{population}[/]";
       polygonTemplate.nonScalingStroke = true;
       polygonTemplate.strokeOpacity = 0.5;
 
@@ -130,8 +132,8 @@ export default {
       polygonTemplate.events.on("hit", this.clicked);
 
       /* Create selected and hover states and set alternative fill color */
-      var ss = polygonTemplate.states.create("active");
-      ss.properties.fill = chart.colors.getIndex(2);
+      // var ss = polygonTemplate.states.create("active");
+      // ss.properties.fill = chart.colors.getIndex(2);
 
       var hs = polygonTemplate.states.create("hover");
       hs.properties.fill = chart.colors.getIndex(4);
@@ -172,8 +174,7 @@ export default {
       homeButton.icon = new Sprite();
       homeButton.padding(7, 5, 7, 5);
       homeButton.width = 30;
-      homeButton.icon.path =
-        "M16,8 L14,8 L14,16 L10,16 L10,10 L6,10 L6,16 L2,16 L2,8 L0,8 L8,0 L16,8 Z M16,8";
+      homeButton.icon.path = "M16,8 L14,8 L14,16 L10,16 L10,10 L6,10 L6,16 L2,16 L2,8 L0,8 L8,0 L16,8 Z M16,8";
       homeButton.marginBottom = 10;
       homeButton.parent = chart.zoomControl;
       homeButton.insertBefore(chart.zoomControl.plusButton);
