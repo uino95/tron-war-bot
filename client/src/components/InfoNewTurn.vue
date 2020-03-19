@@ -4,7 +4,7 @@
       class="mt-0 pb-2 pt-2 white--text"
       v-if="data.serverStatus == 200"
       transition="scale-transition"
-      color="primary"
+      color="secondary"
       light
     >
       <v-card-text class="pa-0 mb-2 text-xs-center ">
