@@ -49,7 +49,7 @@ const buildTgStats = (td, leaderboard) => {
   <i>The road to extinction...</i>
   Mutation: ${td.turn}
 
-  🎖🎖 <b>TOP 5 COUNTRIES<b>🎖🎖
+  🎖🎖 <b>TOP 5 COUNTRIES</b>🎖🎖
   🥇<b>${utils.universalMap(leaderboard[0].idx, "full")}</b>: ${leaderboard[0].deaths} (${utils.toPercent(leaderboard[0].deaths/leaderboard[0].population)} of pop.)
   🥈<b>${utils.universalMap(leaderboard[1].idx, "full")}</b>: ${leaderboard[1].deaths} (${utils.toPercent(leaderboard[1].deaths/leaderboard[1].population)} of pop.)
   🥉<b>${utils.universalMap(leaderboard[2].idx, "full")}</b>: ${leaderboard[2].deaths} (${utils.toPercent(leaderboard[2].deaths/leaderboard[2].population)} of pop.)

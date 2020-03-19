@@ -4,11 +4,12 @@ const templates = {
   //Random
   '222': [
     "$receiver$. Prime minister declare eating pop corns is now illegal.",
+    "$receiver$ to ban Apple products beacuse Tim Cook is gay.",
   ],
   //Deaths
   '122': [
     "$receiver$. Dead bodies found around a dining table stuffed with vegan food. +$deaths$ deaths.",
-    "$receiver$. Hobo fight for the last bottle of whiskey turns into a massacre. +$deaths$ deaths."
+    "$receiver$. Hobo fight for the last bottle of whiskey turns into a massacre. +$deaths$ deaths.",
   ],
   //Infected
   '212': [
@@ -43,7 +44,7 @@ const generate = (params={sender:null, receiver:null, deaths:0, infected:0, cohe
   type += (Math.sign(-params.infected) + 2).toString()
   type += (Math.sign(-params.cohesion) + 2).toString()
 
-  let _size = templates[type].length;
+  let _size = (templates[type] || []).length;
   if (!_size) return '';
 
   let _rand = utils.randomInt(_size);

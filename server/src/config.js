@@ -59,7 +59,7 @@ const config = {
     txMargin: 3
   },
   timingTest: {
-    turn: 15,
+    turn: 60,
     blockConfirmation: 1,
     txMargin: 3
   },
@@ -106,18 +106,19 @@ const config = {
     },
     cohesion:{
       battle: {
-        spread:0.15,
-        bias:0.2
+        spread:0.5,
+        bias:0
       },
       next: {
         spread:15,
-        bias:-0.5
+        bias:-0.3
       }
     },
     restart: JSON.parse(process.env.RESTART || false)
   }
 }
 
+config.timingProd = config.timing;
 if (config.test) config.tron = config.tronTest;
 if (config.test) config.timing = config.timingTest;
 
