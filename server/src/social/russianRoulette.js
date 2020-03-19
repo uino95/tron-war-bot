@@ -133,7 +133,7 @@ module.exports.next = async (cmap, td)=>{
 <i>It's time to clean some cockroaches... or set them on 🔥!</i>
 
 <b> ${utils.universalMap(current.country, "full")}</b>
-Deaths toll: <b>${numeral(cmap[current.country].deaths).format('0[.]0a')} </b> (${utils.toPercent(cmap[current.country].deaths/cmap[current.country].population)})
+Deaths toll: <b>${numeral(cmap[current.country].deaths).format('0[.]0a')} </b> (${utils.toPercent(cmap[current.country].deaths/cmap[current.country].population)} of ${numeral(cmap[current.country].population).format('0[.]0a')} total pop.)
 Infected: <b>${numeral(cmap[current.country].infected).format('0[.]0a')}</b>
 
 You have got ${Math.floor(config.social.updates.rouletteFreq/3600)} hours to express your useless opinion...

@@ -133,16 +133,21 @@ module.exports.battleUpdate = async (cmap, td) => {
 }
 
 module.exports.startWar = async (td)=>{
-  let t="🎉 <b>Welcome to TronWarBot 2.0</b> 🎉\n\n<i>It's the year 2140 and after a century of forced peace treaties among nations, resources are slowly exhausting. "
-  t += "Fear is in the air and the only hope for a brighter future lies in the neighbor country.</i>\n\n"
-  t += "This is when <b>" + utils.universalMap(td.next.o) + "</b> decided to invade <b>" + utils.universalMap(td.next.dt) + "</b>.\n"
-  t += "This is the begin of a long lasting world conflict.\n\n"
-  t += "⚔️ This is the <b>Tron World War</b> ⚔️";
-  let f = "🎉 Welcome to TronWarBot 2.0 🎉\n\nIt's the year 2140 and after a century of forced peace treaties among nations, resources are slowly exhausting. "
-  f += "Fear is in the air and the only hope for a brighter future lies in the neighbor country.\n\n"
-  f += "This is when " + utils.universalMap(td.next.o) + " decided to invade " + utils.universalMap(td.next.dt) + ".\n"
-  f += "This is the begin of a long lasting world conflict.\n\n"
-  f += "⚔️ This is the Tron World War ⚔️";
+  let t= `🎉 <b>Welcome to Covid Olympics 2020</b> 🎉
+<i>It's 2020 when, in a Wuhan laboratory, scientists working on a chemical weapon aimed to eliminate the entire western world, accidentaly break a specimen full of powefull viruses 🦠.
+The situation rapidly get out of control. It's chaos. It's pandemic!
+Countries around the world soon realize that, once in, there is no way out of the game.</i>
+
+Enjoy <b>Covid Olympics</b>! Enjoy the extinction!`;
+
+  let f = `🎉 Welcome to Covid Olympics 2020 🎉
+It's 2020 when, in a Wuhan laboratory, scientists working on a chemical weapon aimed to eliminate the entire western world, accidentaly break a specimen full of powefull viruses 🦠.
+The situation rapidly get out of control. It's chaos. It's pandemic!
+Countries around the world soon realize that, once in, there is no way out of the game.
+
+Enjoy Covid Olympics! Enjoy the extinction!
+
+#covid #olympics #coronavirus #simulation #pandemic`;
   let img = utils.imgUrl('start.jpg');
   await facebook.postWithPhoto(img, f).catch(console.error);
   await telegram.sendMessage(t, {parse_mode: "HTML", disable_web_page_preview: true}).catch(console.error);
