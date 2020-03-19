@@ -14,7 +14,7 @@ const ROULETTE_FREQ = Math.floor(config.social.updates.rouletteFreq/config.timin
 module.exports.runUpdate = async (cmap, td) => {
   try {
     if (wwb.winner()) return updates.endWar();
-    // if (td.turn == 1) await updates.startWar(td);
+    if (td.turn == 1) await updates.startWar(td);
     if (!(td.turn % STATS_FREQ)) await map.takeScreenshot();
     if (!(td.turn % STATS_FREQ)) await updates.stats(td).catch(console.error);
     // if (!(td.turn % config.social.updates.quotesFreq)) await updates.quotes(td);

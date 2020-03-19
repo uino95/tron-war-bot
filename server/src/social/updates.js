@@ -6,6 +6,7 @@ const wwb = require('../worldWarBot')
 const twb = require('../tronWarBot')
 const telegram = require('../utils/telegram')
 const facebook = require('../utils/facebook')
+const numeral = require('numeral');
 
 const SPLIT_UPDATE = 12
 const SPLIT_HALF = Math.ceil(SPLIT_UPDATE/2)
@@ -28,37 +29,37 @@ module.exports.quotes = async (td) => {
 const buildFbStats = (td, leaderboard) => {
   // FACEBOOK
   let f = `👑🦠 Covid Olympics 👑🦠
-  The road to extinction...
-  Mutation: ${td.turn}
+The road to extinction...
+Mutation: ${td.turn}
 
-  🎖🎖 TOP 5 COUNTRIES 🎖🎖
-  🥇${utils.universalMap(leaderboard[0].idx, "full")}: ${leaderboard[0].deaths} (${utils.toPercent(leaderboard[0].deaths/leaderboard[0].population)} of pop.)
-  🥈${utils.universalMap(leaderboard[1].idx, "full")}: ${leaderboard[1].deaths} (${utils.toPercent(leaderboard[1].deaths/leaderboard[1].population)} of pop.)
-  🥉${utils.universalMap(leaderboard[2].idx, "full")}: ${leaderboard[2].deaths} (${utils.toPercent(leaderboard[2].deaths/leaderboard[2].population)} of pop.)
-  4th ${utils.universalMap(leaderboard[3].idx, "full")}: ${leaderboard[3].deaths} (${utils.toPercent(leaderboard[3].deaths/leaderboard[3].population)} of pop.)
-  5th ${utils.universalMap(leaderboard[4].idx, "full")}: ${leaderboard[4].deaths} (${utils.toPercent(leaderboard[4].deaths/leaderboard[4].population)} of pop.)
+🎖🎖 TOP 5 DEATHS TOLL 🎖🎖
+🥇${utils.universalMap(leaderboard[0].idx, "full")}: ${numeral(leaderboard[0].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[0].deaths/leaderboard[0].population)} of pop.)
+🥈${utils.universalMap(leaderboard[1].idx, "full")}: ${numeral(leaderboard[1].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[1].deaths/leaderboard[1].population)} of pop.)
+🥉${utils.universalMap(leaderboard[2].idx, "full")}: ${numeral(leaderboard[2].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[2].deaths/leaderboard[2].population)} of pop.)
+4th ${utils.universalMap(leaderboard[3].idx, "full")}: ${numeral(leaderboard[3].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[3].deaths/leaderboard[3].population)} of pop.)
+5th ${utils.universalMap(leaderboard[4].idx, "full")}: ${numeral(leaderboard[4].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[4].deaths/leaderboard[4].population)} of pop.)
 
-  Stay up to date at https://covidolympics2020.com
-  #covid #coronavirus #outbreak #gaming #simulation #bot`
+Stay up to date at https://covidolympics2020.com
+#covid #coronavirus #outbreak #gaming #simulation #bot`
   return f;
 }
 
 const buildTgStats = (td, leaderboard) => {
   // TELEGRAM
   let t = `👑🦠 Covid Olympics 👑🦠
-  <i>The road to extinction...</i>
-  Mutation: ${td.turn}
+<i>The road to extinction...</i>
+Mutation: ${td.turn}
 
-  🎖🎖 <b>TOP 5 COUNTRIES</b>🎖🎖
-  🥇<b>${utils.universalMap(leaderboard[0].idx, "full")}</b>: ${leaderboard[0].deaths} (${utils.toPercent(leaderboard[0].deaths/leaderboard[0].population)} of pop.)
-  🥈<b>${utils.universalMap(leaderboard[1].idx, "full")}</b>: ${leaderboard[1].deaths} (${utils.toPercent(leaderboard[1].deaths/leaderboard[1].population)} of pop.)
-  🥉<b>${utils.universalMap(leaderboard[2].idx, "full")}</b>: ${leaderboard[2].deaths} (${utils.toPercent(leaderboard[2].deaths/leaderboard[2].population)} of pop.)
-  <i>4th</i> <b>${utils.universalMap(leaderboard[3].idx, "full")}</b>: ${leaderboard[3].deaths} (${utils.toPercent(leaderboard[3].deaths/leaderboard[3].population)} of pop.)
-  <i>5th</i> <b>${utils.universalMap(leaderboard[4].idx, "full")}</b>: ${leaderboard[4].deaths} (${utils.toPercent(leaderboard[4].deaths/leaderboard[4].population)} of pop.)
+🎖🎖 <b>TOP 5 DEATHS TOLL</b> 🎖🎖
+🥇<b>${utils.universalMap(leaderboard[0].idx, "full")}</b>: ${numeral(leaderboard[0].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[0].deaths/leaderboard[0].population)} of pop.)
+🥈<b>${utils.universalMap(leaderboard[1].idx, "full")}</b>: ${numeral(leaderboard[1].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[1].deaths/leaderboard[1].population)} of pop.)
+🥉<b>${utils.universalMap(leaderboard[2].idx, "full")}</b>: ${numeral(leaderboard[2].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[2].deaths/leaderboard[2].population)} of pop.)
+<i>4th</i> <b>${utils.universalMap(leaderboard[3].idx, "full")}</b>: ${numeral(leaderboard[3].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[3].deaths/leaderboard[3].population)} of pop.)
+<i>5th</i> <b>${utils.universalMap(leaderboard[4].idx, "full")}</b>: ${numeral(leaderboard[4].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[4].deaths/leaderboard[4].population)} of pop.)
 
-  Stay up to date at https://covidolympics2020.com
-  Who will get extinct?
-  🎖👇👇👇👇👇👇👇🎖`;
+Stay up to date at https://covidolympics2020.com
+Who will get extinct?
+🎖👇👇👇👇👇👇👇🎖`;
   return t
 }
 
@@ -132,16 +133,21 @@ module.exports.battleUpdate = async (cmap, td) => {
 }
 
 module.exports.startWar = async (td)=>{
-  let t="🎉 <b>Welcome to TronWarBot 2.0</b> 🎉\n\n<i>It's the year 2140 and after a century of forced peace treaties among nations, resources are slowly exhausting. "
-  t += "Fear is in the air and the only hope for a brighter future lies in the neighbor country.</i>\n\n"
-  t += "This is when <b>" + utils.universalMap(td.next.o) + "</b> decided to invade <b>" + utils.universalMap(td.next.dt) + "</b>.\n"
-  t += "This is the begin of a long lasting world conflict.\n\n"
-  t += "⚔️ This is the <b>Tron World War</b> ⚔️";
-  let f = "🎉 Welcome to TronWarBot 2.0 🎉\n\nIt's the year 2140 and after a century of forced peace treaties among nations, resources are slowly exhausting. "
-  f += "Fear is in the air and the only hope for a brighter future lies in the neighbor country.\n\n"
-  f += "This is when " + utils.universalMap(td.next.o) + " decided to invade " + utils.universalMap(td.next.dt) + ".\n"
-  f += "This is the begin of a long lasting world conflict.\n\n"
-  f += "⚔️ This is the Tron World War ⚔️";
+  let t= `🎉 <b>Welcome to Covid Olympics 2020</b> 🎉
+<i>It's 2020 when, in a Wuhan laboratory, scientists working on a chemical weapon aimed to eliminate the entire western world, accidentaly break a specimen full of powefull viruses 🦠.
+The situation rapidly get out of control. It's chaos. It's pandemic!
+Countries around the world soon realize that, once in, there is no way out of the game.</i>
+
+Enjoy <b>Covid Olympics</b>! Enjoy the extinction!`;
+
+  let f = `🎉 Welcome to Covid Olympics 2020 🎉
+It's 2020 when, in a Wuhan laboratory, scientists working on a chemical weapon aimed to eliminate the entire western world, accidentaly break a specimen full of powefull viruses 🦠.
+The situation rapidly get out of control. It's chaos. It's pandemic!
+Countries around the world soon realize that, once in, there is no way out of the game.
+
+Enjoy Covid Olympics! Enjoy the extinction!
+
+#covid #olympics #coronavirus #simulation #pandemic`;
   let img = utils.imgUrl('start.jpg');
   await facebook.postWithPhoto(img, f).catch(console.error);
   await telegram.sendMessage(t, {parse_mode: "HTML", disable_web_page_preview: true}).catch(console.error);
