@@ -113,16 +113,16 @@
               <div>{{props.item.name}}</div>
             </td>
             <td class="text-xs-left pa-0 ">
-              <v-layout row>
-                <div class="hidden-xs-only">{{ props.item.active | NUMBER }}</div>
-                <div class="ml-2 ">{{'(' + ((props.item.active / props.item.population) * 100).toFixed(2)  + ' %)' }}</div>
-              </v-layout>
+                <div>{{ props.item.active | NUMBER }}</div>
             </td>
             <td class="text-xs-left pa-0 pr-2">
               <v-layout row>
               {{ props.item.deaths | NUMBER}}
               <div class="ml-2 redText hidden-xs-only">{{stats[props.item['.key']].deaths | NUMBER_WITH_PLUS }}</div>
               </v-layout>
+            </td>
+            <td class="text-xs-left pa-0 pr-2">
+              {{ ((props.item.deaths / props.item.population) * 100).toFixed(2) + ' %'}}
             </td>
             <td class="text-xs-left pa-0 pr-2">
               <v-layout row>
@@ -382,6 +382,16 @@ export default {
         description:
           "Deaths: \n It represents the number of Deaths of a country. The first country whose deaths is equal to its population wins "
       },
+      {
+        text: "% Deaths",
+        value: "percentage_deaths",
+        id: 6,
+        sortable: true,
+        align: "left",
+        class: "body-1 pa-0 hidden-xs-only",
+        description:
+          "Percentage of Deaths: \n It represents the percentage of Deaths of a country. The first country who reach 100 % of deaths wins "
+      },
       // {
       //   text: "New Deaths",
       //   value: "new_deaths",
@@ -443,6 +453,16 @@ export default {
         icon: "fa-skull-crossbones",
         description:
           "Deaths: \n It represents the number of Deaths of a country. The first country whose deaths is equal to its population wins "
+      },
+      {
+        text: "%",
+        value: "percentage_deaths",
+        id: 13,
+        sortable: true,
+        align: "left",
+        class: "body-1 pa-0 hidden-sm-and-up",
+        description:
+          "Percentage of Deaths: \n It represents the percentage of Deaths of a country. The first country who reach 100 % of deaths wins "
       },
       // {
       //   text: "d",
@@ -560,19 +580,20 @@ export default {
     },
     customSort(items, index, isDesc) {
       items.sort((a, b) => {
-        if (index === "population") {
+        if (index === "percentage_deaths") {
           if (!isDesc) {
-            if((a.active / a.population) == (b.active / b.population)){
-              return a.population < b.population ? -1 : 1;
-            }
-            return (a.active / a.population) < (b.active / b.population) ? -1 : 1;
+            return (a.deaths / a.population) < (b.deaths / b.population) ? -1 : 1;
           } else {
-            if((a.active / a.population) == (b.active / b.population)){
-              return a.population < b.population ? -1 : 1;
-            }
-            return (b.active / b.population) < (a.active / a.population) ? -1 : 1;
+            return (b.deaths / b.population) < (a.deaths / a.population) ? -1 : 1;
           }
-        } else {
+        } else if(index == "recovered"){
+          if(!isDesc){
+            return this.stats[a['.key']].recovered < this.stats[b['.key']].recovered ? -1 : 1
+          } else {
+            return this.stats[b['.key']].recovered < this.stats[a['.key']].recovered ? -1 : 1
+          }
+        }
+        else {
           if (!isDesc) {
             return a[index] < b[index] ? -1 : 1;
           } else {
