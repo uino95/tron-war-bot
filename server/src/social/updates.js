@@ -6,6 +6,7 @@ const wwb = require('../worldWarBot')
 const twb = require('../tronWarBot')
 const telegram = require('../utils/telegram')
 const facebook = require('../utils/facebook')
+const numeral = require('numeral');
 
 const SPLIT_UPDATE = 12
 const SPLIT_HALF = Math.ceil(SPLIT_UPDATE/2)
@@ -28,37 +29,37 @@ module.exports.quotes = async (td) => {
 const buildFbStats = (td, leaderboard) => {
   // FACEBOOK
   let f = `👑🦠 Covid Olympics 👑🦠
-  The road to extinction...
-  Mutation: ${td.turn}
+The road to extinction...
+Mutation: ${td.turn}
 
-  🎖🎖 TOP 5 COUNTRIES 🎖🎖
-  🥇${utils.universalMap(leaderboard[0].idx, "full")}: ${leaderboard[0].deaths} (${utils.toPercent(leaderboard[0].deaths/leaderboard[0].population)} of pop.)
-  🥈${utils.universalMap(leaderboard[1].idx, "full")}: ${leaderboard[1].deaths} (${utils.toPercent(leaderboard[1].deaths/leaderboard[1].population)} of pop.)
-  🥉${utils.universalMap(leaderboard[2].idx, "full")}: ${leaderboard[2].deaths} (${utils.toPercent(leaderboard[2].deaths/leaderboard[2].population)} of pop.)
-  4th ${utils.universalMap(leaderboard[3].idx, "full")}: ${leaderboard[3].deaths} (${utils.toPercent(leaderboard[3].deaths/leaderboard[3].population)} of pop.)
-  5th ${utils.universalMap(leaderboard[4].idx, "full")}: ${leaderboard[4].deaths} (${utils.toPercent(leaderboard[4].deaths/leaderboard[4].population)} of pop.)
+🎖🎖 TOP 5 DEATHS TOLL 🎖🎖
+🥇${utils.universalMap(leaderboard[0].idx, "full")}: ${numeral(leaderboard[0].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[0].deaths/leaderboard[0].population)} of pop.)
+🥈${utils.universalMap(leaderboard[1].idx, "full")}: ${numeral(leaderboard[1].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[1].deaths/leaderboard[1].population)} of pop.)
+🥉${utils.universalMap(leaderboard[2].idx, "full")}: ${numeral(leaderboard[2].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[2].deaths/leaderboard[2].population)} of pop.)
+4th ${utils.universalMap(leaderboard[3].idx, "full")}: ${numeral(leaderboard[3].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[3].deaths/leaderboard[3].population)} of pop.)
+5th ${utils.universalMap(leaderboard[4].idx, "full")}: ${numeral(leaderboard[4].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[4].deaths/leaderboard[4].population)} of pop.)
 
-  Stay up to date at https://covidolympics2020.com
-  #covid #coronavirus #outbreak #gaming #simulation #bot`
+Stay up to date at https://covidolympics2020.com
+#covid #coronavirus #outbreak #gaming #simulation #bot`
   return f;
 }
 
 const buildTgStats = (td, leaderboard) => {
   // TELEGRAM
   let t = `👑🦠 Covid Olympics 👑🦠
-  <i>The road to extinction...</i>
-  Mutation: ${td.turn}
+<i>The road to extinction...</i>
+Mutation: ${td.turn}
 
-  🎖🎖 <b>TOP 5 COUNTRIES</b>🎖🎖
-  🥇<b>${utils.universalMap(leaderboard[0].idx, "full")}</b>: ${leaderboard[0].deaths} (${utils.toPercent(leaderboard[0].deaths/leaderboard[0].population)} of pop.)
-  🥈<b>${utils.universalMap(leaderboard[1].idx, "full")}</b>: ${leaderboard[1].deaths} (${utils.toPercent(leaderboard[1].deaths/leaderboard[1].population)} of pop.)
-  🥉<b>${utils.universalMap(leaderboard[2].idx, "full")}</b>: ${leaderboard[2].deaths} (${utils.toPercent(leaderboard[2].deaths/leaderboard[2].population)} of pop.)
-  <i>4th</i> <b>${utils.universalMap(leaderboard[3].idx, "full")}</b>: ${leaderboard[3].deaths} (${utils.toPercent(leaderboard[3].deaths/leaderboard[3].population)} of pop.)
-  <i>5th</i> <b>${utils.universalMap(leaderboard[4].idx, "full")}</b>: ${leaderboard[4].deaths} (${utils.toPercent(leaderboard[4].deaths/leaderboard[4].population)} of pop.)
+🎖🎖 <b>TOP 5 DEATHS TOLL</b> 🎖🎖
+🥇<b>${utils.universalMap(leaderboard[0].idx, "full")}</b>: ${numeral(leaderboard[0].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[0].deaths/leaderboard[0].population)} of pop.)
+🥈<b>${utils.universalMap(leaderboard[1].idx, "full")}</b>: ${numeral(leaderboard[1].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[1].deaths/leaderboard[1].population)} of pop.)
+🥉<b>${utils.universalMap(leaderboard[2].idx, "full")}</b>: ${numeral(leaderboard[2].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[2].deaths/leaderboard[2].population)} of pop.)
+<i>4th</i> <b>${utils.universalMap(leaderboard[3].idx, "full")}</b>: ${numeral(leaderboard[3].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[3].deaths/leaderboard[3].population)} of pop.)
+<i>5th</i> <b>${utils.universalMap(leaderboard[4].idx, "full")}</b>: ${numeral(leaderboard[4].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[4].deaths/leaderboard[4].population)} of pop.)
 
-  Stay up to date at https://covidolympics2020.com
-  Who will get extinct?
-  🎖👇👇👇👇👇👇👇🎖`;
+Stay up to date at https://covidolympics2020.com
+Who will get extinct?
+🎖👇👇👇👇👇👇👇🎖`;
   return t
 }
 

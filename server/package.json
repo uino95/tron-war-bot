@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
+    "simulate": "node simulate",
     "debug": "node --inspect index.js",
     "hot-debug": "nodemon -L --watch . --exec \"npm run debug\""
   },
@@ -25,6 +26,7 @@
     "newrelic": "^5.13.1",
     "node-cron": "^2.0.3",
     "nodemon": "^1.19.4",
+    "numeral": "^2.0.6",
     "puppeteer": "^2.0.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",

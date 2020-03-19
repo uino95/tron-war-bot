@@ -10,6 +10,8 @@ const templates = {
   '122': [
     "$receiver$. Dead bodies found around a dining table stuffed with vegan food. +$deaths$ deaths.",
     "$receiver$. Hobo fight for the last bottle of whiskey turns into a massacre. +$deaths$ deaths.",
+    "$receiver$. A group of drug-addicts was led to believe the virus could mutate them into pokemons while they tried to fly from a skyscraper. +$deaths$ deaths.",
+    "The Anti-vax Research Lab of $receiver$ has proven the inefficacy of vaccines through in vivo virus samples tests on anti-vax researchers. +$deaths$ deaths.",
   ],
   //Infected
   '212': [
@@ -22,14 +24,15 @@ const templates = {
   //Recovered
   '232': [
     "$receiver$'s scientist found the recipe for the philosopher's stone. +$recovered$ recovered.",
+    "Scientist have demonstrated that the average penis sizes of people in $receiver$ make them more resilient to the virus. +$recovered$ recovered.",
   ],
   //Cohesion resistant
   '221': [
-    "$receiver$'s prime minister declares winemakers should now wash their feet before grape harvest."
+    "$receiver$'s prime minister declares winemakers should now wash their feet before grape harvest.",
   ],
   //Cohesion weakening
   '223': [
-    "In $receiver$ use of face mask is now banned. They are rude and unpolite."
+    "In $receiver$ use of face mask is now banned. They are rude and unpolite.",
   ]
 }
 
