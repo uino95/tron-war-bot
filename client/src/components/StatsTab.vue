@@ -3,7 +3,7 @@
     <!-- Countries -->
     <v-flex sm12 md12 lg12 shrink>
       <v-card>
-        <v-toolbar color="primary" class="text_primary--text" dark>
+        <v-toolbar color="secondary" class="text_primary--text" dark>
           <v-toolbar-title>Current Status</v-toolbar-title>
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
@@ -30,6 +30,7 @@
           class="elevation-1"
           :pagination.sync="paginationStats"
           :rows-per-page-items="[10,20,50]"
+          :custom-sort="customSort"
         >
           <template v-slot:headers="props">
             <th
@@ -111,25 +112,25 @@
             >
               <div>{{props.item.name}}</div>
             </td>
-            <td class="text-xs-left pa-0">
+            <td class="text-xs-left pa-0 ">
               <v-layout row>
-                {{ props.item.active | NUMBER }}
-                <div class="ml-2 hidden-xs-only">{{'(' + ((props.item.active / props.item.population) * 100).toFixed(2)  + ' %)' }}</div>
+                <div class="hidden-xs-only">{{ props.item.active | NUMBER }}</div>
+                <div class="ml-2 ">{{'(' + ((props.item.active / props.item.population) * 100).toFixed(2)  + ' %)' }}</div>
               </v-layout>
             </td>
             <td class="text-xs-left pa-0 pr-2">
               <v-layout row>
               {{ props.item.deaths | NUMBER}}
-              <div class="ml-2 redText hidden-xs-only">{{data.turnData.battle.stats[props.item['.key']].deaths | NUMBER_WITH_PLUS }}</div>
+              <div class="ml-2 redText hidden-xs-only">{{stats[props.item['.key']].deaths | NUMBER_WITH_PLUS }}</div>
               </v-layout>
             </td>
             <td class="text-xs-left pa-0 pr-2">
               <v-layout row>
               {{props.item.infected | NUMBER}}
-              <div class="ml-2 redText hidden-xs-only"> {{data.turnData.battle.stats[props.item['.key']].infected | NUMBER_WITH_PLUS}} </div>
+              <div class="ml-2 redText hidden-xs-only"> {{stats[props.item['.key']].infected | NUMBER_WITH_PLUS}} </div>
               </v-layout>
             </td>
-            <td class="greenText text-xs-left pa-0">{{ data.turnData.battle.stats[props.item['.key']].recovered | NUMBER }}</td>
+            <td class="greenText text-xs-left pa-0">{{ stats[props.item['.key']].recovered | NUMBER }}</td>
             <!-- <td class="text-xs-left hidden-xs-only pa-0">
               <v-btn
                 class="white--text"
@@ -423,14 +424,14 @@ export default {
       },
       {
         text: "P",
-        value: "active_population",
+        value: "population",
         id: 11,
         sortable: true,
         align: "left",
         class: "body-1 pa-0 hidden-sm-and-up",
         icon: "fa-user-friends",
         description:
-          "Active Population: \n It represents the remaining population of a country."
+          "Remaining Population: \n It represents the remaining population of a country."
       },
       {
         text: "D",
@@ -500,6 +501,7 @@ export default {
     snackbarColor: "",
     snackbarTimeout: 6000,
     mapStatus: [],
+    stats: [],
     visButton: {
       possibilities: ["support", "next", "final"],
       count: 0,
@@ -509,7 +511,7 @@ export default {
   firebase: function() {
     return {
       mapStatus: db.ref("public/countriesMap").orderByChild("deaths"),
-      data: db.ref("public/data")
+      stats: db.ref("public/data/turnData/battle/stats")
     };
   },
   filters:{
@@ -555,6 +557,30 @@ export default {
       document.execCommand("selectAll");
       this.copied = document.execCommand("copy");
       this.snackbar = true;
+    },
+    customSort(items, index, isDesc) {
+      items.sort((a, b) => {
+        if (index === "population") {
+          if (!isDesc) {
+            if((a.active / a.population) == (b.active / b.population)){
+              return a.population < b.population ? -1 : 1;
+            }
+            return (a.active / a.population) < (b.active / b.population) ? -1 : 1;
+          } else {
+            if((a.active / a.population) == (b.active / b.population)){
+              return a.population < b.population ? -1 : 1;
+            }
+            return (b.active / b.population) < (a.active / a.population) ? -1 : 1;
+          }
+        } else {
+          if (!isDesc) {
+            return a[index] < b[index] ? -1 : 1;
+          } else {
+            return b[index] < a[index] ? -1 : 1;
+          }
+        }
+      });
+      return items;
     }
     // shareOnFb: async function() {
     //   if (!this.$store.state.isMobile) {

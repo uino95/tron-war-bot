@@ -5,14 +5,14 @@ import 'vuetify/src/stylus/app.styl'
 Vue.use(Vuetify, {
   iconfont: 'md',
   theme: {
-    primary: '#263238',
+    secondary: '#263238',
     primary_dark: '#000a12',
     primary_light: '#4f5b62',
     text_primary: "#ffffff",
 
     background: "#455a64",
 
-    secondary: '#eceff1',
+    primary: '#455a64',
     secondary_dark: '#babdbe',
     secondary_light: '#ffffff',
     text_secondary: "#000000",

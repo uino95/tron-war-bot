@@ -2,7 +2,7 @@
     <v-app id="keep" dark>
         <loading :active.sync="loading" color="#ffffff" :opacity="1" background-color="#455a64" :is-full-page="true">
         </loading>
-        <v-navigation-drawer class="primary" v-model="drawer" fixed clipped app dark>
+        <v-navigation-drawer class="secondary" v-model="drawer" fixed clipped app dark>
             <v-icon class="mt-4 ml-4 text_primary--text" @click="drawer = !drawer" dark>fa-times</v-icon>
             <v-list dense dark>
                 <template v-for="(item, i) in menuItems">
@@ -53,7 +53,7 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-toolbar color="primary" dark app fixed clipped-left>
+        <v-toolbar color="secondary" dark app fixed clipped-left>
             <v-toolbar-side-icon @click="drawer = !drawer" style="color: white"></v-toolbar-side-icon>
 
             <v-avatar class="ml-3">
