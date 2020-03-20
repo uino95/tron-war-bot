@@ -49,11 +49,11 @@ export default {
       let data = snapshot.val();
       data["id"] = this.universalMap(data.idx, "charId");
       data["percentagesOfDeath"] =
-        parseFloat((data.active / data.population).toFixed(3)) * 100;
+        parseFloat((data.deaths / data.population).toFixed(3)) * 100;
       data["color"] = hslToHex(
         this.defaultColor,
         100,
-        (data.percentagesOfDeath) 
+        100 - (data.percentagesOfDeath) 
       );
       this.polygonSeries.data[data.idx] = data;
       this.polygonSeries.invalidateData();
@@ -64,11 +64,11 @@ export default {
       data.map((el, index) => {
         el["id"] = this.universalMap(index, "charId");
         el["percentagesOfDeath"] =
-          parseFloat((el.active / el.population).toFixed(3)) * 100;
+          parseFloat((el.deaths / el.population).toFixed(3)) * 100;
         el["color"] = hslToHex(
           this.defaultColor,
           100,
-          (el.percentagesOfDeath) 
+          100 - (el.percentagesOfDeath) 
         );
       });
       // // assign a color to a particular country

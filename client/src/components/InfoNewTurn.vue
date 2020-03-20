@@ -94,7 +94,7 @@
       <v-card-text class="pa-0 title text-xs-center">Game Over</v-card-text>
       <v-card-text
         class="pa-0 pt-2 text-xs-center"
-      >🎉 Winner of Covid Olympics is {{data.turnData.winner}} 🇱🇸 🎉</v-card-text>
+      >🎉 Winner of Covid Olympics is {{data.turnData.winner}}  🎉</v-card-text>
     </v-card>
   </v-flex>
 </template>
