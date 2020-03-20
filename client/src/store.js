@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-export const test = true; //REMEBER TO SWITCH TO FALSE ALSO in public/login.html
+export const test = false; //REMEBER TO SWITCH TO FALSE ALSO in public/login.html
 
 export default new Vuex.Store({
   state: {
