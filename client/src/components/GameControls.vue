@@ -99,6 +99,6 @@
   }
 
   .redText {
-    color: #dd0f0f;
+    color: #ff0606;
   }
 </style>
