@@ -125,9 +125,14 @@ const launchNextTurn = async (block) =>{
 
   // GET WINNER AND UPDATES
   var td = await wwb.currentTurnData();
-
   // UPDATE HISTORY
-  firebase.history.push().set(td);
+  firebase.history.push().set({
+    countriesMap: cMap,
+    fatality: (td.battle || {}).fatality,
+    transmission: (td.battle || {}).transmission,
+    recovery: (td.battle || {}).recovery,
+    next: td.next
+  });
 
   // REVEAL FAIRNESS
   // await revealFairWinner(block);

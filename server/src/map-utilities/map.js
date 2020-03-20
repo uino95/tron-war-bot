@@ -5,9 +5,9 @@ const utils = require('../utils')
 const takeScreenshot = async () => {
   const browser = await puppeteer.launch({headless: true})
   const page = await browser.newPage();
-  await page.goto('https://tronwarbot.com');
+  await page.goto('https://covidolympics2020.com');
   await page.waitFor('#chartdiv',{visible:true, timeout: 60000});
-  await utils.sleep(5000)
+  await utils.sleep(10000)
   // const chart = await page.$('#chartdiv');
   await page.screenshot({path:path.join(__dirname,'../img/map.jpg'), type:'jpeg', quality:100, clip:{x: 0, y:100, width: 750, height: 500}, })
   // await page.screenshot();
