@@ -9,6 +9,7 @@
     >
         <template v-slot:before>
             <h1 class="ml-2 mr-2 text-xs-center">COVID OLYMPICS 2020</h1>
+            <h5 class="ml-2 mr-2 text-xs-center"><i>The road to extinction</i></h5>
             <br>
         </template>
         <template>
@@ -79,7 +80,7 @@
 
       <span class="headline ml-3 mr-2" style="color: white">
         Covid
-        <span class="font-weight-light" style="color: white">Olympics</span>
+        <span class="font-weight-light" style="color: white">Olympics 2020</span>
       </span>
       <v-spacer></v-spacer>
       <v-toolbar-items>
