@@ -299,7 +299,7 @@ export default {
         icon: "fab fa-facebook-square",
         text: "Facebook Page",
         link: true,
-        body: "https://www.facebook.com/TronWarBot/"
+        body: "https://www.facebook.com/CovidOlympics2020"
       },
       {
         icon: "fab fa-telegram",
@@ -311,7 +311,7 @@ export default {
         icon: "fab fa-twitter",
         text: "Twitter",
         link: true,
-        body: "https://twitter.com/TronWarBot_"
+        body: "https://twitter.com/CovidOlympics_"
       },
       {
         icon: "fab fa-instagram",
