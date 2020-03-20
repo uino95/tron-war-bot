@@ -19,9 +19,9 @@
         </template>
         <template v-slot:after>
             <br>
-            <h4 class="ml-2 mr-2 text-xs-center">
-            All information provided here is intentionally false and satirical. No human was harmed in the making of this.
-            </h4>
+            <h3 class="ml-2 mr-2 text-xs-center">
+            All information provided here is intentionally <b>false and satirical</b>. No human was harmed in the making of this.
+            </h3>
         </template>
     </loading>
     <v-navigation-drawer class="secondary" v-model="drawer" fixed clipped app dark>
