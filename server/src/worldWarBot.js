@@ -68,7 +68,7 @@ const init = async (restart) => {
       // finalQuote: 25, // PRICE OF FINAL BET
       // nextQuote: 200, // MULTIPLIER FOR BET ON NEXT CONQUERER
       // territories: 1,
-      probability: (1/COUNTRIES),
+      // probability: (1/COUNTRIES),
       population:utils.universalMap(idx, 'population'), //total population
       deaths:0, // total deaths
       infected:0, // active * infection rate
@@ -153,13 +153,13 @@ const postTurn = async (turnData) => {
   // bets.forEach((e,i)=>betsPerCountry[e.userChoice]+=1);
 
   // CALCULATE NEW EXACT PDF AND QUOTES
-  realPdf().forEach((e,i)=>{
-    countriesMap[i].probability = e;
+  // realPdf().forEach((e,i)=>{
+  //   countriesMap[i].probability = e;
     // let pf = countriesMap[i].territories/COUNTRIES;
     // countriesMap[i].nextQuote = utils.quoteFromProbability(e);
     // let discountFactor = (betsPerCountry[i]+1)/(betsPerCountry[i]+2);
     // countriesMap[i].finalQuote = Math.round((((jackpot * pf)/(betsPerCountry[i]+1)) + 50) * discountFactor);
-  })
+  // })
   // if (turnData.next) turnData.next.quotes = turnData.next.probabilities.map(e=>utils.quoteFromProbability(e));
   //CALL EXTERNAL SCHEDULED FUNCTIONS
   let awakeFn = turnQueue[turnData.turn.toString()] || [];
@@ -308,9 +308,9 @@ const simulate = async () => {
       // if (!(turn % 5)) editCohesion(utils.randomInt(15), (utils.randomInt(12)-2)/10)
       // if (!(turn % 100)) {saveCurrentState(), await utils.sleep(5000)}
       if (!(turn % 2)) {
-        realPdf().forEach((e,i)=>{
-          countriesMap[i].probability = e;
-        })
+        // realPdf().forEach((e,i)=>{
+        //   countriesMap[i].probability = e;
+        // })
         let l = leaderboard();
         leaders[l[0].idx] = l[0];
         console.log("Current leader at " + turn + " is: " + l[0].idx + " with cohesion: " + utils.toPercent(l[0].cohesion) + " deaths: " + utils.toPercent(l[0].deaths/l[0].population) + " and infected: " + utils.toPercent(l[0].infected/l[0].active))

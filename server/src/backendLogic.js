@@ -82,7 +82,7 @@ const prepareNextTurn = async () =>{
   await firebase.fairness.update({next});
 
   let stopBetsBlock = nextTurnBlock - Math.ceil(config.timing.txMargin/3);
-  let ts = cb.timestamp + ((stopBetsBlock - cb.number) * 3000) + (config.timing.blockConfirmation * 3000);
+  let ts = (new Date()).valueOf() + ((stopBetsBlock - cb.number) * 3000) + (config.timing.blockConfirmation * 3000);
   let nextTurnTime = new Date(ts);
   cb = await twb.getBlock();
   console.log("[PREPARE]: Current block is: " + cb.number + "  nextTurn at: " + nextTurnBlock + " stopBets at: " + stopBetsBlock);
@@ -125,9 +125,14 @@ const launchNextTurn = async (block) =>{
 
   // GET WINNER AND UPDATES
   var td = await wwb.currentTurnData();
-
   // UPDATE HISTORY
-  firebase.history.push().set(td);
+  firebase.history.push().set({
+    countriesMap: cMap,
+    fatality: (td.battle || {}).fatality,
+    transmission: (td.battle || {}).transmission,
+    recovery: (td.battle || {}).recovery,
+    next: td.next
+  });
 
   // REVEAL FAIRNESS
   // await revealFairWinner(block);

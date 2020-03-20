@@ -136,7 +136,8 @@ module.exports.startWar = async (td)=>{
   let t= `🎉 <b>Welcome to Covid Olympics 2020</b> 🎉
 <i>It's 2020 when, in a Wuhan laboratory, scientists working on a chemical weapon aimed to eliminate the entire western world, accidentaly break a specimen full of powefull viruses 🦠.
 The situation rapidly get out of control. It's chaos. It's pandemic!
-Countries around the world soon realize that, once in, there is no way out of the game.</i>
+Countries around the world soon realize that, once in, there is no way out of the game.
+So they decided to unite in one last worldwide competition. The goal is the extinction.</i>
 
 Enjoy <b>Covid Olympics</b>! Enjoy the extinction!`;
 
@@ -144,6 +145,7 @@ Enjoy <b>Covid Olympics</b>! Enjoy the extinction!`;
 It's 2020 when, in a Wuhan laboratory, scientists working on a chemical weapon aimed to eliminate the entire western world, accidentaly break a specimen full of powefull viruses 🦠.
 The situation rapidly get out of control. It's chaos. It's pandemic!
 Countries around the world soon realize that, once in, there is no way out of the game.
+So they decided to unite in one last worldwide competition. The goal is the extinction.
 
 Enjoy Covid Olympics! Enjoy the extinction!
 
