@@ -5,10 +5,11 @@ const templates = {
   '222': [
     "$receiver$. Prime minister declare eating pop corns is now illegal.",
     "$receiver$ to ban Apple products beacuse Tim Cook is gay.",
-    "In $receiver$ the cotton shortage cause mass nudism.",
+    "In $receiver$ the cotton shortage causes mass nudism.",
     "Donald Trump: “Fake news aren't real!”",
     "Sasha Grey: “If the crisis hits I'll work for free!”",
-    "Putin: “You find problem. I hide problem. Problem kaput!”",
+    "Putin on insufficient virus tests: “You find problem. I hide problem. Problem kaput!”",
+    "Silvio Berlusconi to donate 10 millions to help sick people to a pleasant stay. Free plastic surgery for all female nurse personnel.",
   ],
   //Deaths
   '122': [
@@ -25,6 +26,10 @@ const templates = {
     "ISIS group members were found dead in a secret lab in $receiver$ while creating a new virulent terror weapon. +$deaths$ deaths.",
     "$receiver$ to develop new virus tests after shortage of equipment: “If you hold your breath for 300 seconds you are likely negative”. +$deaths$ deaths.",
     "$receiver$ scientists confirms the virus spread into water. The parliament advises: “Do not drink water!”. +$deaths$ deaths.",
+    "$receiver$. During a flash mob on a balcony the balcony collapses. +$deaths$ deaths",
+    "Smurfs reunion in $receiver$. But it's only five of them. Amen. +$deaths$ deaths",
+    "Supermarket shut down in $receiver$. A royal rumble kicks off for the last piece of toilet paper. +$deaths$ deaths",
+    "Student in $receiver$ finds out that the virus dies after shooting it with a Desert Eagle. +$deaths$ deaths"
   ],
   //Infected
   '212': [
@@ -39,7 +44,10 @@ const templates = {
     "$receiver$'s government will use McAfee anti-virus software to fight the pandemic. +$infected$ computers infected.",
     "Social distancing? $receiver$ organizes one last Project X style party before the quarantine. +$infected$ infected.",
     "Conor ‘The Notorious’ McGregor to fight Covid ‘The infamous’ CoronaVirus in $receiver$. Tickets sold out. +$infected$ infected.",
-    "China to help $receiver$ by sending used sanitary equipment. $receiver$: “We are deeply thankful”. +$infected$ infected.",
+    "$sender$ to help $receiver$ by sending used sanitary equipment. $receiver$: “We are deeply thankful”. +$infected$ infected.",
+    "$receiver$. A football team experiencing syntomps after eating vegan food. It's conspiracy! +$infected$ infected.",
+    "New viral tik tok challenge in the streets in $receiver$: Cough and Run! +$infected$ infected.",
+    "$receiver$. A bullies gang go to school. +$infected$ infected.",
   ],
   //Recovered
   '232': [
@@ -53,16 +61,21 @@ const templates = {
   '221': [
     "$receiver$'s prime minister declares winemakers should now wash their feet before grape harvest.",
     "$receiver$ to deploy military tanks to prevent people leaving their houses.",
-    "$receiver$ has locked down the country. Special exit-only permits granted to jews.",
-    "Love festival in $receiver$ will take place online! Safety measure: wash your devices.",
-    "$receiver$. Macbook user found immune to the viral outbreak.",
-    "$receiver$. Nothing changes in parliament after enforced work-from-home policy for politicians.",
+    "In $receiver$ use of face mask is now banned. They are rude and unpolite.",
   ],
   //Cohesion weakening
   '223': [
-    "In $receiver$ use of face mask is now banned. They are rude and unpolite.",
+    "$receiver$ has locked down the country. Special exit-only permits granted to jews.",
+    "Love festival in $receiver$ will take place online! Safety measure: wash your devices.",
+    "Government order in $receiver$. Priests have to stay 2 meters off of children.",
+    "$receiver$. Macbook user found immune to the viral outbreak.",
+    "$receiver$. Nothing changes in parliament after enforced work-from-home policy for politicians.",
+    "$receiver$ discovered the cause of the virus spreading. Cats and their not so lonely walk outside...",
+    "$receiver$. News media stop talking about CoronaVirus.",
+    "$receiver$. Landlord refuses to take cash from tenant. Housing crisis has just begun.",
     "Hospitals in $receiver$ have introduced remote working policy.",
-
+    "Solidal masturbation policy in $receiver$. Girls enforced to send nudes to friend in such hard times.",
+    "In $receiver$ wearing face masks in front of black people is no longer racism."
   ]
 }
 
