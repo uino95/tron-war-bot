@@ -29,7 +29,7 @@
         </v-card-text>
       </v-container>-->
 
-      <v-card-text class="pa-0 text-xs-center">
+      <v-card-text v-if="turnData" class="pa-0 text-xs-center">
         <!-- Current Turn: {{turnData.turn}} - --->
         <b >
           <i>{{turnData.next.description}}</i>
