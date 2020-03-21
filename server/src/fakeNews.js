@@ -7,6 +7,8 @@ const templates = {
     "$receiver$ to ban Apple products beacuse Tim Cook is gay.",
     "In $receiver$ the cotton shortage cause mass nudism.",
     "Donald Trump: “Fake news aren't real!”",
+    "Sasha Grey: “If the crisis hits I'll work for free!”",
+    "Putin: “You find problem. I hide problem. Problem kaput!”",
   ],
   //Deaths
   '122': [
@@ -21,6 +23,8 @@ const templates = {
     "In $receiver$ hospitals are full. The head physicians: “If you breathe, you are fine. Stay at home!”. +$deaths$ deaths.",
     "Dwayne Johnson performs the infamous “The Rock Bottom” amid havoc in a grocery store. +$deaths$ deaths.",
     "ISIS group members were found dead in a secret lab in $receiver$ while creating a new virulent terror weapon. +$deaths$ deaths.",
+    "$receiver$ to develop new virus tests after shortage of equipment: “If you hold your breath for 300 seconds you are likely negative”. +$deaths$ deaths.",
+    "$receiver$ scientists confirms the virus spread into water. The parliament advises: “Do not drink water!”. +$deaths$ deaths.",
   ],
   //Infected
   '212': [
@@ -33,6 +37,9 @@ const templates = {
     "Strong wind from $sender$ brings virus to cities in $receiver$. It's panic! +$infected$ infected.",
     "Parrots escaped from a lab in $receiver$. The vet: “No worries. They were infected. They will die soon.”. +$infected$ infected.",
     "$receiver$'s government will use McAfee anti-virus software to fight the pandemic. +$infected$ computers infected.",
+    "Social distancing? $receiver$ organizes one last Project X style party before the quarantine. +$infected$ infected.",
+    "Conor ‘The Notorious’ McGregor to fight Covid ‘The infamous’ CoronaVirus in $receiver$. Tickets sold out. +$infected$ infected.",
+    "China to help $receiver$ by sending used sanitary equipment. $receiver$: “We are deeply thankful”. +$infected$ infected.",
   ],
   //Recovered
   '232': [
@@ -40,6 +47,7 @@ const templates = {
     "Scientists have demonstrated that the average penis sizes of people in $receiver$ make them more resilient to the virus. +$recovered$ recovered.",
     "$receiver$ to cure covid using blockchain. +$recovered$ recovered.",
     "$receiver$ to convert airport's metal detectors into covid scanner. +$recovered$ recovered.",
+    "$receiver$ newspaper publishes tutorial on how to remove “Greta Thunberg Email Virus”. +$recovered$ recovered.",
   ],
   //Cohesion resistant
   '221': [
@@ -48,11 +56,13 @@ const templates = {
     "$receiver$ has locked down the country. Special exit-only permits granted to jews.",
     "Love festival in $receiver$ will take place online! Safety measure: wash your devices.",
     "$receiver$. Macbook user found immune to the viral outbreak.",
+    "$receiver$. Nothing changes in parliament after enforced work-from-home policy for politicians.",
   ],
   //Cohesion weakening
   '223': [
     "In $receiver$ use of face mask is now banned. They are rude and unpolite.",
     "Hospitals in $receiver$ have introduced remote working policy.",
+
   ]
 }
 
