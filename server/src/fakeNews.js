@@ -64,7 +64,7 @@ const templates = {
     "$receiver$. A bullies gang go to school. +$infected$ infected.",
     "Vegan protesters on the streets in $receiver$: “Cows farts spread the virus!” +$infected$ vegans infected.",
     "$receiver$. Infected goats escaped quarantine. +$infected$ scapegoats",
-    "After toilet paper shortage finally people in $receiver$ are buying bidets. +$infected$ infected."
+    "After toilet paper shortage finally people in $receiver$ are buying bidets. +$infected$ infected.",
     "Boris Johnson got infected with the down syndrome! +$infected$ infected.",
     "Angela Merkel got infected while eating donuts! +$infected$ infected.",
     "Ray Dalio rubs his hands (with soap) watching some more infected",
