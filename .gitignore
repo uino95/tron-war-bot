@@ -32,7 +32,6 @@ wiki
 
 # Dependency directory
 node_modules/
-tron-war-bot-server/
 
 # Debug log from npm
 npm-debug.log*
@@ -61,7 +60,7 @@ dist
 .vagrant
 
 # Map img
-server/img/map.jpg
+server/src/img/map.jpg
 
 # Secret file
 secret.js
