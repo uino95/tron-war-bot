@@ -6,10 +6,11 @@ const templates = {
     "$receiver$. Prime minister declare eating pop corns is now illegal.",
     "$receiver$ to ban Apple products beacuse Tim Cook is gay.",
     "In $receiver$ the cotton shortage causes mass nudism.",
-    "Donald Trump: “Fake news aren't real!”",
+    "Donald Trump: “Real news aren't mexicans!”",
     "Sasha Grey: “If the crisis hits I'll work for free!”",
     "Putin on insufficient virus tests: “You find problem. I hide problem. Problem kaput!”",
     "Silvio Berlusconi to donate 10 millions to help sick people to a pleasant stay. Free plastic surgery for all female nurse personnel.",
+    "Tokyo 2020 mutated into Covid 2020.",
   ],
   //Deaths
   '122': [
@@ -29,7 +30,10 @@ const templates = {
     "$receiver$. During a flash mob on a balcony the balcony collapses. +$deaths$ deaths",
     "Smurfs reunion in $receiver$. But it's only five of them. Amen. +$deaths$ deaths",
     "Supermarket shut down in $receiver$. A royal rumble kicks off for the last piece of toilet paper. +$deaths$ deaths",
-    "Student in $receiver$ finds out that the virus dies after shooting it with a Desert Eagle. +$deaths$ deaths"
+    "Student in $receiver$ finds out that the virus dies after shooting it with a Desert Eagle. +$deaths$ deaths",
+    "$receiver$'s' population to double by 2040, babies to blame. +$deaths$ never-born babies",
+    "$receiver$ Federal Agents Raid Gun Shop Find Weapons. +$deaths$ deaths",
+    "Terrorist attack at security conference in $receiver$. +$deaths$ deaths",
   ],
   //Infected
   '212': [
@@ -48,6 +52,8 @@ const templates = {
     "$receiver$. A football team experiencing syntomps after eating vegan food. It's conspiracy! +$infected$ infected.",
     "New viral tik tok challenge in the streets in $receiver$: Cough and Run! +$infected$ infected.",
     "$receiver$. A bullies gang go to school. +$infected$ infected.",
+    "Vegan protesters on the streets in $receiver$: “Cows farts spread the virus!” +$infected$ vegans infected.",
+    "$receiver$. Infected goats escaped quarantine. +$infected$ scapegoats",
   ],
   //Recovered
   '232': [
@@ -61,11 +67,13 @@ const templates = {
   '221': [
     "$receiver$'s prime minister declares winemakers should now wash their feet before grape harvest.",
     "$receiver$ to deploy military tanks to prevent people leaving their houses.",
-    "In $receiver$ use of face mask is now banned. They are rude and unpolite.",
+    "$receiver$ has locked down the country. Special exit-only permits granted to jews.",
+    "$receiver$. Too many infected. Thursday is cancelled",
+    "$receiver$. Farmers using watermelons to protect cannons",
   ],
   //Cohesion weakening
   '223': [
-    "$receiver$ has locked down the country. Special exit-only permits granted to jews.",
+    "In $receiver$ use of face mask is now banned. They are rude and unpolite.",
     "Love festival in $receiver$ will take place online! Safety measure: wash your devices.",
     "Government order in $receiver$. Priests have to stay 2 meters off of children.",
     "$receiver$. Macbook user found immune to the viral outbreak.",
@@ -75,7 +83,8 @@ const templates = {
     "$receiver$. Landlord refuses to take cash from tenant. Housing crisis has just begun.",
     "Hospitals in $receiver$ have introduced remote working policy.",
     "Solidal masturbation policy in $receiver$. Girls enforced to send nudes to friend in such hard times.",
-    "In $receiver$ wearing face masks in front of black people is no longer racism."
+    "In $receiver$ wearing face masks in front of black people is no longer racism.",
+    "Total quarantine in $receiver$. Voters to vote on voting",
   ]
 }
 

@@ -40,7 +40,7 @@ Mutation: ${td.turn}
 5th ${utils.universalMap(leaderboard[4].idx, "full")}: ${numeral(leaderboard[4].deaths).format('0[.]0a')} (${utils.toPercent(leaderboard[4].deaths/leaderboard[4].population)} of pop.)
 
 Stay up to date at https://covidolympics2020.com
-#covid #coronavirus #outbreak #gaming #simulation #bot`
+#covid #olympics #coronavirus #gaming #simulation #bot`
   return f;
 }
 
@@ -123,6 +123,7 @@ module.exports.battleUpdate = async (cmap, td) => {
 
   // if (utils.randomInt(30) == 0){
     //POST ON FACEBOOK
+  let f = td.next.description + "\n\ncovidolympics2020.com\n#covid #olympics #coronavirus #gaming #simulation #bot";
   await facebook.post(td.next.description).catch(console.error);
   // }
   // if (utils.randomInt(20) == 0){
