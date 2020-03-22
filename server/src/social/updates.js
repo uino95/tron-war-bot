@@ -89,7 +89,7 @@ module.exports.stats = async (td) =>{
   await telegram.sendMessage(t, {parse_mode: "HTML", reply_markup: m, disable_web_page_preview: true}).catch(console.error);
 
   let f = buildFbStats(td, leaderboard);
-  let img = utils.imgUrl('map.jpg')
+  let img = utils.imgUrl('fakeMap.jpg')
   await facebook.postWithPhoto(img, f).catch(console.error);
 }
 
@@ -124,7 +124,7 @@ module.exports.battleUpdate = async (cmap, td) => {
   // if (utils.randomInt(30) == 0){
     //POST ON FACEBOOK
   let f = td.next.description + "\n\ncovidolympics2020.com\n#covid #olympics #coronavirus #gaming #simulation #bot";
-  await facebook.post(td.next.description).catch(console.error);
+  await facebook.post(f).catch(console.error);
   // }
   // if (utils.randomInt(20) == 0){
     // POST ON TELEGRAM
