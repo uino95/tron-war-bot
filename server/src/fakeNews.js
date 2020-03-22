@@ -4,7 +4,7 @@ const templates = {
   //Random
   '222': [
     "$receiver$ PM declares: “We should be more tolerant with the dirty jewish.”",
-    "$receiver$ to ban iPhones not beacuse Tim Cook is gay but because Steve Jobs was adopted.",
+    "$receiver$ to ban iPhones not beacuse Tim Cook is gay but because Steve Jobs was an orphan.",
     "In $receiver$ medicine shortage causes mass handicaps.",
     "Donald Trump: “The economy has never been greater!”",
     "Sasha Grey: “If the crisis hits I'll work for free!”",
