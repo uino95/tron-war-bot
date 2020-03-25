@@ -22,7 +22,7 @@ app.use(cors());
 app.use(xhub({ algorithm: 'sha1', secret: config.facebook.appSecret }));
 app.use(bodyParser.json());
 //Serve map
-app.use('/img', express.static(path.join(__dirname, 'img')))
+app.use('/img', express.static(path.join(__dirname, 'src/img')))
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// Endpoints //////////////////////////////////////
